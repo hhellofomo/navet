@@ -1,5 +1,5 @@
 import { Cloud, CloudRain, CloudSnow, Droplets, Sun, Wind } from 'lucide-react';
-import { useTheme } from '../../contexts/theme-context';
+import { useTheme } from '@/app/contexts/theme-context';
 
 interface WeatherForecast {
 	day: string;

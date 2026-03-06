@@ -16,8 +16,8 @@ import {
 	Zap,
 } from 'lucide-react';
 import { memo, useCallback, useRef, useState } from 'react';
+import { CustomScrollbar } from '@/app/components/shared/custom-scrollbar';
 import type { SensorIconType } from './grouped-sensor-card';
-import { CustomScrollbar } from './shared/custom-scrollbar';
 
 interface SensorReading {
 	label: string;

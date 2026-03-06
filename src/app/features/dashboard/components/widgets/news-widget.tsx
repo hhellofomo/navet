@@ -1,5 +1,5 @@
 import { Clock, ExternalLink, Newspaper } from 'lucide-react';
-import { useTheme } from '../../contexts/theme-context';
+import { useTheme } from '@/app/contexts/theme-context';
 
 interface NewsArticle {
 	id: string;

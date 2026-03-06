@@ -1,4 +1,5 @@
-import type { CardSize } from '../components/card-size-selector';
+import type { CardSize } from '../components/shared/card-size-selector';
+import type { SensorIconType } from '../features/sensors/components/sensors/sensor-types';
 
 // Base device interface
 export interface BaseDevice {
@@ -126,6 +127,19 @@ export interface CalendarDevice extends BaseDevice {
 	room: string;
 }
 
+// Grouped Sensor device
+export interface GroupedSensorDevice extends BaseDevice {
+	room: string;
+	sensors: Array<{
+		id: string;
+		label: string;
+		value: string;
+		unit: string;
+		icon?: SensorIconType;
+	}>;
+	accentColor?: 'teal' | 'blue' | 'purple' | 'amber' | 'emerald';
+}
+
 // Union type for all devices
 export type Device =
 	| LightDevice
@@ -142,7 +156,8 @@ export type Device =
 	| SensorDevice
 	| VacuumDevice
 	| RSSFeedDevice
-	| CalendarDevice;
+	| CalendarDevice
+	| GroupedSensorDevice;
 
 // Device collection
 export interface DeviceCollection {
@@ -161,6 +176,7 @@ export interface DeviceCollection {
 	vacuums: VacuumDevice[];
 	rssFeeds: RSSFeedDevice[];
 	calendars: CalendarDevice[];
+	'grouped-sensors': GroupedSensorDevice[];
 }
 
 // Device with type information
