@@ -1,26 +1,22 @@
 import type { ReactElement } from 'react';
-import { CalendarCard } from '../components/calendar-card';
-import type { CardSize } from '../components/card-size-selector';
-import { ClimateCard } from '../components/climate-card';
-import { CoverCard } from '../components/cover-card';
-import { GroupedSensorCard } from '../components/grouped-sensor-card';
-import { HVACCard } from '../components/hvac-card/index';
-import { LightCard } from '../components/light-card/index';
-import { LockCard } from '../components/lock-card';
-import { MediaCard } from '../components/media-card';
-import { PersonCard } from '../components/person-card';
-import { PowerCard } from '../components/power-card';
-import { RSSFeedCard } from '../components/rss-feed-card';
-import { SensorCard } from '../components/sensor-card';
-import { SwitchCard } from '../components/switch-card';
-import { VacuumCard } from '../components/vacuum-card';
-import { WeatherCard } from '../components/weather-card';
-import { WifiCard } from '../components/wifi-card';
+import type { CardSize } from '../components/shared/card-size-selector';
+import { CalendarCard } from '../features/calendar/components/calendar-card';
+import { ClimateCard } from '../features/climate/components/climate-card';
+import { SwitchCard } from '../features/lighting/components/switch-card';
+import { PowerCard } from '../features/power/components/power-card';
+import { RSSFeedCard } from '../features/rss/components/rss-feed-card';
+import { CoverCard } from '../features/security/components/cover-card';
+import { LockCard } from '../features/security/components/lock-card';
+import { GroupedSensorCard } from '../features/sensors/components/grouped-sensor-card';
+import { SensorCard } from '../features/sensors/components/sensor-card';
+import type { SensorReading } from '../features/sensors/components/sensors/sensor-types';
+import { VacuumCard } from '../features/vacuum/components/vacuum-card';
+import { WifiCard } from '../features/wifi/components/wifi-card';
 
 interface DeviceData {
 	id: string;
 	type: string;
-	[key: string]: string | number | boolean | undefined;
+	[key: string]: string | number | boolean | object | undefined;
 }
 
 interface CardRendererOptions {
@@ -41,42 +37,13 @@ export const renderCard = ({
 	isEditMode,
 }: CardRendererOptions): ReactElement | null => {
 	switch (device.type) {
-		case 'lights':
-			return (
-				<LightCard
-					id={device.id}
-					name={device.name}
-					room={device.room}
-					initialState={device.state}
-					initialBrightness={device.brightness}
-					initialTemp={device.temp}
-					size={size}
-					onSizeChange={handleSizeChange}
-					isEditMode={isEditMode}
-				/>
-			);
-
-		case 'hvac':
-			return (
-				<HVACCard
-					id={device.id}
-					name={device.name}
-					room={device.room}
-					initialTemp={device.temp}
-					initialMode={device.mode}
-					size={size}
-					onSizeChange={handleSizeChange}
-					isEditMode={isEditMode}
-				/>
-			);
-
 		case 'climate':
 			return (
 				<ClimateCard
-					id={device.id}
-					name={device.name}
-					temperature={device.temperature}
-					mode={device.mode}
+					id={device.id as string}
+					name={device.name as string}
+					temperature={device.temperature as number}
+					mode={device.mode as string}
 					size={size}
 					onSizeChange={handleSizeChange}
 					isEditMode={isEditMode}
@@ -86,43 +53,9 @@ export const renderCard = ({
 		case 'power':
 			return (
 				<PowerCard
-					percentage={device.percentage}
-					usage={device.usage}
-					cost={device.cost}
-					size={size}
-					onSizeChange={handleSizeChange}
-					isEditMode={isEditMode}
-				/>
-			);
-
-		case 'media':
-			return (
-				<MediaCard
-					title={device.title}
-					artist={device.artist}
-					size={size}
-					onSizeChange={handleSizeChange}
-					isEditMode={isEditMode}
-				/>
-			);
-
-		case 'weather':
-			return (
-				<WeatherCard
-					id={device.id}
-					location={device.location}
-					temperature={device.temperature}
-					condition={device.condition}
-					humidity={device.humidity}
-					windSpeed={device.windSpeed}
-					precipitation={device.precipitation}
-					sunrise={device.sunrise}
-					sunset={device.sunset}
-					daylight={device.daylight}
-					rainForecast={device.rainForecast}
-					forecast={device.forecast}
-					highTemp={device.highTemp}
-					lowTemp={device.lowTemp}
+					percentage={device.percentage as number}
+					usage={device.usage as string}
+					cost={device.cost as string}
 					size={size}
 					onSizeChange={handleSizeChange}
 					isEditMode={isEditMode}
@@ -132,10 +65,10 @@ export const renderCard = ({
 		case 'wifi':
 			return (
 				<WifiCard
-					networkName={device.networkName}
-					speed={device.speed}
-					uploadSpeed={device.uploadSpeed}
-					downloadSpeed={device.downloadSpeed}
+					networkName={device.networkName as string}
+					speed={device.speed as number}
+					uploadSpeed={device.uploadSpeed as string}
+					downloadSpeed={device.downloadSpeed as string}
 					size={size}
 					onSizeChange={handleSizeChange}
 					isEditMode={isEditMode}
@@ -145,21 +78,20 @@ export const renderCard = ({
 		case 'switches':
 			return (
 				<SwitchCard
-					name={device.name}
-					room={device.room}
-					initialState={device.state}
-					power={device.power}
-					voltage={device.voltage}
-					energy={device.energy}
+					name={device.name as string}
+					initialState={device.state as boolean | undefined}
+					power={device.power as number | undefined}
+					voltage={device.voltage as number | undefined}
+					energy={device.energy as number | undefined}
 				/>
 			);
 
 		case 'covers':
 			return (
 				<CoverCard
-					name={device.name}
-					room={device.room}
-					initialPosition={device.position}
+					name={device.name as string}
+					room={device.room as string}
+					initialPosition={device.position as number | undefined}
 					size={size}
 					onSizeChange={handleSizeChange}
 					isEditMode={isEditMode}
@@ -167,27 +99,21 @@ export const renderCard = ({
 			);
 
 		case 'locks':
-			return <LockCard name={device.name} room={device.room} initialState={device.state} />;
-
-		case 'persons':
 			return (
-				<PersonCard
-					name={device.name}
-					location={device.location}
-					state={device.state}
-					size={size}
-					onSizeChange={handleSizeChange}
-					isEditMode={isEditMode}
+				<LockCard
+					name={device.name as string}
+					room={device.room as string}
+					initialState={device.state as boolean | undefined}
 				/>
 			);
 
 		case 'sensors':
 			return (
 				<SensorCard
-					name={device.name}
-					room={device.room}
-					value={device.value}
-					unit={device.unit}
+					name={device.name as string}
+					room={device.room as string}
+					value={device.value as string}
+					unit={device.unit as string}
 					size={size}
 					onSizeChange={handleSizeChange}
 					isEditMode={isEditMode}
@@ -197,11 +123,13 @@ export const renderCard = ({
 		case 'grouped-sensors':
 			return (
 				<GroupedSensorCard
-					id={device.id}
-					name={device.name}
-					room={device.room}
-					sensors={device.sensors}
-					accentColor={device.accentColor}
+					id={device.id as string}
+					name={device.name as string}
+					room={device.room as string}
+					sensors={device.sensors as SensorReading[]}
+					accentColor={
+						device.accentColor as 'teal' | 'blue' | 'purple' | 'amber' | 'emerald' | undefined
+					}
 					size={size}
 					onSizeChange={handleSizeChange}
 					isEditMode={isEditMode}
@@ -211,13 +139,13 @@ export const renderCard = ({
 		case 'vacuums':
 			return (
 				<VacuumCard
-					id={device.id}
-					name={device.name}
-					room={device.room}
-					status={device.status}
-					battery={device.battery}
-					cleanedArea={device.cleanedArea}
-					cleaningTime={device.cleaningTime}
+					id={device.id as string}
+					name={device.name as string}
+					room={device.room as string}
+					status={device.status as 'cleaning' | 'returning' | 'docked' | 'paused' | 'idle'}
+					battery={device.battery as number}
+					cleanedArea={device.cleanedArea as string | undefined}
+					cleaningTime={device.cleaningTime as string | undefined}
 					size={size}
 					onSizeChange={handleSizeChange}
 					isEditMode={isEditMode}

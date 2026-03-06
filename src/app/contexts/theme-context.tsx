@@ -584,13 +584,24 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-	// Use Zustand store as the source of truth
-	const theme = useThemeStore((state) => state.theme);
-	const primaryColor = useThemeStore((state) => state.primaryColor);
-	const wallpaper = useThemeStore((state) => state.wallpaper);
-	const setTheme = useThemeStore((state) => state.setTheme);
-	const setPrimaryColor = useThemeStore((state) => state.setPrimaryColor);
-	const setWallpaper = useThemeStore((state) => state.setWallpaper);
+	// Use Zustand store as the source of truth with optimized selectors
+	const { theme, primaryColor, wallpaper } = useThemeStore(
+		(state) => ({
+			theme: state.theme,
+			primaryColor: state.primaryColor,
+			wallpaper: state.wallpaper,
+		}),
+		shallow
+	);
+
+	const { setTheme, setPrimaryColor, setWallpaper } = useThemeStore(
+		(state) => ({
+			setTheme: state.setTheme,
+			setPrimaryColor: state.setPrimaryColor,
+			setWallpaper: state.setWallpaper,
+		}),
+		shallow
+	);
 
 	// Memoize the colors to avoid unnecessary recalculations
 	const colors = useMemo(() => generateThemeColors(theme, primaryColor), [theme, primaryColor]);

@@ -1,4 +1,6 @@
 import { createContext, type ReactNode, useContext, useState } from 'react';
+import { useSearchStore } from '../stores/search-store';
+import { searchSelectors } from '../stores/selectors';
 
 interface SearchContextValue {
 	searchQuery: string;
@@ -12,13 +14,18 @@ interface SearchContextValue {
 const SearchContext = createContext<SearchContextValue | undefined>(undefined);
 
 export function SearchProvider({ children }: { children: ReactNode }) {
-	const [searchQuery, setSearchQuery] = useState('');
+	// Use the search store for search query management
+	const searchQuery = useSearchStore(searchSelectors.searchQuery);
+	const setSearchQuery = useSearchStore(searchSelectors.setSearchQuery);
+	const clearSearchAction = useSearchStore(searchSelectors.clearSearch);
+
+	// Local state for filtered device IDs (this is UI-specific state)
 	const [filteredDeviceIds, setFilteredDeviceIds] = useState<string[]>([]);
 
 	const isSearchActive = searchQuery.trim().length > 0;
 
 	const clearSearch = () => {
-		setSearchQuery('');
+		clearSearchAction();
 		setFilteredDeviceIds([]);
 	};
 

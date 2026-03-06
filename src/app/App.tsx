@@ -7,19 +7,17 @@ import {
 	useSensor,
 	useSensors,
 } from '@dnd-kit/core';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { AddCardDialog, type CardType } from './components/add-card-dialog';
-import { LoadingSpinner } from './components/loading-spinner';
-import { RoomNav } from './components/room-nav';
+import { RoomNav } from './components/layout/room-nav';
 import {
 	LightsSection,
 	LocksSection,
 	MediaSection,
 	SecuritySection,
-	SettingsSection,
 	TasksSection,
-} from './components/sections';
+} from './components/layout/sections';
+import { LoadingSpinner } from './components/shared/loading-spinner';
 import { Toaster } from './components/ui/sonner';
 import { AuthProvider, useAuth } from './contexts/auth-context';
 import { ConfigProvider, useConfig } from './contexts/config-context';
@@ -32,8 +30,10 @@ import { SearchProvider } from './contexts/search-context';
 import { ThemeProvider } from './contexts/theme-context';
 import { LoginPage } from './features/auth/login-page';
 import { AllViewGrid } from './features/dashboard/all-view-grid';
+import { AddCardDialog, type CardType } from './features/dashboard/components/add-card-dialog';
 import { DashboardLayout } from './features/dashboard/dashboard-layout';
 import { DeviceGrid } from './features/dashboard/device-grid';
+import { SettingsSection } from './features/settings/components/settings-section';
 import {
 	useCardOrdering,
 	useCardState,
@@ -143,12 +143,15 @@ function Dashboard() {
 	);
 
 	// Edit mode context value
-	const editModeContextValue = {
-		isEditMode,
-		toggleEditMode,
-		cardSizes,
-		updateCardSize,
-	};
+	const editModeContextValue = useMemo(
+		() => ({
+			isEditMode,
+			toggleEditMode,
+			cardSizes,
+			updateCardSize,
+		}),
+		[isEditMode, toggleEditMode, cardSizes, updateCardSize]
+	);
 
 	// Show loading state during initial load
 	if (!devicesLoaded) {
