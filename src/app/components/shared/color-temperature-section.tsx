@@ -10,15 +10,21 @@ interface ColorTemperature {
 interface ColorTemperatureSectionProps {
 	colorTemp: number;
 	isOn: boolean;
+	minTemp: number;
+	maxTemp: number;
 	tempOptions: ColorTemperature[];
 	onTempChange: (temp: number) => void;
+	onTempCommit?: (temp: number) => void;
 }
 
 export const ColorTemperatureSection = memo(function ColorTemperatureSection({
 	colorTemp,
 	isOn,
+	minTemp,
+	maxTemp,
 	tempOptions,
 	onTempChange,
+	onTempCommit,
 }: ColorTemperatureSectionProps) {
 	return (
 		<div>
@@ -31,7 +37,7 @@ export const ColorTemperatureSection = memo(function ColorTemperatureSection({
 				<span
 					className={`text-sm font-semibold transition-colors duration-500 ${isOn ? 'text-white' : 'text-gray-500'}`}
 				>
-					{colorTemp}K
+					{roundToNearestHundred(colorTemp)}K
 				</span>
 			</div>
 
@@ -40,8 +46,9 @@ export const ColorTemperatureSection = memo(function ColorTemperatureSection({
 				<Slider.Root
 					value={[colorTemp]}
 					onValueChange={(value) => onTempChange(value[0])}
-					min={2700}
-					max={6500}
+					onValueCommit={(value) => onTempCommit?.(value[0])}
+					min={minTemp}
+					max={maxTemp}
 					step={100}
 					disabled={!isOn}
 					className="relative flex items-center w-full h-5"
@@ -67,12 +74,15 @@ export const ColorTemperatureSection = memo(function ColorTemperatureSection({
 			</div>
 
 			{/* Temperature Presets */}
-			<div className="grid grid-cols-5 gap-2">
+			<div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
 				{tempOptions.map((temp) => (
 					<button
 						type="button"
 						key={temp.value}
-						onClick={() => onTempChange(temp.value)}
+						onClick={() => {
+							onTempChange(temp.value);
+							onTempCommit?.(temp.value);
+						}}
 						disabled={!isOn}
 						className={`h-10 rounded-full text-xs font-semibold transition-all duration-300 border-2 ${
 							colorTemp === temp.value
@@ -92,3 +102,7 @@ export const ColorTemperatureSection = memo(function ColorTemperatureSection({
 		</div>
 	);
 });
+
+function roundToNearestHundred(value: number): number {
+	return Math.round(value / 100) * 100;
+}

@@ -26,6 +26,8 @@ export const ColorPicker = memo(function ColorPicker({
 				<button
 					type="button"
 					key={color}
+					aria-label={`Select color ${color}`}
+					aria-pressed={selectedColor === color}
 					onClick={(e) => {
 						e.stopPropagation();
 						onColorChange(color);

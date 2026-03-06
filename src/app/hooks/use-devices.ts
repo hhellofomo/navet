@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
+import { useHomeAssistantContext } from '../contexts/home-assistant-context';
 import { DEVICES } from '../data/mock-devices';
 import type { DeviceCollection } from '../types/device.types';
+import { useHADevices } from './use-ha-devices';
 
 /**
  * Custom hook for managing devices
@@ -18,8 +20,13 @@ import type { DeviceCollection } from '../types/device.types';
  * For now, returns mock data
  */
 export const useDevices = (): DeviceCollection => {
-	// Memoize devices to prevent unnecessary re-renders
-	const devices = useMemo(() => DEVICES, []);
+	const { connected } = useHomeAssistantContext();
+	const haDevices = useHADevices();
+
+	const devices = useMemo(
+		() => (connected ? haDevices : { ...DEVICES, lights: haDevices.lights }),
+		[connected, haDevices]
+	);
 
 	return devices;
 };

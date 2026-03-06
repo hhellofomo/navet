@@ -6,7 +6,12 @@
 import type { Connection, HassConfig, HassEntities } from 'home-assistant-js-websocket';
 import { createContext, type ReactNode, useContext } from 'react';
 import { useHomeAssistant } from '../hooks/use-home-assistant';
-import type { HomeAssistantConfiguration } from '../services/home-assistant.service';
+import type {
+	HomeAssistantAreaRegistryEntry,
+	HomeAssistantConfiguration,
+	HomeAssistantDeviceRegistryEntry,
+	HomeAssistantEntityRegistryEntry,
+} from '../services/home-assistant.service';
 
 interface HomeAssistantContextValue {
 	// Connection state
@@ -17,6 +22,9 @@ interface HomeAssistantContextValue {
 	// Home Assistant data
 	config: HassConfig | null;
 	entities: HassEntities | null;
+	areas: HomeAssistantAreaRegistryEntry[];
+	deviceRegistry: HomeAssistantDeviceRegistryEntry[];
+	entityRegistry: HomeAssistantEntityRegistryEntry[];
 	connection: Connection | null;
 
 	// Actions
@@ -31,6 +39,9 @@ const defaultHomeAssistantValue: HomeAssistantContextValue = {
 	error: null,
 	config: null,
 	entities: null,
+	areas: [],
+	deviceRegistry: [],
+	entityRegistry: [],
 	connection: null,
 	connect: async () => undefined,
 	disconnect: () => {},
@@ -51,6 +62,9 @@ export const HomeAssistantProvider = ({ children }: HomeAssistantProviderProps) 
 		error,
 		config,
 		entities,
+		areas,
+		deviceRegistry,
+		entityRegistry,
 		connection,
 		connect,
 		disconnect,
@@ -63,6 +77,9 @@ export const HomeAssistantProvider = ({ children }: HomeAssistantProviderProps) 
 		error,
 		config,
 		entities,
+		areas,
+		deviceRegistry,
+		entityRegistry,
 		connection,
 		connect,
 		disconnect,

@@ -1,9 +1,9 @@
 import { Settings, Wind } from 'lucide-react';
 import { memo, useState } from 'react';
-import { useTheme } from '../../contexts/theme-context';
-import { type CardSize, CardSizeSelector } from '../card-size-selector';
+import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { CardWrapper } from '@/app/components/ui/card-wrapper';
+import { useTheme } from '@/app/contexts/theme-context';
 import { HVACSettingsDialog } from '../hvac-settings-dialog';
-import { CardWrapper } from '../ui/card-wrapper';
 import { HVACGauge } from './hvac-gauge';
 import { HVACModeControls } from './hvac-mode-controls';
 import { HVACTempControls } from './hvac-temp-controls';

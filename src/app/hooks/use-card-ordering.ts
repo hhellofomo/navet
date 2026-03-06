@@ -14,6 +14,26 @@ const CARD_ORDERS_STORAGE_KEY = 'ha-dashboard-card-orders';
  * Handles initialization and updates of card positions with localStorage persistence
  */
 export const useCardOrdering = (devices: Record<string, Device[]>, rooms: string[]) => {
+	const buildOrders = useCallback(() => {
+		const orders: Record<string, string[]> = {};
+
+		rooms.forEach((room) => {
+			const roomCards: string[] = [];
+			Object.values(devices).forEach((deviceArray) => {
+				deviceArray.forEach((device) => {
+					if ('room' in device && device.room === room) {
+						roomCards.push(device.id);
+					} else if ('location' in device && device.location === room) {
+						roomCards.push(device.id);
+					}
+				});
+			});
+			orders[room] = roomCards;
+		});
+
+		return orders;
+	}, [devices, rooms]);
+
 	const [cardOrders, setCardOrders] = useState<Record<string, string[]>>(() => {
 		// Try to load from localStorage first
 		const stored = localStorage.getItem(CARD_ORDERS_STORAGE_KEY);
@@ -39,25 +59,48 @@ export const useCardOrdering = (devices: Record<string, Device[]>, rooms: string
 			}
 		}
 
-		// Default: build orders from devices
-		const orders: Record<string, string[]> = {};
-
-		rooms.forEach((room) => {
-			const roomCards: string[] = [];
-			Object.values(devices).forEach((deviceArray) => {
-				deviceArray.forEach((device) => {
-					if ('room' in device && device.room === room) {
-						roomCards.push(device.id);
-					} else if ('location' in device && device.location === room) {
-						roomCards.push(device.id);
-					}
-				});
-			});
-			orders[room] = roomCards;
-		});
-
-		return orders;
+		return buildOrders();
 	});
+
+	useEffect(() => {
+		const allDeviceIds = new Set(
+			Object.values(devices)
+				.flat()
+				.map((device) => device.id)
+		);
+
+		setCardOrders((prev) => {
+			const next = buildOrders();
+			let changed = false;
+
+			Object.entries(prev).forEach(([room, order]) => {
+				if (!Array.isArray(order)) {
+					return;
+				}
+
+				const roomOrder = next[room] ?? [];
+				const preserved = order.filter((id) => allDeviceIds.has(id));
+				const additions = roomOrder.filter((id) => !preserved.includes(id));
+				const merged = [...preserved, ...additions];
+
+				if (
+					merged.length !== roomOrder.length ||
+					merged.some((id, index) => id !== roomOrder[index])
+				) {
+					changed = true;
+				}
+
+				next[room] = merged;
+			});
+
+			const prevRooms = Object.keys(prev);
+			if (!changed && prevRooms.length === Object.keys(next).length) {
+				return prev;
+			}
+
+			return next;
+		});
+	}, [buildOrders, devices]);
 
 	// Persist to localStorage whenever cardOrders changes
 	useEffect(() => {

@@ -25,9 +25,11 @@ export const CardWrapper = memo(function CardWrapper({
 	const { theme } = useTheme();
 
 	return (
+		// biome-ignore lint/a11y/useSemanticElements: This wrapper may contain nested interactive controls, so a semantic button element is not valid here.
 		<div
-			role={onClick && !isDisabled ? 'button' : undefined}
-			tabIndex={onClick && !isDisabled ? 0 : undefined}
+			role="button"
+			aria-disabled={!onClick || isDisabled}
+			tabIndex={onClick && !isDisabled ? 0 : -1}
 			onClick={!isDisabled ? onClick : undefined}
 			onKeyDown={(e) => {
 				if (onClick && !isDisabled && (e.key === 'Enter' || e.key === ' ')) {

@@ -1,7 +1,7 @@
 import { Home, MapPin, User } from 'lucide-react';
 import { memo } from 'react';
-import { useTheme } from '../contexts/theme-context';
-import { type CardSize, CardSizeSelector } from './card-size-selector';
+import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { useTheme } from '@/app/contexts/theme-context';
 
 interface PersonCardProps {
 	name: string;

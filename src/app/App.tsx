@@ -7,16 +7,17 @@ import {
 	useSensor,
 	useSensors,
 } from '@dnd-kit/core';
+import { Lightbulb } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { RoomNav } from './components/layout/room-nav';
 import {
-	LightsSection,
 	LocksSection,
 	MediaSection,
 	SecuritySection,
 	TasksSection,
 } from './components/layout/sections';
+import { EmptyState } from './components/shared/empty-state';
 import { LoadingSpinner } from './components/shared/loading-spinner';
 import { Toaster } from './components/ui/sonner';
 import { AuthProvider, useAuth } from './contexts/auth-context';
@@ -43,7 +44,6 @@ import {
 } from './hooks';
 import { useCustomCards } from './hooks/use-custom-cards';
 import { useDevices, useRooms } from './hooks/use-devices';
-import { useHADevices } from './hooks/use-ha-devices';
 
 /**
  * Dashboard Component
@@ -55,10 +55,8 @@ function Dashboard() {
 	const [devicesLoaded, setDevicesLoaded] = useState(false);
 	const [showAddCardDialog, setShowAddCardDialog] = useState(false);
 
-	// Fetch devices from Home Assistant or fallback to mock data
-	const haDevices = useHADevices();
-	const mockDevices = useDevices();
-	const devices = connected ? haDevices : mockDevices;
+	// Fetch devices with Home Assistant lights and existing fallback behavior for other types
+	const devices = useDevices();
 	const rooms = useRooms(devices);
 
 	// Set devices loaded when connected or when mock devices are ready
@@ -75,6 +73,19 @@ function Dashboard() {
 	const { cardOrders, moveCard } = useCardOrdering(devices, rooms);
 	const { deviceMap } = useDeviceMap(devices);
 	const { addCard, removeCard, updateCard, getCardsForRoom } = useCustomCards();
+	const lightDeviceMap = useMemo(
+		() => new Map(Array.from(deviceMap.entries()).filter(([, device]) => device.type === 'lights')),
+		[deviceMap]
+	);
+	const lightRooms = useMemo(() => {
+		const roomsWithLights = new Set<string>();
+		lightDeviceMap.forEach((device) => {
+			if ('room' in device && device.room) {
+				roomsWithLights.add(device.room);
+			}
+		});
+		return rooms.filter((room) => roomsWithLights.has(room));
+	}, [lightDeviceMap, rooms]);
 
 	// Get ordered cards for active room
 	const orderedCardIds = cardOrders[activeRoom] || [];
@@ -191,7 +202,17 @@ function Dashboard() {
 	if (activeSection === 'lights') {
 		return (
 			<DashboardLayout>
-				<LightsSection />
+				{lightDeviceMap.size > 0 ? (
+					<EditModeProvider value={editModeContextValue}>
+						<AllViewGrid deviceMap={lightDeviceMap} rooms={lightRooms} />
+					</EditModeProvider>
+				) : (
+					<EmptyState
+						icon={Lightbulb}
+						title="No Lights"
+						description="No Home Assistant light entities are currently available."
+					/>
+				)}
 			</DashboardLayout>
 		);
 	}

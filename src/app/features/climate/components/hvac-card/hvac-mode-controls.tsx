@@ -1,7 +1,7 @@
 import { Flame, Snowflake, Wind } from 'lucide-react';
 import { memo } from 'react';
-import { useTheme } from '../../contexts/theme-context';
-import { getHVACModeButtonColor } from '../../utils/hvac-styles';
+import { useTheme } from '@/app/contexts/theme-context';
+import { getHVACModeButtonColor } from '@/app/utils/hvac-styles';
 
 interface HVACModeControlsProps {
 	mode: string;

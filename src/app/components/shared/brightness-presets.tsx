@@ -4,6 +4,7 @@ import { memo } from 'react';
 interface BrightnessPreset {
 	icon: LucideIcon;
 	brightness: number;
+	key?: string;
 	label: string;
 }
 

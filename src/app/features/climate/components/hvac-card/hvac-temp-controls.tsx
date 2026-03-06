@@ -1,6 +1,6 @@
 import { Minus, Plus } from 'lucide-react';
 import { memo } from 'react';
-import { useTheme } from '../../contexts/theme-context';
+import { useTheme } from '@/app/contexts/theme-context';
 
 interface HVACTempControlsProps {
 	targetTemp: number;

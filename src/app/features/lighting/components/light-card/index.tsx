@@ -1,8 +1,17 @@
-import { memo, useCallback, useState } from 'react';
-import { DEFAULT_LIGHT_ICON, LIGHT_ICON_MAP } from '../../constants/icon-map';
-import { useTheme } from '../../contexts/theme-context';
-import { getGradientColors } from '../../utils/color-utils';
-import { type CardSize, CardSizeSelector } from '../card-size-selector';
+import type { HassEntity } from 'home-assistant-js-websocket';
+import { Settings } from 'lucide-react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { DEFAULT_LIGHT_ICON, LIGHT_ICON_MAP } from '@/app/constants/icon-map';
+import { TEMP_OPTIONS } from '@/app/constants/light-constants';
+import { useHomeAssistantContext } from '@/app/contexts/home-assistant-context';
+import { useTheme } from '@/app/contexts/theme-context';
+import { useBrightnessPresets } from '@/app/hooks/use-brightness-presets';
+import { homeAssistantService } from '@/app/services/home-assistant.service';
+import { useLightMemoryStore } from '@/app/stores/light-memory-store';
+import { useLightPresetStore } from '@/app/stores/light-preset-store';
+import { getGradientColors } from '@/app/utils/color-utils';
 import { LightCardLarge } from './light-card-large';
 import { LightCardMedium } from './light-card-medium';
 import { LightCardSmall } from './light-card-small';
@@ -24,8 +33,8 @@ export const LightCard = memo(function LightCard({
 	id,
 	name,
 	room,
-	initialState = true,
-	initialBrightness = 80,
+	initialState = false,
+	initialBrightness = 0,
 	initialTemp = 4000,
 	size,
 	onSizeChange,
@@ -33,58 +42,422 @@ export const LightCard = memo(function LightCard({
 }: LightCardProps) {
 	const [isOn, setIsOn] = useState(initialState);
 	const [brightness, setBrightness] = useState(initialBrightness);
-	const [colorTemp, setColorTemp] = useState(initialTemp);
+	const [isAdjustingBrightness, setIsAdjustingBrightness] = useState(false);
+	const [colorTemp, setColorTemp] = useState(roundKelvin(initialTemp));
+	const [isAdjustingTemp, setIsAdjustingTemp] = useState(false);
 	const [selectedColor, setSelectedColor] = useState<string | null>(null);
 	const [customColor, setCustomColor] = useState('#FFA500');
 	const [isOpen, setIsOpen] = useState(false);
+	const [applyBrightnessPresetsToAll, setApplyBrightnessPresetsToAll] = useState(false);
 	const [selectedIcon, setSelectedIcon] = useState(DEFAULT_LIGHT_ICON);
+	const { connection, entities } = useHomeAssistantContext();
 	const { colors, theme } = useTheme();
+	const brightnessPresets = useBrightnessPresets(id);
+	const rememberLightState = useLightMemoryStore((state) => state.rememberState);
+	const setBrightnessPresetValue = useLightPresetStore((state) => state.setBrightnessPresetValue);
+	const setBrightnessPresetOrder = useLightPresetStore((state) => state.setBrightnessPresetOrder);
+	const liveEntity = entities?.[id];
+	const rememberedLightState = useLightMemoryStore.getState().getRememberedState(id);
+	const lastBrightnessRef = useRef(
+		rememberedLightState?.brightness ?? (initialBrightness > 0 ? initialBrightness : 100)
+	);
+	const lastColorTempRef = useRef(rememberedLightState?.colorTemp ?? roundKelvin(initialTemp));
+	const pendingBrightnessRef = useRef<number | null>(null);
+	const brightnessSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const pendingStateRef = useRef<boolean | null>(null);
+	const stateSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const pendingTempRef = useRef<number | null>(null);
+	const tempSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const gradientColors = getGradientColors(isOn, selectedColor, theme);
 	const IconComponent = LIGHT_ICON_MAP[selectedIcon] || LIGHT_ICON_MAP[DEFAULT_LIGHT_ICON];
+	const isHomeAssistantLight = Boolean(connection) && id.startsWith('light.');
+	const supportsColorTemperature = supportsColorTemperatureControl(liveEntity);
+	const supportsColorControl = supportsColorSelection(liveEntity);
+	const { max: maxColorTemp, min: minColorTemp } = getSupportedColorTemperatureRange(liveEntity);
+	const tempOptions = TEMP_OPTIONS.filter(
+		(option) => option.value >= minColorTemp && option.value <= maxColorTemp
+	);
 
 	const isSmall = size === 'small';
 	const isMedium = size === 'medium';
 	const padding = isSmall ? 'p-4' : 'p-5';
+	const settingsButtonSize = isSmall ? 'w-7 h-7' : 'w-8 h-8';
+	const settingsIconSize = isSmall ? 'w-3 h-3' : 'w-3.5 h-3.5';
+	const settingsButtonBg =
+		theme === 'light' ? 'bg-gray-900/10 hover:bg-gray-900/20' : 'bg-white/10 hover:bg-white/20';
+	const settingsButtonText = theme === 'light' ? 'text-gray-900' : 'text-white';
+
+	useEffect(() => {
+		if (liveEntity) {
+			return;
+		}
+		setIsOn(initialState);
+	}, [initialState, liveEntity]);
+
+	useEffect(() => {
+		if (liveEntity) {
+			return;
+		}
+		setBrightness(initialBrightness);
+		if (initialBrightness > 0) {
+			lastBrightnessRef.current = initialBrightness;
+			rememberLightState(id, { brightness: initialBrightness });
+		}
+	}, [id, initialBrightness, liveEntity, rememberLightState]);
+
+	useEffect(() => {
+		if (liveEntity) {
+			return;
+		}
+		const nextTemp = roundKelvin(initialTemp);
+		setColorTemp(nextTemp);
+		lastColorTempRef.current = nextTemp;
+		rememberLightState(id, { colorTemp: nextTemp });
+	}, [id, initialTemp, liveEntity, rememberLightState]);
+
+	useEffect(() => {
+		if (!liveEntity) {
+			return;
+		}
+
+		const nextIsOn = liveEntity.state === 'on';
+		if (pendingStateRef.current !== null && nextIsOn !== pendingStateRef.current) {
+			return;
+		}
+
+		if (pendingStateRef.current !== null) {
+			pendingStateRef.current = null;
+			if (stateSyncTimeoutRef.current) {
+				clearTimeout(stateSyncTimeoutRef.current);
+				stateSyncTimeoutRef.current = null;
+			}
+		}
+
+		setIsOn(nextIsOn);
+	}, [liveEntity]);
+
+	useEffect(() => {
+		if (!liveEntity) {
+			return;
+		}
+
+		if (isAdjustingBrightness) {
+			return;
+		}
+
+		if (liveEntity.state !== 'on') {
+			return;
+		}
+
+		const brightnessFromEntity = getBrightnessPercent(liveEntity);
+
+		if (
+			pendingBrightnessRef.current !== null &&
+			Math.abs(brightnessFromEntity - pendingBrightnessRef.current) > 1
+		) {
+			return;
+		}
+
+		if (pendingBrightnessRef.current !== null) {
+			pendingBrightnessRef.current = null;
+			if (brightnessSyncTimeoutRef.current) {
+				clearTimeout(brightnessSyncTimeoutRef.current);
+				brightnessSyncTimeoutRef.current = null;
+			}
+		}
+
+		if (brightnessFromEntity > 0) {
+			lastBrightnessRef.current = brightnessFromEntity;
+			rememberLightState(id, { brightness: brightnessFromEntity });
+		}
+
+		setBrightness(brightnessFromEntity);
+	}, [id, isAdjustingBrightness, liveEntity, rememberLightState]);
+
+	useEffect(() => {
+		return () => {
+			if (brightnessSyncTimeoutRef.current) {
+				clearTimeout(brightnessSyncTimeoutRef.current);
+			}
+			if (stateSyncTimeoutRef.current) {
+				clearTimeout(stateSyncTimeoutRef.current);
+			}
+			if (tempSyncTimeoutRef.current) {
+				clearTimeout(tempSyncTimeoutRef.current);
+			}
+		};
+	}, []);
+
+	useEffect(() => {
+		if (liveEntity) {
+			if (isAdjustingTemp) {
+				return;
+			}
+
+			if (liveEntity.state !== 'on') {
+				return;
+			}
+
+			const entityTemp = getReportedColorTempKelvin(liveEntity);
+			if (entityTemp === null) {
+				return;
+			}
+			if (pendingTempRef.current !== null && Math.abs(entityTemp - pendingTempRef.current) > 100) {
+				return;
+			}
+
+			if (pendingTempRef.current !== null) {
+				pendingTempRef.current = null;
+				if (tempSyncTimeoutRef.current) {
+					clearTimeout(tempSyncTimeoutRef.current);
+					tempSyncTimeoutRef.current = null;
+				}
+			}
+
+			const nextTemp = clampKelvin(entityTemp, minColorTemp, maxColorTemp);
+			lastColorTempRef.current = nextTemp;
+			rememberLightState(id, { colorTemp: nextTemp });
+			setColorTemp(nextTemp);
+			return;
+		}
+
+		if (isAdjustingTemp) {
+			return;
+		}
+
+		if (pendingTempRef.current !== null && Math.abs(initialTemp - pendingTempRef.current) > 100) {
+			return;
+		}
+
+		if (pendingTempRef.current !== null) {
+			pendingTempRef.current = null;
+			if (tempSyncTimeoutRef.current) {
+				clearTimeout(tempSyncTimeoutRef.current);
+				tempSyncTimeoutRef.current = null;
+			}
+		}
+
+		const nextTemp = roundKelvin(initialTemp);
+		lastColorTempRef.current = nextTemp;
+		rememberLightState(id, { colorTemp: nextTemp });
+		setColorTemp(nextTemp);
+	}, [
+		id,
+		initialTemp,
+		isAdjustingTemp,
+		liveEntity,
+		maxColorTemp,
+		minColorTemp,
+		rememberLightState,
+	]);
+
+	const syncLightWithHomeAssistant = useCallback(
+		async (options: {
+			state?: 'on' | 'off';
+			brightnessPct?: number;
+			kelvin?: number;
+			rgbColor?: [number, number, number];
+		}) => {
+			if (!isHomeAssistantLight) {
+				return;
+			}
+
+			try {
+				await homeAssistantService.updateLight(id, options);
+			} catch (error) {
+				toast.error(error instanceof Error ? error.message : 'Failed to update light');
+				throw error;
+			}
+		},
+		[id, isHomeAssistantLight]
+	);
+
+	const hexToRgb = useCallback((hex: string): [number, number, number] | null => {
+		const normalized = hex.replace('#', '');
+		if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
+			return null;
+		}
+
+		return [
+			parseInt(normalized.slice(0, 2), 16),
+			parseInt(normalized.slice(2, 4), 16),
+			parseInt(normalized.slice(4, 6), 16),
+		];
+	}, []);
 
 	const handleBrightnessChange = useCallback(
 		(value: number) => {
-			setBrightness(value);
+			const nextBrightness = clampPercentage(value, 1);
+			setIsAdjustingBrightness(true);
+			setBrightness(nextBrightness);
+			lastBrightnessRef.current = nextBrightness;
+			rememberLightState(id, { brightness: nextBrightness });
 			if (!isOn) setIsOn(true);
 		},
-		[isOn]
+		[id, isOn, rememberLightState]
+	);
+
+	const handleBrightnessCommit = useCallback(
+		(value: number) => {
+			const nextBrightness = clampPercentage(value, 1);
+			setBrightness(nextBrightness);
+			lastBrightnessRef.current = nextBrightness;
+			rememberLightState(id, { brightness: nextBrightness });
+			setIsAdjustingBrightness(false);
+			pendingBrightnessRef.current = nextBrightness;
+			if (brightnessSyncTimeoutRef.current) {
+				clearTimeout(brightnessSyncTimeoutRef.current);
+			}
+			brightnessSyncTimeoutRef.current = setTimeout(() => {
+				pendingBrightnessRef.current = null;
+				brightnessSyncTimeoutRef.current = null;
+			}, 1500);
+			if (!isOn) setIsOn(true);
+			void syncLightWithHomeAssistant({
+				state: 'on',
+				brightnessPct: nextBrightness,
+			});
+		},
+		[id, isOn, rememberLightState, syncLightWithHomeAssistant]
 	);
 
 	const handleTempChange = useCallback(
 		(temp: number) => {
-			setColorTemp(temp);
+			const nextTemp = clampKelvin(temp, minColorTemp, maxColorTemp);
+			setIsAdjustingTemp(true);
+			setColorTemp(nextTemp);
+			lastColorTempRef.current = nextTemp;
+			rememberLightState(id, { colorTemp: nextTemp });
 			setSelectedColor(null);
 			if (!isOn) setIsOn(true);
 		},
-		[isOn]
+		[id, isOn, maxColorTemp, minColorTemp, rememberLightState]
+	);
+
+	const handleTempCommit = useCallback(
+		(temp: number) => {
+			const nextTemp = clampKelvin(temp, minColorTemp, maxColorTemp);
+			setColorTemp(nextTemp);
+			lastColorTempRef.current = nextTemp;
+			rememberLightState(id, { colorTemp: nextTemp });
+			setIsAdjustingTemp(false);
+			pendingTempRef.current = nextTemp;
+			if (tempSyncTimeoutRef.current) {
+				clearTimeout(tempSyncTimeoutRef.current);
+			}
+			tempSyncTimeoutRef.current = setTimeout(() => {
+				pendingTempRef.current = null;
+				tempSyncTimeoutRef.current = null;
+			}, 1500);
+			setSelectedColor(null);
+			if (!isOn) setIsOn(true);
+			void syncLightWithHomeAssistant({
+				state: 'on',
+				kelvin: nextTemp,
+			});
+		},
+		[id, isOn, maxColorTemp, minColorTemp, rememberLightState, syncLightWithHomeAssistant]
 	);
 
 	const handleColorChange = useCallback(
 		(color: string) => {
 			setSelectedColor(color);
 			if (!isOn) setIsOn(true);
-		},
-		[isOn]
-	);
 
-	const handleClearColor = useCallback(() => {
-		setSelectedColor(null);
-	}, []);
+			const rgbColor = hexToRgb(color);
+			if (rgbColor) {
+				void syncLightWithHomeAssistant({
+					state: 'on',
+					rgbColor,
+				});
+			}
+		},
+		[hexToRgb, isOn, syncLightWithHomeAssistant]
+	);
 
 	const handleSettingsClick = useCallback(() => {
 		setIsOpen(true);
 	}, []);
 
+	const toggleLightState = useCallback(
+		(nextIsOn: boolean) => {
+			const latestRememberedState = useLightMemoryStore.getState().getRememberedState(id);
+			const brightnessToRestore =
+				latestRememberedState?.brightness !== undefined
+					? clampPercentage(latestRememberedState.brightness, 1)
+					: brightness > 0
+						? brightness
+						: Math.max(1, Math.round(lastBrightnessRef.current));
+			const colorTempToRestore = clampKelvin(lastColorTempRef.current, minColorTemp, maxColorTemp);
+			const rememberedColorTemp =
+				latestRememberedState?.colorTemp !== undefined
+					? clampKelvin(latestRememberedState.colorTemp, minColorTemp, maxColorTemp)
+					: colorTempToRestore;
+
+			setIsOn(nextIsOn);
+			if (nextIsOn) {
+				setBrightness(brightnessToRestore);
+				setColorTemp(rememberedColorTemp);
+				pendingBrightnessRef.current = brightnessToRestore;
+				pendingTempRef.current = rememberedColorTemp;
+				if (brightnessSyncTimeoutRef.current) {
+					clearTimeout(brightnessSyncTimeoutRef.current);
+				}
+				if (tempSyncTimeoutRef.current) {
+					clearTimeout(tempSyncTimeoutRef.current);
+				}
+				brightnessSyncTimeoutRef.current = setTimeout(() => {
+					pendingBrightnessRef.current = null;
+					brightnessSyncTimeoutRef.current = null;
+				}, 2500);
+				tempSyncTimeoutRef.current = setTimeout(() => {
+					pendingTempRef.current = null;
+					tempSyncTimeoutRef.current = null;
+				}, 2500);
+			}
+			pendingStateRef.current = nextIsOn;
+			if (stateSyncTimeoutRef.current) {
+				clearTimeout(stateSyncTimeoutRef.current);
+			}
+			stateSyncTimeoutRef.current = setTimeout(() => {
+				pendingStateRef.current = null;
+				stateSyncTimeoutRef.current = null;
+			}, 1500);
+
+			void syncLightWithHomeAssistant({
+				state: nextIsOn ? 'on' : 'off',
+				brightnessPct: nextIsOn ? brightnessToRestore : undefined,
+				kelvin: nextIsOn && !selectedColor ? rememberedColorTemp : undefined,
+			}).catch(() => {
+				pendingStateRef.current = null;
+				if (stateSyncTimeoutRef.current) {
+					clearTimeout(stateSyncTimeoutRef.current);
+					stateSyncTimeoutRef.current = null;
+				}
+				setIsOn(!nextIsOn);
+			});
+		},
+		[brightness, id, maxColorTemp, minColorTemp, selectedColor, syncLightWithHomeAssistant]
+	);
+
+	const handleCustomColorChange = useCallback(
+		(color: string) => {
+			setCustomColor(color);
+			handleColorChange(color);
+		},
+		[handleColorChange]
+	);
+
 	return (
 		<>
+			{/* biome-ignore lint/a11y/useSemanticElements: This card contains nested interactive controls, so a semantic button wrapper is not valid here. */}
 			<div
-				role={!isEditMode ? 'button' : undefined}
-				tabIndex={!isEditMode ? 0 : undefined}
+				role="button"
+				aria-label={`${name} light, currently ${isOn ? 'on' : 'off'}`}
+				aria-pressed={isOn}
+				aria-disabled={isEditMode}
+				tabIndex={!isEditMode ? 0 : -1}
 				className={`relative h-full w-full backdrop-blur-xl rounded-3xl ${padding} border overflow-hidden transition-all duration-500 ${!isEditMode ? 'cursor-pointer' : ''} ${
 					gradientColors.customGradient
 						? `border-orange-500/30`
@@ -95,14 +468,37 @@ export const LightCard = memo(function LightCard({
 						? { background: gradientColors.customGradient, borderColor: 'rgba(251, 146, 60, 0.3)' }
 						: {}
 				}
-				onClick={() => !isEditMode && setIsOn(!isOn)}
+				onClick={() => {
+					if (isEditMode) {
+						return;
+					}
+
+					toggleLightState(!isOn);
+				}}
 				onKeyDown={(e) => {
+					if (e.target !== e.currentTarget) {
+						return;
+					}
 					if (!isEditMode && (e.key === 'Enter' || e.key === ' ')) {
 						e.preventDefault();
-						setIsOn(!isOn);
+						toggleLightState(!isOn);
 					}
 				}}
 			>
+				{!isEditMode && !isSmall && !isMedium && (
+					<button
+						type="button"
+						aria-label={`Open settings for ${name}`}
+						onClick={(e) => {
+							e.stopPropagation();
+							handleSettingsClick();
+						}}
+						className={`absolute right-3 bottom-3 z-20 ${settingsButtonSize} rounded-full ${settingsButtonBg} transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center`}
+					>
+						<Settings className={`${settingsIconSize} ${settingsButtonText}`} />
+					</button>
+				)}
+
 				{isEditMode && (
 					<CardSizeSelector
 						currentSize={size}
@@ -135,14 +531,13 @@ export const LightCard = memo(function LightCard({
 							name={name}
 							room={room}
 							brightness={brightness}
-							colorTemp={colorTemp}
-							selectedColor={selectedColor}
+							brightnessPresets={brightnessPresets}
 							isOn={isOn}
 							IconComponent={IconComponent}
+							supportsColorControl={supportsColorControl}
 							onBrightnessChange={handleBrightnessChange}
-							onTempChange={handleTempChange}
+							onBrightnessCommit={handleBrightnessCommit}
 							onColorChange={handleColorChange}
-							onClearColor={handleClearColor}
 							onSettingsClick={handleSettingsClick}
 						/>
 					) : isMedium ? (
@@ -150,14 +545,13 @@ export const LightCard = memo(function LightCard({
 							name={name}
 							room={room}
 							brightness={brightness}
-							colorTemp={colorTemp}
-							selectedColor={selectedColor}
+							brightnessPresets={brightnessPresets}
 							isOn={isOn}
 							IconComponent={IconComponent}
+							supportsColorControl={supportsColorControl}
 							onBrightnessChange={handleBrightnessChange}
-							onTempChange={handleTempChange}
+							onBrightnessCommit={handleBrightnessCommit}
 							onColorChange={handleColorChange}
-							onClearColor={handleClearColor}
 							onSettingsClick={handleSettingsClick}
 						/>
 					) : (
@@ -165,15 +559,14 @@ export const LightCard = memo(function LightCard({
 							name={name}
 							room={room}
 							brightness={brightness}
-							colorTemp={colorTemp}
+							brightnessPresets={brightnessPresets}
 							selectedColor={selectedColor}
 							isOn={isOn}
 							IconComponent={IconComponent}
+							supportsColorControl={supportsColorControl}
 							onBrightnessChange={handleBrightnessChange}
-							onTempChange={handleTempChange}
+							onBrightnessCommit={handleBrightnessCommit}
 							onColorChange={handleColorChange}
-							onClearColor={handleClearColor}
-							onSettingsClick={handleSettingsClick}
 						/>
 					)}
 				</div>
@@ -185,17 +578,161 @@ export const LightCard = memo(function LightCard({
 				name={name}
 				room={room}
 				isOn={isOn}
+				supportsColorTemperature={supportsColorTemperature}
+				supportsColorControl={supportsColorControl}
+				minColorTemp={minColorTemp}
+				maxColorTemp={maxColorTemp}
 				colorTemp={colorTemp}
+				brightnessPresets={brightnessPresets}
 				selectedColor={selectedColor}
 				customColor={customColor}
 				brightness={brightness}
 				selectedIcon={selectedIcon}
-				onTempChange={setColorTemp}
-				onColorChange={setSelectedColor}
-				onCustomColorChange={setCustomColor}
-				onBrightnessChange={setBrightness}
+				tempOptions={tempOptions}
+				onTempChange={handleTempChange}
+				onTempCommit={handleTempCommit}
+				onColorChange={handleColorChange}
+				onCustomColorChange={handleCustomColorChange}
+				onBrightnessChange={handleBrightnessCommit}
+				applyBrightnessPresetsToAll={applyBrightnessPresetsToAll}
+				onApplyBrightnessPresetsToAllChange={setApplyBrightnessPresetsToAll}
+				onBrightnessPresetValueChange={(key, value) =>
+					setBrightnessPresetValue(id, key, value, applyBrightnessPresetsToAll)
+				}
+				onBrightnessPresetOrderChange={(keys) =>
+					setBrightnessPresetOrder(id, keys, applyBrightnessPresetsToAll)
+				}
 				onIconChange={setSelectedIcon}
 			/>
 		</>
 	);
 });
+
+function getBrightnessPercent(entity: HassEntity): number {
+	const brightnessPct = parseNumberish(entity.attributes?.brightness_pct);
+	if (brightnessPct !== null) {
+		return clampPercentage(brightnessPct);
+	}
+
+	const brightness = parseNumberish(entity.attributes?.brightness);
+	if (brightness !== null) {
+		// Home Assistant light brightness is 1..255. Only treat fractional values as 0..1 ratios.
+		if (brightness >= 0 && brightness <= 1) {
+			return clampPercentage(brightness * 100);
+		}
+		return clampPercentage((Math.max(0, Math.min(255, brightness)) / 255) * 100);
+	}
+
+	return entity.state === 'on' ? 100 : 0;
+}
+
+function parseNumberish(value: unknown): number | null {
+	if (typeof value === 'number' && !Number.isNaN(value)) {
+		return value;
+	}
+
+	if (typeof value === 'string') {
+		const parsed = Number.parseFloat(value);
+		if (!Number.isNaN(parsed)) {
+			return parsed;
+		}
+	}
+
+	return null;
+}
+
+function clampPercentage(value: number, min = 0): number {
+	return Math.max(min, Math.min(100, Math.round(value)));
+}
+
+function clampKelvin(value: number, min: number, max: number): number {
+	return Math.max(min, Math.min(max, roundKelvin(value)));
+}
+
+function getReportedColorTempKelvin(entity: HassEntity): number | null {
+	const kelvin = parseNumberish(entity.attributes?.color_temp_kelvin);
+	if (kelvin !== null) {
+		return roundKelvin(kelvin);
+	}
+
+	const mired = parseNumberish(entity.attributes?.color_temp);
+	if (mired !== null && mired > 0) {
+		return roundKelvin(1000000 / mired);
+	}
+
+	return null;
+}
+
+function roundKelvin(value: number): number {
+	return Math.round(value / 100) * 100;
+}
+
+function supportsColorTemperatureControl(entity?: HassEntity): boolean {
+	if (!entity) {
+		return true;
+	}
+
+	const colorModes = getSupportedColorModes(entity);
+	return (
+		colorModes.has('color_temp') ||
+		typeof entity.attributes?.color_temp_kelvin === 'number' ||
+		typeof entity.attributes?.color_temp === 'number'
+	);
+}
+
+function supportsColorSelection(entity?: HassEntity): boolean {
+	if (!entity) {
+		return true;
+	}
+
+	const colorModes = getSupportedColorModes(entity);
+	return ['hs', 'rgb', 'rgbw', 'rgbww', 'xy'].some((mode) => colorModes.has(mode));
+}
+
+function getSupportedColorModes(entity: HassEntity): Set<string> {
+	const modes = entity.attributes?.supported_color_modes;
+	if (Array.isArray(modes)) {
+		return new Set(modes.filter((mode): mode is string => typeof mode === 'string'));
+	}
+
+	const colorMode = entity.attributes?.color_mode;
+	if (typeof colorMode === 'string') {
+		return new Set([colorMode]);
+	}
+
+	return new Set();
+}
+
+function getSupportedColorTemperatureRange(entity?: HassEntity): { min: number; max: number } {
+	if (!entity) {
+		return { min: 2700, max: 6500 };
+	}
+
+	const minKelvin = parseNumberish(entity.attributes?.min_color_temp_kelvin);
+	const maxKelvin = parseNumberish(entity.attributes?.max_color_temp_kelvin);
+	if (minKelvin !== null && maxKelvin !== null && minKelvin < maxKelvin) {
+		const normalizedMin = Math.ceil(minKelvin / 100) * 100;
+		const normalizedMax = Math.floor(maxKelvin / 100) * 100;
+		return {
+			min: normalizedMin < normalizedMax ? normalizedMin : roundKelvin(minKelvin),
+			max: normalizedMin < normalizedMax ? normalizedMax : roundKelvin(maxKelvin),
+		};
+	}
+
+	const minMired = parseNumberish(entity.attributes?.min_mireds);
+	const maxMired = parseNumberish(entity.attributes?.max_mireds);
+	if (minMired !== null && maxMired !== null && minMired > 0 && maxMired > 0) {
+		const derivedMaxKelvin = Math.round(1000000 / minMired);
+		const derivedMinKelvin = Math.round(1000000 / maxMired);
+		if (derivedMinKelvin < derivedMaxKelvin) {
+			const normalizedMin = Math.ceil(derivedMinKelvin / 100) * 100;
+			const normalizedMax = Math.floor(derivedMaxKelvin / 100) * 100;
+			return {
+				min: normalizedMin < normalizedMax ? normalizedMin : roundKelvin(derivedMinKelvin),
+				max: normalizedMin < normalizedMax ? normalizedMax : roundKelvin(derivedMaxKelvin),
+			};
+		}
+	}
+
+	return { min: 2700, max: 6500 };
+}

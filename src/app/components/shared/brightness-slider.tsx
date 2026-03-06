@@ -5,6 +5,7 @@ import { useTheme } from '../../contexts/theme-context';
 interface BrightnessSliderProps {
 	value: number;
 	onChange: (value: number) => void;
+	onCommit?: (value: number) => void;
 	disabled?: boolean;
 	showLabel?: boolean;
 	size?: 'small' | 'medium' | 'large';
@@ -14,6 +15,7 @@ interface BrightnessSliderProps {
 export const BrightnessSlider = memo(function BrightnessSlider({
 	value,
 	onChange,
+	onCommit,
 	disabled = false,
 	showLabel = true,
 	size = 'medium',
@@ -38,7 +40,9 @@ export const BrightnessSlider = memo(function BrightnessSlider({
 			<Slider.Root
 				value={[value]}
 				onValueChange={(val) => onChange(val[0])}
+				onValueCommit={(val) => onCommit?.(val[0])}
 				onClick={onClick}
+				min={1}
 				max={100}
 				step={1}
 				disabled={disabled}
