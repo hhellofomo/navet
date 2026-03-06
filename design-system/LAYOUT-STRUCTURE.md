@@ -1,0 +1,496 @@
+# Navet - Layout Structure
+
+## Application Architecture
+
+### Overall Layout Hierarchy
+```
+App Container
+├── Sidebar (Desktop only)
+│   └── Navigation Menu
+├── Main Content Area
+    ├── Header
+    │   ├── Menu Toggle (Mobile)
+    │   ├── Title
+    │   ├── Search Bar
+    │   └── Edit Mode Toggle
+    ├── Room Navigation Tabs
+    └── Device Grid (Main Content)
+        └── Dynamic Card Grid
+```
+
+---
+
+## Layout Dimensions
+
+### Container Widths
+```css
+Sidebar: 16rem (256px) - Fixed width on desktop
+Main Content: calc(100vw - 16rem) - Desktop
+Main Content: 100vw - Mobile (sidebar hidden)
+```
+
+### Content Padding
+```css
+Mobile: px-4 (16px horizontal)
+Desktop: px-6 to px-8 (24px - 32px horizontal)
+Vertical: py-6 (24px)
+```
+
+---
+
+## Sidebar Layout
+
+### Structure
+```tsx
+<aside className="fixed left-0 top-0 h-screen w-64 bg-black/40 backdrop-blur-xl border-r border-gray-800">
+  {/* Logo/Header */}
+  <div className="p-6">
+    <h2>Home Assistant</h2>
+  </div>
+  
+  {/* Navigation Items */}
+  <nav className="px-4 py-6 space-y-2">
+    {/* Nav Items */}
+  </nav>
+  
+  {/* Bottom Section */}
+  <div className="absolute bottom-0 w-full p-4">
+    {/* Settings, Profile, etc. */}
+  </div>
+</aside>
+```
+
+### Responsive Behavior
+- **Desktop (≥ 1024px)**: Always visible, fixed position
+- **Tablet (768px - 1023px)**: Hidden by default, slides in on toggle
+- **Mobile (< 768px)**: Hidden, accessible via hamburger menu
+
+### Navigation Item Pattern
+```tsx
+<button className="w-full px-4 py-3 rounded-xl hover:bg-white/10 transition-colors">
+  <Icon className="w-5 h-5" />
+  <span>Label</span>
+</button>
+```
+
+---
+
+## Header Layout
+
+### Desktop Structure
+```tsx
+<header className="sticky top-0 z-40 backdrop-blur-xl bg-black/40 border-b border-gray-800">
+  <div className="flex items-center justify-between px-6 py-4">
+    {/* Left: Title */}
+    <h1 className="text-2xl font-bold">Dashboard</h1>
+    
+    {/* Center: Search Bar */}
+    <div className="flex-1 max-w-md mx-8">
+      <SearchInput />
+    </div>
+    
+    {/* Right: Actions */}
+    <div className="flex items-center gap-4">
+      <button>Edit Mode</button>
+    </div>
+  </div>
+</header>
+```
+
+### Mobile Structure
+```tsx
+<header className="sticky top-0 z-40">
+  <div className="flex items-center justify-between px-4 py-3">
+    {/* Left: Menu Toggle */}
+    <button className="w-10 h-10">
+      <MenuIcon />
+    </button>
+    
+    {/* Center: Title */}
+    <h1 className="text-lg font-bold">Dashboard</h1>
+    
+    {/* Right: Edit Toggle */}
+    <button className="w-10 h-10">
+      <EditIcon />
+    </button>
+  </div>
+  
+  {/* Search bar moves below on mobile */}
+  <div className="px-4 pb-3">
+    <SearchInput />
+  </div>
+</header>
+```
+
+### Header Height
+```css
+Desktop: 72px (excluding border)
+Mobile: 56px title + 48px search = 104px total
+```
+
+---
+
+## Room Navigation
+
+### Layout Pattern
+```tsx
+<nav className="sticky top-[72px] z-30 backdrop-blur-xl bg-black/60 border-b border-gray-800">
+  <div className="px-6 py-4">
+    <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+      {rooms.map(room => (
+        <button className={`px-6 py-2 rounded-full whitespace-nowrap ${active ? 'bg-blue-500' : 'bg-white/10'}`}>
+          {room}
+        </button>
+      ))}
+    </div>
+  </div>
+</nav>
+```
+
+### Responsive Behavior
+- **Horizontal Scroll**: On all screen sizes when tabs overflow
+- **Snap Scroll**: Optional for mobile (`scroll-snap-type: x mandatory`)
+- **No Wrapping**: Single row with overflow
+- **Active Indicator**: Solid background vs transparent
+
+### Tab Sizing
+```css
+Padding: px-6 py-2 (24px × 8px)
+Min Width: fit-content
+Height: 36px
+Gap: 8px between tabs
+```
+
+---
+
+## Device Grid System
+
+### Grid Configuration
+
+#### Mobile (< 768px)
+```css
+grid-cols-2
+gap-4 (16px)
+max 2 items per row
+```
+
+#### Tablet (768px - 1023px)
+```css
+grid-cols-3
+gap-4 to gap-6 (16px - 24px)
+max 3 items per row
+```
+
+#### Desktop (1024px - 1439px)
+```css
+grid-cols-4 or grid-cols-6
+gap-6 (24px)
+Recommended: 6 columns for better space utilization
+Alternative: 4 columns for larger card sizes
+```
+
+#### Desktop Large (≥ 1440px)
+```css
+grid-cols-6
+gap-6 (24px)
+max 6 items per row
+```
+
+### Grid Structure
+```tsx
+<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-4 md:gap-6 p-6">
+  {/* Cards with dynamic col-span */}
+  <div className="col-span-1"> {/* Small card */}
+  <div className="col-span-2"> {/* Medium/Large card */}
+</div>
+```
+
+---
+
+## Card Grid Patterns
+
+### Span Classes by Card Size
+
+```typescript
+// From card-size-selector.tsx
+export function getCardSpanClass(size: CardSize): string {
+  switch (size) {
+    case 'small':
+      return 'col-span-1'; // Takes 1 grid column
+    case 'medium':
+      return 'col-span-2'; // Takes 2 grid columns
+    case 'large':
+      return 'col-span-2 row-span-2'; // Takes 2 columns × 2 rows
+    default:
+      return 'col-span-1';
+  }
+}
+```
+
+### Auto-Fit Grid
+```css
+/* Alternative: Auto-fit grid for dynamic columns */
+grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+```
+
+### Card Dimensions
+
+#### Small Card
+```css
+Width: 1 grid column (varies by screen size)
+Height: Auto (content-driven, typically 120px - 160px)
+Min Height: 100px
+```
+
+#### Medium Card
+```css
+Width: 2 grid columns
+Height: Auto (content-driven, typically 140px - 200px)
+Min Height: 140px
+```
+
+#### Large Card
+```css
+Width: 2 grid columns
+Height: 2 grid rows (explicit height needed)
+Typical Height: 300px - 400px
+```
+
+---
+
+## Z-Index Hierarchy
+
+```css
+z-0: Base layer (default)
+z-10: Card hover states
+z-20: Floating elements (tooltips)
+z-30: Room navigation (sticky)
+z-40: Header (sticky)
+z-50: Modals and dialogs (Radix Dialog Portal)
+z-60: Toasts and notifications
+z-[100]: Edit mode overlay
+```
+
+---
+
+## Scroll Behavior
+
+### Main Content Area
+```css
+overflow-y: auto
+scroll-behavior: smooth
+height: calc(100vh - header - room-nav)
+```
+
+### Room Navigation
+```css
+overflow-x: auto
+scrollbar-hide (custom utility)
+-webkit-overflow-scrolling: touch (iOS momentum)
+```
+
+### Sidebar
+```css
+overflow-y: auto (for long navigation lists)
+scrollbar-hide
+```
+
+---
+
+## Sticky Positioning
+
+### Header
+```css
+position: sticky
+top: 0
+z-index: 40
+backdrop-blur-xl
+```
+
+### Room Navigation
+```css
+position: sticky
+top: 72px (height of header)
+z-index: 30
+backdrop-blur-xl
+```
+
+### Edit Mode Size Selector
+```css
+position: absolute
+top: 0
+right: 0
+z-index: 100 (above card content)
+```
+
+---
+
+## Content Organization Patterns
+
+### Entity Type Grouping
+Cards are rendered in this order:
+1. Lights
+2. Climate/HVAC
+3. Media
+4. Weather
+5. Power
+6. WiFi
+7. Switches
+8. Covers
+9. Locks
+10. Persons
+11. Sensors
+
+### Room-Based Filtering
+```typescript
+const filteredLights = devices.lights.filter(light => light.room === activeRoom);
+// Applied to all entity types
+```
+
+### "All Rooms" View
+- Shows all entities from all rooms
+- Useful for global overview
+- Can become dense on large setups
+
+---
+
+## Responsive Layout Strategy
+
+### Breakpoint Strategy
+
+#### Mobile First Approach
+1. Design for smallest screen first
+2. Add complexity as viewport grows
+3. Use Tailwind's responsive prefixes: `sm:`, `md:`, `lg:`, `xl:`
+
+### Key Responsive Changes
+
+#### Mobile (< 768px)
+- Sidebar hidden completely
+- Single column or 2-column grid
+- Reduced padding (p-4)
+- Compact header
+- Search bar below title
+- Smaller card padding (p-4)
+
+#### Tablet (768px - 1023px)
+- Sidebar slides in/out
+- 3-column grid
+- Medium padding (p-5)
+- Standard header
+- Search inline
+
+#### Desktop (≥ 1024px)
+- Sidebar always visible
+- 4-6 column grid
+- Generous padding (p-6)
+- Full header with all features
+- Optimal card spacing
+
+---
+
+## Layout Performance Optimization
+
+### CSS Grid Benefits
+1. **Automatic Flow**: Browser handles card placement
+2. **Responsive**: Native responsive without complex calculations
+3. **Gap Property**: Clean spacing without margin calculations
+4. **Auto-fit**: Adapts to container width automatically
+
+### Sticky Position Benefits
+1. **No JavaScript**: Pure CSS solution
+2. **Smooth Scrolling**: Native browser optimization
+3. **Z-Index Control**: Predictable layering
+
+### Backdrop Blur Optimization
+```css
+will-change: backdrop-filter (on animated elements)
+Use sparingly - GPU intensive
+Consider disabling on low-end devices
+```
+
+---
+
+## Edit Mode Layout
+
+### Size Selector Overlay
+```tsx
+<div className="absolute top-0 right-0 z-[100] p-2">
+  <div className="flex gap-1 bg-black/80 backdrop-blur-md rounded-full p-1 border border-gray-700">
+    <button className="w-8 h-8">S</button>
+    <button className="w-8 h-8">M</button>
+    <button className="w-8 h-8">L</button>
+  </div>
+</div>
+```
+
+### Edit Mode Indicators
+- Size selector visible on all cards
+- Slight border glow on hover
+- Cursor changes to indicate interactivity
+- No functional controls disabled
+
+---
+
+## Empty States
+
+### No Devices in Room
+```tsx
+<div className="col-span-full flex items-center justify-center py-16">
+  <div className="text-center">
+    <p className="text-gray-400">No devices in this room</p>
+  </div>
+</div>
+```
+
+### No Search Results
+```tsx
+<div className="col-span-full">
+  <p className="text-gray-400 text-center">No devices match your search</p>
+</div>
+```
+
+---
+
+## Layout Best Practices
+
+### Grid Guidelines
+1. Maintain consistent gap between cards
+2. Allow grid auto-flow to handle placement
+3. Use explicit row-span only for large cards
+4. Test layouts at all breakpoints
+
+### Sticky Element Guidelines
+1. Always set z-index hierarchy
+2. Include backdrop-blur for visual separation
+3. Ensure proper stacking context
+4. Test scroll performance
+
+### Responsive Guidelines
+1. Mobile-first design approach
+2. Progressive enhancement for larger screens
+3. Test touch targets on mobile (44px minimum)
+4. Ensure horizontal scroll on room navigation
+
+### Performance Guidelines
+1. Minimize use of backdrop-blur (GPU intensive)
+2. Use CSS Grid native capabilities
+3. Avoid layout thrashing with batch DOM updates
+4. Implement virtual scrolling for 100+ cards (future)
+
+---
+
+## Future Layout Considerations
+
+### Potential Enhancements
+1. **Drag & Drop**: Reorder cards in edit mode
+2. **Custom Layouts**: Save different layout configurations
+3. **Multi-Room View**: Grid view of multiple rooms simultaneously
+4. **Compact Mode**: Higher density layout option
+5. **Dashboard Templates**: Pre-configured layouts for common setups
+
+### Scalability
+- Support for 100+ devices per room
+- Virtual scrolling for performance
+- Lazy loading off-screen cards
+- Pagination or infinite scroll options

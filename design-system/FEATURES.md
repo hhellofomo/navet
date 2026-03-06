@@ -1,0 +1,460 @@
+# Navet - Feature Documentation
+
+## Overview
+
+This document details the key features and systems implemented in Navet, including authentication, theming, navigation, and settings.
+
+---
+
+## Authentication System
+
+### Login Page
+
+**Location**: `/src/app/features/auth/login-page.tsx`
+
+The login page provides a secure authentication interface for connecting to your smart home:
+
+#### Features
+- **Smart home URL input** - Connect to local or remote instance
+- **Long-lived access token authentication** - Secure token-based access
+- **Form validation** - Ensures valid URL and token format
+- **Persistent sessions** - Auth state saved to localStorage
+- **Error handling** - Clear feedback for connection issues
+
+#### Design
+- Full-page centered card design
+- Frosted glass aesthetic matching dashboard
+- iOS-inspired input fields
+- Clear help text with token generation link
+- Smooth transitions and loading states
+
+#### Implementation
+```tsx
+// Auth Context
+const { login, isAuthenticated, config, user } = useAuth();
+
+// Login flow
+await login(url, token);
+```
+
+### User Management
+
+**Component**: `/src/app/components/user-dropdown.tsx`
+
+#### Features
+- **User profile display** - Shows username and connection info
+- **Avatar** - First letter of username in colored circle
+- **Dropdown menu** - Quick access to user actions
+- **Logout functionality** - Secure session termination
+
+#### Design
+- Header-integrated dropdown
+- Smooth animations on open/close
+- Theme-aware styling
+- Clear visual hierarchy
+
+---
+
+## Theme System
+
+### Theme Context
+
+**Location**: `/src/app/contexts/theme-context.tsx`
+
+Manages global theme state including mode and primary color customization.
+
+#### Theme Modes
+
+**1. Dark Theme (Default)**
+- Background: `#0a0a0a` (deep black)
+- Cards: Dark gray with subtle gradients
+- Text: White primary, gray secondary
+- Best for: Low-light environments, OLED screens
+
+**2. Light Theme**
+- Background: `#f9fafb` (soft gray)
+- Cards: White with subtle shadows
+- Text: Dark gray primary, mid-gray secondary
+- Best for: Bright environments, accessibility
+
+**3. High Contrast Theme**
+- Background: `#030712` (deepest black)
+- Cards: Pure black with vibrant accents
+- Text: Pure white primary, bright accents
+- Best for: Visual accessibility, maximum contrast
+
+#### Primary Color System
+
+Users can customize the primary color used throughout the interface:
+
+| Color  | Hex Code | Usage                          |
+|--------|----------|--------------------------------|
+| Orange | #f97316  | Default, warm, home-like      |
+| Blue   | #3b82f6  | Technology, calm, professional |
+| Green  | #22c55e  | Nature, eco-friendly          |
+| Purple | #a855f7  | Premium, creative             |
+| Pink   | #ec4899  | Playful, modern               |
+| Red    | #ef4444  | Bold, urgent                  |
+| Yellow | #eab308  | Bright, energetic             |
+| Teal   | #14b8a6  | Fresh, balanced               |
+
+#### What Changes with Primary Color
+- Active card states
+- Button backgrounds and borders
+- Navigation indicators
+- Slider handles and progress bars
+- Icon accents
+- Selection indicators
+- Focus states
+
+#### Implementation
+```tsx
+const { theme, setTheme, primaryColor, setPrimaryColor } = useTheme();
+
+// Change theme
+setTheme('light');
+
+// Change primary color
+setPrimaryColor('blue');
+```
+
+---
+
+## Navigation System
+
+### Navigation Context
+
+**Location**: `/src/app/contexts/navigation-context.tsx`
+
+Manages section navigation state across desktop and mobile layouts.
+
+#### Sections
+
+| Section  | Description                    | Icon      | Status    |
+|----------|--------------------------------|-----------|-----------|
+| Home     | Main dashboard with all cards  | Home      | Active    |
+| Security | Security cameras and monitoring | Video     | Empty     |
+| Tasks    | Automations and routines       | Clipboard | Empty     |
+| Locks    | Smart lock controls            | Lock      | Empty     |
+| Lights   | Lighting control center        | Lightbulb | Empty     |
+| Media    | Media player management        | Tv        | Empty     |
+| Settings | App settings and preferences   | Settings  | Active    |
+
+#### Desktop Sidebar
+
+**Component**: `/src/app/components/sidebar.tsx`
+
+- **Position**: Fixed left, full height
+- **Width**: 64px (16 Tailwind units)
+- **Layout**: Vertical icon stack
+- **Icons**: 40px × 40px touch targets
+- **Active state**: Primary color background with 20% opacity
+- **Home icon**: Orange square at top (logo)
+
+#### Mobile Bottom Navigation
+
+- **Position**: Fixed bottom, full width
+- **Height**: Auto with safe area padding
+- **Layout**: 5 icons in horizontal row
+- **Icons**: 20px with label underneath
+- **Active state**: Primary color text and background
+- **Sections shown**: Home, Security, Lights, Media, Settings
+
+#### Implementation
+```tsx
+const { activeSection, setActiveSection } = useNavigation();
+
+// Navigate to section
+setActiveSection('lights');
+```
+
+---
+
+## Settings Section
+
+### Settings Page
+
+**Location**: `/src/app/components/settings-section.tsx`
+
+Full-page settings interface with card-based organization.
+
+#### Sections
+
+**1. Appearance**
+- **Theme Mode Selection**: 3-column grid with theme options
+- **Primary Color Picker**: 8 color circles in a row
+- **Visual feedback**: Selected items show primary color indicator
+- **Layout**: Left-aligned text, right-aligned selection indicator
+
+**2. Connection**
+- **Connection Status**: Shows Home Assistant URL
+- **Visual design**: Code-style display in subtle container
+
+**3. About**
+- **Version Information**: Current app version
+- **Build Date**: Last build timestamp
+- **Layout**: Two-column key-value pairs
+
+**4. Logout**
+- **Logout Button**: Prominent red-themed button
+- **Confirmation**: Browser confirm dialog before logout
+- **Icon**: LogOut icon from Lucide
+
+#### Design Specifications
+
+**Header**
+- Title: text-xl, semibold
+- Subtitle: text-sm, muted color
+- Spacing: 24px margin bottom
+
+**Section Cards**
+- Border radius: 24px (rounded-2xl)
+- Border: Theme-aware with 10% opacity
+- Padding: 16px (p-4)
+- Gap between sections: 16px (space-y-4)
+
+**Theme Selection**
+- Grid: 3 columns on all screen sizes
+- Button padding: 12px (p-3)
+- Selection indicator: 16px circle, right side
+- Border: 2px when selected (primary color)
+- Background: 10% opacity primary color when selected
+
+**Color Selection**
+- Layout: Horizontal flexbox
+- Circle size: 40px × 40px (w-10 h-10)
+- Gap: 10px (gap-2.5)
+- Selection indicator: 2px ring with 2px offset
+- Hover effect: Scale 1.1
+
+---
+
+## Empty States
+
+### Empty State Component
+
+**Location**: `/src/app/components/empty-state.tsx`
+
+Beautiful placeholder screens for sections without data.
+
+#### Features
+- **Large icon**: 64px × 64px in muted circle
+- **Clear title**: Explains what's missing
+- **Helpful description**: Guides user on next steps
+- **Theme-aware**: Adapts to current theme mode
+- **Centered layout**: Vertically and horizontally centered
+
+#### Usage Pattern
+```tsx
+<EmptyState
+  icon={Video}
+  title="No Security Cameras"
+  description="You don't have any security cameras configured yet."
+/>
+```
+
+#### Sections with Empty States
+- Security: "No Security Cameras"
+- Tasks: "No Tasks"
+- Locks: "No Smart Locks"
+- Lights: "No Lights"
+- Media: "No Media Players"
+
+---
+
+## Responsive Behavior
+
+### Desktop (≥ 1024px)
+- Sidebar always visible on left
+- Settings: Maximum width 896px (max-w-2xl), centered
+- Grid: 4-6 columns
+- Navigation: Sidebar icons only
+
+### Tablet (768px - 1023px)
+- Sidebar hidden, accessible via menu
+- Grid: 3-4 columns
+- Navigation: Bottom bar on mobile breakpoint
+
+### Mobile (< 768px)
+- No sidebar
+- Bottom navigation bar with 5 sections
+- Grid: 2 columns
+- Settings: Full width with mobile padding
+
+---
+
+## User Experience Flows
+
+### First-Time User Flow
+1. **Login Page** → Enter Home Assistant URL and token
+2. **Dashboard** → See all devices and rooms
+3. **Explore Sections** → Navigate to different sections via sidebar/bottom nav
+4. **Customize** → Go to Settings → Change theme and color
+5. **Edit Cards** → Enter edit mode to resize cards
+
+### Settings Customization Flow
+1. Navigate to Settings section
+2. Select Appearance card
+3. Choose theme mode (Dark/Light/Contrast)
+4. Select primary color from 8 options
+5. Changes apply immediately across entire app
+6. Theme persists across sessions
+
+### Authentication Flow
+1. **Logged Out** → Show login page
+2. **Enter Credentials** → Validate URL format
+3. **Submit** → Attempt connection to Home Assistant
+4. **Success** → Store auth in localStorage, redirect to dashboard
+5. **Error** → Show error message, keep on login page
+
+### Logout Flow
+1. Click user avatar in header
+2. Select "Logout" from dropdown (or go to Settings)
+3. Confirm logout in browser dialog
+4. Clear localStorage
+5. Redirect to login page
+
+---
+
+## Technical Implementation
+
+### State Management
+
+**Auth Context**
+```tsx
+interface AuthContextType {
+  isAuthenticated: boolean;
+  user: User | null;
+  config: Config | null;
+  login: (url: string, token: string) => Promise<void>;
+  logout: () => void;
+}
+```
+
+**Theme Context**
+```tsx
+interface ThemeContextType {
+  theme: 'dark' | 'light' | 'contrast';
+  setTheme: (theme: ThemeType) => void;
+  primaryColor: PrimaryColor;
+  setPrimaryColor: (color: PrimaryColor) => void;
+}
+```
+
+**Navigation Context**
+```tsx
+interface NavigationContextType {
+  activeSection: Section;
+  setActiveSection: (section: Section) => void;
+}
+```
+
+### Local Storage
+
+**Keys Used**
+- `ha_dashboard_auth` - Auth config and token
+- `ha_dashboard_theme` - Theme mode preference
+- `ha_dashboard_primary_color` - Primary color preference
+
+### CSS Variables
+
+Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
+- Spacing tokens
+- Color tokens
+- Typography scale
+- Border radius values
+- Shadow definitions
+
+---
+
+## Accessibility
+
+### Keyboard Navigation
+- All sections accessible via Tab key
+- Settings: Tab through theme options and color buttons
+- Dropdown: Arrow keys to navigate menu items
+- Login form: Standard form tab order
+
+### Screen Readers
+- Semantic HTML structure
+- ARIA labels on icon-only buttons
+- Form labels properly associated
+- Section headings for navigation
+
+### Visual Accessibility
+- High contrast theme option
+- Minimum 44px touch targets
+- Clear focus indicators
+- Sufficient color contrast ratios
+- Text sizing options via browser
+
+---
+
+## Performance Considerations
+
+### Theme Switching
+- Instant theme application (no reload)
+- CSS variables for dynamic color changes
+- Memoized components prevent unnecessary re-renders
+
+### Navigation
+- Section-based code splitting (future enhancement)
+- Lazy loading of section components
+- Navigation state persists across renders
+
+### Authentication
+- Token stored securely in localStorage
+- Session validation on app load
+- Graceful handling of expired tokens
+
+---
+
+## Future Enhancements
+
+### Planned Features (v1.5)
+- [ ] Custom theme builder with color wheel
+- [ ] Light/dark theme auto-switching based on time
+- [ ] Per-section customization
+- [ ] Export/import theme configurations
+- [ ] User profile editing
+- [ ] Multiple dashboard layouts
+
+### Under Consideration (v2.0)
+- [ ] Multi-user support with different profiles
+- [ ] Advanced accessibility settings
+- [ ] Gesture navigation for mobile
+- [ ] Section reordering
+- [ ] Custom section creation
+- [ ] Widget marketplace
+
+---
+
+## Best Practices
+
+### When Adding New Sections
+1. Add section to Section type in navigation-context.tsx
+2. Create section component in /components/sections.tsx
+3. Add icon and route to Sidebar component
+4. Include in mobile bottom navigation (if appropriate)
+5. Implement empty state if no data available
+6. Test at all breakpoints
+
+### When Adding Theme-Dependent Styling
+1. Use theme context to get current theme
+2. Define color variations for all three themes
+3. Use primary color for active/selected states
+4. Test in all theme modes
+5. Ensure sufficient contrast in all modes
+
+### When Modifying Authentication
+1. Update AuthContext interface
+2. Handle loading and error states
+3. Persist to localStorage if needed
+4. Test logout flow thoroughly
+5. Consider security implications
+
+---
+
+**Last Updated**: March 5, 2026  
+**Version**: 1.4  
+**Status**: Living Document

@@ -1,0 +1,57 @@
+import { memo } from 'react';
+import { Wind, Snowflake, Flame } from 'lucide-react';
+import { getHVACModeButtonColor } from '../../utils/hvac-styles';
+import { useTheme } from '../../contexts/theme-context';
+
+interface HVACModeControlsProps {
+  mode: string;
+  isOn: boolean;
+  onModeChange: (mode: string) => void;
+  size?: 'small' | 'medium' | 'large';
+}
+
+export const HVACModeControls = memo(function HVACModeControls({ 
+  mode, 
+  isOn, 
+  onModeChange,
+  size = 'medium'
+}: HVACModeControlsProps) {
+  const { theme } = useTheme();
+  const buttonSize = size === 'large' ? 'w-12 h-12' : 'w-8 h-8';
+  const iconSize = size === 'large' ? 'w-5 h-5' : 'w-3.5 h-3.5';
+  
+  return (
+    <>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onModeChange('cool');
+        }}
+        disabled={!isOn}
+        className={`${buttonSize} rounded-full transition-all flex items-center justify-center disabled:opacity-50 ${getHVACModeButtonColor('cool', mode, isOn, theme)}`}
+      >
+        <Snowflake className={iconSize} />
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onModeChange('heat');
+        }}
+        disabled={!isOn}
+        className={`${buttonSize} rounded-full transition-all flex items-center justify-center disabled:opacity-50 ${getHVACModeButtonColor('heat', mode, isOn, theme)}`}
+      >
+        <Flame className={iconSize} />
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onModeChange('fan');
+        }}
+        disabled={!isOn}
+        className={`${buttonSize} rounded-full transition-all flex items-center justify-center disabled:opacity-50 ${getHVACModeButtonColor('fan', mode, isOn, theme)}`}
+      >
+        <Wind className={iconSize} />
+      </button>
+    </>
+  );
+});
