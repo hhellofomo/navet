@@ -3,19 +3,19 @@
  * Central export point for all custom hooks
  */
 
+export { useCardOrdering } from './use-card-ordering';
 // Existing hooks
 export { useCardState } from './use-card-state';
-export { useCardOrdering } from './use-card-ordering';
-export { useRoomNavigation } from './use-room-navigation';
-export { useEditMode } from './use-edit-mode';
+export { useClickOutside } from './use-click-outside';
+export { useCustomCards } from './use-custom-cards';
+export { useDebounce } from './use-debounce';
 export { useDeviceMap } from './use-device-map';
 export { useDevices, useRooms } from './use-devices';
-export { useCustomCards } from './use-custom-cards';
-
+export { useEditMode } from './use-edit-mode';
+export { useHomeAssistant } from './use-home-assistant';
+export { useInterval } from './use-interval';
+export { useBreakpoints, useMediaQuery } from './use-media-query';
 // New reusable hooks
 export { usePersistedState } from './use-persisted-state';
-export { useMediaQuery, useBreakpoints } from './use-media-query';
-export { useDebounce } from './use-debounce';
-export { useInterval } from './use-interval';
-export { useClickOutside } from './use-click-outside';
+export { useRoomNavigation } from './use-room-navigation';
 export { useToggle } from './use-toggle';
