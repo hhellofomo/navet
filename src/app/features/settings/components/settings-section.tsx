@@ -18,7 +18,7 @@ import { Switch } from '@/app/components/ui/switch';
 import { useAuth } from '@/app/contexts/auth-context';
 import { useConfig } from '@/app/contexts/config-context';
 import { type ThemeType, useTheme } from '@/app/contexts/theme-context';
-import { useSettingsStore, type PrimaryColor } from '@/app/stores';
+import { type PrimaryColor, useSettingsStore } from '@/app/stores';
 
 export function SettingsSection() {
   const { theme, setTheme, primaryColor, setPrimaryColor, wallpaper, setWallpaper } = useTheme();

@@ -1,9 +1,8 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import type { LucideIcon } from 'lucide-react';
 import { memo, useCallback, useRef, useState } from 'react';
 import { CustomScrollbar } from '../../shared/components/custom-scrollbar';
-import { iconMap, type SensorIconType } from './sensors/sensor-types';
 import { SensorGroupSettingsView } from './SensorGroupSettingsView';
+import { iconMap, type SensorIconType } from './sensors/sensor-types';
 
 interface SensorReading {
   label: string;
