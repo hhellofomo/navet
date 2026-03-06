@@ -3,7 +3,7 @@
  * Manages connection state, entities, and configuration
  */
 
-import type { Connection, HassConfig, HassEntities } from 'home-assistant-js-websocket';
+import type { Connection, HassConfig, HassEntities, HassUser } from 'home-assistant-js-websocket';
 import { createContext, type ReactNode, useContext } from 'react';
 import { useHomeAssistant } from '../hooks/use-home-assistant';
 import type {
@@ -22,6 +22,7 @@ interface HomeAssistantContextValue {
 	// Home Assistant data
 	config: HassConfig | null;
 	entities: HassEntities | null;
+	user: HassUser | null;
 	areas: HomeAssistantAreaRegistryEntry[];
 	deviceRegistry: HomeAssistantDeviceRegistryEntry[];
 	entityRegistry: HomeAssistantEntityRegistryEntry[];
@@ -39,6 +40,7 @@ const defaultHomeAssistantValue: HomeAssistantContextValue = {
 	error: null,
 	config: null,
 	entities: null,
+	user: null,
 	areas: [],
 	deviceRegistry: [],
 	entityRegistry: [],
@@ -62,6 +64,7 @@ export const HomeAssistantProvider = ({ children }: HomeAssistantProviderProps) 
 		error,
 		config,
 		entities,
+		user,
 		areas,
 		deviceRegistry,
 		entityRegistry,
@@ -77,6 +80,7 @@ export const HomeAssistantProvider = ({ children }: HomeAssistantProviderProps) 
 		error,
 		config,
 		entities,
+		user,
 		areas,
 		deviceRegistry,
 		entityRegistry,

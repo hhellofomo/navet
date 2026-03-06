@@ -62,7 +62,7 @@ export const Sidebar = memo(function Sidebar() {
 		<>
 			{/* Desktop Sidebar */}
 			<div
-				className={`fixed left-0 top-0 h-full w-16 ${bgColor} border-r flex-col items-center py-6 gap-8 hidden md:flex z-50`}
+				className={`fixed left-0 top-0 h-full w-16 ${bgColor} border-r flex-col items-center pt-8 pb-6 gap-[38px] hidden md:flex z-50`}
 			>
 				<div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center mb-4">
 					<ImageWithFallback src="/logo.svg" alt="Brand Logo" className="w-10 h-10" />

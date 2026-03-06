@@ -1,4 +1,5 @@
 import { createContext, type ReactNode, useCallback, useContext, useState } from 'react';
+import { homeAssistantStore } from '../stores/home-assistant-store';
 import { useConfig } from './config-context';
 
 interface AuthConfig {
@@ -18,7 +19,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AUTH_STORAGE_KEY = 'ha_auth_config';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-	const { saveConfig } = useConfig();
+	const { clearConfig, saveConfig } = useConfig();
 	const [config, setConfig] = useState<AuthConfig | null>(() => {
 		// Load from localStorage on mount
 		const stored = localStorage.getItem(AUTH_STORAGE_KEY);
@@ -68,9 +69,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	);
 
 	const logout = useCallback(() => {
+		homeAssistantStore.getState().disconnect();
 		setConfig(null);
 		localStorage.removeItem(AUTH_STORAGE_KEY);
-	}, []);
+		clearConfig();
+	}, [clearConfig]);
 
 	return (
 		<AuthContext.Provider value={{ isAuthenticated, config, login, logout }}>
