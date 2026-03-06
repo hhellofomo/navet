@@ -8,17 +8,6 @@ import type { EditModeState } from './edit-mode-store';
 import type { NavigationState } from './navigation-store';
 import type { SearchState } from './search-store';
 import type { SettingsState } from './settings-store';
-import type {
-	PrimaryColor,
-	PrimaryColor,
-	ThemeMode,
-	ThemeState,
-	PrimaryColor,
-	ThemeMode,
-	ThemeMode,
-	ThemeState,
-	ThemeState,
-} from './theme-store';
 
 /**
  * Theme Store Selectors

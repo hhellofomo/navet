@@ -34,6 +34,7 @@ export const BrightnessPresets = memo(function BrightnessPresets({
 					const IconComponent = preset.icon;
 					return (
 						<button
+							type="button"
 							key={preset.brightness}
 							onClick={() => onBrightnessChange(preset.brightness)}
 							disabled={!isOn}

@@ -83,12 +83,14 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
 				{size !== 'small' && (
 					<>
 						<button
+							type="button"
 							onClick={prevPhoto}
 							className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
 						>
 							<ChevronLeft className="w-5 h-5 text-white" />
 						</button>
 						<button
+							type="button"
 							onClick={nextPhoto}
 							className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
 						>
@@ -103,6 +105,7 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
 				<div className="flex justify-center gap-2">
 					{mockPhotos.map((_, index) => (
 						<button
+							type="button"
 							key={index}
 							onClick={() => setCurrentIndex(index)}
 							className="w-2 h-2 rounded-full transition-all"

@@ -82,8 +82,9 @@ export const LightCard = memo(function LightCard({
 
 	return (
 		<>
-			<button
-				type="button"
+			<div
+				role={!isEditMode ? 'button' : undefined}
+				tabIndex={!isEditMode ? 0 : undefined}
 				className={`relative h-full w-full backdrop-blur-xl rounded-3xl ${padding} border overflow-hidden transition-all duration-500 ${!isEditMode ? 'cursor-pointer' : ''} ${
 					gradientColors.customGradient
 						? `border-orange-500/30`
@@ -95,6 +96,12 @@ export const LightCard = memo(function LightCard({
 						: {}
 				}
 				onClick={() => !isEditMode && setIsOn(!isOn)}
+				onKeyDown={(e) => {
+					if (!isEditMode && (e.key === 'Enter' || e.key === ' ')) {
+						e.preventDefault();
+						setIsOn(!isOn);
+					}
+				}}
 			>
 				{isEditMode && (
 					<CardSizeSelector
@@ -170,7 +177,7 @@ export const LightCard = memo(function LightCard({
 						/>
 					)}
 				</div>
-			</button>
+			</div>
 
 			<LightSettingsDialog
 				isOpen={isOpen}

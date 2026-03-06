@@ -1,6 +1,5 @@
 import { X } from 'lucide-react';
 import { useEditModeContext } from '../contexts/edit-mode-context';
-import { useTheme } from '../contexts/theme-context';
 import type { CustomCard } from '../hooks/use-custom-cards';
 import { CalendarWidget, NewsWidget, NoteWidget, PhotoFrameWidget, WeatherWidget } from './widgets';
 
@@ -12,7 +11,6 @@ interface WidgetCardProps {
 
 export function WidgetCard({ card, onDelete, onUpdate }: WidgetCardProps) {
 	const { isEditMode } = useEditModeContext();
-	const { theme } = useTheme();
 
 	const handleDelete = (e: React.MouseEvent) => {
 		e.stopPropagation();
@@ -27,7 +25,7 @@ export function WidgetCard({ card, onDelete, onUpdate }: WidgetCardProps) {
 		}
 	};
 
-	let widgetContent;
+	let widgetContent: React.ReactNode;
 	switch (card.type) {
 		case 'calendar':
 			widgetContent = <CalendarWidget size={card.size} />;
@@ -61,6 +59,7 @@ export function WidgetCard({ card, onDelete, onUpdate }: WidgetCardProps) {
 			{/* Delete button in edit mode */}
 			{isEditMode && onDelete && (
 				<button
+					type="button"
 					onClick={handleDelete}
 					className="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center transition-all shadow-lg z-10"
 					aria-label="Delete widget"

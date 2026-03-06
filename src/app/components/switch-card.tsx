@@ -13,12 +13,11 @@ interface SwitchCardProps {
 
 export const SwitchCard = memo(function SwitchCard({
 	name,
-	room,
 	initialState = false,
 	power,
 	voltage,
 	energy,
-}: SwitchCardProps) {
+}: Omit<SwitchCardProps, 'room'>) {
 	const [isOn, setIsOn] = useState(initialState);
 	const { colors, theme } = useTheme();
 
@@ -44,6 +43,7 @@ export const SwitchCard = memo(function SwitchCard({
 
 	return (
 		<button
+			type="button"
 			onClick={() => setIsOn(!isOn)}
 			className={`relative h-full w-full bg-gradient-to-br ${cardColors.gradient} backdrop-blur-xl rounded-3xl p-4 border ${cardColors.border} overflow-hidden transition-all duration-500 cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${theme === 'light' ? 'shadow-lg' : ''}`}
 		>

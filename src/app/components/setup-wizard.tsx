@@ -1,8 +1,9 @@
-import { AlertCircle, CheckCircle2, ExternalLink, Loader2, Lock, Server } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ExternalLink, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useConfig } from '../contexts/config-context';
 import { useTheme } from '../contexts/theme-context';
+import { ImageWithFallback } from './figma/ImageWithFallback';
 
 export function SetupWizard() {
 	const { saveConfig, testConnection } = useConfig();
@@ -110,11 +111,8 @@ export function SetupWizard() {
 			<div className="w-full max-w-md space-y-6">
 				{/* Header */}
 				<div className="text-center space-y-2">
-					<div
-						className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center"
-						style={{ backgroundColor: `${getColorValue(primaryColor)}20` }}
-					>
-						<Server className="w-8 h-8" style={{ color: getColorValue(primaryColor) }} />
+					<div className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center">
+						<ImageWithFallback src="/logo.svg" alt="Navet Logo" className="w-12 h-12" />
 					</div>
 					<h1 className={`text-2xl font-bold ${textColor}`}>Welcome to Navet</h1>
 					<p className={`text-sm ${mutedColor}`}>
@@ -127,10 +125,14 @@ export function SetupWizard() {
 					<div className="p-6 space-y-4">
 						{/* URL Input */}
 						<div>
-							<label className={`text-sm font-medium ${textColor} block mb-2`}>
+							<label
+								htmlFor="smart-home-url"
+								className={`text-sm font-medium ${textColor} block mb-2`}
+							>
 								Smart Home URL
 							</label>
 							<input
+								id="smart-home-url"
 								type="url"
 								value={url}
 								onChange={(e) => {
@@ -148,10 +150,14 @@ export function SetupWizard() {
 
 						{/* Token Input */}
 						<div>
-							<label className={`text-sm font-medium ${textColor} block mb-2`}>
+							<label
+								htmlFor="access-token"
+								className={`text-sm font-medium ${textColor} block mb-2`}
+							>
 								Long-Lived Access Token
 							</label>
 							<input
+								id="access-token"
 								type="password"
 								value={token}
 								onChange={(e) => {
@@ -201,6 +207,7 @@ export function SetupWizard() {
 						<div className="space-y-3 pt-2">
 							<div className="flex gap-3">
 								<button
+									type="button"
 									onClick={handleTestConnection}
 									disabled={isLoading || !url || !token}
 									className={`flex-1 px-4 py-3 rounded-xl border ${borderColor} ${textColor} text-sm font-medium transition-all ${
@@ -220,6 +227,7 @@ export function SetupWizard() {
 								</button>
 
 								<button
+									type="button"
 									onClick={handleSave}
 									disabled={isLoading || !url || !token}
 									className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 text-white`}
@@ -251,6 +259,7 @@ export function SetupWizard() {
 				{/* Footer */}
 				<div className="text-center space-y-2">
 					<button
+						type="button"
 						onClick={() => {
 							setUrl('http://homeassistant.local:8123');
 							setToken('demo-token-for-development');

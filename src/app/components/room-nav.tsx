@@ -45,6 +45,7 @@ export const RoomNav = memo(function RoomNav({
 		>
 			{rooms.map((room) => (
 				<button
+					type="button"
 					key={room}
 					onClick={() => onRoomChange(room)}
 					className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
@@ -59,6 +60,7 @@ export const RoomNav = memo(function RoomNav({
 
 			{isEditMode && onAddCard && (
 				<button
+					type="button"
 					onClick={onAddCard}
 					className="ml-auto p-2 rounded-lg bg-orange-500 hover:bg-orange-600 transition-colors flex-shrink-0 flex items-center gap-2 px-3"
 				>
@@ -70,6 +72,7 @@ export const RoomNav = memo(function RoomNav({
 			{!isEditMode && <div className="ml-auto" />}
 
 			<button
+				type="button"
 				onClick={onToggleEditMode}
 				className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
 					isEditMode ? 'bg-orange-500 hover:bg-orange-600' : `${inactiveBg} ${hoverBg}`

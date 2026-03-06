@@ -77,7 +77,18 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 	return (
 		<>
 			{/* Backdrop overlay */}
-			<div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" onClick={onClose} />
+			<button
+				type="button"
+				className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+				onClick={onClose}
+				onKeyDown={(e) => {
+					if (e.key === 'Escape') {
+						e.preventDefault();
+						onClose();
+					}
+				}}
+				aria-label="Close settings panel"
+			/>
 
 			{/* Full-page panel */}
 			<div
@@ -92,6 +103,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 								<p className={`text-sm ${subtleColor} mt-0.5`}>Customize your dashboard</p>
 							</div>
 							<button
+								type="button"
 								onClick={onClose}
 								className={`w-10 h-10 rounded-xl ${theme === 'light' ? 'bg-gray-100 hover:bg-gray-200' : 'bg-white/5 hover:bg-white/10'} transition-colors flex items-center justify-center`}
 							>
@@ -121,12 +133,16 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 							<div className="p-4 md:p-5 space-y-6">
 								{/* Theme Mode */}
 								<div>
-									<label className={`text-sm font-medium ${textColor} block mb-3`}>
+									<label
+										htmlFor="theme-mode"
+										className={`text-sm font-medium ${textColor} block mb-3`}
+									>
 										Theme Mode
 									</label>
 									<div className="space-y-2">
 										{themeOptions.map((option) => (
 											<button
+												type="button"
 												key={option.value}
 												onClick={() => setTheme(option.value)}
 												className={`
@@ -168,7 +184,10 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 
 								{/* Primary Color */}
 								<div>
-									<label className={`text-sm font-medium ${textColor} block mb-3`}>
+									<label
+										htmlFor="primary-color"
+										className={`text-sm font-medium ${textColor} block mb-3`}
+									>
 										Primary Color
 									</label>
 									<p className={`text-xs ${subtleColor} mb-4`}>
@@ -177,6 +196,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 									<div className="grid grid-cols-6 gap-3">
 										{colorOptions.map((option) => (
 											<button
+												type="button"
 												key={option.value}
 												onClick={() => setPrimaryColor(option.value)}
 												className={`w-full aspect-square rounded-full transition-all duration-300 ${
@@ -254,6 +274,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
 						{/* Logout Section */}
 						<section>
 							<button
+								type="button"
 								onClick={handleLogout}
 								className={`w-full p-5 rounded-2xl border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 transition-all text-left flex items-center gap-4`}
 							>

@@ -164,7 +164,7 @@ export interface DeviceCollection {
 }
 
 // Device with type information
-export interface DeviceWithType extends Record<string, any> {
+export interface DeviceWithType extends Record<string, string | number | boolean | undefined> {
 	id: string;
 	type: keyof DeviceCollection;
 }

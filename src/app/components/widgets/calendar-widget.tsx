@@ -96,6 +96,7 @@ export function CalendarWidget({ size = 'medium' }: CalendarWidgetProps) {
 
 			{size !== 'small' && (
 				<button
+					type="button"
 					className={`mt-4 w-full py-2 rounded-lg text-xs font-medium transition-colors ${textSecondary}`}
 					style={{ backgroundColor: theme === 'light' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.05)' }}
 				>

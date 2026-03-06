@@ -70,6 +70,7 @@ export const ColorTemperatureSection = memo(function ColorTemperatureSection({
 			<div className="grid grid-cols-5 gap-2">
 				{tempOptions.map((temp) => (
 					<button
+						type="button"
 						key={temp.value}
 						onClick={() => onTempChange(temp.value)}
 						disabled={!isOn}
@@ -82,7 +83,6 @@ export const ColorTemperatureSection = memo(function ColorTemperatureSection({
 						}`}
 						style={{
 							backgroundColor: isOn ? temp.color : '#4a4a4a',
-							color: isOn ? (temp.value <= 3000 ? '#8B4513' : '#1a1a1a') : '#fff',
 						}}
 					>
 						{temp.label}

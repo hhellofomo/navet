@@ -30,6 +30,7 @@ export const DialogHeader = memo(function DialogHeader({
 
 			<Dialog.Close asChild>
 				<button
+					type="button"
 					className={`p-2 rounded-lg transition-all duration-300 ${
 						isOn ? 'bg-white/10 hover:bg-white/20' : 'bg-white/5 hover:bg-white/10'
 					}`}
