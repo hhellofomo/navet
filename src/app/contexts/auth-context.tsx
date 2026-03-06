@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { useConfig } from './config-context';
 
 interface AuthConfig {
   url: string;
@@ -8,7 +9,7 @@ interface AuthConfig {
 interface AuthContextType {
   isAuthenticated: boolean;
   config: AuthConfig | null;
-  login: (url: string, token: string) => void;
+  login: (url: string, token: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AUTH_STORAGE_KEY = 'ha_auth_config';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const { saveConfig } = useConfig();
   const [config, setConfig] = useState<AuthConfig | null>(() => {
     // Load from localStorage on mount
     const stored = localStorage.getItem(AUTH_STORAGE_KEY);
@@ -32,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isAuthenticated = config !== null;
 
-  const login = useCallback((url: string, token: string) => {
+  const login = useCallback(async (url: string, token: string) => {
     // Remove trailing slash from URL
     const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url;
     
@@ -43,7 +45,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     setConfig(authConfig);
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authConfig));
-  }, []);
+    
+    // Also save to config context for Home Assistant connection
+    const saved = await saveConfig(authConfig);
+    return saved;
+  }, [saveConfig]);
 
   const logout = useCallback(() => {
     setConfig(null);
