@@ -1,10 +1,10 @@
 import { type ButtonHTMLAttributes, memo, type ReactNode } from 'react';
 
 interface RoundButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-	children: ReactNode;
-	size?: 'small' | 'medium' | 'large';
-	variant?: 'default' | 'primary';
-	className?: string;
+  children: ReactNode;
+  size?: 'small' | 'medium' | 'large';
+  variant?: 'default' | 'primary';
+  className?: string;
 }
 
 /**
@@ -12,33 +12,33 @@ interface RoundButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * Provides consistent button styling across all cards
  */
 export const RoundButton = memo(function RoundButton({
-	children,
-	size = 'medium',
-	variant = 'default',
-	className = '',
-	disabled,
-	onClick,
-	...props
+  children,
+  size = 'medium',
+  variant = 'default',
+  className = '',
+  disabled,
+  onClick,
+  ...props
 }: RoundButtonProps) {
-	const sizeClasses = {
-		small: 'w-7 h-7',
-		medium: 'w-8 h-8',
-		large: 'w-12 h-12',
-	};
+  const sizeClasses = {
+    small: 'w-7 h-7',
+    medium: 'w-8 h-8',
+    large: 'w-12 h-12',
+  };
 
-	const variantClasses = {
-		default: 'bg-white/10 hover:bg-white/20',
-		primary: 'bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700',
-	};
+  const variantClasses = {
+    default: 'bg-white/10 hover:bg-white/20',
+    primary: 'bg-gradient-to-br from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700',
+  };
 
-	return (
-		<button
-			onClick={onClick}
-			disabled={disabled}
-			className={`${sizeClasses[size]} rounded-full ${variantClasses[variant]} transition-all flex items-center justify-center disabled:opacity-50 ${className}`}
-			{...props}
-		>
-			{children}
-		</button>
-	);
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`${sizeClasses[size]} rounded-full ${variantClasses[variant]} transition-all flex items-center justify-center disabled:opacity-50 ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
 });

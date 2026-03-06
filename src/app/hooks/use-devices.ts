@@ -20,15 +20,15 @@ import { useHADevices } from './use-ha-devices';
  * For now, returns mock data
  */
 export const useDevices = (): DeviceCollection => {
-	const { connected } = useHomeAssistantContext();
-	const haDevices = useHADevices();
+  const { connected } = useHomeAssistantContext();
+  const haDevices = useHADevices();
 
-	const devices = useMemo(
-		() => (connected ? haDevices : { ...DEVICES, lights: haDevices.lights }),
-		[connected, haDevices]
-	);
+  const devices = useMemo(
+    () => (connected ? haDevices : { ...DEVICES, lights: haDevices.lights }),
+    [connected, haDevices]
+  );
 
-	return devices;
+  return devices;
 };
 
 /**
@@ -36,19 +36,19 @@ export const useDevices = (): DeviceCollection => {
  * Extracts unique rooms from devices
  */
 export const useRooms = (devices: DeviceCollection): string[] => {
-	return useMemo(() => {
-		const roomsSet = new Set<string>();
+  return useMemo(() => {
+    const roomsSet = new Set<string>();
 
-		Object.values(devices).forEach((deviceArray) => {
-			deviceArray.forEach((device) => {
-				if ('room' in device && device.room) {
-					roomsSet.add(device.room);
-				} else if ('location' in device && device.location) {
-					roomsSet.add(device.location);
-				}
-			});
-		});
+    Object.values(devices).forEach((deviceArray) => {
+      deviceArray.forEach((device) => {
+        if ('room' in device && device.room) {
+          roomsSet.add(device.room);
+        } else if ('location' in device && device.location) {
+          roomsSet.add(device.location);
+        }
+      });
+    });
 
-		return Array.from(roomsSet);
-	}, [devices]);
+    return Array.from(roomsSet);
+  }, [devices]);
 };

@@ -36,12 +36,12 @@ import { DashboardLayout } from './features/dashboard/dashboard-layout';
 import { DeviceGrid } from './features/dashboard/device-grid';
 import { SettingsSection } from './features/settings/components/settings-section';
 import {
-	useCardOrdering,
-	useCardState,
-	useDeviceMap,
-	useEditMode,
-	useRoomNavigation,
-	useRoomOrdering,
+  useCardOrdering,
+  useCardState,
+  useDeviceMap,
+  useEditMode,
+  useRoomNavigation,
+  useRoomOrdering,
 } from './hooks';
 import { useCustomCards } from './hooks/use-custom-cards';
 import { useDevices, useRooms } from './hooks/use-devices';
@@ -230,11 +230,7 @@ function Dashboard() {
       <DashboardLayout>
         {lightDeviceMap.size > 0 ? (
           <EditModeProvider value={editModeContextValue}>
-            <AllViewGrid
-              deviceMap={lightDeviceMap}
-              rooms={lightRooms}
-              cardOrders={cardOrders}
-            />
+            <AllViewGrid deviceMap={lightDeviceMap} rooms={lightRooms} cardOrders={cardOrders} />
           </EditModeProvider>
         ) : (
           <EmptyState

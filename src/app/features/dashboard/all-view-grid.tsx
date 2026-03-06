@@ -11,12 +11,12 @@ import { renderCard } from '../../utils/card-renderer';
 import { WidgetCard } from './components/widget-card';
 
 interface AllViewGridProps {
-	deviceMap: Map<string, DeviceWithType>;
-	rooms: string[];
-	cardOrders: Record<string, string[]>;
-	customCards?: CustomCard[];
-	onDeleteCard?: (cardId: string) => void;
-	onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
+  deviceMap: Map<string, DeviceWithType>;
+  rooms: string[];
+  cardOrders: Record<string, string[]>;
+  customCards?: CustomCard[];
+  onDeleteCard?: (cardId: string) => void;
+  onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
 }
 
 /**
@@ -24,155 +24,155 @@ interface AllViewGridProps {
  * Displays all entities and custom widgets grouped by room
  */
 export const AllViewGrid = memo(function AllViewGrid({
-	deviceMap,
-	rooms,
-	cardOrders,
-	customCards = [],
-	onDeleteCard,
-	onUpdateCard,
+  deviceMap,
+  rooms,
+  cardOrders,
+  customCards = [],
+  onDeleteCard,
+  onUpdateCard,
 }: AllViewGridProps) {
-	const { isEditMode, cardSizes, updateCardSize } = useEditModeContext();
-	const { isSearchActive, filteredDeviceIds } = useSearch();
-	const { theme } = useTheme();
+  const { isEditMode, cardSizes, updateCardSize } = useEditModeContext();
+  const { isSearchActive, filteredDeviceIds } = useSearch();
+  const { theme } = useTheme();
 
-	const handleSizeChange = useCallback(
-		(id: string, size: CardSize) => {
-			updateCardSize(id, size);
-		},
-		[updateCardSize]
-	);
+  const handleSizeChange = useCallback(
+    (id: string, size: CardSize) => {
+      updateCardSize(id, size);
+    },
+    [updateCardSize]
+  );
 
-	// Group devices by room
-	const devicesByRoom = useMemo(() => {
-		const grouped: Record<string, DeviceWithType[]> = {};
+  // Group devices by room
+  const devicesByRoom = useMemo(() => {
+    const grouped: Record<string, DeviceWithType[]> = {};
 
-		deviceMap.forEach((device) => {
-			// Filter by search if active
-			if (isSearchActive && !filteredDeviceIds.includes(device.id)) {
-				return;
-			}
+    deviceMap.forEach((device) => {
+      // Filter by search if active
+      if (isSearchActive && !filteredDeviceIds.includes(device.id)) {
+        return;
+      }
 
-			const room = (
-				'room' in device ? device.room : 'location' in device ? device.location : null
-			) as string | null;
-			if (room) {
-				if (!grouped[room]) {
-					grouped[room] = [];
-				}
-				grouped[room].push(device);
-			}
-		});
+      const room = (
+        'room' in device ? device.room : 'location' in device ? device.location : null
+      ) as string | null;
+      if (room) {
+        if (!grouped[room]) {
+          grouped[room] = [];
+        }
+        grouped[room].push(device);
+      }
+    });
 
-		return grouped;
-	}, [deviceMap, isSearchActive, filteredDeviceIds]);
+    return grouped;
+  }, [deviceMap, isSearchActive, filteredDeviceIds]);
 
-	// Group custom cards by room
-	const customCardsByRoom = useMemo(() => {
-		const grouped: Record<string, CustomCard[]> = {};
+  // Group custom cards by room
+  const customCardsByRoom = useMemo(() => {
+    const grouped: Record<string, CustomCard[]> = {};
 
-		customCards.forEach((card) => {
-			const room = card.room;
-			if (room) {
-				if (!grouped[room]) {
-					grouped[room] = [];
-				}
-				grouped[room].push(card);
-			}
-		});
+    customCards.forEach((card) => {
+      const room = card.room;
+      if (room) {
+        if (!grouped[room]) {
+          grouped[room] = [];
+        }
+        grouped[room].push(card);
+      }
+    });
 
-		return grouped;
-	}, [customCards]);
-	const customCardMap = useMemo(
-		() => new Map(customCards.map((card) => [card.id, card])),
-		[customCards]
-	);
+    return grouped;
+  }, [customCards]);
+  const customCardMap = useMemo(
+    () => new Map(customCards.map((card) => [card.id, card])),
+    [customCards]
+  );
 
-	const textColor =
-		theme === 'light' ? 'text-gray-900' : theme === 'contrast' ? 'text-white' : 'text-white';
-	const textSecondary =
-		theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-400';
+  const textColor =
+    theme === 'light' ? 'text-gray-900' : theme === 'contrast' ? 'text-white' : 'text-white';
+  const textSecondary =
+    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-400';
 
-	return (
-		<div className="space-y-8">
-			{rooms.map((room) => {
-				const roomDevices = devicesByRoom[room] || [];
-				const roomCustomCards = customCardsByRoom[room] || [];
-				const totalItems = roomDevices.length + roomCustomCards.length;
-				const orderedRoomIds = (cardOrders[room] || []).filter(
-					(id) =>
-						roomDevices.some((device) => device.id === id) ||
-						roomCustomCards.some((card) => card.id === id)
-				);
+  return (
+    <div className="space-y-8">
+      {rooms.map((room) => {
+        const roomDevices = devicesByRoom[room] || [];
+        const roomCustomCards = customCardsByRoom[room] || [];
+        const totalItems = roomDevices.length + roomCustomCards.length;
+        const orderedRoomIds = (cardOrders[room] || []).filter(
+          (id) =>
+            roomDevices.some((device) => device.id === id) ||
+            roomCustomCards.some((card) => card.id === id)
+        );
 
-				if (totalItems === 0) return null;
+        if (totalItems === 0) return null;
 
-				return (
-					<div key={room}>
-						{/* Room Header */}
-						<div className="flex items-center gap-3 mb-4">
-							<h2
-								className={`text-lg md:text-xl font-semibold ${
-									room === 'Unknown Room'
-										? theme === 'light'
-											? 'text-gray-700'
-											: textColor
-										: textColor
-								}`}
-							>
-								{room}
-							</h2>
-							<span className={`text-xs md:text-sm ${textSecondary}`}>
-								{totalItems} {totalItems === 1 ? 'item' : 'items'}
-							</span>
-						</div>
+        return (
+          <div key={room}>
+            {/* Room Header */}
+            <div className="flex items-center gap-3 mb-4">
+              <h2
+                className={`text-lg md:text-xl font-semibold ${
+                  room === 'Unknown Room'
+                    ? theme === 'light'
+                      ? 'text-gray-700'
+                      : textColor
+                    : textColor
+                }`}
+              >
+                {room}
+              </h2>
+              <span className={`text-xs md:text-sm ${textSecondary}`}>
+                {totalItems} {totalItems === 1 ? 'item' : 'items'}
+              </span>
+            </div>
 
-						{/* Device and Widget Grid for this room */}
-						<SortableContext items={orderedRoomIds} strategy={rectSortingStrategy}>
-							<div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-2 md:gap-3 lg:gap-4 auto-rows-[180px] md:auto-rows-[190px]">
-								{orderedRoomIds.map((id, index) => {
-									const device = deviceMap.get(id);
-									if (device) {
-										const size = cardSizes[device.id] || (device.size as CardSize);
+            {/* Device and Widget Grid for this room */}
+            <SortableContext items={orderedRoomIds} strategy={rectSortingStrategy}>
+              <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-2 md:gap-3 lg:gap-4 auto-rows-[180px] md:auto-rows-[190px]">
+                {orderedRoomIds.map((id, index) => {
+                  const device = deviceMap.get(id);
+                  if (device) {
+                    const size = cardSizes[device.id] || (device.size as CardSize);
 
-										return (
-											<DraggableCard
-												key={device.id}
-												id={device.id}
-												index={index}
-												isEditMode={isEditMode}
-												className={getCardSpanClass(size)}
-											>
-												{renderCard({ device, size, handleSizeChange, isEditMode })}
-											</DraggableCard>
-										);
-									}
+                    return (
+                      <DraggableCard
+                        key={device.id}
+                        id={device.id}
+                        index={index}
+                        isEditMode={isEditMode}
+                        className={getCardSpanClass(size)}
+                      >
+                        {renderCard({ device, size, handleSizeChange, isEditMode })}
+                      </DraggableCard>
+                    );
+                  }
 
-									const card = customCardMap.get(id);
-									if (!card) return null;
+                  const card = customCardMap.get(id);
+                  if (!card) return null;
 
-									const size = cardSizes[card.id] || card.size;
+                  const size = cardSizes[card.id] || card.size;
 
-									return (
-										<DraggableCard
-											key={card.id}
-											id={card.id}
-											index={index}
-											isEditMode={isEditMode}
-											className={getCardSpanClass(size)}
-										>
-											<WidgetCard
-												card={{ ...card, size }}
-												onDelete={onDeleteCard}
-												onUpdate={onUpdateCard}
-											/>
-										</DraggableCard>
-									);
-								})}
-							</div>
-						</SortableContext>
-					</div>
-				);
-			})}
-		</div>
-	);
+                  return (
+                    <DraggableCard
+                      key={card.id}
+                      id={card.id}
+                      index={index}
+                      isEditMode={isEditMode}
+                      className={getCardSpanClass(size)}
+                    >
+                      <WidgetCard
+                        card={{ ...card, size }}
+                        onDelete={onDeleteCard}
+                        onUpdate={onUpdateCard}
+                      />
+                    </DraggableCard>
+                  );
+                })}
+              </div>
+            </SortableContext>
+          </div>
+        );
+      })}
+    </div>
+  );
 });

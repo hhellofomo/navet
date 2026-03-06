@@ -7,35 +7,35 @@ import { homeAssistantStore } from '../stores/home-assistant-store';
  * Provides state and actions for connecting to Home Assistant
  */
 export const useHomeAssistant = () => {
-	const [state, setState] = useState(() => homeAssistantStore.getState());
+  const [state, setState] = useState(() => homeAssistantStore.getState());
 
-	useEffect(() => {
-		// Subscribe to store changes
-		const unsubscribe = homeAssistantStore.subscribe(setState);
+  useEffect(() => {
+    // Subscribe to store changes
+    const unsubscribe = homeAssistantStore.subscribe(setState);
 
-		// Cleanup subscription on unmount
-		return unsubscribe;
-	}, []);
+    // Cleanup subscription on unmount
+    return unsubscribe;
+  }, []);
 
-	const connect = useCallback(async (config: HomeAssistantConfiguration) => {
-		return await homeAssistantStore.getState().connect(config);
-	}, []);
+  const connect = useCallback(async (config: HomeAssistantConfiguration) => {
+    return await homeAssistantStore.getState().connect(config);
+  }, []);
 
-	const disconnect = useCallback(() => {
-		homeAssistantStore.getState().disconnect();
-	}, []);
+  const disconnect = useCallback(() => {
+    homeAssistantStore.getState().disconnect();
+  }, []);
 
-	const clearError = useCallback(() => {
-		homeAssistantStore.getState().clearError();
-	}, []);
+  const clearError = useCallback(() => {
+    homeAssistantStore.getState().clearError();
+  }, []);
 
-	return {
-		// State
-		...state,
+  return {
+    // State
+    ...state,
 
-		// Actions
-		connect,
-		disconnect,
-		clearError,
-	};
+    // Actions
+    connect,
+    disconnect,
+    clearError,
+  };
 };

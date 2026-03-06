@@ -9,90 +9,90 @@ import { CustomColorTrigger } from './custom-color-trigger';
 import { LightCardHeader } from './light-card-header';
 
 interface LightCardLargeProps {
-	name: string;
-	room: string;
-	brightness: number;
-	brightnessPresets: Array<{ brightness: number; icon: LucideIcon; key: string; label: string }>;
-	selectedColor: string | null;
-	currentColor: string;
-	isOn: boolean;
-	IconComponent: LucideIcon;
-	supportsColorControl: boolean;
-	onBrightnessChange: (value: number) => void;
-	onBrightnessCommit: (value: number) => void;
-	onColorChange: (color: string) => void;
+  name: string;
+  room: string;
+  brightness: number;
+  brightnessPresets: Array<{ brightness: number; icon: LucideIcon; key: string; label: string }>;
+  selectedColor: string | null;
+  currentColor: string;
+  isOn: boolean;
+  IconComponent: LucideIcon;
+  supportsColorControl: boolean;
+  onBrightnessChange: (value: number) => void;
+  onBrightnessCommit: (value: number) => void;
+  onColorChange: (color: string) => void;
 }
 
 export const LightCardLarge = memo(function LightCardLarge({
-	name,
-	brightness,
-	brightnessPresets,
-	selectedColor,
-	currentColor,
-	isOn,
-	IconComponent,
-	supportsColorControl,
-	onBrightnessChange,
-	onBrightnessCommit,
-	onColorChange,
+  name,
+  brightness,
+  brightnessPresets,
+  selectedColor,
+  currentColor,
+  isOn,
+  IconComponent,
+  supportsColorControl,
+  onBrightnessChange,
+  onBrightnessCommit,
+  onColorChange,
 }: Omit<LightCardLargeProps, 'room'>) {
-	const { theme } = useTheme();
-	const secondaryTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
-	const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
+  const { theme } = useTheme();
+  const secondaryTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+  const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
 
-	return (
-		<>
-			<LightCardHeader name={name} isOn={isOn} IconComponent={IconComponent} size="large" />
+  return (
+    <>
+      <LightCardHeader name={name} isOn={isOn} IconComponent={IconComponent} size="large" />
 
-			<div className="flex-1 flex flex-col justify-between">
-				{/* Brightness section */}
-				<div className="mb-2">
-					<div className="flex items-baseline justify-between mb-2">
-						<div className={`text-xs ${secondaryTextColor}`}>Brightness</div>
-						<div className={`text-2xl font-bold ${textColor}`}>{brightness}%</div>
-					</div>
-					<BrightnessSlider
-						value={brightness}
-						onChange={onBrightnessChange}
-						onCommit={onBrightnessCommit}
-						showLabel={false}
-						size="large"
-						onClick={(e) => e.stopPropagation()}
-					/>
-					<div className="mt-3">
-						<BrightnessPresetsInline
-							presets={brightnessPresets}
-							currentBrightness={brightness}
-							isOn={isOn}
-							onBrightnessChange={onBrightnessCommit}
-							size="large"
-						/>
-					</div>
-				</div>
+      <div className="flex-1 flex flex-col justify-between">
+        {/* Brightness section */}
+        <div className="mb-2">
+          <div className="flex items-baseline justify-between mb-2">
+            <div className={`text-xs ${secondaryTextColor}`}>Brightness</div>
+            <div className={`text-2xl font-bold ${textColor}`}>{brightness}%</div>
+          </div>
+          <BrightnessSlider
+            value={brightness}
+            onChange={onBrightnessChange}
+            onCommit={onBrightnessCommit}
+            showLabel={false}
+            size="large"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="mt-3">
+            <BrightnessPresetsInline
+              presets={brightnessPresets}
+              currentBrightness={brightness}
+              isOn={isOn}
+              onBrightnessChange={onBrightnessCommit}
+              size="large"
+            />
+          </div>
+        </div>
 
-				{supportsColorControl && (
-					<div className="space-y-2">
-						<div className={`text-xs ${secondaryTextColor}`}>Colors</div>
-						<div className="flex items-center gap-2">
-							<div className="flex gap-2 flex-1">
-								<ColorPicker
-									colors={Array.from(PRESET_COLORS).slice(0, 4)}
-									selectedColor={selectedColor}
-									isOn={isOn}
-									onColorChange={onColorChange}
-									size="large"
-								/>
-								<CustomColorTrigger
-									isOn={isOn}
-									currentColor={currentColor}
-									onColorChange={onColorChange}
-									size="large"
-								/>
-							</div>
-						</div>
-					</div>
-				)}
-			</div>
-		</>
-	);
+        {supportsColorControl && (
+          <div className="space-y-2">
+            <div className={`text-xs ${secondaryTextColor}`}>Colors</div>
+            <div className="flex items-center gap-2">
+              <div className="flex gap-2 flex-1">
+                <ColorPicker
+                  colors={Array.from(PRESET_COLORS).slice(0, 4)}
+                  selectedColor={selectedColor}
+                  isOn={isOn}
+                  onColorChange={onColorChange}
+                  size="large"
+                />
+                <CustomColorTrigger
+                  isOn={isOn}
+                  currentColor={currentColor}
+                  onColorChange={onColorChange}
+                  size="large"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
 });
