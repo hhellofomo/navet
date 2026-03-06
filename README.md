@@ -14,7 +14,7 @@
 
 **A beautiful, iOS-inspired smart home dashboard with frosted glass aesthetics**
 
-[Features](#features) • [Installation](#installation) • [Usage](#usage) • [Widgets](WIDGETS.md) • [License](#license) • [Contributing](CONTRIBUTING.md)
+[Features](#features) • [Installation](#installation) • [Usage](#usage) • [Widgets](docs/WIDGETS.md) • [License](#license) • [Contributing](CONTRIBUTING.md)
 
 </div>
 
@@ -161,7 +161,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - Available in **3 sizes**: Small, Medium, Large
 - Widgets persist across browser sessions
 - Full drag-and-drop and delete support
-- See [WIDGETS.md](WIDGETS.md) for detailed documentation
+- See [WIDGETS.md](docs/WIDGETS.md) for detailed documentation
 
 ## 🏗️ Tech Stack
 
@@ -190,7 +190,7 @@ This project is licensed under the **Creative Commons Attribution-NonCommercial 
 
 **For commercial licensing inquiries, please contact the author.**
 
-See [LICENSE](LICENSE) and [TERMS_OF_USE.md](TERMS_OF_USE.md) for full details.
+See [LICENSE](LICENSE) and [TERMS_OF_USE.md](docs/TERMS_OF_USE.md) for full details.
 
 ## 🤝 Contributing
 

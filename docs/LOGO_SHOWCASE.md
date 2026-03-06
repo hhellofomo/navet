@@ -228,13 +228,8 @@ public/
 ## Brand Resources
 
 For complete brand guidelines, see:
-- [BRANDING.md](../BRANDING.md) - Full brand guidelines
+- [BRANDING.md](branding/BRANDING.md) - Full brand guidelines
 - [public/README.md](../public/README.md) - Logo asset documentation
 
 ---
-
-<<<<<<< HEAD
 **Last Updated:** March 5, 2026
-=======
-**Last Updated:** March 5, 2026
->>>>>>> 9122518 (fix: resolve Biome linting issues and improve accessibility)

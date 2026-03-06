@@ -6,7 +6,7 @@ Complete documentation for the Navet smart home dashboard.
 
 1. **[Main README](../README.md)** - Start here for project overview
 2. **[Contributing](../CONTRIBUTING.md)** - How to contribute
-3. **[Branding](../BRANDING.md)** - Brand identity and usage
+3. **[Branding](branding/BRANDING.md)** - Brand identity and usage
 4. **[Logo Showcase](LOGO_SHOWCASE.md)** - Visual brand assets
 
 ## 📚 Documentation Structure
@@ -17,6 +17,11 @@ Complete documentation for the Navet smart home dashboard.
   - Managing widgets
   - Creating custom widgets
   - Widget storage and API
+- **[Docker and Home Assistant Add-on](DOCKER_HOME_ASSISTANT_ADDON.md)** - Packaging and deployment guide
+  - Standalone Docker image
+  - Home Assistant add-on structure
+  - Ingress setup
+  - Runtime config and deployment flow
 
 ### Legal & Terms
 - **[License](../LICENSE.md)** - CC BY-NC 4.0 license
@@ -24,6 +29,8 @@ Complete documentation for the Navet smart home dashboard.
 - **[Attributions](ATTRIBUTIONS.md)** - Credits and third-party licenses
 
 ### Design & Branding
+- **[Branding Guide](branding/BRANDING.md)** - Brand identity and usage
+- **[Branding Assets](branding/BRANDING_ASSETS.md)** - Quick reference for logo assets
 - **[Logo Showcase](LOGO_SHOWCASE.md)** - All logo variations and usage
 - **[Design System](../design-system/README.md)** - Complete design system
 - **[UI Guidelines](../design-system/UI-GUIDELINES.md)** - UI best practices
@@ -60,7 +67,10 @@ Complete documentation for the Navet smart home dashboard.
 → See [Change History](archive/CHANGES.md)
 
 **Use Navet branding:**
-→ See [Branding Guide](../BRANDING.md)
+→ See [Branding Guide](branding/BRANDING.md)
+
+**Run Navet in Docker or as a Home Assistant add-on:**
+→ See [Docker and Home Assistant Add-on](DOCKER_HOME_ASSISTANT_ADDON.md)
 
 ## 📖 Documentation Organization
 
@@ -69,12 +79,18 @@ This documentation is organized into:
 ```
 docs/
 ├── README.md (this file)      ← Documentation index
+├── DOCKER_HOME_ASSISTANT_ADDON.md ← Deployment packaging guide
 ├── WIDGETS.md                 ← User-facing feature docs
 ├── TERMS_OF_USE.md            ← Legal information
 ├── ATTRIBUTIONS.md            ← Credits
+├── branding/                  ← Brand identity docs
+│   ├── BRANDING.md            ← Brand guide
+│   └── BRANDING_ASSETS.md     ← Asset quick reference
 ├── archive/                   ← Historical records
 │   ├── CHANGES.md             ← Complete changelog
-│   └── CLEANUP_SUMMARY.md     ← Organization history
+│   ├── CLEANUP_SUMMARY.md     ← Organization history
+│   ├── legacy/                ← Superseded root docs
+│   └── status/                ← Historical status summaries
 └── technical/                 ← Developer references (legacy)
 ```
 
@@ -83,6 +99,7 @@ docs/
 **By Topic:**
 - **Features** → WIDGETS.md
 - **Design** → design-system/
+- **Branding** → branding/
 - **Legal** → TERMS_OF_USE.md, LICENSE.md
 - **History** → archive/CHANGES.md
 - **Credits** → ATTRIBUTIONS.md
@@ -91,6 +108,7 @@ docs/
 - **Users** → README.md, WIDGETS.md
 - **Contributors** → CONTRIBUTING.md, design-system/
 - **Developers** → design-system/, archive/CHANGES.md
+- **Brand / Marketing** → branding/, LOGO_SHOWCASE.md, public/README.md
 - **Legal** → TERMS_OF_USE.md, LICENSE.md
 
 ## 💡 Tips
@@ -102,5 +120,5 @@ docs/
 
 ---
 
-**Last Updated:** March 5, 2026  
+**Last Updated:** March 6, 2026  
 **Documentation Status:** ✅ Complete and organized

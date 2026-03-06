@@ -1,4 +1,5 @@
 import { createContext, type ReactNode, useCallback, useContext, useState } from 'react';
+import { getRuntimeConfig } from '../config/runtime-config';
 
 export interface HAConfig {
 	url: string;
@@ -27,14 +28,11 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
 				}
 			}
 
-			// Fallback to environment variables if available
-			const hassUrl = import.meta.env.VITE_URL;
-			const token = import.meta.env.VITE_TOKEN;
+			const { hassUrl, token } = getRuntimeConfig();
 
 			if (hassUrl && token) {
-				const cleanUrl = hassUrl.endsWith('/') ? hassUrl.slice(0, -1) : hassUrl;
 				return {
-					url: cleanUrl,
+					url: hassUrl,
 					token: token,
 				};
 			}
