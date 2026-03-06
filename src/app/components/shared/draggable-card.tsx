@@ -38,12 +38,17 @@ export function DraggableCard({
 	return (
 		<div
 			ref={setNodeRef}
+			data-draggable-card="true"
 			style={style}
 			{...(isSortable ? attributes : {})}
 			{...(isSortable ? listeners : {})}
 			className={`h-full relative transition-opacity duration-200 ${className} ${
 				isDragging ? 'opacity-40 z-50' : 'opacity-100'
-			} ${isEditMode && !isDragging ? 'cursor-move animate-wiggle' : ''} ${isEditMode ? 'active:cursor-grabbing' : ''}`}
+			} ${
+				isEditMode && !isDragging
+					? 'cursor-move animate-wiggle [&_*]:cursor-inherit'
+					: ''
+			} ${isEditMode ? 'active:cursor-grabbing [&_*]:active:cursor-inherit' : ''}`}
 		>
 			{children}
 		</div>

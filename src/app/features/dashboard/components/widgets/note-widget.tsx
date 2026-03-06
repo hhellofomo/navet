@@ -70,6 +70,7 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
 				</div>
 				<div className="flex-1 min-w-0">
 					<h3 className={`text-sm font-semibold ${textPrimary}`}>Quick Note</h3>
+					<p className="text-[10px] text-gray-400 truncate mt-0.5">Widget</p>
 				</div>
 				{!isEditing && (
 					<button

@@ -1,6 +1,14 @@
 import type { CardSize } from '../components/shared/card-size-selector';
 import type { SensorIconType } from '../features/sensors/components/sensors/sensor-types';
 
+export interface DeviceMetric {
+	label: string;
+	value: string | number;
+	unit: string;
+	icon: SensorIconType;
+	category?: 'measurement' | 'configuration';
+}
+
 // Base device interface
 export interface BaseDevice {
 	id: string;
@@ -79,9 +87,11 @@ export interface WiFiDevice extends BaseDevice {
 export interface SwitchDevice extends BaseDevice {
 	room: string;
 	state: boolean;
-	power: number;
-	voltage: number;
-	energy: number;
+	entityType?: string;
+	power?: number;
+	voltage?: number;
+	energy?: number;
+	metrics?: DeviceMetric[];
 }
 
 // Cover device

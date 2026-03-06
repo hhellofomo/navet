@@ -9,6 +9,7 @@ import { CustomScrollbar } from '@/app/components/shared/custom-scrollbar';
 import { DialogHeader } from '@/app/components/shared/dialog-header';
 import { IconPicker } from '@/app/components/shared/icon-picker';
 import { PRESET_COLORS } from '@/app/constants/light-constants';
+import { useTheme } from '@/app/contexts/theme-context';
 import type { BrightnessPresetKey } from '@/app/stores/light-preset-store';
 
 interface LightSettingsDialogProps {
@@ -73,6 +74,19 @@ export const LightSettingsDialog = memo(function LightSettingsDialog({
 	onBrightnessPresetOrderChange,
 	onIconChange,
 }: LightSettingsDialogProps) {
+	const { primaryColor } = useTheme();
+	const colorMap = {
+		orange: { from: 'from-orange-900/95', to: 'to-orange-950/95', border: 'border-orange-500/20' },
+		blue: { from: 'from-blue-900/95', to: 'to-blue-950/95', border: 'border-blue-500/20' },
+		green: { from: 'from-green-900/95', to: 'to-green-950/95', border: 'border-green-500/20' },
+		purple: { from: 'from-purple-900/95', to: 'to-purple-950/95', border: 'border-purple-500/20' },
+		pink: { from: 'from-pink-900/95', to: 'to-pink-950/95', border: 'border-pink-500/20' },
+		red: { from: 'from-red-900/95', to: 'to-red-950/95', border: 'border-red-500/20' },
+		yellow: { from: 'from-yellow-900/95', to: 'to-yellow-950/95', border: 'border-yellow-500/20' },
+		teal: { from: 'from-teal-900/95', to: 'to-teal-950/95', border: 'border-teal-500/20' },
+	} as const;
+	const activeDialogColors = colorMap[primaryColor];
+
 	return (
 		<Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
 			<Dialog.Portal>
@@ -80,7 +94,7 @@ export const LightSettingsDialog = memo(function LightSettingsDialog({
 				<Dialog.Content
 					className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md h-[85vh] backdrop-blur-xl rounded-3xl border shadow-2xl z-50 animate-in fade-in zoom-in duration-200 overflow-hidden ${
 						isOn
-							? 'bg-gradient-to-br from-orange-900/95 to-orange-950/95 border-orange-500/20'
+							? `bg-gradient-to-br ${activeDialogColors.from} ${activeDialogColors.to} ${activeDialogColors.border}`
 							: 'bg-gradient-to-br from-gray-900/95 to-gray-950/95 border-gray-500/10'
 					}`}
 				>
@@ -124,14 +138,9 @@ export const LightSettingsDialog = memo(function LightSettingsDialog({
 									isOn={isOn}
 									onPresetValueChange={onBrightnessPresetValueChange}
 									onPresetOrderChange={onBrightnessPresetOrderChange}
-									onScopeToggle={() =>
-										onApplyBrightnessPresetsToAllChange(!applyBrightnessPresetsToAll)
-									}
-									scopeLabel={applyBrightnessPresetsToAll ? 'All lights' : 'This light'}
-									scopeHint={
-										applyBrightnessPresetsToAll
-											? 'Click to edit presets for this light only'
-											: 'Click to apply preset changes to all lights'
+									onlyApplyToThisLight={!applyBrightnessPresetsToAll}
+									onOnlyApplyToThisLightChange={(checked) =>
+										onApplyBrightnessPresetsToAllChange(!checked)
 									}
 								/>
 

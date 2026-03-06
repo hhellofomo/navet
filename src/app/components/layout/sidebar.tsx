@@ -5,13 +5,27 @@ import { useTheme } from '@/app/contexts/theme-context';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 
 export const Sidebar = memo(function Sidebar() {
-	const { theme } = useTheme();
+	const { theme, primaryColor } = useTheme();
 	const { activeSection, setActiveSection } = useNavigation();
 
 	const bgColor = theme === 'light' ? 'bg-white border-gray-200' : 'bg-[#0a0a0a] border-white/5';
-	const activeColor = 'bg-orange-500/20 text-orange-500';
 	const inactiveColor =
 		theme === 'light' ? 'text-gray-400 hover:text-gray-900' : 'text-gray-600 hover:text-gray-400';
+	const getColorValue = (color: typeof primaryColor) => {
+		const colors = {
+			orange: '#f97316',
+			blue: '#3b82f6',
+			green: '#22c55e',
+			purple: '#a855f7',
+			pink: '#ec4899',
+			red: '#ef4444',
+			yellow: '#eab308',
+			teal: '#14b8a6',
+		} as const;
+
+		return colors[color];
+	};
+	const activeColorValue = getColorValue(primaryColor);
 
 	const menuItems = [
 		{
@@ -75,8 +89,16 @@ export const Sidebar = memo(function Sidebar() {
 							key={index}
 							onClick={item.onClick}
 							className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-								activeSection === item.section ? activeColor : inactiveColor
+								activeSection === item.section ? '' : inactiveColor
 							}`}
+							style={
+								activeSection === item.section
+									? {
+											backgroundColor: `${activeColorValue}20`,
+											color: activeColorValue,
+										}
+									: undefined
+							}
 						>
 							<item.icon className="w-5 h-5" />
 						</button>
@@ -95,8 +117,16 @@ export const Sidebar = memo(function Sidebar() {
 							key={index}
 							onClick={item.onClick}
 							className={`flex flex-col items-center gap-1 py-2 px-2 rounded-lg transition-colors ${
-								activeSection === item.section ? activeColor : inactiveColor
+								activeSection === item.section ? '' : inactiveColor
 							}`}
+							style={
+								activeSection === item.section
+									? {
+											backgroundColor: `${activeColorValue}20`,
+											color: activeColorValue,
+										}
+									: undefined
+							}
 						>
 							<item.icon className="w-5 h-5" />
 							<span className="text-[10px] font-medium">{item.label}</span>

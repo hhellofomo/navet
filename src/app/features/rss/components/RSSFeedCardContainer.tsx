@@ -1,3 +1,4 @@
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { memo } from 'react';
 import { useTheme } from '../../../contexts/theme-context';
 import { RSSFeedCardView } from './RSSFeedCardView';
@@ -72,7 +73,7 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
 	size = 'medium',
 	onSizeChange,
 }: RSSFeedCardContainerProps) {
-	const { theme, colors } = useTheme();
+	const { theme, colors, primaryColor } = useTheme();
 	const isSmall = size === 'small';
 	const isMedium = size === 'medium';
 	const _isLarge = size === 'large';
@@ -93,6 +94,7 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
 			size={size}
 			onSizeChange={onSizeChange}
 			theme={theme}
+			primaryColor={primaryColor}
 			colors={colors}
 			isSmall={isSmall}
 			isMedium={isMedium}

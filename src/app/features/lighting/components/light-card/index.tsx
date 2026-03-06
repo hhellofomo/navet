@@ -48,7 +48,7 @@ export const LightCard = memo(function LightCard({
 	const [selectedColor, setSelectedColor] = useState<string | null>(null);
 	const [customColor, setCustomColor] = useState('#FFA500');
 	const [isOpen, setIsOpen] = useState(false);
-	const [applyBrightnessPresetsToAll, setApplyBrightnessPresetsToAll] = useState(false);
+	const [applyBrightnessPresetsToAll, setApplyBrightnessPresetsToAll] = useState(true);
 	const [selectedIcon, setSelectedIcon] = useState(DEFAULT_LIGHT_ICON);
 	const { connection, entities } = useHomeAssistantContext();
 	const { colors, theme } = useTheme();
@@ -85,7 +85,7 @@ export const LightCard = memo(function LightCard({
 	const settingsButtonSize = isSmall ? 'w-7 h-7' : 'w-8 h-8';
 	const settingsIconSize = isSmall ? 'w-3 h-3' : 'w-3.5 h-3.5';
 	const settingsButtonBg =
-		theme === 'light' ? 'bg-gray-900/10 hover:bg-gray-900/20' : 'bg-white/10 hover:bg-white/20';
+		theme === 'light' ? 'bg-gray-900/15 hover:bg-gray-900/25' : 'bg-white/10 hover:bg-white/20';
 	const settingsButtonText = theme === 'light' ? 'text-gray-900' : 'text-white';
 
 	useEffect(() => {
@@ -251,6 +251,18 @@ export const LightCard = memo(function LightCard({
 		minColorTemp,
 		rememberLightState,
 	]);
+
+	useEffect(() => {
+		if (!liveEntity || liveEntity.state !== 'on' || isAdjustingTemp) {
+			return;
+		}
+
+		const reportedColor = getReportedColorHex(liveEntity);
+		setSelectedColor(reportedColor);
+		if (reportedColor) {
+			setCustomColor(reportedColor);
+		}
+	}, [isAdjustingTemp, liveEntity]);
 
 	const syncLightWithHomeAssistant = useCallback(
 		async (options: {
@@ -493,7 +505,7 @@ export const LightCard = memo(function LightCard({
 							e.stopPropagation();
 							handleSettingsClick();
 						}}
-						className={`absolute right-3 bottom-3 z-20 ${settingsButtonSize} rounded-full ${settingsButtonBg} transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center`}
+						className={`absolute right-3 bottom-3 z-20 ${settingsButtonSize} rounded-full ${settingsButtonBg} transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center cursor-pointer`}
 					>
 						<Settings className={`${settingsIconSize} ${settingsButtonText}`} />
 					</button>
@@ -518,7 +530,18 @@ export const LightCard = memo(function LightCard({
 
 				{/* Light theme frosted overlay - warm tint when on, neutral when off */}
 				{theme === 'light' && (
-					<div className={`absolute inset-0 ${isOn ? 'bg-amber-50/45' : 'bg-white/60'}`} />
+					<div
+						className="absolute inset-0"
+						style={
+							isOn
+								? {
+										background: selectedColor
+											? `linear-gradient(135deg, ${selectedColor}2e 0%, rgba(255, 255, 255, 0.38) 100%)`
+											: 'rgba(255, 251, 235, 0.3)',
+									}
+								: { background: 'rgba(255, 255, 255, 0.6)' }
+						}
+					/>
 				)}
 
 				{theme !== 'light' && (
@@ -531,6 +554,7 @@ export const LightCard = memo(function LightCard({
 							name={name}
 							room={room}
 							brightness={brightness}
+							currentColor={selectedColor ?? customColor}
 							brightnessPresets={brightnessPresets}
 							isOn={isOn}
 							IconComponent={IconComponent}
@@ -543,8 +567,8 @@ export const LightCard = memo(function LightCard({
 					) : isMedium ? (
 						<LightCardMedium
 							name={name}
-							room={room}
 							brightness={brightness}
+							currentColor={selectedColor ?? customColor}
 							brightnessPresets={brightnessPresets}
 							isOn={isOn}
 							IconComponent={IconComponent}
@@ -557,10 +581,10 @@ export const LightCard = memo(function LightCard({
 					) : (
 						<LightCardLarge
 							name={name}
-							room={room}
 							brightness={brightness}
 							brightnessPresets={brightnessPresets}
 							selectedColor={selectedColor}
+							currentColor={selectedColor ?? customColor}
 							isOn={isOn}
 							IconComponent={IconComponent}
 							supportsColorControl={supportsColorControl}
@@ -661,6 +685,69 @@ function getReportedColorTempKelvin(entity: HassEntity): number | null {
 	}
 
 	return null;
+}
+
+function getReportedColorHex(entity: HassEntity): string | null {
+	const rgbColor = entity.attributes?.rgb_color;
+	if (
+		Array.isArray(rgbColor) &&
+		rgbColor.length >= 3 &&
+		rgbColor.every((value) => typeof value === 'number' && Number.isFinite(value))
+	) {
+		return rgbToHex(rgbColor[0], rgbColor[1], rgbColor[2]);
+	}
+
+	const hsColor = entity.attributes?.hs_color;
+	if (
+		Array.isArray(hsColor) &&
+		hsColor.length >= 2 &&
+		hsColor.every((value) => typeof value === 'number' && Number.isFinite(value))
+	) {
+		return hsToHex(hsColor[0], hsColor[1]);
+	}
+
+	return null;
+}
+
+function hsToHex(hue: number, saturation: number): string {
+	const normalizedHue = ((hue % 360) + 360) % 360;
+	const normalizedSaturation = Math.max(0, Math.min(100, saturation)) / 100;
+	const chroma = normalizedSaturation;
+	const segment = normalizedHue / 60;
+	const second = chroma * (1 - Math.abs((segment % 2) - 1));
+	const match = 1 - chroma;
+
+	let red = 0;
+	let green = 0;
+	let blue = 0;
+
+	if (segment >= 0 && segment < 1) {
+		red = chroma;
+		green = second;
+	} else if (segment < 2) {
+		red = second;
+		green = chroma;
+	} else if (segment < 3) {
+		green = chroma;
+		blue = second;
+	} else if (segment < 4) {
+		green = second;
+		blue = chroma;
+	} else if (segment < 5) {
+		red = second;
+		blue = chroma;
+	} else {
+		red = chroma;
+		blue = second;
+	}
+
+	return rgbToHex((red + match) * 255, (green + match) * 255, (blue + match) * 255);
+}
+
+function rgbToHex(red: number, green: number, blue: number): string {
+	return `#${[red, green, blue]
+		.map((value) => Math.max(0, Math.min(255, Math.round(value))).toString(16).padStart(2, '0'))
+		.join('')}`;
 }
 
 function roundKelvin(value: number): number {

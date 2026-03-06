@@ -1,6 +1,6 @@
 import * as Popover from '@radix-ui/react-popover';
 import { Maximize2 } from 'lucide-react';
-import { memo, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 
 export type CardSize = 'small' | 'medium' | 'large';
 
@@ -47,15 +47,34 @@ export const CardSizeSelector = memo(function CardSizeSelector({
 	allowedSizes,
 }: CardSizeSelectorProps) {
 	const [open, setOpen] = useState(false);
+	const triggerRef = useRef<HTMLButtonElement | null>(null);
 
 	const availableSizes = allowedSizes
 		? sizes.filter((size) => allowedSizes.includes(size.value))
 		: sizes;
 
+	useEffect(() => {
+		const draggableCard = triggerRef.current?.closest('[data-draggable-card="true"]');
+		if (!draggableCard) {
+			return;
+		}
+
+		if (open) {
+			draggableCard.setAttribute('data-size-selector-open', 'true');
+		} else {
+			draggableCard.removeAttribute('data-size-selector-open');
+		}
+
+		return () => {
+			draggableCard.removeAttribute('data-size-selector-open');
+		};
+	}, [open]);
+
 	return (
 		<Popover.Root open={open} onOpenChange={setOpen}>
 			<Popover.Trigger asChild>
 				<button
+					ref={triggerRef}
 					type="button"
 					className="absolute top-3 right-3 z-50 p-2 rounded-xl bg-black/50 backdrop-blur-md border border-white/10 hover:bg-black/70 transition-all duration-200 group cursor-pointer"
 					onClick={(e) => e.stopPropagation()}

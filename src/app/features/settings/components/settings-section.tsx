@@ -14,15 +14,18 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Switch } from '@/app/components/ui/switch';
 import { useAuth } from '@/app/contexts/auth-context';
 import { useConfig } from '@/app/contexts/config-context';
 import { type ThemeType, useTheme } from '@/app/contexts/theme-context';
-import type { PrimaryColor } from '@/app/stores';
+import { useSettingsStore, type PrimaryColor } from '@/app/stores';
 
 export function SettingsSection() {
 	const { theme, setTheme, primaryColor, setPrimaryColor, wallpaper, setWallpaper } = useTheme();
 	const { logout, config } = useAuth();
 	const { clearConfig } = useConfig();
+	const disableAnimations = useSettingsStore((state) => state.disableAnimations);
+	const updateSettings = useSettingsStore((state) => state.updateSettings);
 	const [showLicense, setShowLicense] = useState(false);
 	const [showTerms, setShowTerms] = useState(false);
 	const [_showEditConnection, _setShowEditConnection] = useState(false);
@@ -292,6 +295,42 @@ export function SettingsSection() {
 									/>
 								</label>
 							)}
+						</div>
+					</div>
+				</section>
+
+				{/* Performance Section */}
+				<section className={`${cardBg} rounded-2xl border ${borderColor} overflow-hidden`}>
+					<div className="p-4 border-b border-white/10">
+						<div className="flex items-center gap-3">
+							<div
+								className={`w-8 h-8 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} flex items-center justify-center`}
+							>
+								<Settings2 className={`w-4 h-4 ${mutedColor}`} />
+							</div>
+							<div>
+								<h3 className={`text-sm font-semibold ${textColor}`}>Performance</h3>
+								<p className={`text-xs ${subtleColor}`}>Reduce GPU and CPU load on slower devices</p>
+							</div>
+						</div>
+					</div>
+
+					<div className="p-4">
+						<div
+							className={`flex items-start justify-between gap-4 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} p-3`}
+						>
+							<div className="flex-1">
+								<p className={`text-sm font-medium ${textColor}`}>Disable animations</p>
+								<p className={`text-xs ${subtleColor} mt-1`}>
+									Turn off transitions and animated effects across the app. Useful for slower
+									devices like Raspberry Pis.
+								</p>
+							</div>
+							<Switch
+								checked={disableAnimations}
+								onCheckedChange={(checked) => updateSettings({ disableAnimations: checked })}
+								aria-label="Disable animations across the app"
+							/>
 						</div>
 					</div>
 				</section>

@@ -41,6 +41,7 @@ interface UserSettings {
 	temperatureUnit: 'celsius' | 'fahrenheit';
 	defaultView: 'all' | string;
 	compactMode: boolean;
+	disableAnimations: boolean;
 }
 
 export interface SettingsState extends UserSettings {

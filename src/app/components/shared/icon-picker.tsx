@@ -29,6 +29,7 @@ import {
 	ZapOff,
 } from 'lucide-react';
 import { memo, useState } from 'react';
+import { useTheme } from '../../contexts/theme-context';
 
 interface IconPickerProps {
 	selectedIcon: string;
@@ -85,7 +86,19 @@ export const IconPicker = memo(function IconPicker({
 	onIconChange,
 	isLightOn,
 }: IconPickerProps) {
+	const { primaryColor } = useTheme();
 	const [searchQuery, setSearchQuery] = useState('');
+	const colorMap = {
+		orange: '#f97316',
+		blue: '#3b82f6',
+		green: '#22c55e',
+		purple: '#a855f7',
+		pink: '#ec4899',
+		red: '#ef4444',
+		yellow: '#eab308',
+		teal: '#14b8a6',
+	} as const;
+	const activeColor = colorMap[primaryColor];
 
 	// Filter icons based on search query
 	const filteredIcons = searchQuery
@@ -118,9 +131,17 @@ export const IconPicker = memo(function IconPicker({
 					placeholder="Search icons..."
 					className={`w-full pl-10 pr-4 py-2 rounded-xl text-sm transition-all duration-500 border ${
 						isLightOn
-							? 'bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10 focus:border-orange-500/30'
+							? 'bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:bg-white/10'
 							: 'bg-white/[0.02] border-white/5 text-gray-500 placeholder:text-gray-700 focus:bg-white/5 focus:border-gray-500/30'
-					} focus:outline-none focus:ring-2 ${isLightOn ? 'focus:ring-orange-500/20' : 'focus:ring-gray-500/20'}`}
+					} focus:outline-none focus:ring-2 ${isLightOn ? 'focus:ring-transparent' : 'focus:ring-gray-500/20'}`}
+					style={
+						isLightOn
+							? {
+									borderColor: searchQuery ? `${activeColor}4d` : undefined,
+									boxShadow: searchQuery ? `0 0 0 2px ${activeColor}26` : undefined,
+								}
+							: undefined
+					}
 				/>
 			</div>
 
@@ -137,22 +158,34 @@ export const IconPicker = memo(function IconPicker({
 							className={`w-full aspect-square rounded-full flex items-center justify-center transition-all duration-300 border-2 ${
 								selectedIcon === icon.name
 									? isLightOn
-										? 'bg-orange-500/30 border-orange-500 scale-105 shadow-lg shadow-orange-500/20'
+										? 'scale-105'
 										: 'bg-gray-500/20 border-gray-500/50'
 									: isLightOn
 										? 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:scale-105'
 										: 'bg-white/[0.02] border-white/5 opacity-50 cursor-not-allowed'
 							}`}
+							style={
+								selectedIcon === icon.name && isLightOn
+									? {
+											backgroundColor: `${activeColor}30`,
+											borderColor: activeColor,
+											boxShadow: `0 10px 20px -12px ${activeColor}80`,
+										}
+									: undefined
+							}
 							title={icon.label}
 						>
 							<IconComponent
 								className={`w-5 h-5 transition-colors duration-500 ${
 									selectedIcon === icon.name
-										? 'text-orange-300'
+										? ''
 										: isLightOn
 											? 'text-gray-300'
 											: 'text-gray-600'
 								}`}
+								style={
+									selectedIcon === icon.name && isLightOn ? { color: '#ffffff' } : undefined
+								}
 							/>
 						</button>
 					);

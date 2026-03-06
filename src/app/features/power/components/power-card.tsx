@@ -76,6 +76,7 @@ export const PowerCard = memo(function PowerCard({
 						>
 							Energy Usage
 						</h3>
+						<p className="text-[10px] text-gray-400 truncate mt-0.5">Power</p>
 					</div>
 					<div
 						className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${iconBg} flex items-center justify-center flex-shrink-0`}

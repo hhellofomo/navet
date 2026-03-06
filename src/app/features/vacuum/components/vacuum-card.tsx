@@ -81,6 +81,7 @@ export const VacuumCard = memo(function VacuumCard({
 							>
 								{name}
 							</h3>
+							<p className="text-[10px] text-gray-400 truncate mt-0.5">Vacuum</p>
 						</div>
 						<div
 							className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${

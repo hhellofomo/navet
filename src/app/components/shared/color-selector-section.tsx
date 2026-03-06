@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useTheme } from '../../contexts/theme-context';
 
 interface ColorSelectorSectionProps {
 	colors: string[];
@@ -17,6 +18,18 @@ export const ColorSelectorSection = memo(function ColorSelectorSection({
 	onColorChange,
 	onCustomColorChange,
 }: ColorSelectorSectionProps) {
+	const { primaryColor } = useTheme();
+	const colorMap = {
+		orange: '#f97316',
+		blue: '#3b82f6',
+		green: '#22c55e',
+		purple: '#a855f7',
+		pink: '#ec4899',
+		red: '#ef4444',
+		yellow: '#eab308',
+		teal: '#14b8a6',
+	} as const;
+	const activeColor = colorMap[primaryColor];
 	return (
 		<div>
 			<span
@@ -35,17 +48,26 @@ export const ColorSelectorSection = memo(function ColorSelectorSection({
 						disabled={!isOn}
 						className={`w-full aspect-square rounded-full transition-all duration-300 ${
 							isOn ? 'hover:scale-110' : 'cursor-not-allowed opacity-50'
-						} ${selectedColor === color ? 'ring-4 ring-white scale-110 shadow-lg' : ''}`}
-						style={{ backgroundColor: color }}
+						} ${selectedColor === color ? 'scale-110 shadow-lg' : ''}`}
+						style={{
+							backgroundColor: color,
+							boxShadow:
+								selectedColor === color ? `0 0 0 4px ${activeColor}` : undefined,
+						}}
 					/>
 				))}
 
-				{/* Custom Color Button with Rainbow Gradient */}
+				{/* Custom Color Button */}
 				<label
-					className={`w-full aspect-square rounded-full bg-gradient-to-br from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 transition-all duration-300 flex items-center justify-center cursor-pointer relative overflow-hidden ${
+					className={`w-full aspect-square rounded-full transition-all duration-300 flex items-center justify-center cursor-pointer relative overflow-hidden ${
 						isOn ? 'hover:scale-110' : 'cursor-not-allowed opacity-50'
 					}`}
 					title="Custom color picker"
+					style={{
+						background: `linear-gradient(135deg, ${customColor} 0%, ${customColor}cc 45%, rgba(255, 255, 255, 0.9) 100%)`,
+						boxShadow:
+							selectedColor === customColor ? `0 0 0 4px ${activeColor}` : undefined,
+					}}
 				>
 					<input
 						type="color"
@@ -58,7 +80,12 @@ export const ColorSelectorSection = memo(function ColorSelectorSection({
 						className="absolute inset-0 opacity-0 cursor-pointer"
 					/>
 					<div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center pointer-events-none">
-						<div className="w-3 h-3 rounded-full border-2 border-white" />
+						<div
+							className="w-3 h-3 rounded-full border border-white/80"
+							style={{
+								background: `linear-gradient(135deg, ${customColor} 0%, rgba(255, 255, 255, 0.9) 100%)`,
+							}}
+						/>
 					</div>
 				</label>
 			</div>

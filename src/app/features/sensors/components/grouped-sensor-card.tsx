@@ -85,6 +85,7 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
 							>
 								{name}
 							</h3>
+							<p className="text-[10px] text-gray-400 truncate mt-0.5">Sensor Group</p>
 						</div>
 						<div
 							className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${colors.iconBg} flex items-center justify-center flex-shrink-0`}

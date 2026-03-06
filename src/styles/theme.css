@@ -178,6 +178,18 @@
 		font-weight: var(--font-weight-normal);
 		line-height: 1.5;
 	}
+
+	html[data-no-animation='true'] {
+		scroll-behavior: auto !important;
+	}
+
+	html[data-no-animation='true'] *,
+	html[data-no-animation='true'] *::before,
+	html[data-no-animation='true'] *::after {
+		animation: none !important;
+		transition: none !important;
+		scroll-behavior: auto !important;
+	}
 }
 
 @layer utilities {
@@ -305,5 +317,9 @@
 
 	.animate-wiggle {
 		animation: wiggle 0.3s ease-in-out infinite;
+	}
+
+	[data-draggable-card='true'][data-size-selector-open='true'] {
+		animation: none !important;
 	}
 }

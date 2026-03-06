@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 import { memo } from 'react';
+import { useTheme } from '../../contexts/theme-context';
 
 interface BrightnessPreset {
 	icon: LucideIcon;
@@ -21,6 +22,18 @@ export const BrightnessPresets = memo(function BrightnessPresets({
 	isOn,
 	onBrightnessChange,
 }: BrightnessPresetsProps) {
+	const { primaryColor } = useTheme();
+	const colorMap = {
+		orange: '#f97316',
+		blue: '#3b82f6',
+		green: '#22c55e',
+		purple: '#a855f7',
+		pink: '#ec4899',
+		red: '#ef4444',
+		yellow: '#eab308',
+		teal: '#14b8a6',
+	} as const;
+	const activeColor = colorMap[primaryColor];
 	return (
 		<div>
 			<span
@@ -43,12 +56,25 @@ export const BrightnessPresets = memo(function BrightnessPresets({
 								isOn ? 'hover:scale-110' : 'cursor-not-allowed opacity-50'
 							} ${
 								currentBrightness === preset.brightness
-									? 'ring-4 ring-white scale-110 shadow-lg'
+									? 'scale-110 shadow-lg'
 									: ''
 							}`}
-							style={{ backgroundColor: isOn ? '#ffffff' : '#4a4a4a' }}
+							style={{
+								backgroundColor:
+									isOn && currentBrightness === preset.brightness
+										? activeColor
+										: isOn
+											? '#ffffff'
+											: '#4a4a4a',
+								boxShadow:
+									currentBrightness === preset.brightness ? `0 0 0 4px ${activeColor}` : undefined,
+							}}
 						>
-							<IconComponent className={`w-5 h-5 ${isOn ? 'text-gray-900' : 'text-white'}`} />
+							<IconComponent
+								className={`w-5 h-5 ${
+									isOn && currentBrightness === preset.brightness ? 'text-white' : isOn ? 'text-gray-900' : 'text-white'
+								}`}
+							/>
 						</button>
 					);
 				})}

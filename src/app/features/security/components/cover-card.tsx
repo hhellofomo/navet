@@ -165,6 +165,9 @@ export const CoverCard = memo(function CoverCard({
 						>
 							{name}
 						</h3>
+						<p className="text-[10px] text-gray-400 truncate mt-0.5">
+							{deviceClassConfig[deviceClass].label}
+						</p>
 						{!isSmall && (
 							<div className="space-y-0.5">
 								<p className={`text-xs ${secondaryTextColor} truncate`}>{room}</p>

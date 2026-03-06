@@ -45,6 +45,10 @@ export const ClimateCard = memo(function ClimateCard({
 	const isMedium = size === 'medium';
 	const _isLarge = size === 'large';
 	const padding = isSmall ? 'p-4' : 'p-5';
+	const isOff = mode === 'off';
+	const resolvedIconBg = theme === 'light' && isOff ? 'bg-gray-300/70' : iconBg;
+	const resolvedIconColor = theme === 'light' && isOff ? 'text-gray-600' : iconColor;
+	const resolvedTextSecondary = theme === 'light' && isOff ? 'text-gray-600' : textSecondary;
 
 	return (
 		<div
@@ -70,11 +74,12 @@ export const ClimateCard = memo(function ClimateCard({
 						>
 							{name}
 						</h3>
+						<p className="text-[10px] text-gray-400 truncate mt-0.5">Climate</p>
 					</div>
 					<div
-						className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${iconBg} flex items-center justify-center flex-shrink-0`}
+						className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${resolvedIconBg} flex items-center justify-center flex-shrink-0`}
 					>
-						<Thermometer className={`${isSmall ? 'w-4 h-4' : 'w-5 h-5'} ${iconColor}`} />
+						<Thermometer className={`${isSmall ? 'w-4 h-4' : 'w-5 h-5'} ${resolvedIconColor}`} />
 					</div>
 				</div>
 
@@ -83,14 +88,14 @@ export const ClimateCard = memo(function ClimateCard({
 						temperature={temperature}
 						mode={mode}
 						textPrimary={textPrimary}
-						textSecondary={textSecondary}
+						textSecondary={resolvedTextSecondary}
 					/>
 				) : isMedium ? (
 					<ClimateMediumView
 						temperature={temperature}
 						mode={mode}
 						textPrimary={textPrimary}
-						textSecondary={textSecondary}
+						textSecondary={resolvedTextSecondary}
 						activeBtnBg={activeBtnBg}
 						inactiveBtnBg={inactiveBtnBg}
 						onModeChange={setMode}
@@ -100,7 +105,7 @@ export const ClimateCard = memo(function ClimateCard({
 						temperature={temperature}
 						mode={mode}
 						textPrimary={textPrimary}
-						textSecondary={textSecondary}
+						textSecondary={resolvedTextSecondary}
 						activeBtnBg={activeBtnBg}
 						inactiveBtnBg={inactiveBtnBg}
 						onModeChange={setMode}

@@ -65,9 +65,7 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
 				</div>
 				<div className="flex-1 min-w-0">
 					<h3 className={`text-sm font-semibold ${textPrimary}`}>Photo Frame</h3>
-					<p className={`text-xs ${textSecondary}`}>
-						{currentIndex + 1} of {mockPhotos.length}
-					</p>
+					<p className="text-[10px] text-gray-400 truncate mt-0.5">Widget</p>
 				</div>
 			</div>
 

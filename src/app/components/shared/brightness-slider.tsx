@@ -21,13 +21,24 @@ export const BrightnessSlider = memo(function BrightnessSlider({
 	size = 'medium',
 	onClick,
 }: BrightnessSliderProps) {
-	const { theme } = useTheme();
-	const heightClass = size === 'small' ? 'h-4' : 'h-5';
+	const { theme, primaryColor } = useTheme();
+	const heightClass = size === 'small' ? 'h-5' : 'h-6';
 	const trackHeightClass = size === 'small' ? 'h-1' : 'h-1';
-	const thumbSizeClass = size === 'small' ? 'w-3 h-3' : 'w-4 h-4';
+	const thumbSizeClass = size === 'small' ? 'w-4 h-4' : 'w-5 h-5';
 	const labelColor = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
 	const valueColor = theme === 'light' ? 'text-gray-900' : 'text-white';
 	const trackBg = theme === 'light' ? 'bg-gray-200' : 'bg-white/10';
+	const colorMap = {
+		orange: { from: '#fb923c', to: '#f97316', ring: '#f97316' },
+		blue: { from: '#60a5fa', to: '#3b82f6', ring: '#3b82f6' },
+		green: { from: '#4ade80', to: '#22c55e', ring: '#22c55e' },
+		purple: { from: '#c084fc', to: '#a855f7', ring: '#a855f7' },
+		pink: { from: '#f472b6', to: '#ec4899', ring: '#ec4899' },
+		red: { from: '#f87171', to: '#ef4444', ring: '#ef4444' },
+		yellow: { from: '#facc15', to: '#eab308', ring: '#eab308' },
+		teal: { from: '#2dd4bf', to: '#14b8a6', ring: '#14b8a6' },
+	} as const;
+	const activeColor = colorMap[primaryColor];
 
 	return (
 		<div>
@@ -49,10 +60,16 @@ export const BrightnessSlider = memo(function BrightnessSlider({
 				className={`relative flex items-center w-full ${heightClass}`}
 			>
 				<Slider.Track className={`relative grow rounded-full ${trackHeightClass} ${trackBg}`}>
-					<Slider.Range className="absolute rounded-full h-full bg-gradient-to-r from-orange-400 to-orange-600" />
+					<Slider.Range
+						className="absolute rounded-full h-full"
+						style={{
+							backgroundImage: `linear-gradient(to right, ${activeColor.from}, ${activeColor.to})`,
+						}}
+					/>
 				</Slider.Track>
 				<Slider.Thumb
-					className={`block ${thumbSizeClass} bg-white rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer`}
+					className={`block ${thumbSizeClass} bg-white rounded-full shadow-lg focus:outline-none cursor-pointer touch-manipulation`}
+					style={{ boxShadow: `0 0 0 2px ${activeColor.ring}` }}
 				/>
 			</Slider.Root>
 		</div>

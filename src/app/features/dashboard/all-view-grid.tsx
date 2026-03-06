@@ -1,3 +1,4 @@
+import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { memo, useCallback, useMemo } from 'react';
 import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-size-selector';
 import { DraggableCard } from '@/app/components/shared/draggable-card';
@@ -12,6 +13,7 @@ import { WidgetCard } from './components/widget-card';
 interface AllViewGridProps {
 	deviceMap: Map<string, DeviceWithType>;
 	rooms: string[];
+	cardOrders: Record<string, string[]>;
 	customCards?: CustomCard[];
 	onDeleteCard?: (cardId: string) => void;
 	onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
@@ -24,6 +26,7 @@ interface AllViewGridProps {
 export const AllViewGrid = memo(function AllViewGrid({
 	deviceMap,
 	rooms,
+	cardOrders,
 	customCards = [],
 	onDeleteCard,
 	onUpdateCard,
@@ -79,6 +82,10 @@ export const AllViewGrid = memo(function AllViewGrid({
 
 		return grouped;
 	}, [customCards]);
+	const customCardMap = useMemo(
+		() => new Map(customCards.map((card) => [card.id, card])),
+		[customCards]
+	);
 
 	const textColor =
 		theme === 'light' ? 'text-gray-900' : theme === 'contrast' ? 'text-white' : 'text-white';
@@ -91,6 +98,11 @@ export const AllViewGrid = memo(function AllViewGrid({
 				const roomDevices = devicesByRoom[room] || [];
 				const roomCustomCards = customCardsByRoom[room] || [];
 				const totalItems = roomDevices.length + roomCustomCards.length;
+				const orderedRoomIds = (cardOrders[room] || []).filter(
+					(id) =>
+						roomDevices.some((device) => device.id === id) ||
+						roomCustomCards.some((card) => card.id === id)
+				);
 
 				if (totalItems === 0) return null;
 
@@ -98,54 +110,66 @@ export const AllViewGrid = memo(function AllViewGrid({
 					<div key={room}>
 						{/* Room Header */}
 						<div className="flex items-center gap-3 mb-4">
-							<h2 className={`text-lg md:text-xl font-semibold ${textColor}`}>{room}</h2>
+							<h2
+								className={`text-lg md:text-xl font-semibold ${
+									room === 'Unknown Room'
+										? theme === 'light'
+											? 'text-gray-700'
+											: textColor
+										: textColor
+								}`}
+							>
+								{room}
+							</h2>
 							<span className={`text-xs md:text-sm ${textSecondary}`}>
 								{totalItems} {totalItems === 1 ? 'item' : 'items'}
 							</span>
 						</div>
 
 						{/* Device and Widget Grid for this room */}
-						<div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-2 md:gap-3 lg:gap-4 auto-rows-[180px] md:auto-rows-[190px]">
-							{/* Render devices */}
-							{roomDevices.map((device, index) => {
-								const size = cardSizes[device.id] || (device.size as CardSize);
+						<SortableContext items={orderedRoomIds} strategy={rectSortingStrategy}>
+							<div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-2 md:gap-3 lg:gap-4 auto-rows-[180px] md:auto-rows-[190px]">
+								{orderedRoomIds.map((id, index) => {
+									const device = deviceMap.get(id);
+									if (device) {
+										const size = cardSizes[device.id] || (device.size as CardSize);
 
-								return (
-									<DraggableCard
-										key={device.id}
-										id={device.id}
-										index={index}
-										isEditMode={isEditMode}
-										isSortable={false}
-										className={getCardSpanClass(size)}
-									>
-										{renderCard({ device, size, handleSizeChange, isEditMode })}
-									</DraggableCard>
-								);
-							})}
+										return (
+											<DraggableCard
+												key={device.id}
+												id={device.id}
+												index={index}
+												isEditMode={isEditMode}
+												className={getCardSpanClass(size)}
+											>
+												{renderCard({ device, size, handleSizeChange, isEditMode })}
+											</DraggableCard>
+										);
+									}
 
-							{/* Render custom widgets */}
-							{roomCustomCards.map((card, index) => {
-								const size = cardSizes[card.id] || card.size;
+									const card = customCardMap.get(id);
+									if (!card) return null;
 
-								return (
-									<DraggableCard
-										key={card.id}
-										id={card.id}
-										index={roomDevices.length + index}
-										isEditMode={isEditMode}
-										isSortable={false}
-										className={getCardSpanClass(size)}
-									>
-										<WidgetCard
-											card={{ ...card, size }}
-											onDelete={onDeleteCard}
-											onUpdate={onUpdateCard}
-										/>
-									</DraggableCard>
-								);
-							})}
-						</div>
+									const size = cardSizes[card.id] || card.size;
+
+									return (
+										<DraggableCard
+											key={card.id}
+											id={card.id}
+											index={index}
+											isEditMode={isEditMode}
+											className={getCardSpanClass(size)}
+										>
+											<WidgetCard
+												card={{ ...card, size }}
+												onDelete={onDeleteCard}
+												onUpdate={onUpdateCard}
+											/>
+										</DraggableCard>
+									);
+								})}
+							</div>
+						</SortableContext>
 					</div>
 				);
 			})}

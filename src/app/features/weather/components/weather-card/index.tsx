@@ -108,6 +108,7 @@ export const WeatherCard = memo(function WeatherCard({
 						>
 							{location}
 						</h3>
+						<p className="text-[10px] text-gray-400 truncate mt-0.5">Weather</p>
 						{!isSmall && <p className={`text-xs ${textSecondary}`}>{dateTime}</p>}
 					</div>
 					<div

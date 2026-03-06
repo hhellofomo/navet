@@ -4,8 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      NAVET_HASS_URL: http://homeassistant.local:8123
-      NAVET_HASS_TOKEN: your-long-lived-access-token
+      NAVET_HASS_URL: ${NAVET_HASS_URL}
+      NAVET_HASS_TOKEN: ${NAVET_HASS_TOKEN}
     ports:
       - "8080:80"
     restart: unless-stopped

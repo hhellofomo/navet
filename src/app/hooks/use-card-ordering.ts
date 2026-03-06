@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import type { CustomCard } from './use-custom-cards';
 
 interface Device {
 	id: string;
@@ -13,7 +14,11 @@ const CARD_ORDERS_STORAGE_KEY = 'ha-dashboard-card-orders';
  * Custom hook for managing card ordering within rooms via drag-and-drop
  * Handles initialization and updates of card positions with localStorage persistence
  */
-export const useCardOrdering = (devices: Record<string, Device[]>, rooms: string[]) => {
+export const useCardOrdering = (
+	devices: Record<string, Device[]>,
+	rooms: string[],
+	customCards: CustomCard[] = []
+) => {
 	const buildOrders = useCallback(() => {
 		const orders: Record<string, string[]> = {};
 
@@ -28,11 +33,16 @@ export const useCardOrdering = (devices: Record<string, Device[]>, rooms: string
 					}
 				});
 			});
+			customCards.forEach((card) => {
+				if (card.room === room || card.room === 'All') {
+					roomCards.push(card.id);
+				}
+			});
 			orders[room] = roomCards;
 		});
 
 		return orders;
-	}, [devices, rooms]);
+	}, [customCards, devices, rooms]);
 
 	const [cardOrders, setCardOrders] = useState<Record<string, string[]>>(() => {
 		// Try to load from localStorage first
@@ -46,6 +56,7 @@ export const useCardOrdering = (devices: Record<string, Device[]>, rooms: string
 						.flat()
 						.map((d) => d.id)
 				);
+				customCards.forEach((card) => allDeviceIds.add(card.id));
 				const isValid = Object.values(parsed).every(
 					(orderArray: unknown) =>
 						Array.isArray(orderArray) &&
@@ -68,6 +79,7 @@ export const useCardOrdering = (devices: Record<string, Device[]>, rooms: string
 				.flat()
 				.map((device) => device.id)
 		);
+		customCards.forEach((card) => allDeviceIds.add(card.id));
 
 		setCardOrders((prev) => {
 			const next = buildOrders();
@@ -100,7 +112,7 @@ export const useCardOrdering = (devices: Record<string, Device[]>, rooms: string
 
 			return next;
 		});
-	}, [buildOrders, devices]);
+	}, [buildOrders, customCards, devices]);
 
 	// Persist to localStorage whenever cardOrders changes
 	useEffect(() => {
