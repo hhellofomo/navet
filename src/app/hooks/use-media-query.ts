@@ -1,50 +1,50 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * Custom hook for responsive design with media queries
- * 
+ *
  * @param query - The media query string
  * @returns boolean indicating if the media query matches
- * 
+ *
  * @example
  * const isMobile = useMediaQuery('(max-width: 768px)');
  * const isDark = useMediaQuery('(prefers-color-scheme: dark)');
  */
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia(query).matches;
-  });
+	const [matches, setMatches] = useState<boolean>(() => {
+		if (typeof window === 'undefined') return false;
+		return window.matchMedia(query).matches;
+	});
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
 
-    const mediaQuery = window.matchMedia(query);
-    
-    const handleChange = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
-    };
+		const mediaQuery = window.matchMedia(query);
 
-    // Set initial value
-    setMatches(mediaQuery.matches);
+		const handleChange = (event: MediaQueryListEvent) => {
+			setMatches(event.matches);
+		};
 
-    // Listen for changes
-    mediaQuery.addEventListener('change', handleChange);
+		// Set initial value
+		setMatches(mediaQuery.matches);
 
-    return () => {
-      mediaQuery.removeEventListener('change', handleChange);
-    };
-  }, [query]);
+		// Listen for changes
+		mediaQuery.addEventListener('change', handleChange);
 
-  return matches;
+		return () => {
+			mediaQuery.removeEventListener('change', handleChange);
+		};
+	}, [query]);
+
+	return matches;
 }
 
 /**
  * Predefined breakpoint hooks for convenience
  */
 export const useBreakpoints = () => ({
-  isMobile: useMediaQuery('(max-width: 767px)'),
-  isTablet: useMediaQuery('(min-width: 768px) and (max-width: 1023px)'),
-  isDesktop: useMediaQuery('(min-width: 1024px)'),
-  isLargeDesktop: useMediaQuery('(min-width: 1280px)'),
+	isMobile: useMediaQuery('(max-width: 767px)'),
+	isTablet: useMediaQuery('(min-width: 768px) and (max-width: 1023px)'),
+	isDesktop: useMediaQuery('(min-width: 1024px)'),
+	isLargeDesktop: useMediaQuery('(min-width: 1280px)'),
 });

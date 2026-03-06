@@ -1,10 +1,4 @@
-import type {
-	Auth,
-	AuthData,
-	Connection,
-	HassConfig,
-	HassEntities,
-} from 'home-assistant-js-websocket';
+import type { Auth, Connection, HassConfig, HassEntities } from 'home-assistant-js-websocket';
 import {
 	createConnection,
 	createLongLivedTokenAuth,
@@ -67,19 +61,16 @@ class HomeAssistantService {
 
 			// Connection events
 			this.connection.addEventListener('ready', () => {
-				console.debug('Connected to Home Assistant');
 				this.connected = true;
 				this.notifyListeners();
 			});
 
 			this.connection.addEventListener('disconnected', () => {
-				console.debug('Disconnected from Home Assistant');
 				this.connected = false;
 				this.notifyListeners();
 			});
 
 			this.connection.addEventListener('reconnect-error', () => {
-				console.error('Reconnection error');
 				this.connected = false;
 				this.notifyListeners();
 			});
@@ -99,22 +90,17 @@ class HomeAssistantService {
 	private handleError(error: unknown): never {
 		switch (error) {
 			case ERR_INVALID_AUTH:
-				console.error('Invalid authentication');
 				break;
 			case ERR_CANNOT_CONNECT:
-				console.error('Cannot connect to Home Assistant');
 				break;
 			case ERR_CONNECTION_LOST:
-				console.error('Connection lost');
 				break;
 			case ERR_HASS_HOST_REQUIRED:
-				console.error('Home Assistant host is required');
 				break;
 			case ERR_INVALID_HTTPS_TO_HTTP:
-				console.error('Invalid HTTPS to HTTP connection');
 				break;
 			default:
-				console.error('Unknown error:', error);
+				break;
 		}
 		throw error;
 	}
