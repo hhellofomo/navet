@@ -22,6 +22,7 @@ Complete documentation for the Navet smart home dashboard.
   - Home Assistant add-on structure
   - Ingress setup
   - Runtime config and deployment flow
+  - Current dashboard performance notes
 
 ### Legal & Terms
 - **[License](../LICENSE.md)** - CC BY-NC 4.0 license
@@ -73,6 +74,9 @@ Complete documentation for the Navet smart home dashboard.
 
 **Understand recent performance work:**
 → See [Docker and Home Assistant Add-on -> Current Performance Work](DOCKER_HOME_ASSISTANT_ADDON.md#current-performance-work)
+
+**Manage dashboard backup and restore:**
+→ See [Main README -> Dashboard Config](../README.md#dashboard-config)
 
 ## 📖 Documentation Organization
 

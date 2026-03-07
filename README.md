@@ -42,6 +42,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 ### 🛠️ Functionality
 - **Edit Mode** - Drag-and-drop card reordering and resizing
 - **Custom Widgets** - Add Calendar, News, Weather, Photo Frame, and Quick Note widgets
+- **Manual Entity Mode** - Switch from auto-discovered cards to a curated entity list
 - **Search & Filter** - Real-time search filters dashboard view
 - **All View** - See all devices grouped by room
 - **Notifications** - System notifications panel
@@ -64,6 +65,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **Deferred Room Rendering** - Offscreen room groups are deferred in the All view
 - **Smart Re-renders** - Zustand-backed search state and stable device maps reduce dashboard churn
 - **No-Animation Mode** - Optional global animation disable for slower devices
+- **Local Config Backup** - Export and restore dashboard layout/preferences from a JSON file
 - **Tree-shakeable** - Only imports what's actually used
 
 ## 🚀 Installation
@@ -123,6 +125,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 #### Edit Mode
 - Click the **Edit** button in the header
 - **Add widgets** with the Add Card button
+- In **Manual** dashboard mode, use **Add Entity** to choose exactly which Home Assistant entities appear
 - **Drag cards** to reorder them
 - **Click cards** to resize (small/medium/large)
 - **Save changes** when done
@@ -141,6 +144,23 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - Use **room tabs** to filter by room
 - **All** view shows everything grouped by room
 - Device counts shown for each room
+
+#### Dashboard Content
+- In **Settings -> Dashboard Content**, choose between:
+  - **Auto**: show discovered entities automatically
+  - **Manual**: only show entities you explicitly add
+- Manual mode is useful for hiding helper, diagnostic, or duplicate Home Assistant entities
+
+#### Dashboard Config
+- In **Settings -> Dashboard Config**, export your local dashboard setup to a JSON file
+- Import that file later on the same machine or another device to restore:
+  - theme and wallpaper
+  - room order and card order
+  - card sizes
+  - custom widgets
+  - manual entity selection
+  - light preset settings
+- Home Assistant connection URL and token are intentionally not included
 
 #### Custom Widgets
 - Click **Add Card** in edit mode to add custom widgets
@@ -230,8 +250,9 @@ Found a bug or have an idea? [Open an issue](https://github.com/awesomestvi/nave
 - [x] Configuration UI with setup wizard
 - [x] Loading states and error handling
 - [x] Delete custom widgets
+- [x] Manual dashboard entity selection
+- [x] Export/import dashboard configuration
 - [ ] Widget settings (customize content)
-- [ ] Export/import dashboard configuration
 - [ ] Automations management
 - [ ] History and analytics
 - [ ] Multi-language support

@@ -150,6 +150,8 @@ The current dashboard build includes a few runtime-focused optimizations:
 - Deferred rendering for offscreen room groups in the All view
 - Zustand-backed search result state to reduce context fan-out
 - Stable device-map reuse to avoid rerendering unchanged cards
+- Manual dashboard entity mode for curated Home Assistant card selection
+- Local dashboard config export/import for layout and preference backup
 - Optional no-animation mode for slower devices such as Raspberry Pi deployments
 
 ## Remaining Limitation
@@ -179,6 +181,7 @@ If you are the only consumer right now:
 - That only affects development and does not block Docker packaging
 - `index.html` now loads `/config.js` before the app bootstraps
 - Home Assistant credentials are still persisted in browser storage after login
+- Dashboard config export/import intentionally excludes connection URL and token
 - Development builds log slow dashboard renders with `[Navet][RenderProfiler]`
 
 ## If You Want Full Add-on UX
