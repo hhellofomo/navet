@@ -13,6 +13,7 @@ interface RoomNavProps {
   onToggleEditMode: () => void;
   onMoveRoom?: (activeRoom: string, overRoom: string) => void;
   onAddCard?: () => void;
+  onAddEntity?: () => void;
 }
 
 export const RoomNav = memo(function RoomNav({
@@ -23,6 +24,7 @@ export const RoomNav = memo(function RoomNav({
   onToggleEditMode,
   onMoveRoom,
   onAddCard,
+  onAddEntity,
 }: RoomNavProps) {
   const { theme, primaryColor } = useTheme();
   const visibleRooms = ['All', ...rooms];
@@ -105,6 +107,19 @@ export const RoomNav = memo(function RoomNav({
       </div>
 
       <div className="flex items-center gap-2 flex-shrink-0 pl-2">
+        {isEditMode && onAddEntity && (
+          <button
+            type="button"
+            onClick={onAddEntity}
+            className={`p-2 rounded-lg transition-colors flex items-center gap-2 px-3 ${inactiveBg} ${hoverBg}`}
+          >
+            <Plus className={`w-4 h-4 ${textSecondary}`} />
+            <span className={`text-xs font-medium hidden md:inline ${textSecondary}`}>
+              Add Entity
+            </span>
+          </button>
+        )}
+
         {isEditMode && onAddCard && (
           <button
             type="button"

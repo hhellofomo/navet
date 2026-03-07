@@ -38,6 +38,7 @@ import { DeviceGrid } from './features/dashboard/device-grid';
 import {
   useCardOrdering,
   useCardState,
+  useDashboardDevices,
   useDeviceMap,
   useEditMode,
   useRoomNavigation,
@@ -45,11 +46,16 @@ import {
 } from './hooks';
 import { useCustomCards } from './hooks/use-custom-cards';
 import { useDevices, useRooms } from './hooks/use-devices';
-import { useSettingsStore } from './stores';
+import { useDashboardEntitiesStore, useSettingsStore } from './stores';
 
 const AddCardDialog = lazy(async () => {
   const module = await import('./features/dashboard/components/add-card-dialog');
   return { default: module.AddCardDialog };
+});
+
+const AddEntityDialog = lazy(async () => {
+  const module = await import('./features/dashboard/components/add-entity-dialog');
+  return { default: module.AddEntityDialog };
 });
 
 const SettingsSection = lazy(async () => {
@@ -66,9 +72,15 @@ function Dashboard() {
   const { connected, connecting, error } = useHomeAssistantContext();
   const [devicesLoaded, setDevicesLoaded] = useState(false);
   const [showAddCardDialog, setShowAddCardDialog] = useState(false);
+  const [showAddEntityDialog, setShowAddEntityDialog] = useState(false);
+  const dashboardMode = useDashboardEntitiesStore((state) => state.mode);
+  const manualEntityIds = useDashboardEntitiesStore((state) => state.manualEntityIds);
+  const addManualEntity = useDashboardEntitiesStore((state) => state.addEntity);
+  const removeManualEntity = useDashboardEntitiesStore((state) => state.removeEntity);
 
   // Fetch devices with Home Assistant lights and existing fallback behavior for other types
-  const devices = useDevices();
+  const allDevices = useDevices();
+  const devices = useDashboardDevices(allDevices, dashboardMode, manualEntityIds);
   const rooms = useRooms(devices);
 
   // Set devices loaded when connected or when mock devices are ready
@@ -87,6 +99,7 @@ function Dashboard() {
   const { cardOrders, moveCard } = useCardOrdering(devices, rooms, allCustomCards);
   const { roomOrder, moveRoom } = useRoomOrdering(rooms);
   const { deviceMap } = useDeviceMap(devices);
+  const { deviceMap: availableDeviceMap } = useDeviceMap(allDevices);
   const lightDeviceMap = useMemo(
     () => new Map(Array.from(deviceMap.entries()).filter(([, device]) => device.type === 'lights')),
     [deviceMap]
@@ -181,6 +194,22 @@ function Dashboard() {
     [removeCard]
   );
 
+  const handleAddEntity = useCallback(
+    (entityId: string) => {
+      addManualEntity(entityId);
+      toast.success('Entity added to dashboard');
+    },
+    [addManualEntity]
+  );
+
+  const handleRemoveEntity = useCallback(
+    (entityId: string) => {
+      removeManualEntity(entityId);
+      toast.success('Entity removed from dashboard');
+    },
+    [removeManualEntity]
+  );
+
   // Handle updating a card
   const handleUpdateCard = useCallback(
     (cardId: string, data: Record<string, unknown>) => {
@@ -248,7 +277,13 @@ function Dashboard() {
           <EmptyState
             icon={Lightbulb}
             title="No Lights"
-            description="No Home Assistant light entities are currently available."
+            description={
+              dashboardMode === 'manual'
+                ? 'No light entities have been added to the dashboard yet.'
+                : 'No Home Assistant light entities are currently available.'
+            }
+            actionLabel={dashboardMode === 'manual' ? 'Add Entity' : undefined}
+            onAction={dashboardMode === 'manual' ? () => setShowAddEntityDialog(true) : undefined}
           />
         )}
       </DashboardLayout>
@@ -293,6 +328,9 @@ function Dashboard() {
             onToggleEditMode={toggleEditMode}
             onMoveRoom={moveRoom}
             onAddCard={() => setShowAddCardDialog(true)}
+            onAddEntity={
+              dashboardMode === 'manual' ? () => setShowAddEntityDialog(true) : undefined
+            }
           />
 
           {activeRoom === 'All' ? (
@@ -304,6 +342,8 @@ function Dashboard() {
                 customCards={customCards}
                 onDeleteCard={handleDeleteCard}
                 onUpdateCard={handleUpdateCard}
+                onRemoveEntity={handleRemoveEntity}
+                allowEntityRemoval={dashboardMode === 'manual'}
               />
             </RenderProfiler>
           ) : (
@@ -314,9 +354,24 @@ function Dashboard() {
                 customCards={customCards}
                 onDeleteCard={handleDeleteCard}
                 onUpdateCard={handleUpdateCard}
+                onRemoveEntity={handleRemoveEntity}
+                allowEntityRemoval={dashboardMode === 'manual'}
               />
             </RenderProfiler>
           )}
+
+          {dashboardMode === 'manual' &&
+            deviceMap.size === 0 &&
+            customCards.length === 0 &&
+            activeRoom === 'All' && (
+              <EmptyState
+                icon={Lightbulb}
+                title="No Entities Added"
+                description="Switch to edit mode and add only the Home Assistant entities you want on the dashboard."
+                actionLabel={isEditMode ? 'Add Entity' : undefined}
+                onAction={isEditMode ? () => setShowAddEntityDialog(true) : undefined}
+              />
+            )}
 
           {showAddCardDialog && (
             <Suspense fallback={null}>
@@ -325,6 +380,19 @@ function Dashboard() {
                 onClose={() => setShowAddCardDialog(false)}
                 onAddCard={handleAddCard}
                 currentRoom={activeRoom}
+              />
+            </Suspense>
+          )}
+
+          {showAddEntityDialog && (
+            <Suspense fallback={null}>
+              <AddEntityDialog
+                open={showAddEntityDialog}
+                onClose={() => setShowAddEntityDialog(false)}
+                onAddEntity={handleAddEntity}
+                currentRoom={activeRoom}
+                deviceMap={availableDeviceMap}
+                addedEntityIds={manualEntityIds}
               />
             </Suspense>
           )}

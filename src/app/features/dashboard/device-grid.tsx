@@ -13,6 +13,8 @@ interface DeviceGridProps {
   customCards?: CustomCard[];
   onDeleteCard?: (cardId: string) => void;
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
+  onRemoveEntity?: (entityId: string) => void;
+  allowEntityRemoval?: boolean;
 }
 
 /**
@@ -26,6 +28,8 @@ export const DeviceGrid = memo(function DeviceGrid({
   customCards = [],
   onDeleteCard,
   onUpdateCard,
+  onRemoveEntity,
+  allowEntityRemoval = false,
 }: DeviceGridProps) {
   const { isEditMode, cardSizes, updateCardSize } = useEditModeContext();
   const { isSearchActive, filteredDeviceIds } = useSearch();
@@ -99,6 +103,8 @@ export const DeviceGrid = memo(function DeviceGrid({
                 size={size}
                 isEditMode={isEditMode}
                 handleSizeChange={handleSizeChange}
+                onRemoveEntity={onRemoveEntity}
+                allowEntityRemoval={allowEntityRemoval}
               />
             );
           } else {
@@ -117,6 +123,8 @@ export const DeviceGrid = memo(function DeviceGrid({
                 handleSizeChange={handleSizeChange}
                 onDeleteCard={onDeleteCard}
                 onUpdateCard={onUpdateCard}
+                onRemoveEntity={onRemoveEntity}
+                allowEntityRemoval={allowEntityRemoval}
               />
             );
           }
