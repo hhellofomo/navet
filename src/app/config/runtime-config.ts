@@ -21,7 +21,7 @@ export function getRuntimeConfig(): NavetRuntimeConfig {
   const runtimeConfig = window.__NAVET_CONFIG__ ?? {};
 
   return {
-    hassUrl: normalizeUrl(runtimeConfig.hassUrl ?? import.meta.env.VITE_URL),
-    token: normalizeValue(runtimeConfig.token ?? import.meta.env.VITE_TOKEN),
+    hassUrl: normalizeUrl(runtimeConfig.hassUrl ?? import.meta.env.NAVET_HASS_URL),
+    token: normalizeValue(runtimeConfig.token ?? import.meta.env.NAVET_HASS_TOKEN),
   };
 }
