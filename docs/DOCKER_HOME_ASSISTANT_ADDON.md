@@ -49,19 +49,21 @@ If those are unset, Navet falls back to manual setup in the UI.
 ### Local Run Example
 
 ```bash
-docker compose up --build
+docker compose pull
+docker compose up -d
 ```
 
 Then open `http://localhost:8080`.
 
 ### Release Pipeline
 
-The GitHub Actions publish workflow is manual for private-repo use. It publishes a multi-arch image to GitHub Container Registry:
+The GitHub Actions publish workflow publishes a multi-arch image to GitHub Container Registry on pushes to `main`, and it can also be run manually:
 
-- `ghcr.io/<owner>/navet:<version>`
+- `ghcr.io/<owner>/navet:main`
+- `ghcr.io/<owner>/navet:sha-<commit>`
 - `ghcr.io/<owner>/navet:latest`
 
-Run it from the GitHub Actions UI and provide a version string such as `0.1.0-private.1`.
+Manual dispatch can still publish an additional version tag such as `0.1.0-private.1`.
 
 ### Private GHCR Deployment
 
@@ -128,10 +130,9 @@ For private Home Assistant development:
 
 For standalone Docker users:
 
-1. Open the `Publish` workflow in GitHub Actions
-2. Enter a version like `0.1.0-private.1`
-3. Run the workflow
-4. Pull the updated image from GHCR on your deployment host
+1. Push changes to `main` or run the `Publish` workflow manually
+2. Pull the updated image from GHCR on your deployment host
+3. Restart the container with `docker compose up -d`
 
 ## Runtime Config Resolution
 
@@ -140,6 +141,16 @@ The app resolves Home Assistant defaults in this order:
 1. Browser `localStorage`
 2. Runtime `window.__NAVET_CONFIG__` from `/config.js`
 3. Build-time `import.meta.env.NAVET_HASS_URL` and `import.meta.env.NAVET_HASS_TOKEN`
+
+## Current Performance Work
+
+The current dashboard build includes a few runtime-focused optimizations:
+
+- Lazy-loaded settings, add-card dialog, widgets, and media dialog
+- Deferred rendering for offscreen room groups in the All view
+- Zustand-backed search result state to reduce context fan-out
+- Stable device-map reuse to avoid rerendering unchanged cards
+- Optional no-animation mode for slower devices such as Raspberry Pi deployments
 
 ## Remaining Limitation
 
@@ -159,7 +170,7 @@ If you are the only consumer right now:
 
 1. Keep the repo private
 2. Use local add-on installs for Home Assistant testing
-3. Use the manual GHCR publish workflow for remote Docker deployments
+3. Let pushes to `main` publish the GHCR image for remote Docker deployments
 4. Move to tag-based or public releases only when you are ready to distribute the project
 
 ## Notes Specific to This Repo
@@ -168,6 +179,7 @@ If you are the only consumer right now:
 - That only affects development and does not block Docker packaging
 - `index.html` now loads `/config.js` before the app bootstraps
 - Home Assistant credentials are still persisted in browser storage after login
+- Development builds log slow dashboard renders with `[Navet][RenderProfiler]`
 
 ## If You Want Full Add-on UX
 

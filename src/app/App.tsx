@@ -8,7 +8,7 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { Lightbulb } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { RoomNav } from './components/layout/room-nav';
 import {
@@ -19,6 +19,7 @@ import {
 } from './components/layout/sections';
 import { EmptyState } from './components/shared/empty-state';
 import { LoadingSpinner } from './components/shared/loading-spinner';
+import { RenderProfiler } from './components/shared/render-profiler';
 import { Toaster } from './components/ui/sonner';
 import { AuthProvider, useAuth } from './contexts/auth-context';
 import { ConfigProvider, useConfig } from './contexts/config-context';
@@ -31,10 +32,9 @@ import { SearchProvider } from './contexts/search-context';
 import { ThemeProvider } from './contexts/theme-context';
 import { LoginPage } from './features/auth/login-page';
 import { AllViewGrid } from './features/dashboard/all-view-grid';
-import { AddCardDialog, type CardType } from './features/dashboard/components/add-card-dialog';
+import type { CardType } from './features/dashboard/components/add-card-dialog';
 import { DashboardLayout } from './features/dashboard/dashboard-layout';
 import { DeviceGrid } from './features/dashboard/device-grid';
-import { SettingsSection } from './features/settings/components/settings-section';
 import {
   useCardOrdering,
   useCardState,
@@ -46,6 +46,16 @@ import {
 import { useCustomCards } from './hooks/use-custom-cards';
 import { useDevices, useRooms } from './hooks/use-devices';
 import { useSettingsStore } from './stores';
+
+const AddCardDialog = lazy(async () => {
+  const module = await import('./features/dashboard/components/add-card-dialog');
+  return { default: module.AddCardDialog };
+});
+
+const SettingsSection = lazy(async () => {
+  const module = await import('./features/settings/components/settings-section');
+  return { default: module.SettingsSection };
+});
 
 /**
  * Dashboard Component
@@ -230,7 +240,9 @@ function Dashboard() {
       <DashboardLayout>
         {lightDeviceMap.size > 0 ? (
           <EditModeProvider value={editModeContextValue}>
-            <AllViewGrid deviceMap={lightDeviceMap} rooms={lightRooms} cardOrders={cardOrders} />
+            <RenderProfiler id="LightsSection">
+              <AllViewGrid deviceMap={lightDeviceMap} rooms={lightRooms} cardOrders={cardOrders} />
+            </RenderProfiler>
           </EditModeProvider>
         ) : (
           <EmptyState
@@ -254,7 +266,11 @@ function Dashboard() {
   if (activeSection === 'settings') {
     return (
       <DashboardLayout>
-        <SettingsSection />
+        <Suspense fallback={<LoadingSpinner message="Loading settings..." />}>
+          <RenderProfiler id="SettingsSection">
+            <SettingsSection />
+          </RenderProfiler>
+        </Suspense>
       </DashboardLayout>
     );
   }
@@ -280,30 +296,38 @@ function Dashboard() {
           />
 
           {activeRoom === 'All' ? (
-            <AllViewGrid
-              deviceMap={deviceMap}
-              rooms={roomOrder}
-              cardOrders={cardOrders}
-              customCards={customCards}
-              onDeleteCard={handleDeleteCard}
-              onUpdateCard={handleUpdateCard}
-            />
+            <RenderProfiler id="AllViewGrid">
+              <AllViewGrid
+                deviceMap={deviceMap}
+                rooms={roomOrder}
+                cardOrders={cardOrders}
+                customCards={customCards}
+                onDeleteCard={handleDeleteCard}
+                onUpdateCard={handleUpdateCard}
+              />
+            </RenderProfiler>
           ) : (
-            <DeviceGrid
-              orderedCardIds={orderedCardIds}
-              deviceMap={deviceMap}
-              customCards={customCards}
-              onDeleteCard={handleDeleteCard}
-              onUpdateCard={handleUpdateCard}
-            />
+            <RenderProfiler id={`DeviceGrid:${activeRoom}`}>
+              <DeviceGrid
+                orderedCardIds={orderedCardIds}
+                deviceMap={deviceMap}
+                customCards={customCards}
+                onDeleteCard={handleDeleteCard}
+                onUpdateCard={handleUpdateCard}
+              />
+            </RenderProfiler>
           )}
 
-          <AddCardDialog
-            open={showAddCardDialog}
-            onClose={() => setShowAddCardDialog(false)}
-            onAddCard={handleAddCard}
-            currentRoom={activeRoom}
-          />
+          {showAddCardDialog && (
+            <Suspense fallback={null}>
+              <AddCardDialog
+                open={showAddCardDialog}
+                onClose={() => setShowAddCardDialog(false)}
+                onAddCard={handleAddCard}
+                currentRoom={activeRoom}
+              />
+            </Suspense>
+          )}
         </DashboardLayout>
       </DndContext>
     </EditModeProvider>

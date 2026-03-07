@@ -1,14 +1,12 @@
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
-import { memo, useCallback, useMemo } from 'react';
-import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-size-selector';
-import { DraggableCard } from '@/app/components/shared/draggable-card';
+import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useEditModeContext } from '../../contexts/edit-mode-context';
 import { useSearch } from '../../contexts/search-context';
 import { useTheme } from '../../contexts/theme-context';
 import type { CustomCard } from '../../hooks/use-custom-cards';
 import type { DeviceWithType } from '../../types/device.types';
-import { renderCard } from '../../utils/card-renderer';
-import { WidgetCard } from './components/widget-card';
+import { DashboardCardItem } from './components/dashboard-card-item';
 
 interface AllViewGridProps {
   deviceMap: Map<string, DeviceWithType>;
@@ -18,6 +16,141 @@ interface AllViewGridProps {
   onDeleteCard?: (cardId: string) => void;
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
 }
+
+interface RoomSectionProps {
+  room: string;
+  orderedRoomIds: string[];
+  totalItems: number;
+  theme: 'light' | 'dark' | 'contrast';
+  textColor: string;
+  textSecondary: string;
+  isEditMode: boolean;
+  cardSizes: Record<string, CardSize>;
+  deviceMap: Map<string, DeviceWithType>;
+  customCardMap: Map<string, CustomCard>;
+  handleSizeChange: (id: string, size: CardSize) => void;
+  onDeleteCard?: (cardId: string) => void;
+  onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
+}
+
+const RoomSection = memo(function RoomSection({
+  room,
+  orderedRoomIds,
+  totalItems,
+  theme,
+  textColor,
+  textSecondary,
+  isEditMode,
+  cardSizes,
+  deviceMap,
+  customCardMap,
+  handleSizeChange,
+  onDeleteCard,
+  onUpdateCard,
+}: RoomSectionProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [isVisible, setIsVisible] = useState(isEditMode);
+
+  useEffect(() => {
+    if (isEditMode) {
+      setIsVisible(true);
+      return;
+    }
+
+    const node = containerRef.current;
+    if (!node) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '400px 0px' }
+    );
+
+    observer.observe(node);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [isEditMode]);
+
+  const estimatedRows = Math.max(1, Math.ceil(totalItems / 4));
+  const placeholderHeight = estimatedRows * 220;
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        contentVisibility: 'auto',
+        containIntrinsicSize: '800px',
+      }}
+    >
+      <div className="flex items-center gap-3 mb-4">
+        <h2
+          className={`text-lg md:text-xl font-semibold ${
+            room === 'Unknown Room' ? (theme === 'light' ? 'text-gray-700' : textColor) : textColor
+          }`}
+        >
+          {room}
+        </h2>
+        <span className={`text-xs md:text-sm ${textSecondary}`}>
+          {totalItems} {totalItems === 1 ? 'item' : 'items'}
+        </span>
+      </div>
+
+      {isVisible ? (
+        <SortableContext items={orderedRoomIds} strategy={rectSortingStrategy}>
+          <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-2 md:gap-3 lg:gap-4 auto-rows-[180px] md:auto-rows-[190px]">
+            {orderedRoomIds.map((id, index) => {
+              const device = deviceMap.get(id);
+              if (device) {
+                const size = cardSizes[device.id] || (device.size as CardSize);
+
+                return (
+                  <DashboardCardItem
+                    key={device.id}
+                    id={device.id}
+                    index={index}
+                    device={device}
+                    size={size}
+                    isEditMode={isEditMode}
+                    handleSizeChange={handleSizeChange}
+                  />
+                );
+              }
+
+              const card = customCardMap.get(id);
+              if (!card) return null;
+
+              const size = cardSizes[card.id] || card.size;
+
+              return (
+                <DashboardCardItem
+                  key={card.id}
+                  id={card.id}
+                  index={index}
+                  card={card}
+                  size={size}
+                  isEditMode={isEditMode}
+                  handleSizeChange={handleSizeChange}
+                  onDeleteCard={onDeleteCard}
+                  onUpdateCard={onUpdateCard}
+                />
+              );
+            })}
+          </div>
+        </SortableContext>
+      ) : (
+        <div className="w-full" style={{ minHeight: `${placeholderHeight}px` }} />
+      )}
+    </div>
+  );
+});
 
 /**
  * All View Grid Component
@@ -34,12 +167,17 @@ export const AllViewGrid = memo(function AllViewGrid({
   const { isEditMode, cardSizes, updateCardSize } = useEditModeContext();
   const { isSearchActive, filteredDeviceIds } = useSearch();
   const { theme } = useTheme();
+  const deferredFilteredDeviceIds = useDeferredValue(filteredDeviceIds);
 
   const handleSizeChange = useCallback(
     (id: string, size: CardSize) => {
       updateCardSize(id, size);
     },
     [updateCardSize]
+  );
+  const filteredDeviceIdSet = useMemo(
+    () => new Set(deferredFilteredDeviceIds),
+    [deferredFilteredDeviceIds]
   );
 
   // Group devices by room
@@ -48,7 +186,7 @@ export const AllViewGrid = memo(function AllViewGrid({
 
     deviceMap.forEach((device) => {
       // Filter by search if active
-      if (isSearchActive && !filteredDeviceIds.includes(device.id)) {
+      if (isSearchActive && !filteredDeviceIdSet.has(device.id)) {
         return;
       }
 
@@ -64,7 +202,7 @@ export const AllViewGrid = memo(function AllViewGrid({
     });
 
     return grouped;
-  }, [deviceMap, isSearchActive, filteredDeviceIds]);
+  }, [deviceMap, filteredDeviceIdSet, isSearchActive]);
 
   // Group custom cards by room
   const customCardsByRoom = useMemo(() => {
@@ -107,70 +245,22 @@ export const AllViewGrid = memo(function AllViewGrid({
         if (totalItems === 0) return null;
 
         return (
-          <div key={room}>
-            {/* Room Header */}
-            <div className="flex items-center gap-3 mb-4">
-              <h2
-                className={`text-lg md:text-xl font-semibold ${
-                  room === 'Unknown Room'
-                    ? theme === 'light'
-                      ? 'text-gray-700'
-                      : textColor
-                    : textColor
-                }`}
-              >
-                {room}
-              </h2>
-              <span className={`text-xs md:text-sm ${textSecondary}`}>
-                {totalItems} {totalItems === 1 ? 'item' : 'items'}
-              </span>
-            </div>
-
-            {/* Device and Widget Grid for this room */}
-            <SortableContext items={orderedRoomIds} strategy={rectSortingStrategy}>
-              <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-2 md:gap-3 lg:gap-4 auto-rows-[180px] md:auto-rows-[190px]">
-                {orderedRoomIds.map((id, index) => {
-                  const device = deviceMap.get(id);
-                  if (device) {
-                    const size = cardSizes[device.id] || (device.size as CardSize);
-
-                    return (
-                      <DraggableCard
-                        key={device.id}
-                        id={device.id}
-                        index={index}
-                        isEditMode={isEditMode}
-                        className={getCardSpanClass(size)}
-                      >
-                        {renderCard({ device, size, handleSizeChange, isEditMode })}
-                      </DraggableCard>
-                    );
-                  }
-
-                  const card = customCardMap.get(id);
-                  if (!card) return null;
-
-                  const size = cardSizes[card.id] || card.size;
-
-                  return (
-                    <DraggableCard
-                      key={card.id}
-                      id={card.id}
-                      index={index}
-                      isEditMode={isEditMode}
-                      className={getCardSpanClass(size)}
-                    >
-                      <WidgetCard
-                        card={{ ...card, size }}
-                        onDelete={onDeleteCard}
-                        onUpdate={onUpdateCard}
-                      />
-                    </DraggableCard>
-                  );
-                })}
-              </div>
-            </SortableContext>
-          </div>
+          <RoomSection
+            key={room}
+            room={room}
+            orderedRoomIds={orderedRoomIds}
+            totalItems={totalItems}
+            theme={theme}
+            textColor={textColor}
+            textSecondary={textSecondary}
+            isEditMode={isEditMode}
+            cardSizes={cardSizes}
+            deviceMap={deviceMap}
+            customCardMap={customCardMap}
+            handleSizeChange={handleSizeChange}
+            onDeleteCard={onDeleteCard}
+            onUpdateCard={onUpdateCard}
+          />
         );
       })}
     </div>

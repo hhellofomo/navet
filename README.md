@@ -60,10 +60,10 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **Secure Connections** - Direct connection to your smart home instance
 
 ### ⚡ Performance
-- **Optimized Bundle** - 1.2MB (52% smaller after cleanup)
-- **28 Dependencies** - Removed 19 unused packages (-40%)
-- **Fast Loading** - ~400ms first load time
-- **Smart Re-renders** - Zustand selective subscriptions
+- **Lazy-Loaded UI** - Settings, add-card flows, widgets, and media dialogs load on demand
+- **Deferred Room Rendering** - Offscreen room groups are deferred in the All view
+- **Smart Re-renders** - Zustand-backed search state and stable device maps reduce dashboard churn
+- **No-Animation Mode** - Optional global animation disable for slower devices
 - **Tree-shakeable** - Only imports what's actually used
 
 ## 🚀 Installation
@@ -83,50 +83,42 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 
 2. **Install dependencies**
    ```bash
-   npm install
-   # or
    pnpm install
    ```
 
 3. **Configure your smart home connection**
-   
-   Update `/src/app/hooks/use-devices.ts` with your smart home system URL and token:
-   ```typescript
-   const HA_URL = 'http://your-smart-home:8123';
-   const HA_TOKEN = 'your-long-lived-access-token';
+
+   Create a local env file from the example and set your Home Assistant connection details:
+   ```bash
+   cp .env.example .env
+   ```
+
+   Then set:
+   ```env
+   NAVET_HASS_URL=http://your-home-assistant:8123
+   NAVET_HASS_TOKEN=your-long-lived-access-token
    ```
 
 4. **Start development server**
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
 5. **Open in browser**
-   
-   Navigate to `http://localhost:5173`
+
+   Navigate to `http://navet.homeassistant.local:5200`
 
 ## 📖 Usage
 
 ### First Time Setup
 
-1. **Login** - Use default credentials (demo/demo123) or configure your own
-2. **Connect System** - Ensure your smart home instance is accessible
-3. **Customize Layout** - Enter Edit Mode to arrange cards
+1. **Provide Home Assistant credentials** via `.env`, Docker runtime config, or the in-app login screen
+2. **Connect System** - Ensure your Home Assistant instance is accessible
+3. **Customize Layout** - Enter Edit Mode to arrange rooms and cards
 4. **Choose Theme** - Select your preferred color scheme and theme mode
+5. **Optional for slower hardware** - Disable animations in Settings -> Performance
 
 ### Features Guide
-
-#### Custom Widgets
-- Enter **Edit Mode** and click **Add Card**
-- Choose from 5 widget types:
-  - **Calendar** - View upcoming events
-  - **News Feed** - Latest headlines
-  - **Weather** - Current conditions and forecast
-  - **Photo Frame** - Beautiful photo carousel
-  - **Quick Note** - Editable sticky notes
-- Select size (small/medium/large)
-- **Delete widgets** by clicking the X button in edit mode
-- Widgets are saved and persist across sessions
 
 #### Edit Mode
 - Click the **Edit** button in the header
@@ -170,9 +162,9 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **Zustand** - State management with persistence
 - **Tailwind CSS v4** - Utility-first styling
 - **Radix UI** - Accessible component primitives
-- **React DnD** - Drag and drop functionality
+- **dnd-kit** - Drag and drop functionality
 - **Lucide React** - Icon library
-- **Motion** (Framer Motion) - Animations
+- **Vite** - Development server and build tooling
 
 ## 📄 License
 
@@ -225,7 +217,7 @@ For technical documentation and developer guides, see [`/docs/README.md`](docs/R
 
 ## 🐛 Bug Reports & Feature Requests
 
-Found a bug or have an idea? [Open an issue](https://github.com/awesomestvi/home-assistant-dashboard/issues)!
+Found a bug or have an idea? [Open an issue](https://github.com/awesomestvi/navet/issues)!
 
 ## 📸 Screenshots
 
