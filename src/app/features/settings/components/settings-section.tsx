@@ -3,11 +3,11 @@ import {
   ExternalLink,
   FileText,
   Github,
-  Heart,
   Image as ImageIcon,
   Info,
   LayoutGrid,
   LogOut,
+  type LucideIcon,
   Palette,
   Scale,
   Server,
@@ -15,7 +15,7 @@ import {
   Upload,
   X,
 } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Switch } from '@/app/components/ui/switch';
 import { useAuth } from '@/app/contexts/auth-context';
@@ -29,6 +29,90 @@ import {
 } from '@/app/stores';
 import { exportDashboardConfig, importDashboardConfig } from '@/app/utils/dashboard-config';
 
+type SectionNavItem = {
+  id: string;
+  label: string;
+  icon: LucideIcon;
+};
+
+type SettingsSectionCardProps = {
+  id: string;
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  textColor: string;
+  mutedColor: string;
+  subtleColor: string;
+  borderColor: string;
+  dividerColor: string;
+  cardBg: string;
+  iconBg: string;
+  children: ReactNode;
+};
+
+type SettingsItemProps = {
+  title: string;
+  description: string;
+  textColor: string;
+  subtleColor: string;
+  dividerColor?: string;
+  children: ReactNode;
+};
+
+function SettingsSectionCard({
+  id,
+  icon: Icon,
+  title,
+  description,
+  textColor,
+  mutedColor,
+  subtleColor,
+  borderColor,
+  dividerColor,
+  cardBg,
+  iconBg,
+  children,
+}: SettingsSectionCardProps) {
+  return (
+    <section id={id} className={`rounded-[32px] border ${borderColor} ${cardBg}`}>
+      <div className="px-6 py-6 md:px-8 md:py-8">
+        <div className="flex items-start gap-4">
+          <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${iconBg}`}>
+            <Icon className={`h-5 w-5 ${mutedColor}`} />
+          </div>
+          <div className="min-w-0">
+            <h2 className={`text-xl font-semibold tracking-tight ${textColor}`}>{title}</h2>
+            <p className={`mt-1 max-w-2xl text-sm leading-relaxed ${subtleColor}`}>{description}</p>
+          </div>
+        </div>
+
+        <div className={`mt-8 divide-y ${dividerColor}`}>{children}</div>
+      </div>
+    </section>
+  );
+}
+
+function SettingsItem({
+  title,
+  description,
+  textColor,
+  subtleColor,
+  dividerColor,
+  children,
+}: SettingsItemProps) {
+  return (
+    <div className={`py-6 ${dividerColor || ''}`}>
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)] lg:gap-8">
+        <div className="min-w-0">
+          <h3 className={`text-base font-medium tracking-tight ${textColor}`}>{title}</h3>
+          <p className={`mt-2 text-sm leading-relaxed ${subtleColor}`}>{description}</p>
+        </div>
+        <div className="min-w-0">{children}</div>
+      </div>
+    </div>
+  );
+}
+
 export function SettingsSection() {
   const { theme, setTheme, primaryColor, setPrimaryColor, wallpaper, setWallpaper } = useTheme();
   const { logout, config } = useAuth();
@@ -39,10 +123,8 @@ export function SettingsSection() {
   const setDashboardMode = useDashboardEntitiesStore((state) => state.setMode);
   const [showLicense, setShowLicense] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
-  const [_showEditConnection, _setShowEditConnection] = useState(false);
   const importInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Get color value for inline styles
   const getColorValue = (color: PrimaryColor): string => {
     const colors: Record<PrimaryColor, string> = {
       orange: '#f97316',
@@ -86,6 +168,13 @@ export function SettingsSection() {
     { value: 'teal', label: 'Teal', color: '#14b8a6' },
   ];
 
+  const navItems: SectionNavItem[] = [
+    { id: 'appearance', label: 'Appearance', icon: Palette },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
+    { id: 'system', label: 'System', icon: Server },
+    { id: 'project', label: 'Project', icon: Info },
+  ];
+
   const handleLogout = () => {
     if (confirm('Are you sure you want to logout?')) {
       logout();
@@ -109,13 +198,11 @@ export function SettingsSection() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Check if file is an image
     if (!file.type.startsWith('image/')) {
       alert('Please upload an image file');
       return;
     }
 
-    // Check file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       alert('Image size should be less than 5MB');
       return;
@@ -167,172 +254,206 @@ export function SettingsSection() {
     }
   };
 
-  // Theme colors
-  const _bgColor = theme === 'light' ? 'bg-gray-50' : 'bg-[#0a0a0a]';
+  const accentColor = getColorValue(primaryColor);
   const cardBg =
-    theme === 'light' ? 'bg-white' : theme === 'contrast' ? 'bg-gray-950' : 'bg-gray-900';
+    theme === 'light' ? 'bg-white/92' : theme === 'contrast' ? 'bg-gray-950' : 'bg-gray-900/88';
+  const softBg = theme === 'light' ? 'bg-gray-50/90' : 'bg-white/[0.04]';
+  const insetBg = theme === 'light' ? 'bg-white' : 'bg-black/20';
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
-  const subtleColor = theme === 'light' ? 'text-gray-500' : 'text-gray-500';
-  const borderColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
-  const hoverBg = theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-white/5';
+  const mutedColor = theme === 'light' ? 'text-gray-700' : 'text-gray-300';
+  const subtleColor = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
+  const borderColor = theme === 'light' ? 'border-gray-200/80' : 'border-white/10';
+  const dividerColor = theme === 'light' ? 'divide-gray-200/80' : 'divide-white/10';
+  const lineColor = theme === 'light' ? 'border-gray-200/80' : 'border-white/10';
+  const hoverBg = theme === 'light' ? 'hover:bg-gray-100/90' : 'hover:bg-white/7';
+  const chipBg =
+    theme === 'light' ? 'bg-gray-100' : theme === 'contrast' ? 'bg-black/50' : 'bg-white/5';
+  const chipHoverBg =
+    theme === 'light'
+      ? 'hover:bg-gray-200'
+      : theme === 'contrast'
+        ? 'hover:bg-white/20'
+        : 'hover:bg-white/10';
+  const iconBg = theme === 'light' ? 'bg-gray-100' : 'bg-white/6';
 
   return (
-    <div className="h-full overflow-y-auto p-4 md:p-6">
-      <div className="max-w-2xl mx-auto space-y-4">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className={`text-xl font-semibold ${textColor} mb-1`}>Settings</h1>
-          <p className={`text-sm ${subtleColor}`}>Customize your dashboard</p>
-        </div>
+    <div className="h-full overflow-y-auto px-4 py-4 md:px-6 md:py-6">
+      <div className="mx-auto max-w-6xl space-y-8">
+        <section
+          className={`relative overflow-hidden rounded-[36px] border ${borderColor} px-6 py-8 md:px-8 md:py-10`}
+          style={{
+            background:
+              theme === 'light'
+                ? `linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.9) 72%, ${accentColor}0f 100%)`
+                : `linear-gradient(180deg, rgba(18,18,20,0.96) 0%, rgba(12,12,14,0.92) 72%, ${accentColor}12 100%)`,
+          }}
+        >
+          <div
+            className="absolute right-[-40px] top-[-40px] h-44 w-44 rounded-full blur-3xl"
+            style={{ backgroundColor: `${accentColor}22` }}
+          />
 
-        {/* Appearance Section */}
-        <section className={`${cardBg} rounded-2xl border ${borderColor} overflow-hidden`}>
-          <div className="p-4 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-8 h-8 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} flex items-center justify-center`}
-              >
-                <Palette className={`w-4 h-4 ${mutedColor}`} />
-              </div>
-              <div>
-                <h3 className={`text-sm font-semibold ${textColor}`}>Appearance</h3>
-                <p className={`text-xs ${subtleColor}`}>Customize colors and theme</p>
-              </div>
+          <div className="relative">
+            <p className={`text-[11px] font-semibold uppercase tracking-[0.24em] ${subtleColor}`}>
+              Settings
+            </p>
+            <h1
+              className={`mt-4 max-w-3xl text-3xl font-semibold tracking-tight md:text-5xl ${textColor}`}
+            >
+              A calmer place to tune Navet.
+            </h1>
+            <p className={`mt-4 max-w-2xl text-sm leading-7 md:text-base ${subtleColor}`}>
+              Large type, fewer boxes, and one clear action path per setting. The page stays
+              scalable, but it should now read more like a product settings experience than a dense
+              control panel.
+            </p>
+
+            <div className="mt-8 flex flex-wrap gap-2">
+              {navItems.map(({ id, label, icon: Icon }) => (
+                <a
+                  key={id}
+                  href={`#${id}`}
+                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium transition-colors ${chipBg} ${chipHoverBg} ${mutedColor}`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  <span>{label}</span>
+                </a>
+              ))}
             </div>
           </div>
+        </section>
 
-          <div className="p-4 space-y-5">
-            {/* Theme Mode */}
-            <div>
-              <label htmlFor="theme-mode" className={`text-xs font-medium ${textColor} block mb-2`}>
-                Theme Mode
-              </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                {themeOptions.map((option) => (
-                  <button
-                    type="button"
-                    key={option.value}
-                    onClick={() => setTheme(option.value)}
-                    className={`
-                      p-3 rounded-xl border transition-all text-left
-                      ${theme === option.value ? 'border-2' : `${borderColor} ${hoverBg}`}
-                    `}
-                    style={
-                      theme === option.value
-                        ? {
-                            backgroundColor: `${getColorValue(primaryColor)}1a`,
-                            borderColor: getColorValue(primaryColor),
-                          }
-                        : {}
-                    }
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <span
-                          className={`font-medium text-xs block mb-0.5 ${theme === option.value ? '' : textColor}`}
-                          style={
-                            theme === option.value ? { color: getColorValue(primaryColor) } : {}
-                          }
-                        >
-                          {option.label}
-                        </span>
-                        <p className={`text-[10px] ${mutedColor} leading-tight`}>
-                          {option.description}
-                        </p>
-                      </div>
-                      <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
-                        {theme === option.value && (
-                          <div
-                            className="w-4 h-4 rounded-full flex items-center justify-center"
-                            style={{ backgroundColor: getColorValue(primaryColor) }}
-                          >
-                            <div className="w-1.5 h-1.5 rounded-full bg-white" />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                ))}
+        <SettingsSectionCard
+          id="appearance"
+          icon={Palette}
+          title="Appearance"
+          description="Visual decisions that define the overall feel of the dashboard."
+          textColor={textColor}
+          mutedColor={mutedColor}
+          subtleColor={subtleColor}
+          borderColor={borderColor}
+          dividerColor={dividerColor}
+          cardBg={cardBg}
+          iconBg={iconBg}
+        >
+          <SettingsItem
+            title="Theme mode"
+            description="Choose the overall visual tone before adjusting accent details."
+            textColor={textColor}
+            subtleColor={subtleColor}
+          >
+            <div className={`rounded-[28px] p-2 ${softBg}`}>
+              <div className="grid gap-2 md:grid-cols-3">
+                {themeOptions.map((option) => {
+                  const isActive = theme === option.value;
+                  return (
+                    <button
+                      type="button"
+                      key={option.value}
+                      onClick={() => setTheme(option.value)}
+                      className={`rounded-[22px] px-4 py-4 text-left transition-all ${
+                        isActive ? 'shadow-sm' : hoverBg
+                      }`}
+                      style={
+                        isActive
+                          ? {
+                              backgroundColor: insetBg === 'bg-white' ? '#ffffff' : undefined,
+                              border: `1px solid ${accentColor}`,
+                              boxShadow:
+                                theme === 'light'
+                                  ? '0 10px 30px rgba(15, 23, 42, 0.06)'
+                                  : '0 10px 30px rgba(0, 0, 0, 0.18)',
+                            }
+                          : undefined
+                      }
+                    >
+                      <p
+                        className={`text-sm font-semibold ${isActive ? '' : textColor}`}
+                        style={isActive ? { color: accentColor } : undefined}
+                      >
+                        {option.label}
+                      </p>
+                      <p className={`mt-1 text-xs leading-relaxed ${subtleColor}`}>
+                        {option.description}
+                      </p>
+                    </button>
+                  );
+                })}
               </div>
             </div>
+          </SettingsItem>
 
-            {/* Primary Color */}
-            <div>
-              <label
-                htmlFor="primary-color"
-                className={`text-xs font-medium ${textColor} block mb-2`}
-              >
-                Primary Color
-              </label>
-              <p className={`text-xs ${subtleColor} mb-3`}>
-                Choose a color that will be used for active states throughout your dashboard
-              </p>
-              <div className="flex items-center gap-2.5">
-                {colorOptions.map((option) => (
+          <SettingsItem
+            title="Accent color"
+            description="Used for active states, selected controls, and the most important UI highlights."
+            textColor={textColor}
+            subtleColor={subtleColor}
+          >
+            <div className="flex flex-wrap items-center gap-3">
+              {colorOptions.map((option) => {
+                const isActive = primaryColor === option.value;
+                return (
                   <button
                     type="button"
                     key={option.value}
                     onClick={() => setPrimaryColor(option.value)}
-                    className={`w-10 h-10 rounded-full transition-all duration-300 flex-shrink-0 ${
-                      primaryColor === option.value
+                    className={`h-11 w-11 rounded-full transition-all duration-300 ${
+                      isActive
                         ? `ring-2 ${theme === 'light' ? 'ring-black/30' : 'ring-white/40'} ring-offset-2 ${theme === 'light' ? 'ring-offset-white' : 'ring-offset-gray-900'}`
                         : 'hover:scale-110'
                     }`}
-                    style={{
-                      backgroundColor: option.color,
-                    }}
+                    style={{ backgroundColor: option.color }}
                     title={option.label}
                   />
-                ))}
-              </div>
+                );
+              })}
             </div>
+          </SettingsItem>
 
-            {/* Background Wallpaper */}
-            <div>
-              <label htmlFor="wallpaper" className={`text-xs font-medium ${textColor} block mb-2`}>
-                Background Wallpaper
-              </label>
-              <p className={`text-xs ${subtleColor} mb-3`}>
-                Upload an image that will blend with your theme color for a harmonized look
-              </p>
-
-              {wallpaper ? (
-                <div className="relative">
-                  <div
-                    className="w-full h-32 rounded-xl border overflow-hidden relative"
-                    style={{ borderColor: `${getColorValue(primaryColor)}40` }}
-                  >
-                    <img
-                      src={wallpaper}
-                      alt="Wallpaper preview"
-                      className="w-full h-full object-cover"
-                    />
-                    <div
-                      className="absolute inset-0 bg-gradient-to-br"
-                      style={{
-                        background: `linear-gradient(135deg, ${getColorValue(primaryColor)}60, ${getColorValue(primaryColor)}20)`,
-                        mixBlendMode: theme === 'light' ? 'multiply' : 'screen',
-                      }}
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleRemoveWallpaper}
-                    className={`absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center ${
-                      theme === 'light' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
-                    } hover:scale-110 transition-all shadow-lg`}
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              ) : (
-                <label
-                  className={`w-full h-32 rounded-xl border-2 border-dashed ${borderColor} flex flex-col items-center justify-center cursor-pointer transition-all ${hoverBg}`}
+          <SettingsItem
+            title="Wallpaper"
+            description="Add a background image that blends with the active accent and theme."
+            textColor={textColor}
+            subtleColor={subtleColor}
+          >
+            {wallpaper ? (
+              <div className="relative max-w-2xl">
+                <div
+                  className="relative h-36 overflow-hidden rounded-[24px] border"
+                  style={{ borderColor: `${accentColor}40` }}
                 >
-                  <ImageIcon className={`w-8 h-8 ${mutedColor} mb-2`} />
-                  <span className={`text-xs ${textColor} mb-1`}>Click to upload</span>
-                  <span className={`text-[10px] ${subtleColor}`}>PNG, JPG up to 5MB</span>
+                  <img
+                    src={wallpaper}
+                    alt="Wallpaper preview"
+                    className="h-full w-full object-cover"
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background: `linear-gradient(135deg, ${accentColor}55, ${accentColor}10)`,
+                      mixBlendMode: theme === 'light' ? 'multiply' : 'screen',
+                    }}
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleRemoveWallpaper}
+                  className={`absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full ${
+                    theme === 'light' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
+                  } shadow-lg transition-all hover:scale-110`}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+
+                <label
+                  className={`mt-4 flex h-16 cursor-pointer items-center justify-center gap-3 rounded-[20px] border-2 border-dashed ${lineColor} transition-colors ${hoverBg}`}
+                >
+                  <Upload className={`h-4 w-4 ${mutedColor}`} />
+                  <div className="text-center">
+                    <p className={`text-sm font-medium ${textColor}`}>Replace wallpaper</p>
+                    <p className={`text-[11px] ${subtleColor}`}>PNG, JPG up to 5MB</p>
+                  </div>
                   <input
                     type="file"
                     accept="image/*"
@@ -340,138 +461,110 @@ export function SettingsSection() {
                     className="hidden"
                   />
                 </label>
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* Dashboard Content Section */}
-        <section className={`${cardBg} rounded-2xl border ${borderColor} overflow-hidden`}>
-          <div className="p-4 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-8 h-8 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} flex items-center justify-center`}
+              </div>
+            ) : (
+              <label
+                className={`flex h-36 max-w-2xl cursor-pointer flex-col items-center justify-center rounded-[24px] border-2 border-dashed ${lineColor} text-center transition-colors ${hoverBg}`}
               >
-                <LayoutGrid className={`w-4 h-4 ${mutedColor}`} />
-              </div>
-              <div>
-                <h3 className={`text-sm font-semibold ${textColor}`}>Dashboard Content</h3>
-                <p className={`text-xs ${subtleColor}`}>
-                  Choose whether entities appear automatically or only when added manually
-                </p>
-              </div>
+                <ImageIcon className={`mb-3 h-9 w-9 ${mutedColor}`} />
+                <span className={`text-sm font-medium ${textColor}`}>Upload wallpaper</span>
+                <span className={`mt-1 text-[11px] ${subtleColor}`}>PNG, JPG up to 5MB</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleWallpaperUpload}
+                  className="hidden"
+                />
+              </label>
+            )}
+          </SettingsItem>
+        </SettingsSectionCard>
+
+        <SettingsSectionCard
+          id="dashboard"
+          icon={LayoutGrid}
+          title="Dashboard"
+          description="Decide what shows up on the board and how this local setup is backed up."
+          textColor={textColor}
+          mutedColor={mutedColor}
+          subtleColor={subtleColor}
+          borderColor={borderColor}
+          dividerColor={dividerColor}
+          cardBg={cardBg}
+          iconBg={iconBg}
+        >
+          <SettingsItem
+            title="Entity visibility mode"
+            description="Either let Navet discover device cards automatically or curate the dashboard manually."
+            textColor={textColor}
+            subtleColor={subtleColor}
+          >
+            <div className={`inline-flex rounded-full p-1 ${softBg}`}>
+              {(
+                [
+                  { value: 'auto', label: 'Auto' },
+                  { value: 'manual', label: 'Manual' },
+                ] as Array<{ value: DashboardEntityMode; label: string }>
+              ).map((option) => {
+                const isActive = dashboardMode === option.value;
+                return (
+                  <button
+                    type="button"
+                    key={option.value}
+                    onClick={() => setDashboardMode(option.value)}
+                    className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
+                      isActive ? 'shadow-sm' : ''
+                    }`}
+                    style={
+                      isActive
+                        ? {
+                            backgroundColor: accentColor,
+                            color: '#ffffff',
+                          }
+                        : {
+                            color: theme === 'light' ? '#4b5563' : '#d1d5db',
+                          }
+                    }
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
             </div>
-          </div>
+            <p className={`mt-3 text-xs leading-relaxed ${subtleColor}`}>
+              Auto keeps discovery hands-off. Manual only shows entities you explicitly add.
+            </p>
+          </SettingsItem>
 
-          <div className="p-4 space-y-3">
-            {(
-              [
-                {
-                  value: 'auto',
-                  label: 'Auto',
-                  description: 'Show discovered entities automatically based on device type.',
-                },
-                {
-                  value: 'manual',
-                  label: 'Manual',
-                  description: 'Only show entities that you explicitly add to the dashboard.',
-                },
-              ] as Array<{
-                value: DashboardEntityMode;
-                label: string;
-                description: string;
-              }>
-            ).map((option) => (
-              <button
-                type="button"
-                key={option.value}
-                onClick={() => setDashboardMode(option.value)}
-                className={`w-full rounded-xl border p-3 text-left transition-all ${
-                  dashboardMode === option.value
-                    ? 'border-2'
-                    : `${borderColor} ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-white/5'}`
-                }`}
-                style={
-                  dashboardMode === option.value
-                    ? {
-                        backgroundColor: `${getColorValue(primaryColor)}14`,
-                        borderColor: getColorValue(primaryColor),
-                      }
-                    : {}
-                }
-              >
-                <p
-                  className={`text-sm font-medium ${
-                    dashboardMode === option.value ? '' : textColor
-                  }`}
-                  style={
-                    dashboardMode === option.value
-                      ? { color: getColorValue(primaryColor) }
-                      : undefined
-                  }
-                >
-                  {option.label}
-                </p>
-                <p className={`text-xs ${subtleColor} mt-1`}>{option.description}</p>
-              </button>
-            ))}
-          </div>
-        </section>
+          <SettingsItem
+            title="Local config backup"
+            description="Export a reusable snapshot of your dashboard layout and restore it on another device later."
+            textColor={textColor}
+            subtleColor={subtleColor}
+          >
+            <p className={`max-w-2xl text-sm leading-relaxed ${subtleColor}`}>
+              Includes theme, layout, room order, card order, manual entity selection, custom
+              widgets, and light preset settings. Connection URL and token are intentionally left
+              out.
+            </p>
 
-        {/* Backup Section */}
-        <section className={`${cardBg} rounded-2xl border ${borderColor} overflow-hidden`}>
-          <div className="p-4 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-8 h-8 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} flex items-center justify-center`}
-              >
-                <FileText className={`w-4 h-4 ${mutedColor}`} />
-              </div>
-              <div>
-                <h3 className={`text-sm font-semibold ${textColor}`}>Dashboard Config</h3>
-                <p className={`text-xs ${subtleColor}`}>
-                  Export or restore your local dashboard layout and preferences
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4 space-y-3">
-            <div
-              className={`rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} p-3`}
-            >
-              <p className={`text-sm font-medium ${textColor}`}>Local backup file</p>
-              <p className={`text-xs ${subtleColor} mt-1`}>
-                Includes theme, layout, card ordering, manual entity selection, custom widgets, and
-                light preset settings. Connection URL and token are not included.
-              </p>
-            </div>
-
-            <div className="flex flex-col md:flex-row gap-3">
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
               <button
                 type="button"
                 onClick={handleExportDashboardConfig}
-                className={`flex-1 p-3 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} ${hoverBg} transition-all text-left flex items-center gap-3`}
+                className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${softBg} ${hoverBg} ${textColor}`}
               >
-                <Download className={`w-4 h-4 ${mutedColor}`} />
-                <div>
-                  <p className={`text-sm font-medium ${textColor}`}>Export Config</p>
-                  <p className={`text-xs ${subtleColor}`}>Download a reusable JSON backup</p>
-                </div>
+                <Download className="h-4 w-4" />
+                <span>Export config</span>
               </button>
-
               <button
                 type="button"
                 onClick={() => importInputRef.current?.click()}
-                className={`flex-1 p-3 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} ${hoverBg} transition-all text-left flex items-center gap-3`}
+                className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${softBg} ${hoverBg} ${textColor}`}
               >
-                <Upload className={`w-4 h-4 ${mutedColor}`} />
-                <div>
-                  <p className={`text-sm font-medium ${textColor}`}>Import Config</p>
-                  <p className={`text-xs ${subtleColor}`}>Restore a previously exported file</p>
-                </div>
+                <Upload className="h-4 w-4" />
+                <span>Import config</span>
               </button>
-
               <input
                 ref={importInputRef}
                 type="file"
@@ -480,397 +573,237 @@ export function SettingsSection() {
                 onChange={handleImportDashboardConfig}
               />
             </div>
-          </div>
-        </section>
+          </SettingsItem>
+        </SettingsSectionCard>
 
-        {/* Performance Section */}
-        <section className={`${cardBg} rounded-2xl border ${borderColor} overflow-hidden`}>
-          <div className="p-4 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-8 h-8 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} flex items-center justify-center`}
-              >
-                <Settings2 className={`w-4 h-4 ${mutedColor}`} />
-              </div>
-              <div>
-                <h3 className={`text-sm font-semibold ${textColor}`}>Performance</h3>
-                <p className={`text-xs ${subtleColor}`}>
-                  Reduce GPU and CPU load on slower devices
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4">
-            <div
-              className={`flex items-start justify-between gap-4 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} p-3`}
-            >
-              <div className="flex-1">
-                <p className={`text-sm font-medium ${textColor}`}>Disable animations</p>
-                <p className={`text-xs ${subtleColor} mt-1`}>
-                  Turn off transitions and animated effects across the app. Useful for slower
-                  devices like Raspberry Pis.
-                </p>
-              </div>
+        <SettingsSectionCard
+          id="system"
+          icon={Server}
+          title="System"
+          description="Performance controls and connection details for the current Home Assistant target."
+          textColor={textColor}
+          mutedColor={mutedColor}
+          subtleColor={subtleColor}
+          borderColor={borderColor}
+          dividerColor={dividerColor}
+          cardBg={cardBg}
+          iconBg={iconBg}
+        >
+          <SettingsItem
+            title="Disable animations"
+            description="Useful for slower devices like Raspberry Pis. Turns off transitions and animated effects across the app."
+            textColor={textColor}
+            subtleColor={subtleColor}
+          >
+            <div className={`inline-flex rounded-full p-1 ${softBg}`}>
               <Switch
                 checked={disableAnimations}
                 onCheckedChange={(checked) => updateSettings({ disableAnimations: checked })}
                 aria-label="Disable animations across the app"
               />
             </div>
-          </div>
-        </section>
+          </SettingsItem>
 
-        {/* Connection Section */}
-        <section className={`${cardBg} rounded-2xl border ${borderColor} overflow-hidden`}>
-          <div className="p-4 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-8 h-8 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} flex items-center justify-center`}
-              >
-                <Server className={`w-4 h-4 ${mutedColor}`} />
-              </div>
-              <div>
-                <h3 className={`text-sm font-semibold ${textColor}`}>Connection</h3>
-                <p className={`text-xs ${subtleColor}`}>Smart home instance</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4 space-y-3">
-            <div
-              className={`p-3 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'}`}
-            >
-              <p className={`text-xs ${subtleColor} mb-1.5`}>Connected to</p>
-              <p className={`text-sm ${textColor} font-mono break-all`}>
+          <SettingsItem
+            title="Connection"
+            description="Review the current server target, open Home Assistant, or reset the saved connection."
+            textColor={textColor}
+            subtleColor={subtleColor}
+          >
+            <div className={`rounded-[24px] border px-5 py-4 ${borderColor} ${softBg}`}>
+              <p className={`text-[11px] uppercase tracking-[0.18em] ${subtleColor}`}>
+                Connected to
+              </p>
+              <p className={`mt-2 break-all font-mono text-sm ${textColor}`}>
                 {config?.url || 'Not connected'}
               </p>
             </div>
 
-            {/* Link to Smart Home */}
-            {config?.url && (
-              <a
-                href={config.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`block p-3 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} ${hoverBg} transition-all group`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className={`text-sm font-medium ${textColor}`}>Open Smart Home</p>
-                      <ExternalLink
-                        className={`w-3.5 h-3.5 ${mutedColor} group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform`}
-                      />
-                    </div>
-                    <p className={`text-xs ${subtleColor}`}>
-                      Configure devices, automations, and advanced settings
-                    </p>
-                  </div>
-                </div>
-              </a>
-            )}
+            {config?.url ? (
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                <a
+                  href={config.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${softBg} ${hoverBg} ${textColor}`}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  <span>Open Smart Home</span>
+                </a>
 
-            {/* Reset Connection Button */}
-            {config?.url && (
-              <button
-                type="button"
-                onClick={handleResetConnection}
-                className={`w-full p-3 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} ${hoverBg} transition-all text-left flex items-center gap-3`}
-              >
-                <Settings2 className={`w-4 h-4 ${mutedColor}`} />
-                <div className="flex-1">
-                  <p className={`text-sm font-medium ${textColor}`}>Reset Connection</p>
-                  <p className={`text-xs ${subtleColor}`}>Change smart home URL or token</p>
-                </div>
-              </button>
-            )}
-          </div>
-        </section>
-
-        {/* About Section */}
-        <section className={`${cardBg} rounded-2xl border ${borderColor} overflow-hidden`}>
-          <div className="p-4 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-8 h-8 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} flex items-center justify-center`}
-              >
-                <Info className={`w-4 h-4 ${mutedColor}`} />
+                <button
+                  type="button"
+                  onClick={handleResetConnection}
+                  className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${softBg} ${hoverBg} ${textColor}`}
+                >
+                  <Settings2 className="h-4 w-4" />
+                  <span>Reset connection</span>
+                </button>
               </div>
-              <div>
-                <h3 className={`text-sm font-semibold ${textColor}`}>About</h3>
-                <p className={`text-xs ${subtleColor}`}>Dashboard information</p>
-              </div>
-            </div>
-          </div>
+            ) : null}
+          </SettingsItem>
+        </SettingsSectionCard>
 
-          <div className="p-4 space-y-2">
-            <div className="flex justify-between items-center">
-              <span className={`text-sm ${mutedColor}`}>Version</span>
-              <span className={`text-sm font-medium ${textColor}`}>1.0.0</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className={`text-sm ${mutedColor}`}>Build</span>
-              <span className={`text-sm font-medium ${textColor}`}>March 2026</span>
-            </div>
-          </div>
-        </section>
-
-        {/* License Section */}
-        <section className={`${cardBg} rounded-2xl border ${borderColor} overflow-hidden`}>
-          <div className="p-4 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-8 h-8 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} flex items-center justify-center`}
-              >
-                <Scale className={`w-4 h-4 ${mutedColor}`} />
+        <SettingsSectionCard
+          id="project"
+          icon={Info}
+          title="Project"
+          description="Version details, maintainer links, and the legal basics for using Navet."
+          textColor={textColor}
+          mutedColor={mutedColor}
+          subtleColor={subtleColor}
+          borderColor={borderColor}
+          dividerColor={dividerColor}
+          cardBg={cardBg}
+          iconBg={iconBg}
+        >
+          <SettingsItem
+            title="About"
+            description="Quick project information."
+            textColor={textColor}
+            subtleColor={subtleColor}
+          >
+            <div className={`grid gap-3 sm:grid-cols-2`}>
+              <div className={`rounded-[24px] border px-5 py-4 ${borderColor} ${softBg}`}>
+                <p className={`text-[11px] uppercase tracking-[0.18em] ${subtleColor}`}>Version</p>
+                <p className={`mt-2 text-lg font-semibold ${textColor}`}>1.0.0</p>
               </div>
-              <div>
-                <h3 className={`text-sm font-semibold ${textColor}`}>License</h3>
-                <p className={`text-xs ${subtleColor}`}>CC BY-NC-SA 4.0</p>
+              <div className={`rounded-[24px] border px-5 py-4 ${borderColor} ${softBg}`}>
+                <p className={`text-[11px] uppercase tracking-[0.18em] ${subtleColor}`}>Build</p>
+                <p className={`mt-2 text-lg font-semibold ${textColor}`}>March 2026</p>
               </div>
             </div>
-          </div>
+          </SettingsItem>
 
-          <div className="p-4 space-y-3">
-            <div
-              className={`p-3 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'}`}
-            >
-              <p className={`text-xs ${textColor} mb-2`}>
-                This work is licensed under the Creative Commons
-                Attribution-NonCommercial-ShareAlike 4.0 International License.
-              </p>
-              <p className={`text-xs ${subtleColor}`}>
-                Free for personal, educational, and non-profit use. Commercial use requires a
-                separate license.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowLicense(!showLicense)}
-              className={`w-full p-3 rounded-xl border ${borderColor} ${hoverBg} transition-all text-left flex items-center justify-between`}
-            >
-              <div className="flex items-center gap-2">
-                <FileText className={`w-4 h-4 ${mutedColor}`} />
-                <span className={`text-sm ${textColor}`}>View Full License</span>
-              </div>
-              <ExternalLink className={`w-3.5 h-3.5 ${mutedColor}`} />
-            </button>
-
-            {showLicense && (
-              <div
-                className={`p-4 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} max-h-64 overflow-y-auto`}
-              >
-                <div className={`text-xs ${textColor} space-y-3 leading-relaxed`}>
-                  <div>
-                    <p className="font-semibold mb-1">You are free to:</p>
-                    <ul className="list-disc list-inside space-y-1 ml-2">
-                      <li>
-                        <strong>Share</strong> — copy and redistribute the material
-                      </li>
-                      <li>
-                        <strong>Adapt</strong> — remix, transform, and build upon the material
-                      </li>
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Under the following terms:</p>
-                    <ul className="list-disc list-inside space-y-1 ml-2">
-                      <li>
-                        <strong>Attribution</strong> — You must give appropriate credit
-                      </li>
-                      <li>
-                        <strong>NonCommercial</strong> — You may not use the material for commercial
-                        purposes
-                      </li>
-                      <li>
-                        <strong>ShareAlike</strong> — If you remix or build upon the material, you
-                        must distribute your contributions under the same license
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="pt-2 border-t border-white/10">
-                    <a
-                      href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      Read the full legal code →
-                    </a>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Terms of Use Section */}
-        <section className={`${cardBg} rounded-2xl border ${borderColor} overflow-hidden`}>
-          <div className="p-4 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-8 h-8 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} flex items-center justify-center`}
-              >
-                <FileText className={`w-4 h-4 ${mutedColor}`} />
-              </div>
-              <div>
-                <h3 className={`text-sm font-semibold ${textColor}`}>Terms of Use</h3>
-                <p className={`text-xs ${subtleColor}`}>Usage guidelines</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4 space-y-3">
-            <div
-              className={`p-3 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'}`}
-            >
-              <p className={`text-xs ${textColor} mb-2`}>
-                By using this software, you agree to the terms of use.
-              </p>
-              <p className={`text-xs ${subtleColor}`}>Last updated: March 5, 2026</p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowTerms(!showTerms)}
-              className={`w-full p-3 rounded-xl border ${borderColor} ${hoverBg} transition-all text-left flex items-center justify-between`}
-            >
-              <div className="flex items-center gap-2">
-                <FileText className={`w-4 h-4 ${mutedColor}`} />
-                <span className={`text-sm ${textColor}`}>View Terms of Use</span>
-              </div>
-              <ExternalLink className={`w-3.5 h-3.5 ${mutedColor}`} />
-            </button>
-
-            {showTerms && (
-              <div
-                className={`p-4 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} max-h-64 overflow-y-auto`}
-              >
-                <div className={`text-xs ${textColor} space-y-3 leading-relaxed`}>
-                  <div>
-                    <p className="font-semibold mb-1">Permitted Use:</p>
-                    <ul className="list-disc list-inside space-y-1 ml-2">
-                      <li>Personal use on your home devices</li>
-                      <li>Educational and learning purposes</li>
-                      <li>Non-profit organizations</li>
-                      <li>Contributing to the open-source project</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Prohibited Use:</p>
-                    <ul className="list-disc list-inside space-y-1 ml-2">
-                      <li>Commercial use or revenue generation</li>
-                      <li>Corporate deployment for business purposes</li>
-                      <li>Offering as a paid service or SaaS</li>
-                      <li>White-labeling and reselling</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="font-semibold mb-1">Disclaimer:</p>
-                    <p className={`${subtleColor} ml-2`}>
-                      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. The author is
-                      not responsible for any security breaches or damages resulting from use of
-                      this software.
-                    </p>
-                  </div>
-                  <div className="pt-2 border-t border-white/10">
-                    <p className={`${subtleColor}`}>
-                      For commercial licensing inquiries, please contact the author on GitHub.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Credits Section */}
-        <section className={`${cardBg} rounded-2xl border ${borderColor} overflow-hidden`}>
-          <div className="p-4 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-8 h-8 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} flex items-center justify-center`}
-              >
-                <Heart className={`w-4 h-4 ${mutedColor}`} />
-              </div>
-              <div>
-                <h3 className={`text-sm font-semibold ${textColor}`}>Credits</h3>
-                <p className={`text-xs ${subtleColor}`}>Made with ❤️ by the community</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4 space-y-3">
-            {/* Creator */}
+          <SettingsItem
+            title="Credits"
+            description="Project maintainer and the stack behind the app."
+            textColor={textColor}
+            subtleColor={subtleColor}
+          >
             <a
               href="https://github.com/awesomestvi/"
               target="_blank"
               rel="noopener noreferrer"
-              className={`block p-3 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} ${hoverBg} transition-all group`}
+              className={`inline-flex items-center gap-3 rounded-full px-4 py-3 text-sm font-medium transition-colors ${softBg} ${hoverBg} ${textColor}`}
             >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-10 h-10 rounded-full ${theme === 'light' ? 'bg-gray-200' : 'bg-white/10'} flex items-center justify-center`}
-                >
-                  <Github className={`w-5 h-5 ${textColor}`} />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className={`text-sm font-semibold ${textColor}`}>awesomestvi</p>
-                    <ExternalLink
-                      className={`w-3 h-3 ${mutedColor} group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform`}
-                    />
-                  </div>
-                  <p className={`text-xs ${subtleColor}`}>Creator & Maintainer</p>
-                </div>
-              </div>
+              <Github className="h-4 w-4" />
+              <span>awesomestvi</span>
+              <ExternalLink className={`h-3.5 w-3.5 ${subtleColor}`} />
             </a>
 
-            {/* Acknowledgments */}
-            <div
-              className={`p-3 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'}`}
-            >
-              <p className={`text-xs font-semibold ${textColor} mb-2`}>Built with:</p>
-              <div className={`text-xs ${subtleColor} space-y-1`}>
-                <p>• React & TypeScript</p>
-                <p>• Tailwind CSS v4</p>
-                <p>• Radix UI</p>
-                <p>• Smart Home Community</p>
-              </div>
+            <div className={`mt-4 space-y-1 text-sm leading-relaxed ${subtleColor}`}>
+              <p>React & TypeScript</p>
+              <p>Tailwind CSS v4</p>
+              <p>Radix UI</p>
+              <p>Home Assistant community feedback</p>
             </div>
+          </SettingsItem>
 
-            {/* Support */}
-            <div
-              className={`p-3 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'}`}
-            >
-              <p className={`text-xs ${textColor} mb-1`}>
-                If you find this project useful, consider giving it a ⭐️ on GitHub!
-              </p>
-              <p className={`text-xs ${subtleColor}`}>
-                Contributions and feedback are always welcome.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Logout Section */}
-        <section>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className={`w-full p-4 rounded-2xl border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 transition-all text-left flex items-center gap-3`}
+          <SettingsItem
+            title="License"
+            description="CC BY-NC-SA 4.0. Free for personal, educational, and non-profit use."
+            textColor={textColor}
+            subtleColor={subtleColor}
           >
-            <div className="w-8 h-8 rounded-xl bg-red-500/20 flex items-center justify-center">
-              <LogOut className="w-4 h-4 text-red-500" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-red-500">Logout</p>
-              <p className={`text-xs ${mutedColor}`}>Disconnect from your system</p>
-            </div>
-          </button>
-        </section>
+            <button
+              type="button"
+              onClick={() => setShowLicense(!showLicense)}
+              className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${softBg} ${hoverBg} ${textColor}`}
+            >
+              <Scale className="h-4 w-4" />
+              <span>{showLicense ? 'Hide full license' : 'View full license'}</span>
+            </button>
+
+            {showLicense ? (
+              <div className={`mt-4 rounded-[24px] border p-5 ${borderColor} ${softBg}`}>
+                <div className={`space-y-3 text-sm leading-relaxed ${textColor}`}>
+                  <div>
+                    <p className="font-semibold">You are free to:</p>
+                    <ul className="mt-2 ml-4 list-disc space-y-1">
+                      <li>Share and redistribute the material.</li>
+                      <li>Adapt, remix, transform, and build upon it.</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="font-semibold">Under these terms:</p>
+                    <ul className="mt-2 ml-4 list-disc space-y-1">
+                      <li>Attribution is required.</li>
+                      <li>Commercial use is not allowed.</li>
+                      <li>Derivative work must keep the same license.</li>
+                    </ul>
+                  </div>
+                  <a
+                    href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-blue-500 hover:underline"
+                  >
+                    <span>Read the full legal code</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                </div>
+              </div>
+            ) : null}
+          </SettingsItem>
+
+          <SettingsItem
+            title="Terms of use"
+            description="Permitted and prohibited use, plus the standard warranty disclaimer."
+            textColor={textColor}
+            subtleColor={subtleColor}
+          >
+            <button
+              type="button"
+              onClick={() => setShowTerms(!showTerms)}
+              className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${softBg} ${hoverBg} ${textColor}`}
+            >
+              <FileText className="h-4 w-4" />
+              <span>{showTerms ? 'Hide terms of use' : 'View terms of use'}</span>
+            </button>
+
+            {showTerms ? (
+              <div className={`mt-4 rounded-[24px] border p-5 ${borderColor} ${softBg}`}>
+                <div className={`space-y-3 text-sm leading-relaxed ${textColor}`}>
+                  <div>
+                    <p className="font-semibold">Permitted use</p>
+                    <ul className="mt-2 ml-4 list-disc space-y-1">
+                      <li>Personal use on your home devices.</li>
+                      <li>Educational and learning purposes.</li>
+                      <li>Non-profit organizations.</li>
+                      <li>Open-source contributions to the project.</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="font-semibold">Prohibited use</p>
+                    <ul className="mt-2 ml-4 list-disc space-y-1">
+                      <li>Commercial use or revenue generation.</li>
+                      <li>Corporate deployment for business purposes.</li>
+                      <li>Offering the software as a paid service.</li>
+                      <li>White-labeling or reselling it.</li>
+                    </ul>
+                  </div>
+                  <p className={subtleColor}>
+                    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. The author is
+                    not responsible for security breaches or damages resulting from use of this
+                    software.
+                  </p>
+                </div>
+              </div>
+            ) : null}
+          </SettingsItem>
+
+          <div className="pt-6">
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="inline-flex items-center gap-2 rounded-full bg-red-500/10 px-5 py-3 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/15"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </button>
+          </div>
+        </SettingsSectionCard>
       </div>
     </div>
   );
