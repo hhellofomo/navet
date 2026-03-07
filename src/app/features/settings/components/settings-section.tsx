@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import { type ReactNode, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { Switch } from '@/app/components/ui/switch';
 import { useAuth } from '@/app/contexts/auth-context';
 import { useConfig } from '@/app/contexts/config-context';
 import { type ThemeType, useTheme } from '@/app/contexts/theme-context';
@@ -596,11 +595,35 @@ export function SettingsSection() {
             subtleColor={subtleColor}
           >
             <div className={`inline-flex rounded-full p-1 ${softBg}`}>
-              <Switch
-                checked={disableAnimations}
-                onCheckedChange={(checked) => updateSettings({ disableAnimations: checked })}
-                aria-label="Disable animations across the app"
-              />
+              {[
+                { value: false, label: 'Off' },
+                { value: true, label: 'On' },
+              ].map((option) => {
+                const isActive = disableAnimations === option.value;
+                return (
+                  <button
+                    type="button"
+                    key={option.label}
+                    onClick={() => updateSettings({ disableAnimations: option.value })}
+                    className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
+                      isActive ? 'shadow-sm' : ''
+                    }`}
+                    style={
+                      isActive
+                        ? {
+                            backgroundColor: accentColor,
+                            color: '#ffffff',
+                          }
+                        : {
+                            color: theme === 'light' ? '#4b5563' : '#d1d5db',
+                          }
+                    }
+                    aria-pressed={isActive}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
             </div>
           </SettingsItem>
 
@@ -628,7 +651,7 @@ export function SettingsSection() {
                   className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${softBg} ${hoverBg} ${textColor}`}
                 >
                   <ExternalLink className="h-4 w-4" />
-                  <span>Open Smart Home</span>
+                  <span>Open Homeassistant</span>
                 </a>
 
                 <button

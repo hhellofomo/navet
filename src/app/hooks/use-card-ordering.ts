@@ -19,6 +19,8 @@ export const useCardOrdering = (
   rooms: string[],
   customCards: CustomCard[] = []
 ) => {
+  const safeCustomCards = Array.isArray(customCards) ? customCards : [];
+
   const buildOrders = useCallback(() => {
     const orders: Record<string, string[]> = {};
 
@@ -33,7 +35,7 @@ export const useCardOrdering = (
           }
         });
       });
-      customCards.forEach((card) => {
+      safeCustomCards.forEach((card) => {
         if (card.room === room || card.room === 'All') {
           roomCards.push(card.id);
         }
@@ -42,7 +44,7 @@ export const useCardOrdering = (
     });
 
     return orders;
-  }, [customCards, devices, rooms]);
+  }, [devices, rooms, safeCustomCards]);
 
   const [cardOrders, setCardOrders] = useState<Record<string, string[]>>(() => {
     // Try to load from localStorage first
@@ -56,7 +58,7 @@ export const useCardOrdering = (
             .flat()
             .map((d) => d.id)
         );
-        customCards.forEach((card) => {
+        safeCustomCards.forEach((card) => {
           allDeviceIds.add(card.id);
         });
         const isValid = Object.values(parsed).every(
@@ -81,7 +83,7 @@ export const useCardOrdering = (
         .flat()
         .map((device) => device.id)
     );
-    customCards.forEach((card) => {
+    safeCustomCards.forEach((card) => {
       allDeviceIds.add(card.id);
     });
 
@@ -116,7 +118,7 @@ export const useCardOrdering = (
 
       return next;
     });
-  }, [buildOrders, customCards, devices]);
+  }, [buildOrders, devices, safeCustomCards]);
 
   // Persist to localStorage whenever cardOrders changes
   useEffect(() => {
