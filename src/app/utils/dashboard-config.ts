@@ -1,4 +1,5 @@
 import { STORAGE_KEYS } from '../constants/storage-keys';
+import { isSection } from '../navigation/sections';
 import { useCustomCardsStore } from '../stores/custom-cards-store';
 import { useDashboardEntitiesStore } from '../stores/dashboard-entities-store';
 import { useLightPresetStore } from '../stores/light-preset-store';
@@ -20,7 +21,7 @@ interface DashboardConfigPayload {
   customCards: ReturnType<typeof useCustomCardsStore.getState>['cards'];
   dashboardEntities: Pick<
     ReturnType<typeof useDashboardEntitiesStore.getState>,
-    'mode' | 'manualEntityIds'
+    'hiddenEntityIds' | 'onboardingCompleted'
   >;
   lightPresets: Pick<
     ReturnType<typeof useLightPresetStore.getState>,
@@ -69,8 +70,8 @@ export const exportDashboardConfig = (): DashboardConfigPayload => {
     },
     customCards: customCardsState.cards,
     dashboardEntities: {
-      mode: dashboardEntitiesState.mode,
-      manualEntityIds: dashboardEntitiesState.manualEntityIds,
+      hiddenEntityIds: dashboardEntitiesState.hiddenEntityIds,
+      onboardingCompleted: dashboardEntitiesState.onboardingCompleted,
     },
     lightPresets: {
       globalBrightnessPresetValues: lightPresetState.globalBrightnessPresetValues,
@@ -123,7 +124,7 @@ export const importDashboardConfig = (value: unknown) => {
 
   useNavigationStore.setState({
     currentRoom: (navigation.currentRoom as string | undefined) ?? 'All',
-    activeSection: (navigation.activeSection as 'home' | undefined) ?? 'home',
+    activeSection: isSection(navigation.activeSection) ? navigation.activeSection : 'home',
   });
 
   useCustomCardsStore.setState({
@@ -131,10 +132,13 @@ export const importDashboardConfig = (value: unknown) => {
   });
 
   useDashboardEntitiesStore.setState({
-    mode: dashboardEntities.mode === 'manual' ? 'manual' : 'auto',
-    manualEntityIds: Array.isArray(dashboardEntities.manualEntityIds)
-      ? dashboardEntities.manualEntityIds.filter((item): item is string => typeof item === 'string')
+    hiddenEntityIds: Array.isArray(dashboardEntities.hiddenEntityIds)
+      ? dashboardEntities.hiddenEntityIds.filter((item): item is string => typeof item === 'string')
       : [],
+    onboardingCompleted:
+      typeof dashboardEntities.onboardingCompleted === 'boolean'
+        ? dashboardEntities.onboardingCompleted
+        : true,
   });
 
   useLightPresetStore.setState({

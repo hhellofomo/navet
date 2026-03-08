@@ -136,8 +136,9 @@ Manages section navigation state across desktop and mobile layouts through a dir
 | Security | Security cameras and monitoring | Video     | Empty     |
 | Tasks    | Automations and routines       | Clipboard | Empty     |
 | Locks    | Smart lock controls            | Lock      | Empty     |
-| Lights   | Lighting control center        | Lightbulb | Empty     |
+| Lights   | Lighting control center        | Lightbulb | Active    |
 | Media    | Media player management        | Tv        | Empty     |
+| Mock     | Flat staging area for mock entities | FlaskConical | Active |
 | Settings | App settings and preferences   | Settings  | Active    |
 
 #### Desktop Sidebar
@@ -158,7 +159,7 @@ Manages section navigation state across desktop and mobile layouts through a dir
 - **Layout**: 5 icons in horizontal row
 - **Icons**: 20px with label underneath
 - **Active state**: Primary color text and background
-- **Sections shown**: Home, Security, Lights, Media, Settings
+- **Sections shown**: Home, Security, Lights, Media, Mock, Settings
 
 #### Implementation
 ```tsx
@@ -186,16 +187,21 @@ Full-page settings interface with card-based organization.
 - **Visual feedback**: Selected items show primary color indicator
 - **Layout**: Left-aligned text, right-aligned selection indicator
 
-**2. Connection**
+**2. Dashboard**
+- **Interaction mode**: choose between tap toggles and tap opens controls
+- **Entity restore action**: add all removed entities back to the dashboard
+- **Onboarding reset**: restart the first-launch dashboard choice
+
+**3. Connection**
 - **Connection Status**: Shows Home Assistant URL
 - **Visual design**: Code-style display in subtle container
 
-**3. About**
+**4. About**
 - **Version Information**: Current app version
 - **Build Date**: Last build timestamp
 - **Layout**: Two-column key-value pairs
 
-**4. Logout**
+**5. Logout**
 - **Logout Button**: Prominent red-themed button
 - **Confirmation**: Browser confirm dialog before logout
 - **Icon**: LogOut icon from Lucide
@@ -267,18 +273,18 @@ Beautiful placeholder screens for sections without data.
 ### Desktop (≥ 1024px)
 - Sidebar always visible on left
 - Settings: Maximum width 896px (max-w-2xl), centered
-- Grid: 4-6 columns
+- Grid: fixed-width 190px tracks with wrapping
 - Navigation: Sidebar icons only
 
 ### Tablet (768px - 1023px)
 - Sidebar hidden, accessible via menu
-- Grid: 3-4 columns
+- Grid: fixed-width 190px tracks with wrapping
 - Navigation: Bottom bar on mobile breakpoint
 
 ### Mobile (< 768px)
 - No sidebar
-- Bottom navigation bar with 5 sections
-- Grid: 2 columns
+- Bottom navigation bar with 6 sections including Mock and Settings
+- Grid: fixed-width tracks wrap based on available width
 - Settings: Full width with mobile padding
 
 ---
@@ -287,10 +293,11 @@ Beautiful placeholder screens for sections without data.
 
 ### First-Time User Flow
 1. **Login Page** → Enter Home Assistant URL and token
-2. **Dashboard** → See all devices and rooms
-3. **Explore Sections** → Navigate to different sections via sidebar/bottom nav
-4. **Customize** → Go to Settings → Change theme and color
-5. **Edit Cards** → Enter edit mode to resize cards, including `extra-small` where supported
+2. **Onboarding Dialog** → Choose start with all entities or a blank dashboard
+3. **Dashboard** → See current entities and rooms
+4. **Explore Sections** → Navigate to different sections via sidebar/bottom nav
+5. **Customize** → Go to Settings → Change theme and color
+6. **Edit Cards** → Enter edit mode to add/remove entities, reorder cards, and resize cards
 
 ### Settings Customization Flow
 1. Navigate to Settings section
@@ -357,6 +364,8 @@ Theme, navigation, search, and Home Assistant access use direct hook modules ins
 - `ha_dashboard_auth` - Auth config and token
 - `ha_dashboard_theme` - Theme mode preference
 - `ha_dashboard_primary_color` - Primary color preference
+- `ha-dashboard-navigation` - Active section and current room
+- `navet-dashboard-entities` - Removed entity ids and onboarding state
 
 ### CSS Variables
 
@@ -458,5 +467,5 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 ---
 
 **Last Updated**: March 5, 2026  
-**Version**: 1.4  
+**Version**: 1.5  
 **Status**: Living Document

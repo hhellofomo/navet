@@ -61,7 +61,7 @@ Complete feature implementation guide:
 4. **Consistent Icon Sizing** - Extra-small: 7×7 container / 3.5×3.5 icon, Small: 8×8 / 4×4, Medium/Large: 10×10 / 5×5
 5. **Smooth Transitions** - 500ms for state changes, 200ms for interactions
 6. **Theme Customization** - Three theme modes (Dark, Light, High Contrast) with 8 primary color options
-7. **Section-Based Navigation** - Organized into dedicated sections (Home, Security, Tasks, Locks, Lights, Media, Settings)
+7. **Section-Based Navigation** - Organized into dedicated sections (Home, Security, Tasks, Locks, Lights, Media, Mock, Settings)
 
 ### Authentication System
 - **Login Page** - Secure authentication with Home Assistant URL and long-lived access token
@@ -77,9 +77,9 @@ Complete feature implementation guide:
 - **Dynamic Theming** - All active states, buttons, and indicators adapt to selected primary color
 
 ### Navigation Structure
-- **Sections**: Home (dashboard), Security, Tasks, Locks, Lights, Media, Settings
+- **Sections**: Home (dashboard), Security, Tasks, Locks, Lights, Media, Mock, Settings
 - **Desktop**: Fixed vertical sidebar on left (16px wide)
-- **Mobile**: Bottom navigation bar with 5 key sections
+- **Mobile**: Bottom navigation bar with 6 key sections including Mock and Settings
 - **Empty States**: Beautiful placeholder screens for sections without data
 
 ### Color System at a Glance
@@ -100,7 +100,7 @@ Complete feature implementation guide:
 - **Medium (2×1)**: Primary controls + info, `p-5`, minimum `396px` wide and `190px` tall
 - **Large (2×2)**: Full controls + advanced features, `p-6`, minimum `396px × 396px`
 
-Dashboard cards use `repeat(auto-fit, minmax(190px, 1fr))`, so cards can grow wider when the container has more space.
+Dashboard cards use a fixed-width track grid: `repeat(auto-fit, 190px)` with `16px` gaps and `87px` auto-rows.
 
 ### Responsive Breakpoints
 - **Mobile**: `< 768px` - 2 column grid, hidden sidebar
@@ -124,6 +124,8 @@ When creating a new card component:
 - [ ] Test at all breakpoints
 - [ ] Ensure 44px minimum touch targets
 - [ ] Add edit mode size selector support
+- [ ] Use the shared header pattern: icon top-left, title, then subtitle
+- [ ] Use the shared bottom action-row pattern when the card exposes left actions plus a controls/settings opener
 
 ### Key Files
 ```
@@ -186,5 +188,5 @@ This design system evolves based on real-world usage and feedback. Document lear
 ---
 
 **Design System Maintained By:** Development Team
-**Last Updated:** March 5, 2026
+**Last Updated:** March 8, 2026
 **Status:** Living Document

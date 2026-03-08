@@ -1,7 +1,9 @@
+import { CalendarDays } from 'lucide-react';
 import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
+import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { useTheme } from '@/app/hooks';
-import { CalendarDateDisplay } from './calendar/calendar-date-display';
 import { CalendarLargeView } from './calendar/calendar-large-view';
 import { CalendarMediumView } from './calendar/calendar-medium-view';
 import { CalendarSmallView } from './calendar/calendar-small-view';
@@ -27,8 +29,6 @@ export const CalendarCard = memo(function CalendarCard({
     textPrimary,
     textSecondary,
     overlayBg,
-    iconBg,
-    iconColor,
     dividerColor,
     hoverBg,
     hoverText,
@@ -38,7 +38,6 @@ export const CalendarCard = memo(function CalendarCard({
 
   const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
-  const _isLarge = size === 'large';
 
   return (
     <div
@@ -62,14 +61,13 @@ export const CalendarCard = memo(function CalendarCard({
 
       {/* Content */}
       <div className="relative h-full flex flex-col p-4">
-        <CalendarDateDisplay
-          theme={theme}
-          textPrimary={textPrimary}
-          iconBg={iconBg}
-          iconColor={iconColor}
-          dayName={dayName}
-          monthName={monthName}
-          dayNumber={dayNumber}
+        <EntityCardHeader
+          title={`${dayName}, ${monthName} ${dayNumber}`}
+          subtitle="Family Calendar"
+          size={size}
+          leading={
+            <EntityCardHeaderIcon IconComponent={CalendarDays} isActive={true} size={size} />
+          }
         />
 
         {inEditMode && onSizeChange && (

@@ -1,6 +1,8 @@
 import { ChevronRight, Rss } from 'lucide-react';
 import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
+import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { useTheme } from '@/app/hooks';
 
 interface RSSItem {
@@ -130,27 +132,12 @@ export const RSSFeedCard = memo(function RSSFeedCard({
 
       {/* Content */}
       <div className="relative h-full flex flex-col p-4">
-        {/* Header */}
-        <div className={`flex items-start justify-between ${isSmall ? 'mb-2' : 'mb-3'}`}>
-          <div className="min-w-0 flex-1 text-left">
-            <span className={`font-semibold ${textPrimary} text-sm text-left`}>News Feed</span>
-            <p className="text-[10px] text-gray-300 truncate mt-0.5">RSS Feed</p>
-          </div>
-
-          <div
-            className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ml-2 ${
-              theme === 'light' ? '' : 'backdrop-blur-sm'
-            }`}
-            style={{
-              backgroundColor: theme === 'light' ? accentColor.soft : `${accentColor.base}33`,
-            }}
-          >
-            <Rss
-              className="w-5 h-5"
-              style={{ color: theme === 'light' ? accentColor.base : '#ffffff' }}
-            />
-          </div>
-        </div>
+        <EntityCardHeader
+          title="News Feed"
+          subtitle="RSS Feed"
+          size={size}
+          leading={<EntityCardHeaderIcon IconComponent={Rss} isActive={true} size={size} />}
+        />
 
         {inEditMode && onSizeChange && (
           <CardSizeSelector currentSize={size} onSizeChange={onSizeChange} />

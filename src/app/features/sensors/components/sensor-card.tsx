@@ -1,6 +1,8 @@
 import { Gauge, TrendingDown, TrendingUp } from 'lucide-react';
 import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
+import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { useTheme } from '@/app/hooks';
 
 interface SensorCardProps {
@@ -40,8 +42,6 @@ export const SensorCard = memo(function SensorCard({
   const cardBorder = theme === 'light' ? 'border-gray-200/80' : 'border-teal-700/30';
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
   const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
-  const iconBg = theme === 'light' ? 'bg-teal-100' : 'bg-teal-500/20';
-  const iconColor = theme === 'light' ? 'text-teal-600' : 'text-teal-400';
   const accentColor = theme === 'light' ? 'text-teal-700' : 'text-teal-400';
   const glowGradient = theme === 'light' ? 'from-teal-50/40' : 'from-teal-500/5';
 
@@ -62,22 +62,16 @@ export const SensorCard = memo(function SensorCard({
       {theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
 
       <div className="relative h-full flex flex-col">
-        <div className="flex items-start justify-between mb-2">
-          <div className="min-w-0 flex-1">
-            <h3
-              className={`font-semibold ${textPrimary} truncate ${isSmall ? 'text-xs' : 'text-sm'}`}
-            >
-              {name}
-            </h3>
-            <p className="text-[10px] text-gray-300 truncate mt-0.5">Sensor</p>
-            {!isSmall && <p className={`text-xs ${textSecondary}`}>{room}</p>}
-          </div>
-          <div
-            className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${iconBg} flex items-center justify-center flex-shrink-0`}
-          >
-            <IconComponent className={`${isSmall ? 'w-4 h-4' : 'w-5 h-5'} ${iconColor}`} />
-          </div>
-        </div>
+        <EntityCardHeader
+          title={name}
+          subtitle="Sensor"
+          size={size}
+          leading={
+            <EntityCardHeaderIcon IconComponent={IconComponent} isActive={true} size={size} />
+          }
+        />
+
+        {!isSmall && <p className={`mb-2 text-xs ${textSecondary}`}>{room}</p>}
 
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">

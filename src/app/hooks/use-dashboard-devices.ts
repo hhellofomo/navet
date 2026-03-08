@@ -1,36 +1,30 @@
 import { useMemo } from 'react';
-import type { DashboardEntityMode } from '../stores/dashboard-entities-store';
 import type { DeviceCollection } from '../types/device.types';
 
 export const useDashboardDevices = (
   devices: DeviceCollection,
-  mode: DashboardEntityMode,
-  manualEntityIds: string[]
+  hiddenEntityIds: string[]
 ): DeviceCollection => {
   return useMemo(() => {
-    if (mode === 'auto') {
-      return devices;
-    }
-
-    const allowedIds = new Set(manualEntityIds);
+    const hiddenIds = new Set(hiddenEntityIds);
 
     return {
-      lights: devices.lights.filter((device) => allowedIds.has(device.id)),
-      hvac: devices.hvac.filter((device) => allowedIds.has(device.id)),
-      climate: devices.climate.filter((device) => allowedIds.has(device.id)),
-      power: devices.power.filter((device) => allowedIds.has(device.id)),
-      media: devices.media.filter((device) => allowedIds.has(device.id)),
-      weather: devices.weather.filter((device) => allowedIds.has(device.id)),
-      wifi: devices.wifi.filter((device) => allowedIds.has(device.id)),
-      switches: devices.switches.filter((device) => allowedIds.has(device.id)),
-      covers: devices.covers.filter((device) => allowedIds.has(device.id)),
-      locks: devices.locks.filter((device) => allowedIds.has(device.id)),
-      persons: devices.persons.filter((device) => allowedIds.has(device.id)),
-      sensors: devices.sensors.filter((device) => allowedIds.has(device.id)),
-      vacuums: devices.vacuums.filter((device) => allowedIds.has(device.id)),
-      rssFeeds: devices.rssFeeds.filter((device) => allowedIds.has(device.id)),
-      calendars: devices.calendars.filter((device) => allowedIds.has(device.id)),
-      'grouped-sensors': devices['grouped-sensors'].filter((device) => allowedIds.has(device.id)),
+      lights: devices.lights.filter((device) => !hiddenIds.has(device.id)),
+      hvac: devices.hvac.filter((device) => !hiddenIds.has(device.id)),
+      climate: devices.climate.filter((device) => !hiddenIds.has(device.id)),
+      power: devices.power.filter((device) => !hiddenIds.has(device.id)),
+      media: devices.media.filter((device) => !hiddenIds.has(device.id)),
+      weather: devices.weather.filter((device) => !hiddenIds.has(device.id)),
+      wifi: devices.wifi.filter((device) => !hiddenIds.has(device.id)),
+      switches: devices.switches.filter((device) => !hiddenIds.has(device.id)),
+      covers: devices.covers.filter((device) => !hiddenIds.has(device.id)),
+      locks: devices.locks.filter((device) => !hiddenIds.has(device.id)),
+      persons: devices.persons.filter((device) => !hiddenIds.has(device.id)),
+      sensors: devices.sensors.filter((device) => !hiddenIds.has(device.id)),
+      vacuums: devices.vacuums.filter((device) => !hiddenIds.has(device.id)),
+      rssFeeds: devices.rssFeeds.filter((device) => !hiddenIds.has(device.id)),
+      calendars: devices.calendars.filter((device) => !hiddenIds.has(device.id)),
+      'grouped-sensors': devices['grouped-sensors'].filter((device) => !hiddenIds.has(device.id)),
     };
-  }, [devices, manualEntityIds, mode]);
+  }, [devices, hiddenEntityIds]);
 };

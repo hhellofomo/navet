@@ -22,7 +22,7 @@ export const EntityCardHeaderIcon = memo(function EntityCardHeaderIcon({
 }: EntityCardHeaderIconProps) {
   const { theme, primaryColor } = useTheme();
   const isExtraSmall = size === 'extra-small';
-  const isCompact = isExtraSmall || size === 'small';
+  const isCompact = isExtraSmall || size === 'small' || size === 'medium';
   const badgeSize = isExtraSmall ? 'h-7 w-7' : isCompact ? 'h-8 w-8' : 'h-10 w-10';
   const iconSize = isExtraSmall ? 'h-3.5 w-3.5' : isCompact ? 'h-4 w-4' : 'h-5 w-5';
   const colorMap = {
@@ -36,9 +36,10 @@ export const EntityCardHeaderIcon = memo(function EntityCardHeaderIcon({
     teal: { bg: 'rgba(20, 184, 166, 0.24)', text: '#0f766e' },
   } as const;
   const activeColor = colorMap[primaryColor];
-  const interactiveClass = onClick
+  const isInteractive = Boolean(onClick);
+  const interactiveClass = isInteractive
     ? 'cursor-pointer hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2'
-    : 'pointer-events-none';
+    : '';
   const focusRingClass =
     theme === 'light'
       ? 'focus-visible:ring-gray-900/25 focus-visible:ring-offset-white'
@@ -59,30 +60,43 @@ export const EntityCardHeaderIcon = memo(function EntityCardHeaderIcon({
       }
     : undefined;
 
+  const icon = (
+    <IconComponent
+      aria-hidden="true"
+      className={`${iconSize} transition-colors duration-500 ${
+        !isActive && theme === 'light' ? 'text-gray-600' : !isActive ? 'text-gray-500' : ''
+      }`}
+      style={
+        isActive
+          ? {
+              color: theme === 'light' ? activeColor.text : '#ffffff',
+              filter: theme === 'light' ? undefined : 'drop-shadow(0 1px 6px rgba(0, 0, 0, 0.35))',
+            }
+          : undefined
+      }
+    />
+  );
+
+  const className = `${badgeSize} rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-500 ${interactiveClass} ${focusRingClass} ${badgeClass}`;
+
+  if (!isInteractive) {
+    return (
+      <div className={className} style={badgeStyle}>
+        {icon}
+      </div>
+    );
+  }
+
   return (
     <button
       type="button"
       aria-label={ariaLabel}
       onClick={onClick}
       onPointerDown={onPointerDown}
-      className={`${badgeSize} rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-500 ${interactiveClass} ${focusRingClass} ${badgeClass}`}
+      className={className}
       style={badgeStyle}
     >
-      <IconComponent
-        aria-hidden="true"
-        className={`${iconSize} transition-colors duration-500 ${
-          !isActive && theme === 'light' ? 'text-gray-600' : !isActive ? 'text-gray-500' : ''
-        }`}
-        style={
-          isActive
-            ? {
-                color: theme === 'light' ? activeColor.text : '#ffffff',
-                filter:
-                  theme === 'light' ? undefined : 'drop-shadow(0 1px 6px rgba(0, 0, 0, 0.35))',
-              }
-            : undefined
-        }
-      />
+      {icon}
     </button>
   );
 });

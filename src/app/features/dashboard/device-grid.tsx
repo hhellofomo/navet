@@ -17,6 +17,7 @@ interface DeviceGridProps {
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
   onRemoveEntity?: (entityId: string) => void;
   allowEntityRemoval?: boolean;
+  usesHideAction?: boolean;
 }
 
 /**
@@ -35,6 +36,7 @@ export const DeviceGrid = memo(function DeviceGrid({
   onUpdateCard,
   onRemoveEntity,
   allowEntityRemoval = false,
+  usesHideAction = false,
 }: DeviceGridProps) {
   const { isSearchActive, filteredDeviceIds } = useSearch();
   const deferredFilteredDeviceIds = useDeferredValue(filteredDeviceIds);
@@ -87,10 +89,9 @@ export const DeviceGrid = memo(function DeviceGrid({
     () => allCards.map((item) => (item.type === 'device' ? item.id : item.card.id)),
     [allCards]
   );
-
   return (
     <SortableContext items={allCardIds} strategy={rectSortingStrategy}>
-      <div className="grid w-full grid-flow-row-dense grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-4 auto-rows-[87px]">
+      <div className="grid w-full justify-start grid-flow-row-dense grid-cols-[repeat(auto-fit,190px)] gap-4 auto-rows-[87px]">
         {allCards.map((item, index) => {
           if (item.type === 'device') {
             const device = deviceMap.get(item.id);
@@ -109,6 +110,7 @@ export const DeviceGrid = memo(function DeviceGrid({
                 handleSizeChange={handleSizeChange}
                 onRemoveEntity={onRemoveEntity}
                 allowEntityRemoval={allowEntityRemoval}
+                usesHideAction={usesHideAction}
               />
             );
           } else {
@@ -129,6 +131,7 @@ export const DeviceGrid = memo(function DeviceGrid({
                 onUpdateCard={onUpdateCard}
                 onRemoveEntity={onRemoveEntity}
                 allowEntityRemoval={allowEntityRemoval}
+                usesHideAction={usesHideAction}
               />
             );
           }

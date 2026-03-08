@@ -1,4 +1,4 @@
-import { Clipboard, Home, Lightbulb, Lock, Settings, Tv, Video } from 'lucide-react';
+import { Clipboard, FlaskConical, Home, Lightbulb, Lock, Settings, Tv, Video } from 'lucide-react';
 import { memo } from 'react';
 import { type Section, useNavigation, useTheme } from '@/app/hooks';
 import { getThemeColorValue } from '@/app/utils/theme-colors';
@@ -51,6 +51,12 @@ export const Sidebar = memo(function Sidebar() {
       onClick: () => setActiveSection('media'),
     },
     {
+      icon: FlaskConical,
+      label: 'Mock',
+      section: 'mock' as Section,
+      onClick: () => setActiveSection('mock'),
+    },
+    {
       icon: Settings,
       label: 'Settings',
       section: 'settings' as Section,
@@ -96,7 +102,7 @@ export const Sidebar = memo(function Sidebar() {
       <div
         className={`fixed bottom-0 left-0 right-0 ${bgColor} border-t flex md:hidden justify-around items-center px-2 py-2 z-50 safe-area-pb`}
       >
-        {[menuItems[0], menuItems[1], menuItems[4], menuItems[5], menuItems[6]].map(
+        {[menuItems[0], menuItems[1], menuItems[4], menuItems[5], menuItems[6], menuItems[7]].map(
           (item, index) => (
             <button
               type="button"

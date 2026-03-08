@@ -23,7 +23,6 @@ import { useAuth } from '@/app/contexts/auth-context';
 import { useConfig } from '@/app/contexts/config-context';
 import { useTheme } from '@/app/hooks';
 import {
-  type DashboardEntityMode,
   type EntityInteractionMode,
   useDashboardEntitiesStore,
   useSettingsStore,
@@ -123,8 +122,9 @@ export function SettingsSection() {
   const disableAnimations = useSettingsStore((state) => state.disableAnimations);
   const entityInteractionMode = useSettingsStore((state) => state.entityInteractionMode);
   const updateSettings = useSettingsStore((state) => state.updateSettings);
-  const dashboardMode = useDashboardEntitiesStore((state) => state.mode);
-  const setDashboardMode = useDashboardEntitiesStore((state) => state.setMode);
+  const hiddenEntityIds = useDashboardEntitiesStore((state) => state.hiddenEntityIds);
+  const showAllEntities = useDashboardEntitiesStore((state) => state.showAllEntities);
+  const reopenOnboarding = useDashboardEntitiesStore((state) => state.reopenOnboarding);
   const [showLicense, setShowLicense] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const importInputRef = useRef<HTMLInputElement | null>(null);
@@ -450,45 +450,37 @@ export function SettingsSection() {
           iconBg={iconBg}
         >
           <SettingsItem
-            title="Entity visibility mode"
-            description="Either let Navet discover device cards automatically or curate the dashboard manually."
+            title="Entity visibility"
+            description="Navet now uses one visibility model. Remove entities from edit mode, then add them back later from Add Entity."
             textColor={textColor}
             subtleColor={subtleColor}
           >
-            <div className={`inline-flex rounded-full p-1 ${softBg}`}>
-              {(
-                [
-                  { value: 'auto', label: 'Auto' },
-                  { value: 'manual', label: 'Manual' },
-                ] as Array<{ value: DashboardEntityMode; label: string }>
-              ).map((option) => {
-                const isActive = dashboardMode === option.value;
-                return (
-                  <button
-                    type="button"
-                    key={option.value}
-                    onClick={() => setDashboardMode(option.value)}
-                    className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
-                      isActive ? 'shadow-sm' : ''
-                    }`}
-                    style={
-                      isActive
-                        ? {
-                            backgroundColor: accentColor,
-                            color: '#ffffff',
-                          }
-                        : {
-                            color: theme === 'light' ? '#4b5563' : '#d1d5db',
-                          }
-                    }
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={showAllEntities}
+                disabled={hiddenEntityIds.length === 0}
+                className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${
+                  hiddenEntityIds.length === 0
+                    ? 'cursor-not-allowed opacity-50'
+                    : `${softBg} ${hoverBg} ${textColor}`
+                }`}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                <span>Add all removed entities</span>
+              </button>
+              <button
+                type="button"
+                onClick={reopenOnboarding}
+                className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${softBg} ${hoverBg} ${textColor}`}
+              >
+                <Scale className="h-4 w-4" />
+                <span>Restart onboarding</span>
+              </button>
             </div>
             <p className={`mt-3 text-xs leading-relaxed ${subtleColor}`}>
-              Auto keeps discovery hands-off. Manual only shows entities you explicitly add.
+              Hidden right now: {hiddenEntityIds.length}. Restart onboarding if you want to choose
+              between starting full or blank again.
             </p>
           </SettingsItem>
 
@@ -546,9 +538,8 @@ export function SettingsSection() {
             subtleColor={subtleColor}
           >
             <p className={`max-w-2xl text-sm leading-relaxed ${subtleColor}`}>
-              Includes theme, layout, room order, card order, manual entity selection, custom
-              widgets, and light preset settings. Connection URL and token are intentionally left
-              out.
+              Includes theme, layout, room order, card order, hidden entity state, custom widgets,
+              and light preset settings. Connection URL and token are intentionally left out.
             </p>
 
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">

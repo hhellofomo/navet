@@ -307,6 +307,18 @@ class HomeAssistantService {
   }
 
   /**
+   * Update a switch entity using Home Assistant switch services.
+   */
+  async updateSwitch(entityId: string, state: 'on' | 'off'): Promise<void> {
+    await this.callService(
+      'switch',
+      state === 'on' ? 'turn_on' : 'turn_off',
+      {},
+      { entity_id: entityId }
+    );
+  }
+
+  /**
    * Close the connection
    */
   disconnect(): void {

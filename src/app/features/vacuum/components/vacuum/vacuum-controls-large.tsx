@@ -1,4 +1,6 @@
-import { Home, Pause, Play, Settings2 } from 'lucide-react';
+import { Home, Pause, Play } from 'lucide-react';
+import { CardActionRow } from '@/app/components/shared/card-action-row';
+import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
 import type { VacuumStatus } from './vacuum-utils';
 
 interface VacuumControlsLargeProps {
@@ -23,43 +25,47 @@ export function VacuumControlsLarge({
   const btnText = theme === 'light' ? 'text-gray-700' : 'text-gray-300';
 
   return (
-    <div className="flex items-center gap-4">
-      <div className="flex items-center gap-3">
-        {currentStatus === 'cleaning' ? (
+    <CardActionRow
+      theme={theme}
+      size="large"
+      leftContent={
+        <>
+          {currentStatus === 'cleaning' ? (
+            <button
+              type="button"
+              onClick={onPause}
+              className={`h-10 w-10 rounded-full ${btnBg} transition-colors flex items-center justify-center`}
+            >
+              <Pause className={`h-5 w-5 ${btnText}`} />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onStartCleaning}
+              className="h-14 w-14 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors flex items-center justify-center shadow-lg shadow-blue-500/30"
+            >
+              <Play className="h-6 w-6 text-white" />
+            </button>
+          )}
           <button
             type="button"
-            onClick={onPause}
-            className={`w-10 h-10 rounded-full ${btnBg} transition-colors flex items-center justify-center`}
+            onClick={onReturnHome}
+            className={`h-10 w-10 rounded-full ${btnBg} transition-colors flex items-center justify-center`}
           >
-            <Pause className={`w-5 h-5 ${btnText}`} />
+            <Home className={`h-5 w-5 ${btnText}`} />
           </button>
-        ) : (
-          <button
-            type="button"
-            onClick={onStartCleaning}
-            className="w-14 h-14 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors flex items-center justify-center shadow-lg shadow-blue-500/30"
-          >
-            <Play className="w-6 h-6 text-white" />
-          </button>
-        )}
-        <button
-          type="button"
-          onClick={onReturnHome}
-          className={`w-10 h-10 rounded-full ${btnBg} transition-colors flex items-center justify-center`}
-        >
-          <Home className={`w-5 h-5 ${btnText}`} />
-        </button>
-      </div>
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onOpenSettings();
-        }}
-        className={`w-10 h-10 rounded-full ${btnBg} transition-all flex items-center justify-center`}
-      >
-        <Settings2 className={`w-5 h-5 ${btnText}`} />
-      </button>
-    </div>
+        </>
+      }
+      rightContent={
+        <CardSettingsActionButton
+          theme={theme}
+          size="large"
+          onClick={(event) => {
+            event.stopPropagation();
+            onOpenSettings();
+          }}
+        />
+      }
+    />
   );
 }

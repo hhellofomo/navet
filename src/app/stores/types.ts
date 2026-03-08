@@ -1,4 +1,5 @@
 import type { CardSize } from '../components/shared/card-size-selector';
+import type { Section } from '../navigation/sections';
 import type { EntityInteractionMode } from './settings-store';
 import type { PrimaryColor, ThemeMode } from './theme-store';
 
@@ -18,8 +19,6 @@ export interface EditModeState {
   setEditMode: (isEditMode: boolean) => void;
   toggleEditMode: () => void;
 }
-
-import type { Section } from '../hooks';
 
 export interface NavigationState {
   currentRoom: string;

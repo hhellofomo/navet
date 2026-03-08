@@ -1,7 +1,11 @@
-import { X } from 'lucide-react';
+import { EyeOff, X } from 'lucide-react';
 import { memo } from 'react';
 import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-size-selector';
 import { DraggableCard } from '@/app/components/shared/draggable-card';
+import {
+  getEditControlButtonClass,
+  getEditControlLayout,
+} from '@/app/components/shared/edit-card-controls';
 import type { CustomCard } from '@/app/hooks/use-custom-cards';
 import type { DeviceWithType } from '@/app/types/device.types';
 import { renderCard } from '@/app/utils/card-renderer';
@@ -19,6 +23,7 @@ interface DashboardCardItemProps {
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
   onRemoveEntity?: (entityId: string) => void;
   allowEntityRemoval?: boolean;
+  usesHideAction?: boolean;
 }
 
 export const DashboardCardItem = memo(function DashboardCardItem({
@@ -33,11 +38,16 @@ export const DashboardCardItem = memo(function DashboardCardItem({
   onUpdateCard,
   onRemoveEntity,
   allowEntityRemoval = false,
+  usesHideAction = false,
 }: DashboardCardItemProps) {
-  const isCompact = size === 'extra-small' || size === 'small';
-  const removeButtonPosition = isCompact ? 'top-4 left-4' : 'top-5 left-5';
-  const removeButtonSize = isCompact ? 'w-8 h-8' : 'w-10 h-10';
-  const removeIconSize = isCompact ? 'w-4 h-4' : 'w-5 h-5';
+  const {
+    topLeftPosition: removeButtonPosition,
+    buttonSize: removeButtonSize,
+    iconSize: removeIconSize,
+  } = getEditControlLayout(size);
+  const RemoveActionIcon = usesHideAction ? EyeOff : X;
+  const removeButtonClass = getEditControlButtonClass(usesHideAction ? 'neutral' : 'destructive');
+  const removeAriaLabel = 'Remove entity from dashboard';
 
   return (
     <DraggableCard id={id} index={index} isEditMode={isEditMode} className={getCardSpanClass(size)}>
@@ -48,10 +58,10 @@ export const DashboardCardItem = memo(function DashboardCardItem({
             event.stopPropagation();
             onRemoveEntity(id);
           }}
-          className={`absolute ${removeButtonPosition} z-20 ${removeButtonSize} rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow-lg`}
-          aria-label="Remove entity from dashboard"
+          className={`absolute ${removeButtonPosition} z-20 ${removeButtonSize} ${removeButtonClass}`}
+          aria-label={removeAriaLabel}
         >
-          <X className={`${removeIconSize} text-white`} />
+          <RemoveActionIcon className={`${removeIconSize} text-white`} />
         </button>
       )}
       {device
@@ -83,6 +93,7 @@ function areDashboardCardItemPropsEqual(
     previous.onDeleteCard === next.onDeleteCard &&
     previous.onUpdateCard === next.onUpdateCard &&
     previous.onRemoveEntity === next.onRemoveEntity &&
-    previous.allowEntityRemoval === next.allowEntityRemoval
+    previous.allowEntityRemoval === next.allowEntityRemoval &&
+    previous.usesHideAction === next.usesHideAction
   );
 }

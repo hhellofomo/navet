@@ -150,7 +150,7 @@ The current dashboard build includes a few runtime-focused optimizations:
 - Deferred rendering for offscreen room groups in the All view
 - Zustand-backed search result state to reduce context fan-out
 - Stable device-map reuse to avoid rerendering unchanged cards
-- Manual dashboard entity mode for curated Home Assistant card selection
+- Onboarding-based dashboard visibility with add/remove entity curation
 - Local dashboard config export/import for layout and preference backup
 - Configurable entity card interaction styles with a live preview in Settings
 - Optional no-animation mode for slower devices such as Raspberry Pi deployments

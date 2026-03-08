@@ -13,6 +13,10 @@ interface AddEntityDialogProps {
   currentRoom: string;
   deviceMap: Map<string, DeviceWithType>;
   addedEntityIds: string[];
+  visibleEntityIds?: string[];
+  title?: string;
+  description?: string;
+  actionLabel?: string;
 }
 
 export function AddEntityDialog({
@@ -22,6 +26,10 @@ export function AddEntityDialog({
   currentRoom,
   deviceMap,
   addedEntityIds,
+  visibleEntityIds,
+  title = 'Add Entity',
+  description,
+  actionLabel = 'Add',
 }: AddEntityDialogProps) {
   const { theme, primaryColor } = useTheme();
   const [query, setQuery] = useState('');
@@ -36,8 +44,10 @@ export function AddEntityDialog({
 
   const availableDevices = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
+    const visibleIdSet = visibleEntityIds ? new Set(visibleEntityIds) : null;
 
     return Array.from(deviceMap.values())
+      .filter((device) => (visibleIdSet ? visibleIdSet.has(device.id) : true))
       .filter((device) => !addedEntityIds.includes(device.id))
       .filter((device) => currentRoom === 'All' || getDeviceRoomLabel(device) === currentRoom)
       .filter((device) => {
@@ -64,7 +74,7 @@ export function AddEntityDialog({
         const rightName = typeof right.name === 'string' ? right.name : right.id;
         return leftName.localeCompare(rightName);
       });
-  }, [addedEntityIds, currentRoom, deviceMap, query]);
+  }, [addedEntityIds, currentRoom, deviceMap, query, visibleEntityIds]);
 
   if (!open) return null;
 
@@ -76,11 +86,12 @@ export function AddEntityDialog({
       >
         <div className="flex items-center justify-between p-6 border-b border-white/10">
           <div>
-            <h2 className={`text-xl font-semibold ${textColor}`}>Add Entity</h2>
+            <h2 className={`text-xl font-semibold ${textColor}`}>{title}</h2>
             <p className={`text-sm ${mutedColor} mt-1`}>
-              {currentRoom === 'All'
-                ? 'Choose which Home Assistant entities should appear on the dashboard'
-                : `Choose entities for ${currentRoom}`}
+              {description ??
+                (currentRoom === 'All'
+                  ? 'Choose which Home Assistant entities should appear on the dashboard'
+                  : `Choose entities for ${currentRoom}`)}
             </p>
           </div>
           <button
@@ -130,7 +141,7 @@ export function AddEntityDialog({
                     className="px-3 py-2 rounded-lg text-xs font-medium text-white"
                     style={{ backgroundColor: getThemeColorValue(primaryColor) }}
                   >
-                    Add
+                    {actionLabel}
                   </button>
                 </div>
               );
@@ -139,7 +150,9 @@ export function AddEntityDialog({
             <div className={`rounded-xl border ${borderColor} ${cardBg} p-8 text-center`}>
               <p className={`text-sm font-medium ${textColor}`}>No entities available</p>
               <p className={`text-xs ${mutedColor} mt-2`}>
-                Try another search or switch to a different room.
+                {visibleEntityIds
+                  ? 'There are no removed entities matching this room or search.'
+                  : 'Try another search or switch to a different room.'}
               </p>
             </div>
           )}

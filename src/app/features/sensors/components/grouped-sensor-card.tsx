@@ -1,6 +1,8 @@
 import { Gauge } from 'lucide-react';
 import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
+import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { useTheme } from '@/app/hooks';
 import { SensorGroupSettingsDialog } from './sensor-group-settings-dialog';
 import { GridSensorDisplay } from './sensors/grid-sensor-display';
@@ -77,22 +79,14 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
         {theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
 
         <div className="relative h-full flex flex-col">
-          {/* Header */}
-          <div className={`flex items-start justify-between ${isSmall ? 'mb-2' : 'mb-3'}`}>
-            <div className="min-w-0 flex-1">
-              <h3
-                className={`font-semibold ${textPrimary} truncate ${isSmall ? 'text-xs' : 'text-sm'}`}
-              >
-                {name}
-              </h3>
-              <p className="text-[10px] text-gray-300 truncate mt-0.5">Sensor Group</p>
-            </div>
-            <div
-              className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${colors.iconBg} flex items-center justify-center flex-shrink-0`}
-            >
-              <PrimaryIcon className={`${isSmall ? 'w-4 h-4' : 'w-5 h-5'} ${colors.iconColor}`} />
-            </div>
-          </div>
+          <EntityCardHeader
+            title={name}
+            subtitle="Sensor Group"
+            size={size}
+            leading={
+              <EntityCardHeaderIcon IconComponent={PrimaryIcon} isActive={true} size={size} />
+            }
+          />
 
           {/* Sensor Grid */}
           <div className="flex-1 flex items-end min-h-0">

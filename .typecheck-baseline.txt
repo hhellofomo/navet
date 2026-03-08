@@ -14,8 +14,8 @@ src/app/components/ui/chart.tsx(101,3): error TS2339: Property 'payload' does no
 src/app/components/ui/chart.tsx(106,3): error TS2339: Property 'label' does not exist on type 'Omit<Props<ValueType, NameType>, PropertiesReadFromContext> & { active?: boolean | undefined; allowEscapeViewBox?: AllowInDimension | undefined; ... 24 more ...; wrapperStyle?: CSSProperties | undefined; } & ClassAttributes<...> & HTMLAttributes<...> & { ...; }'.
 src/app/components/ui/chart.tsx(164,23): error TS7006: Parameter 'item' implicitly has an 'any' type.
 src/app/components/ui/chart.tsx(164,29): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/app/components/ui/chart.tsx(242,39): error TS2344: Type '"payload" | "verticalAlign"' does not satisfy the constraint '"string" | "filter" | "fill" | "values" | "children" | "slot" | "style" | "clipPath" | "mask" | "path" | "key" | "name" | "type" | "suppressHydrationWarning" | "className" | "id" | ... 433 more ... | "portal"'.
-  Type '"payload"' is not assignable to type '"string" | "filter" | "fill" | "values" | "children" | "slot" | "style" | "clipPath" | "mask" | "path" | "key" | "name" | "type" | "suppressHydrationWarning" | "className" | "id" | ... 433 more ... | "portal"'.
+src/app/components/ui/chart.tsx(242,39): error TS2344: Type '"payload" | "verticalAlign"' does not satisfy the constraint '"string" | "media" | "iconSize" | "filter" | "fill" | "values" | "children" | "slot" | "style" | "clipPath" | "mask" | "path" | "key" | "name" | "type" | "suppressHydrationWarning" | ... 433 more ... | "portal"'.
+  Type '"payload"' is not assignable to type '"string" | "media" | "iconSize" | "filter" | "fill" | "values" | "children" | "slot" | "style" | "clipPath" | "mask" | "path" | "key" | "name" | "type" | "suppressHydrationWarning" | ... 433 more ... | "portal"'.
 src/app/components/ui/chart.tsx(248,17): error TS2339: Property 'length' does not exist on type '{}'.
 src/app/components/ui/chart.tsx(260,16): error TS2339: Property 'map' does not exist on type '{}'.
 src/app/components/ui/chart.tsx(260,21): error TS7006: Parameter 'item' implicitly has an 'any' type.
@@ -36,31 +36,20 @@ src/app/config/runtime-config.ts(24,64): error TS2339: Property 'env' does not e
 src/app/config/runtime-config.ts(25,62): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
 src/app/data/devices.ts(1,31): error TS2307: Cannot find module '../components/card-size-selector' or its corresponding type declarations.
 src/app/data/mock-devices.ts(37,7): error TS2353: Object literal may only specify known properties, and 'type' does not exist in type 'WeatherDevice'.
-src/app/features/calendar/components/calendar-card.tsx(41,9): error TS6133: '_isLarge' is declared but its value is never read.
-src/app/features/calendar/components/calendar-card.tsx(66,11): error TS2322: Type '{ theme: ThemeMode; textPrimary: string; iconBg: string; iconColor: string; dayName: string; monthName: string; dayNumber: number; }' is not assignable to type 'IntrinsicAttributes & CalendarDateDisplayProps'.
-  Property 'theme' does not exist on type 'IntrinsicAttributes & CalendarDateDisplayProps'.
 src/app/features/calendar/components/calendar/calendar-small-view.tsx(28,16): error TS2552: Cannot find name 'Clock'. Did you mean 'Lock'?
 src/app/features/climate/components/climate-card.tsx(46,9): error TS6133: '_isLarge' is declared but its value is never read.
-src/app/features/climate/components/hvac-card/index.tsx(48,9): error TS6133: '_isLarge' is declared but its value is never read.
-src/app/features/climate/components/hvac-card/index.tsx(142,62): error TS2339: Property 'onPointerDown' does not exist on type '{ type: "button"; 'aria-label': string; onClick: (event: MouseEvent<HTMLButtonElement, MouseEvent>) => void; }'.
-src/app/features/lighting/components/switch-card.tsx(142,62): error TS2339: Property 'onPointerDown' does not exist on type '{ type: "button"; 'aria-label': string; onClick: (event: MouseEvent<HTMLButtonElement, MouseEvent>) => void; }'.
 src/app/features/media/components/media-card.tsx(137,13): error TS2322: Type '{ isOpen: true; onOpenChange: () => void; albumArt: string; title: string; artist: string; isPlaying: boolean; volume: number; isMuted: boolean; isLight: boolean; onTogglePlay: () => void; onToggleMute: () => void; onVolumeChange: (newVolume: number) => void; }' is not assignable to type 'IntrinsicAttributes & MediaDialogProps'.
   Property 'isLight' does not exist on type 'IntrinsicAttributes & MediaDialogProps'.
 src/app/features/media/components/media/media-medium-view.tsx(76,16): error TS2552: Cannot find name 'Pause'. Did you mean 'onpause'?
 src/app/features/media/components/media/media-medium-view.tsx(78,16): error TS2304: Cannot find name 'Play'.
 src/app/features/power/components/power-card.tsx(29,9): error TS6133: '_isLarge' is declared but its value is never read.
-src/app/features/rss/components/rss-feed-card.tsx(79,9): error TS6133: '_isLarge' is declared but its value is never read.
+src/app/features/rss/components/rss-feed-card.tsx(81,9): error TS6133: '_isLarge' is declared but its value is never read.
 src/app/features/rss/components/RSSFeedCardContainer.tsx(79,9): error TS6133: '_isLarge' is declared but its value is never read.
 src/app/features/rss/components/RSSFeedCardContainer.tsx(95,7): error TS2322: Type '((size: CardSize) => void) | undefined' is not assignable to type '((size: string) => void) | undefined'.
   Type '(size: CardSize) => void' is not assignable to type '(size: string) => void'.
     Types of parameters 'size' and 'size' are incompatible.
       Type 'string' is not assignable to type 'CardSize'.
 src/app/features/rss/components/RSSFeedCardView.tsx(114,29): error TS2322: Type 'string' is not assignable to type 'CardSize'.
-src/app/features/security/components/cover-card.tsx(71,9): error TS6133: '_cardId' is declared but its value is never read.
-src/app/features/security/components/cover-card.tsx(77,9): error TS6133: '_isLarge' is declared but its value is never read.
-src/app/features/security/components/cover-card.tsx(196,13): error TS2322: Type 'ComponentType<SVGProps<SVGSVGElement>>' is not assignable to type 'LucideIcon'.
-  Property '$$typeof' is missing in type 'ComponentClass<SVGProps<SVGSVGElement>, any>' but required in type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>'.
-src/app/features/security/components/cover-card.tsx(201,60): error TS2339: Property 'onPointerDown' does not exist on type '{ type: "button"; 'aria-label': string; onClick: (event: MouseEvent<HTMLButtonElement, MouseEvent>) => void; }'.
 src/app/features/security/components/CoverCardContainer.tsx(21,9): error TS2304: Cannot find name 'CardSize'.
 src/app/features/security/components/CoverCardContainer.tsx(22,36): error TS2304: Cannot find name 'CardSize'.
 src/app/features/security/components/CoverCardContainer.tsx(30,42): error TS2304: Cannot find name 'Blinds'.
@@ -71,10 +60,10 @@ src/app/features/security/components/CoverCardContainer.tsx(34,33): error TS2304
 src/app/features/security/components/CoverCardContainer.tsx(35,37): error TS2304: Cannot find name 'SunDim'.
 src/app/features/security/components/CoverCardContainer.tsx(36,39): error TS2304: Cannot find name 'Square'.
 src/app/features/security/components/CoverCardContainer.tsx(37,33): error TS2304: Cannot find name 'DoorOpen'.
-src/app/features/sensors/components/grouped-sensor-card.tsx(27,3): error TS2339: Property '_room' does not exist on type 'GroupedSensorCardProps'.
-src/app/features/sensors/components/grouped-sensor-card.tsx(27,3): error TS6133: '_room' is declared but its value is never read.
-src/app/features/sensors/components/grouped-sensor-card.tsx(46,9): error TS6133: '_isLarge' is declared but its value is never read.
-src/app/features/sensors/components/grouped-sensor-card.tsx(125,9): error TS2322: Type '(newSensors: SensorReading[]) => void' is not assignable to type '(sensors: SensorReading[]) => void'.
+src/app/features/sensors/components/grouped-sensor-card.tsx(29,3): error TS2339: Property '_room' does not exist on type 'GroupedSensorCardProps'.
+src/app/features/sensors/components/grouped-sensor-card.tsx(29,3): error TS6133: '_room' is declared but its value is never read.
+src/app/features/sensors/components/grouped-sensor-card.tsx(48,9): error TS6133: '_isLarge' is declared but its value is never read.
+src/app/features/sensors/components/grouped-sensor-card.tsx(119,9): error TS2322: Type '(newSensors: SensorReading[]) => void' is not assignable to type '(sensors: SensorReading[]) => void'.
   Types of parameters 'newSensors' and 'sensors' are incompatible.
     Type 'SensorReading[]' is not assignable to type 'import("/Users/vishal/Development/Github/Navet/Navet/src/app/features/sensors/components/sensors/sensor-types").SensorReading[]'.
       Property 'id' is missing in type 'SensorReading' but required in type 'import("/Users/vishal/Development/Github/Navet/Navet/src/app/features/sensors/components/sensors/sensor-types").SensorReading'.
@@ -96,5 +85,5 @@ src/app/hooks/use-click-outside.ts(31,3): error TS2322: Type 'RefObject<T | null
 src/app/hooks/use-device-map.ts(115,11): error TS2345: Argument of type 'DeviceWithType | undefined' is not assignable to parameter of type 'DeviceWithType'.
   Type 'undefined' is not assignable to type 'DeviceWithType'.
 src/app/hooks/use-ha-devices.ts(48,23): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
-src/app/utils/card-renderer.tsx(184,11): error TS2322: Type '{ name: string; room: string; initialState: boolean | undefined; }' is not assignable to type 'IntrinsicAttributes & Omit<LockCardProps, "room">'.
+src/app/utils/card-renderer.tsx(186,11): error TS2322: Type '{ name: string; room: string; initialState: boolean | undefined; }' is not assignable to type 'IntrinsicAttributes & Omit<LockCardProps, "room">'.
   Property 'room' does not exist on type 'IntrinsicAttributes & Omit<LockCardProps, "room">'.

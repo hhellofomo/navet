@@ -2,6 +2,8 @@ import type { LucideIcon } from 'lucide-react';
 import { type ButtonHTMLAttributes, memo } from 'react';
 import { BrightnessPresetsInline } from '@/app/components/shared/brightness-presets-inline';
 import { BrightnessSlider } from '@/app/components/shared/brightness-slider';
+import { CardActionRow } from '@/app/components/shared/card-action-row';
+import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
 import { ColorPicker } from '@/app/components/shared/color-picker';
 import { PRESET_COLORS } from '@/app/constants/light-constants';
 import { useTheme } from '@/app/hooks';
@@ -27,6 +29,8 @@ interface LightCardLargeProps {
   onBrightnessCommit: (value: number) => void;
   onColorChange: (color: string) => void;
   iconButtonProps: HeaderIconButtonProps;
+  settingsButtonProps: HeaderIconButtonProps;
+  showSettingsButton: boolean;
 }
 
 export const LightCardLarge = memo(function LightCardLarge({
@@ -42,6 +46,8 @@ export const LightCardLarge = memo(function LightCardLarge({
   onBrightnessCommit,
   onColorChange,
   iconButtonProps,
+  settingsButtonProps,
+  showSettingsButton,
 }: Omit<LightCardLargeProps, 'room'>) {
   const { theme } = useTheme();
   const secondaryTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
@@ -105,6 +111,18 @@ export const LightCardLarge = memo(function LightCardLarge({
                 />
               </div>
             </div>
+          </div>
+        )}
+
+        {showSettingsButton && (
+          <div className="mt-auto pt-4">
+            <CardActionRow
+              theme={theme}
+              size="large"
+              rightContent={
+                <CardSettingsActionButton {...settingsButtonProps} theme={theme} size="large" />
+              }
+            />
           </div>
         )}
       </div>

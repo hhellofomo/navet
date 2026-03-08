@@ -19,6 +19,7 @@ interface AllViewGridProps {
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
   onRemoveEntity?: (entityId: string) => void;
   allowEntityRemoval?: boolean;
+  usesHideAction?: boolean;
 }
 
 interface RoomSectionProps {
@@ -37,6 +38,7 @@ interface RoomSectionProps {
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
   onRemoveEntity?: (entityId: string) => void;
   allowEntityRemoval?: boolean;
+  usesHideAction?: boolean;
 }
 
 const RoomSection = memo(function RoomSection({
@@ -55,6 +57,7 @@ const RoomSection = memo(function RoomSection({
   onUpdateCard,
   onRemoveEntity,
   allowEntityRemoval = false,
+  usesHideAction = false,
 }: RoomSectionProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isVisible, setIsVisible] = useState(isEditMode);
@@ -89,7 +92,6 @@ const RoomSection = memo(function RoomSection({
 
   const estimatedRows = Math.max(1, Math.ceil(totalItems / 4));
   const placeholderHeight = estimatedRows * 120;
-
   return (
     <div
       ref={containerRef}
@@ -117,7 +119,7 @@ const RoomSection = memo(function RoomSection({
 
       {isVisible ? (
         <SortableContext items={orderedRoomIds} strategy={rectSortingStrategy}>
-          <div className="grid w-full grid-flow-row-dense grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-4 auto-rows-[87px]">
+          <div className="grid w-full justify-start grid-flow-row-dense grid-cols-[repeat(auto-fit,190px)] gap-4 auto-rows-[87px]">
             {orderedRoomIds.map((id, index) => {
               const device = deviceMap.get(id);
               if (device) {
@@ -134,6 +136,7 @@ const RoomSection = memo(function RoomSection({
                     handleSizeChange={handleSizeChange}
                     onRemoveEntity={onRemoveEntity}
                     allowEntityRemoval={allowEntityRemoval}
+                    usesHideAction={usesHideAction}
                   />
                 );
               }
@@ -156,6 +159,7 @@ const RoomSection = memo(function RoomSection({
                   onUpdateCard={onUpdateCard}
                   onRemoveEntity={onRemoveEntity}
                   allowEntityRemoval={allowEntityRemoval}
+                  usesHideAction={usesHideAction}
                 />
               );
             })}
@@ -184,6 +188,7 @@ export const AllViewGrid = memo(function AllViewGrid({
   onUpdateCard,
   onRemoveEntity,
   allowEntityRemoval = false,
+  usesHideAction = false,
 }: AllViewGridProps) {
   const { isSearchActive, filteredDeviceIds } = useSearch();
   const { theme } = useTheme();
@@ -278,6 +283,7 @@ export const AllViewGrid = memo(function AllViewGrid({
             onUpdateCard={onUpdateCard}
             onRemoveEntity={onRemoveEntity}
             allowEntityRemoval={allowEntityRemoval}
+            usesHideAction={usesHideAction}
           />
         );
       })}

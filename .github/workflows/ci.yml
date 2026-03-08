@@ -32,5 +32,4 @@ jobs:
         run: pnpm check
 
       - name: Build app
-        if: github.event_name == 'pull_request'
         run: pnpm build

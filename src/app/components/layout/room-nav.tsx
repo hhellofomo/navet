@@ -15,6 +15,7 @@ interface RoomNavProps {
   onMoveRoom?: (activeRoom: string, overRoom: string) => void;
   onAddCard?: () => void;
   onAddEntity?: () => void;
+  addEntityLabel?: string;
 }
 
 export const RoomNav = memo(function RoomNav({
@@ -26,6 +27,7 @@ export const RoomNav = memo(function RoomNav({
   onMoveRoom,
   onAddCard,
   onAddEntity,
+  addEntityLabel = 'Add Entity',
 }: RoomNavProps) {
   const { theme, primaryColor } = useTheme();
   const visibleRooms = ['All', ...rooms];
@@ -102,7 +104,7 @@ export const RoomNav = memo(function RoomNav({
           >
             <Plus className={`w-4 h-4 ${textSecondary}`} />
             <span className={`text-xs font-medium hidden md:inline ${textSecondary}`}>
-              Add Entity
+              {addEntityLabel}
             </span>
           </button>
         )}
@@ -111,26 +113,46 @@ export const RoomNav = memo(function RoomNav({
           <button
             type="button"
             onClick={onAddCard}
-            className="p-2 rounded-lg transition-colors flex items-center gap-2 px-3"
-            style={{ backgroundColor: activeColorValue }}
+            className={`p-2 rounded-lg transition-colors flex items-center gap-2 px-3 ${inactiveBg} ${hoverBg}`}
           >
-            <Plus className="w-4 h-4 text-white" />
-            <span className="text-xs font-medium text-white hidden md:inline">Add Card</span>
+            <Plus className={`w-4 h-4 ${textSecondary}`} />
+            <span className={`text-xs font-medium hidden md:inline ${textSecondary}`}>
+              Add Card
+            </span>
           </button>
+        )}
+
+        {isEditMode && (
+          <div
+            aria-hidden="true"
+            className={`mx-1 h-6 w-px ${
+              theme === 'light'
+                ? 'bg-gray-200'
+                : theme === 'contrast'
+                  ? 'bg-white/20'
+                  : 'bg-white/10'
+            }`}
+          />
         )}
 
         <button
           type="button"
           onClick={onToggleEditMode}
-          className={`p-2 rounded-lg transition-colors ${
-            isEditMode ? 'text-white' : `${inactiveBg} ${hoverBg}`
+          className={`p-2 rounded-lg transition-colors flex items-center gap-2 px-3 ${
+            isEditMode ? 'text-white shadow-sm' : `${inactiveBg} ${hoverBg}`
           }`}
           style={isEditMode ? { backgroundColor: activeColorValue } : undefined}
         >
           {isEditMode ? (
-            <Check className="w-4 h-4 text-white" />
+            <>
+              <Check className="w-4 h-4 text-white" />
+              <span className="text-xs font-medium text-white">Done Editing</span>
+            </>
           ) : (
-            <Edit3 className={`w-4 h-4 ${textSecondary}`} />
+            <>
+              <Edit3 className={`w-4 h-4 ${textSecondary}`} />
+              <span className={`text-xs font-medium ${textSecondary}`}>Customize</span>
+            </>
           )}
         </button>
       </div>

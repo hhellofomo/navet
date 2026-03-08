@@ -9,11 +9,12 @@ App Container
 │   └── Navigation Menu
 ├── Main Content Area
     ├── Header
-    │   ├── Menu Toggle (Mobile)
-    │   ├── Title
+    │   ├── Greeting
+    │   ├── Date + 24h time
     │   ├── Search Bar
-    │   └── Edit Mode Toggle
+    │   └── User / notifications
     ├── Room Navigation Tabs
+    │   └── Customize / Add Entity / Add Card / Done Editing
     └── Device Grid (Main Content)
         └── Dynamic Card Grid
 ```
@@ -167,37 +168,17 @@ Gap: 8px between tabs
 
 ### Grid Configuration
 
-#### Mobile (< 768px)
+#### All Breakpoints
 ```css
-grid-template-columns: repeat(auto-fit, minmax(190px, 1fr))
+grid-template-columns: repeat(auto-fit, 190px)
+grid-auto-rows: 87px
 gap: 16px
-cards wrap automatically based on available width
-```
-
-#### Tablet (768px - 1023px)
-```css
-grid-template-columns: repeat(auto-fit, minmax(190px, 1fr))
-gap: 16px
-cards expand in width when more space is available
-```
-
-#### Desktop (1024px - 1439px)
-```css
-grid-template-columns: repeat(auto-fit, minmax(190px, 1fr))
-gap: 16px
-small cards remain at least 190px wide and grow to fill remaining space
-```
-
-#### Desktop Large (≥ 1440px)
-```css
-grid-template-columns: repeat(auto-fit, minmax(190px, 1fr))
-gap: 16px
-medium and large cards span two columns and grow with the grid
+justify-content: start
 ```
 
 ### Grid Structure
 ```tsx
-<div className="grid w-full grid-flow-row-dense grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-4 auto-rows-[87px]">
+<div className="grid w-full justify-start grid-flow-row-dense grid-cols-[repeat(auto-fit,190px)] gap-4 auto-rows-[87px]">
   {/* Cards with dynamic col-span */}
   <div className="col-span-1 row-span-1"> {/* Extra-small card */}
   <div className="col-span-1 row-span-2"> {/* Small card */}
@@ -230,12 +211,13 @@ export function getCardSpanClass(size: CardSize): string {
 }
 ```
 
-### Auto-Fit Grid
+### Fixed-Track Grid
 ```css
 /* Current dashboard grid */
-grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+grid-template-columns: repeat(auto-fit, 190px);
 grid-auto-rows: 87px;
 gap: 16px;
+justify-content: start;
 ```
 
 ### Card Dimensions
@@ -251,7 +233,7 @@ Typical Use: Dense status or one inline control row
 #### Small Card
 ```css
 Min Width: 190px
-Width: 1 grid column, expands with available space
+Width: 190px
 Height: 190px (2 rows + 1 gap)
 Typical Use: Standard compact controls
 ```
@@ -259,7 +241,7 @@ Typical Use: Standard compact controls
 #### Medium Card
 ```css
 Min Width: 396px (2 columns + 1 gap)
-Width: 2 grid columns, expands with available space
+Width: 396px minimum (2 columns + 1 gap)
 Height: 190px (2 rows + 1 gap)
 Typical Use: Primary controls plus supporting details
 ```
@@ -267,7 +249,7 @@ Typical Use: Primary controls plus supporting details
 #### Large Card
 ```css
 Min Width: 396px (2 columns + 1 gap)
-Width: 2 grid columns, expands with available space
+Width: 396px minimum (2 columns + 1 gap)
 Height: 396px (4 rows + 3 gaps)
 Typical Use: Full feature layout with secondary sections
 ```
@@ -331,12 +313,12 @@ z-index: 30
 backdrop-blur-xl
 ```
 
-### Edit Mode Size Selector
+### Edit Mode Controls
 ```css
 position: absolute
-top: 0
-right: 0
-z-index: 100 (above card content)
+top-left: remove entity
+top-right: resize
+z-index: above card content
 ```
 
 ---
@@ -383,22 +365,22 @@ const filteredLights = devices.lights.filter(light => light.room === activeRoom)
 
 #### Mobile (< 768px)
 - Sidebar hidden completely
-- Single column or 2-column grid
+- Fixed-width tracks wrap as space allows
 - Reduced padding (p-4)
 - Compact header
 - Search bar below title
 - Smaller card padding (p-4)
 
 #### Tablet (768px - 1023px)
-- Sidebar slides in/out
-- 3-column grid
+- Sidebar hidden, bottom navigation remains primary
+- Fixed-width tracks continue to wrap
 - Medium padding (p-5)
 - Standard header
 - Search inline
 
 #### Desktop (≥ 1024px)
 - Sidebar always visible
-- 4-6 column grid
+- Fixed-width tracks wrap across available width
 - Generous padding (p-6)
 - Full header with all features
 - Optimal card spacing
@@ -409,9 +391,9 @@ const filteredLights = devices.lights.filter(light => light.room === activeRoom)
 
 ### CSS Grid Benefits
 1. **Automatic Flow**: Browser handles card placement
-2. **Responsive**: Native responsive without complex calculations
+2. **Responsive**: Native wrapping with stable card widths
 3. **Gap Property**: Clean spacing without margin calculations
-4. **Auto-fit**: Adapts to container width automatically
+4. **Auto-fit**: Adds or removes fixed-width tracks automatically
 
 ### Sticky Position Benefits
 1. **No JavaScript**: Pure CSS solution
@@ -429,19 +411,9 @@ Consider disabling on low-end devices
 
 ## Edit Mode Layout
 
-### Size Selector Overlay
-```tsx
-<div className="absolute top-0 right-0 z-[100] p-2">
-  <div className="flex gap-1 bg-black/80 backdrop-blur-md rounded-full p-1 border border-gray-700">
-    <button className="w-8 h-8">S</button>
-    <button className="w-8 h-8">M</button>
-    <button className="w-8 h-8">L</button>
-  </div>
-</div>
-```
-
 ### Edit Mode Indicators
-- Size selector visible on all cards
+- Size selector visible in the top-right card slot
+- Remove-entity action visible in the top-left card slot for dashboard entities
 - Slight border glow on hover
 - Cursor changes to indicate interactivity
 - No functional controls disabled
@@ -499,7 +471,7 @@ Consider disabling on low-end devices
 ## Future Layout Considerations
 
 ### Potential Enhancements
-1. **Drag & Drop**: Reorder cards in edit mode
+1. **Drag & Drop**: Reorder cards and rooms in edit mode
 2. **Custom Layouts**: Save different layout configurations
 3. **Multi-Room View**: Grid view of multiple rooms simultaneously
 4. **Compact Mode**: Higher density layout option

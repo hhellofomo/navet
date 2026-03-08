@@ -43,7 +43,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 ### 🛠️ Functionality
 - **Edit Mode** - Drag-and-drop card reordering and resizing
 - **Custom Widgets** - Add Calendar, News, Weather, Photo Frame, and Quick Note widgets
-- **Manual Entity Mode** - Switch from auto-discovered cards to a curated entity list
+- **Entity Visibility Control** - Start with all entities or a blank board, then add/remove entities as needed
 - **Search & Filter** - Real-time search filters dashboard view
 - **All View** - See all devices grouped by room
 - **Notifications** - System notifications panel
@@ -130,11 +130,13 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 ### Features Guide
 
 #### Edit Mode
-- Click the **Edit** button in the header
+- Click **Customize**
+- The top action row uses **Add Entity**, **Add Card**, and **Done Editing**
 - **Add widgets** with the Add Card button
-- In **Manual** dashboard mode, use **Add Entity** to choose exactly which Home Assistant entities appear
+- Use **Add Entity** to bring entities onto the dashboard
+- Use the card remove action to remove entities from the dashboard
 - **Drag cards** to reorder them
-- **Click cards** to resize (`extra-small`/small/medium/large, depending on card type)
+- Use the top-right resize action to change card size (`extra-small`/small/medium/large, depending on card type)
 - **Save changes** when done
 
 #### Search
@@ -160,12 +162,13 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - Use **room tabs** to filter by room
 - **All** view shows everything grouped by room
 - Device counts shown for each room
+- The selected dashboard section and room both persist across refresh
 
 #### Dashboard Content
-- In **Settings -> Dashboard Content**, choose between:
-  - **Auto**: show discovered entities automatically
-  - **Manual**: only show entities you explicitly add
-- Manual mode is useful for hiding helper, diagnostic, or duplicate Home Assistant entities
+- On first launch, choose whether to start with all discovered entities or a blank dashboard
+- After onboarding, use **Add Entity** and **Remove Entity** to curate the board
+- This is useful for excluding helper, diagnostic, or duplicate Home Assistant entities without switching between dashboard modes
+- The empty dashboard state now exposes **Add Entity** directly so blank dashboards do not dead-end
 
 #### Dashboard Config
 - In **Settings -> Dashboard Config**, export your local dashboard setup to a JSON file
@@ -174,7 +177,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
   - room order and card order
   - card sizes
   - custom widgets
-  - manual entity selection
+  - removed entity state and onboarding state
   - light preset settings
 - Home Assistant connection URL and token are intentionally not included
 
@@ -191,6 +194,12 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - Widgets persist across browser sessions
 - Full drag-and-drop and delete support
 - See [WIDGETS.md](docs/WIDGETS.md) for detailed documentation
+
+#### Navigation Sections
+- **Home** for the main dashboard
+- **Security**, **Tasks**, **Locks**, **Lights**, and **Media** as dedicated sections
+- **Mock** as a temporary flat staging area for mock entities that are not yet integrated into room-based dashboard flow
+- **Settings** for appearance, dashboard, config export/import, and onboarding reset
 
 ## 🏗️ Tech Stack
 
@@ -269,7 +278,7 @@ Found a bug or have an idea? [Open an issue](https://github.com/awesomestvi/nave
 - [x] Configuration UI with setup wizard
 - [x] Loading states and error handling
 - [x] Delete custom widgets
-- [x] Manual dashboard entity selection
+- [x] Onboarding-based entity visibility and add/remove entity flow
 - [x] Export/import dashboard configuration
 - [ ] Widget settings (customize content)
 - [ ] Automations management
