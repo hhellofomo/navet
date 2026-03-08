@@ -81,9 +81,10 @@ export const LightCard = memo(function LightCard({
     (option) => option.value >= minColorTemp && option.value <= maxColorTemp
   );
 
-  const isSmall = size === 'extra-small' || size === 'small';
+  const isExtraSmall = size === 'extra-small';
+  const isSmall = isExtraSmall || size === 'small';
   const isMedium = size === 'medium';
-  const padding = isSmall ? 'p-4' : 'p-5';
+  const padding = isExtraSmall ? 'px-3.5 pt-3 pb-4' : isSmall ? 'p-4' : 'p-5';
   const settingsButtonSize = isSmall ? 'w-7 h-7' : 'w-8 h-8';
   const settingsIconSize = isSmall ? 'w-3 h-3' : 'w-3.5 h-3.5';
   const settingsButtonBg =
@@ -547,6 +548,7 @@ export const LightCard = memo(function LightCard({
             <LightCardSmall
               name={name}
               room={room}
+              size={size}
               brightness={brightness}
               currentColor={effectiveSelectedColor ?? customColor}
               brightnessPresets={brightnessPresets}
@@ -689,6 +691,14 @@ function getReportedColorTempKelvin(entity: HassEntity): number | null {
 }
 
 function getReportedColorHex(entity: HassEntity): string | null {
+  const activeColorMode = entity.attributes?.color_mode;
+  if (
+    typeof activeColorMode === 'string' &&
+    !['hs', 'rgb', 'rgbw', 'rgbww', 'xy'].includes(activeColorMode)
+  ) {
+    return null;
+  }
+
   const rgbColor = entity.attributes?.rgb_color;
   if (
     Array.isArray(rgbColor) &&
@@ -702,7 +712,8 @@ function getReportedColorHex(entity: HassEntity): string | null {
   if (
     Array.isArray(hsColor) &&
     hsColor.length >= 2 &&
-    hsColor.every((value) => typeof value === 'number' && Number.isFinite(value))
+    hsColor.every((value) => typeof value === 'number' && Number.isFinite(value)) &&
+    hsColor[1] > 0
   ) {
     return hsToHex(hsColor[0], hsColor[1]);
   }

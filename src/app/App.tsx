@@ -45,7 +45,7 @@ import {
 import { useCustomCards } from './hooks/use-custom-cards';
 import { useDevices, useRooms } from './hooks/use-devices';
 import { useDashboardEntitiesStore, useSettingsStore } from './stores';
-import { getDeviceRoom } from './utils/device-location';
+import { getDeviceRoom, getDeviceRoomLabel } from './utils/device-location';
 
 const AddCardDialog = lazy(async () => {
   const module = await import('./features/dashboard/components/AddCardDialogContainer');
@@ -107,7 +107,7 @@ function Dashboard() {
     (cardId: string) => {
       const device = deviceMap.get(cardId);
       if (device) {
-        return getDeviceRoom(device);
+        return getDeviceRoomLabel(device);
       }
 
       const customCard = allCustomCards.find((card) => card.id === cardId);

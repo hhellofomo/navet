@@ -21,9 +21,10 @@ export const EntityCardHeaderIcon = memo(function EntityCardHeaderIcon({
   onPointerDown,
 }: EntityCardHeaderIconProps) {
   const { theme, primaryColor } = useTheme();
-  const isCompact = size === 'extra-small' || size === 'small';
-  const badgeSize = isCompact ? 'h-8 w-8' : 'h-10 w-10';
-  const iconSize = isCompact ? 'h-4 w-4' : 'h-5 w-5';
+  const isExtraSmall = size === 'extra-small';
+  const isCompact = isExtraSmall || size === 'small';
+  const badgeSize = isExtraSmall ? 'h-7 w-7' : isCompact ? 'h-8 w-8' : 'h-10 w-10';
+  const iconSize = isExtraSmall ? 'h-3.5 w-3.5' : isCompact ? 'h-4 w-4' : 'h-5 w-5';
   const colorMap = {
     orange: { bg: 'rgba(249, 115, 22, 0.24)', text: '#c2410c' },
     blue: { bg: 'rgba(59, 130, 246, 0.24)', text: '#1d4ed8' },

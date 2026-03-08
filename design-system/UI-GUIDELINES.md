@@ -125,6 +125,7 @@ Based on Tailwind's 4px increment system:
 ```
 
 ### Card Padding by Size
+- **Extra-Small**: `px-3.5 pt-3 pb-4` for dense control layouts
 - **Small**: `p-4` (16px)
 - **Medium**: `p-5` (20px)
 - **Large**: `p-6` (24px)
@@ -152,6 +153,12 @@ Images: rounded-2xl to rounded-3xl (16px - 24px)
 ## Icon System
 
 ### Sizing Standards (CRITICAL)
+
+#### Extra-Small Cards
+```css
+Container: w-7 h-7 (28px × 28px)
+Icon: w-3.5 h-3.5 (14px × 14px)
+```
 
 #### Small Cards
 ```css
@@ -183,10 +190,17 @@ Icon: w-5 h-5 (20px × 20px)
 - **WiFi**: Wifi, Signal
 
 ### Icon Placement
-- **Primary Position**: Top right corner of card
+- **Primary Position**: Leading slot in the card header (top-left in current entity cards)
 - **Container**: Circular background with 20% opacity of accent color
 - **Alignment**: Flexbox centered (`flex items-center justify-center`)
 - **Flex Shrink**: Always set `flex-shrink-0` to prevent icon container collapse
+
+### Compact Card Guidance
+- **Extra-Small** cards should keep to one primary inline control row whenever possible
+- **Extra-Small lights** keep an unlabeled brightness slider visible
+- In **tap toggles** mode, the settings button belongs on the same row as the extra-small light slider, aligned right, with a compact gap between slider and action
+- In **tap opens controls** mode, the extra-small light slider should expand to the full row width instead of reserving space for a hidden action button
+- Avoid duplicate action buttons across header/body rows in compact layouts
 
 ---
 

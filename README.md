@@ -134,7 +134,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **Add widgets** with the Add Card button
 - In **Manual** dashboard mode, use **Add Entity** to choose exactly which Home Assistant entities appear
 - **Drag cards** to reorder them
-- **Click cards** to resize (small/medium/large)
+- **Click cards** to resize (`extra-small`/small/medium/large, depending on card type)
 - **Save changes** when done
 
 #### Search
@@ -152,6 +152,9 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **Tap toggles**: tapping the card toggles the device directly
 - **Tap opens controls**: tapping the card opens the device controls instead
 - The settings screen includes a live practice card preview so you can test the interaction before leaving Settings
+- On **extra-small** light cards, the compact brightness slider always stays visible
+- In **Tap toggles** mode, the settings button moves onto the slider row with compact spacing
+- In **Tap opens controls** mode, that button is hidden and the slider expands to the full row width
 
 #### Room Navigation
 - Use **room tabs** to filter by room
@@ -237,13 +240,14 @@ For technical documentation and developer guides, see [`/docs/README.md`](docs/R
 
 1. **Fork the repository**
 2. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
-3. **Commit your changes** (`git commit -m 'Add amazing feature'`)
+3. **Commit your changes** (`git commit -m 'feat(scope): add amazing feature'`)
 4. **Push to the branch** (`git push origin feature/amazing-feature`)
 5. **Open a Pull Request**
 
 ### Contribution Guidelines
 
 - Follow the existing code style
+- Use Conventional Commits for every commit message (`type(scope): summary`)
 - Maintain the iOS-inspired design aesthetic
 - Test on multiple screen sizes
 - Update documentation as needed

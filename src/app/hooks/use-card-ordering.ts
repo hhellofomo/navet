@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { STORAGE_KEYS } from '../constants/storage-keys';
 import type { Device, DeviceCollection } from '../types/device.types';
-import { getDeviceRoom } from '../utils/device-location';
+import { getDeviceRoomLabel } from '../utils/device-location';
 import { storage } from '../utils/storage';
 import type { CustomCard } from './use-custom-cards';
 
@@ -23,7 +23,7 @@ export const useCardOrdering = (
       const roomCards: string[] = [];
       Object.values(devices).forEach((deviceArray) => {
         (deviceArray as Device[]).forEach((device: Device) => {
-          if (getDeviceRoom(device) === room) {
+          if (getDeviceRoomLabel(device) === room) {
             roomCards.push(device.id);
           }
         });

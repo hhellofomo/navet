@@ -23,10 +23,11 @@ export const BrightnessSlider = memo(function BrightnessSlider({
   onClick,
 }: BrightnessSliderProps) {
   const { theme, primaryColor } = useTheme();
-  const isCompact = size === 'extra-small' || size === 'small';
-  const heightClass = isCompact ? 'h-5' : 'h-6';
-  const trackHeightClass = 'h-1';
-  const thumbSizeClass = isCompact ? 'w-4 h-4' : 'w-5 h-5';
+  const isExtraSmall = size === 'extra-small';
+  const isCompact = isExtraSmall || size === 'small';
+  const heightClass = isExtraSmall ? 'h-4' : isCompact ? 'h-5' : 'h-6';
+  const trackHeightClass = isExtraSmall ? 'h-[3px]' : 'h-1';
+  const thumbSizeClass = isExtraSmall ? 'w-3.5 h-3.5' : isCompact ? 'w-4 h-4' : 'w-5 h-5';
   const labelColor = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
   const valueColor = theme === 'light' ? 'text-gray-900' : 'text-white';
   const trackBg = theme === 'light' ? 'bg-gray-200' : 'bg-white/10';

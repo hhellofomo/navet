@@ -30,7 +30,7 @@ The login page provides a secure authentication interface for connecting to your
 
 #### Implementation
 ```tsx
-// Auth Context
+// Auth context
 const { login, isAuthenticated, config, user } = useAuth();
 
 // Login flow
@@ -57,11 +57,11 @@ await login(url, token);
 
 ## Theme System
 
-### Theme Context
+### Theme Hook + Store
 
-**Location**: `/src/app/contexts/theme-context.tsx`
+**Location**: `/src/app/hooks/use-theme.ts`
 
-Manages global theme state including mode and primary color customization.
+Exposes global theme state including mode and primary color customization through a direct hook API backed by shared client state.
 
 #### Theme Modes
 
@@ -122,11 +122,11 @@ setPrimaryColor('blue');
 
 ## Navigation System
 
-### Navigation Context
+### Navigation Hook + Store
 
-**Location**: `/src/app/contexts/navigation-context.tsx`
+**Location**: `/src/app/hooks/use-navigation.ts`
 
-Manages section navigation state across desktop and mobile layouts.
+Manages section navigation state across desktop and mobile layouts through a direct hook API backed by shared client state.
 
 #### Sections
 
@@ -290,7 +290,7 @@ Beautiful placeholder screens for sections without data.
 2. **Dashboard** → See all devices and rooms
 3. **Explore Sections** → Navigate to different sections via sidebar/bottom nav
 4. **Customize** → Go to Settings → Change theme and color
-5. **Edit Cards** → Enter edit mode to resize cards
+5. **Edit Cards** → Enter edit mode to resize cards, including `extra-small` where supported
 
 ### Settings Customization Flow
 1. Navigate to Settings section
@@ -331,9 +331,9 @@ interface AuthContextType {
 }
 ```
 
-**Theme Context**
+**Theme hook**
 ```tsx
-interface ThemeContextType {
+interface ThemeState {
   theme: 'dark' | 'light' | 'contrast';
   setTheme: (theme: ThemeType) => void;
   primaryColor: PrimaryColor;
@@ -341,13 +341,15 @@ interface ThemeContextType {
 }
 ```
 
-**Navigation Context**
+**Navigation hook**
 ```tsx
-interface NavigationContextType {
+interface NavigationState {
   activeSection: Section;
   setActiveSection: (section: Section) => void;
 }
 ```
+
+Theme, navigation, search, and Home Assistant access use direct hook modules instead of passthrough provider wrappers. Auth and config remain provider-backed shell concerns.
 
 ### Local Storage
 
@@ -432,7 +434,7 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 ## Best Practices
 
 ### When Adding New Sections
-1. Add section to Section type in navigation-context.tsx
+1. Add the section to the navigation store types and exported navigation hook API
 2. Create section component in /components/sections.tsx
 3. Add icon and route to Sidebar component
 4. Include in mobile bottom navigation (if appropriate)
@@ -440,7 +442,7 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 6. Test at all breakpoints
 
 ### When Adding Theme-Dependent Styling
-1. Use theme context to get current theme
+1. Use the theme hook to get current theme
 2. Define color variations for all three themes
 3. Use primary color for active/selected states
 4. Test in all theme modes

@@ -169,39 +169,40 @@ Gap: 8px between tabs
 
 #### Mobile (< 768px)
 ```css
-grid-cols-2
-gap-4 (16px)
-max 2 items per row
+grid-template-columns: repeat(auto-fit, minmax(190px, 1fr))
+gap: 16px
+cards wrap automatically based on available width
 ```
 
 #### Tablet (768px - 1023px)
 ```css
-grid-cols-3
-gap-4 to gap-6 (16px - 24px)
-max 3 items per row
+grid-template-columns: repeat(auto-fit, minmax(190px, 1fr))
+gap: 16px
+cards expand in width when more space is available
 ```
 
 #### Desktop (1024px - 1439px)
 ```css
-grid-cols-4 or grid-cols-6
-gap-6 (24px)
-Recommended: 6 columns for better space utilization
-Alternative: 4 columns for larger card sizes
+grid-template-columns: repeat(auto-fit, minmax(190px, 1fr))
+gap: 16px
+small cards remain at least 190px wide and grow to fill remaining space
 ```
 
 #### Desktop Large (≥ 1440px)
 ```css
-grid-cols-6
-gap-6 (24px)
-max 6 items per row
+grid-template-columns: repeat(auto-fit, minmax(190px, 1fr))
+gap: 16px
+medium and large cards span two columns and grow with the grid
 ```
 
 ### Grid Structure
 ```tsx
-<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 xl:grid-cols-6 gap-4 md:gap-6 p-6">
+<div className="grid w-full grid-flow-row-dense grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-4 auto-rows-[87px]">
   {/* Cards with dynamic col-span */}
-  <div className="col-span-1"> {/* Small card */}
-  <div className="col-span-2"> {/* Medium/Large card */}
+  <div className="col-span-1 row-span-1"> {/* Extra-small card */}
+  <div className="col-span-1 row-span-2"> {/* Small card */}
+  <div className="col-span-2 row-span-2"> {/* Medium card */}
+  <div className="col-span-2 row-span-4"> {/* Large card */}
 </div>
 ```
 
@@ -215,45 +216,60 @@ max 6 items per row
 // From card-size-selector.tsx
 export function getCardSpanClass(size: CardSize): string {
   switch (size) {
+    case 'extra-small':
+      return 'col-span-1 row-span-1'; // 1 column × 0.5 row
     case 'small':
-      return 'col-span-1'; // Takes 1 grid column
+      return 'col-span-1 row-span-2'; // 1 column × 1 row
     case 'medium':
-      return 'col-span-2'; // Takes 2 grid columns
+      return 'col-span-2 row-span-2'; // 2 columns × 1 row
     case 'large':
-      return 'col-span-2 row-span-2'; // Takes 2 columns × 2 rows
+      return 'col-span-2 row-span-4'; // 2 columns × 2 rows
     default:
-      return 'col-span-1';
+      return 'col-span-1 row-span-2';
   }
 }
 ```
 
 ### Auto-Fit Grid
 ```css
-/* Alternative: Auto-fit grid for dynamic columns */
-grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+/* Current dashboard grid */
+grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+grid-auto-rows: 87px;
+gap: 16px;
 ```
 
 ### Card Dimensions
 
+#### Extra-Small Card
+```css
+Min Width: 190px
+Width: 1 grid column, expands with available space
+Height: 87px
+Typical Use: Dense status or one inline control row
+```
+
 #### Small Card
 ```css
-Width: 1 grid column (varies by screen size)
-Height: Auto (content-driven, typically 120px - 160px)
-Min Height: 100px
+Min Width: 190px
+Width: 1 grid column, expands with available space
+Height: 190px (2 rows + 1 gap)
+Typical Use: Standard compact controls
 ```
 
 #### Medium Card
 ```css
-Width: 2 grid columns
-Height: Auto (content-driven, typically 140px - 200px)
-Min Height: 140px
+Min Width: 396px (2 columns + 1 gap)
+Width: 2 grid columns, expands with available space
+Height: 190px (2 rows + 1 gap)
+Typical Use: Primary controls plus supporting details
 ```
 
 #### Large Card
 ```css
-Width: 2 grid columns
-Height: 2 grid rows (explicit height needed)
-Typical Height: 300px - 400px
+Min Width: 396px (2 columns + 1 gap)
+Width: 2 grid columns, expands with available space
+Height: 396px (4 rows + 3 gaps)
+Typical Use: Full feature layout with secondary sections
 ```
 
 ---

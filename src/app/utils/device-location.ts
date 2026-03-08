@@ -24,10 +24,7 @@ export function getAllRooms(devices: DeviceCollection): string[] {
 
   Object.values(devices).forEach((deviceArray) => {
     (deviceArray as Device[]).forEach((device: Device) => {
-      const room = getDeviceRoom(device);
-      if (room) {
-        rooms.add(room);
-      }
+      rooms.add(getDeviceRoomLabel(device));
     });
   });
 

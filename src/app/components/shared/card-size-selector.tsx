@@ -55,6 +55,10 @@ export const CardSizeSelector = memo(function CardSizeSelector({
 }: CardSizeSelectorProps) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const isCompact = currentSize === 'extra-small' || currentSize === 'small';
+  const triggerPosition = isCompact ? 'top-4 right-4' : 'top-5 right-5';
+  const triggerSize = isCompact ? 'h-8 w-8' : 'h-10 w-10';
+  const iconSize = isCompact ? 'w-4 h-4' : 'w-5 h-5';
 
   const availableSizes = allowedSizes
     ? sizes.filter((size) => allowedSizes.includes(size.value))
@@ -83,10 +87,12 @@ export const CardSizeSelector = memo(function CardSizeSelector({
         <button
           ref={triggerRef}
           type="button"
-          className="absolute top-3 right-3 z-50 p-2 rounded-xl bg-black/50 backdrop-blur-md border border-white/10 hover:bg-black/70 transition-all duration-200 group cursor-pointer"
+          className={`absolute ${triggerPosition} z-50 ${triggerSize} rounded-full bg-black/50 backdrop-blur-md border border-white/10 hover:bg-black/70 transition-all duration-200 group cursor-pointer flex items-center justify-center`}
           onClick={(e) => e.stopPropagation()}
         >
-          <Maximize2 className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+          <Maximize2
+            className={`${iconSize} text-white group-hover:scale-110 transition-transform`}
+          />
         </button>
       </Popover.Trigger>
       <Popover.Portal>

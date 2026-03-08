@@ -159,10 +159,7 @@ const BrightnessOverflowMenu = memo(function BrightnessOverflowMenu({
     theme === 'light'
       ? 'opacity-50 cursor-not-allowed bg-gray-900/10 text-gray-500'
       : 'opacity-50 cursor-not-allowed bg-white/15 text-white';
-  const selectedClasses =
-    theme === 'light'
-      ? 'bg-gray-900 text-white ring-2 ring-gray-900/15 scale-105'
-      : 'bg-white text-gray-900 ring-2 ring-white/70 scale-105';
+  const selectedClasses = 'text-white ring-2 scale-105';
   const unselectedClasses =
     theme === 'light'
       ? 'bg-gray-900/10 text-gray-900 hover:bg-gray-900/18'
