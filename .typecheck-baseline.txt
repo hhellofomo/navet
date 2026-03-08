@@ -1,0 +1,189 @@
+src/app/App.tsx(99,54): error TS2345: Argument of type 'DeviceCollection' is not assignable to parameter of type 'Record<string, Device[]>'.
+  Index signature for type 'string' is missing in type 'DeviceCollection'.
+src/app/App.tsx(100,52): error TS2345: Argument of type 'DeviceCollection' is not assignable to parameter of type 'Record<string, Device[]>'.
+  Index signature for type 'string' is missing in type 'DeviceCollection'.
+src/app/App.tsx(126,29): error TS2345: Argument of type 'string | number | true' is not assignable to parameter of type 'string'.
+  Type 'number' is not assignable to type 'string'.
+src/app/components/layout/header.tsx(43,28): error TS2345: Argument of type 'string | number | boolean | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/app/components/layout/header.tsx(49,21): error TS2345: Argument of type 'LightDevice[]' is not assignable to parameter of type 'Record<string, string | number | boolean | undefined>[]'.
+  Type 'LightDevice' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Index signature for type 'string' is missing in type 'LightDevice'.
+src/app/components/layout/header.tsx(50,21): error TS2345: Argument of type 'HVACDevice[]' is not assignable to parameter of type 'Record<string, string | number | boolean | undefined>[]'.
+  Type 'HVACDevice' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Index signature for type 'string' is missing in type 'HVACDevice'.
+src/app/components/layout/header.tsx(51,21): error TS2345: Argument of type 'SwitchDevice[]' is not assignable to parameter of type 'Record<string, string | number | boolean | undefined>[]'.
+  Type 'SwitchDevice' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Index signature for type 'string' is missing in type 'SwitchDevice'.
+src/app/components/layout/header.tsx(52,21): error TS2345: Argument of type 'CoverDevice[]' is not assignable to parameter of type 'Record<string, string | number | boolean | undefined>[]'.
+  Type 'CoverDevice' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Index signature for type 'string' is missing in type 'CoverDevice'.
+src/app/components/layout/header.tsx(53,21): error TS2345: Argument of type 'LockDevice[]' is not assignable to parameter of type 'Record<string, string | number | boolean | undefined>[]'.
+  Type 'LockDevice' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Index signature for type 'string' is missing in type 'LockDevice'.
+src/app/components/layout/header.tsx(54,21): error TS2345: Argument of type 'MediaDevice[]' is not assignable to parameter of type 'Record<string, string | number | boolean | undefined>[]'.
+  Type 'MediaDevice' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Index signature for type 'string' is missing in type 'MediaDevice'.
+src/app/components/layout/header.tsx(55,21): error TS2345: Argument of type 'PersonDevice[]' is not assignable to parameter of type 'Record<string, string | number | boolean | undefined>[]'.
+  Type 'PersonDevice' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Index signature for type 'string' is missing in type 'PersonDevice'.
+src/app/components/layout/header.tsx(56,21): error TS2345: Argument of type 'SensorDevice[]' is not assignable to parameter of type 'Record<string, string | number | boolean | undefined>[]'.
+  Type 'SensorDevice' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Index signature for type 'string' is missing in type 'SensorDevice'.
+src/app/components/layout/header.tsx(57,21): error TS2345: Argument of type 'VacuumDevice[]' is not assignable to parameter of type 'Record<string, string | number | boolean | undefined>[]'.
+  Type 'VacuumDevice' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Index signature for type 'string' is missing in type 'VacuumDevice'.
+src/app/components/layout/header.tsx(58,21): error TS2345: Argument of type 'ClimateDevice[]' is not assignable to parameter of type 'Record<string, string | number | boolean | undefined>[]'.
+  Type 'ClimateDevice' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Index signature for type 'string' is missing in type 'ClimateDevice'.
+src/app/components/layout/header.tsx(59,21): error TS2345: Argument of type 'WeatherDevice[]' is not assignable to parameter of type 'Record<string, string | number | boolean | undefined>[]'.
+  Type 'WeatherDevice' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Index signature for type 'string' is missing in type 'WeatherDevice'.
+src/app/components/layout/header.tsx(60,21): error TS2345: Argument of type 'PowerDevice[]' is not assignable to parameter of type 'Record<string, string | number | boolean | undefined>[]'.
+  Type 'PowerDevice' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Index signature for type 'string' is missing in type 'PowerDevice'.
+src/app/components/layout/header.tsx(61,21): error TS2345: Argument of type 'WiFiDevice[]' is not assignable to parameter of type 'Record<string, string | number | boolean | undefined>[]'.
+  Type 'WiFiDevice' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Index signature for type 'string' is missing in type 'WiFiDevice'.
+src/app/components/shared/draggable-card.tsx(16,3): error TS2339: Property '_index' does not exist on type 'DraggableCardProps'.
+src/app/components/shared/draggable-card.tsx(16,3): error TS6133: '_index' is declared but its value is never read.
+src/app/components/shared/loading-spinner.tsx(17,9): error TS6133: '_textColor' is declared but its value is never read.
+src/app/components/shared/render-profiler.tsx(10,20): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+src/app/components/ui/carousel.tsx(149,6): error TS2322: Type '{ ref?: Ref<HTMLDivElement> | undefined; key?: Key | null | undefined; defaultChecked?: boolean | undefined; defaultValue?: string | number | readonly string[] | undefined; ... 276 more ...; className: string; }' is not assignable to type 'DetailedHTMLProps<FieldsetHTMLAttributes<HTMLFieldSetElement>, HTMLFieldSetElement>'.
+  Type '{ ref?: Ref<HTMLDivElement> | undefined; key?: Key | null | undefined; defaultChecked?: boolean | undefined; defaultValue?: string | number | readonly string[] | undefined; ... 276 more ...; className: string; }' is not assignable to type 'ClassAttributes<HTMLFieldSetElement>'.
+    Types of property 'ref' are incompatible.
+      Type 'Ref<HTMLDivElement> | undefined' is not assignable to type 'Ref<HTMLFieldSetElement> | undefined'.
+        Type '(instance: HTMLDivElement | null) => void | (() => VoidOrUndefinedOnly)' is not assignable to type 'Ref<HTMLFieldSetElement> | undefined'.
+          Type '(instance: HTMLDivElement | null) => void | (() => VoidOrUndefinedOnly)' is not assignable to type '(instance: HTMLFieldSetElement | null) => void | (() => VoidOrUndefinedOnly)'.
+            Types of parameters 'instance' and 'instance' are incompatible.
+              Type 'HTMLFieldSetElement | null' is not assignable to type 'HTMLDivElement | null'.
+                Property 'align' is missing in type 'HTMLFieldSetElement' but required in type 'HTMLDivElement'.
+src/app/components/ui/chart.tsx(101,3): error TS2339: Property 'payload' does not exist on type 'Omit<Props<ValueType, NameType>, PropertiesReadFromContext> & { active?: boolean | undefined; allowEscapeViewBox?: AllowInDimension | undefined; ... 24 more ...; wrapperStyle?: CSSProperties | undefined; } & ClassAttributes<...> & HTMLAttributes<...> & { ...; }'.
+src/app/components/ui/chart.tsx(106,3): error TS2339: Property 'label' does not exist on type 'Omit<Props<ValueType, NameType>, PropertiesReadFromContext> & { active?: boolean | undefined; allowEscapeViewBox?: AllowInDimension | undefined; ... 24 more ...; wrapperStyle?: CSSProperties | undefined; } & ClassAttributes<...> & HTMLAttributes<...> & { ...; }'.
+src/app/components/ui/chart.tsx(164,23): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/app/components/ui/chart.tsx(164,29): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/app/components/ui/chart.tsx(242,39): error TS2344: Type '"payload" | "verticalAlign"' does not satisfy the constraint '"string" | "filter" | "fill" | "values" | "version" | "children" | "dangerouslySetInnerHTML" | "onCopy" | "onCopyCapture" | "onCut" | "onCutCapture" | "onPaste" | "onPasteCapture" | ... 436 more ... | "portal"'.
+  Type '"payload"' is not assignable to type '"string" | "filter" | "fill" | "values" | "version" | "children" | "dangerouslySetInnerHTML" | "onCopy" | "onCopyCapture" | "onCut" | "onCutCapture" | "onPaste" | "onPasteCapture" | ... 436 more ... | "portal"'.
+src/app/components/ui/chart.tsx(248,17): error TS2339: Property 'length' does not exist on type '{}'.
+src/app/components/ui/chart.tsx(260,16): error TS2339: Property 'map' does not exist on type '{}'.
+src/app/components/ui/chart.tsx(260,21): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/app/components/ui/input-otp.tsx(67,6): error TS2322: Type '{ ref?: Ref<HTMLDivElement> | undefined; key?: Key | null | undefined; defaultChecked?: boolean | undefined; defaultValue?: string | number | readonly string[] | undefined; ... 276 more ...; "data-slot": string; }' is not assignable to type 'DetailedHTMLProps<HTMLAttributes<HTMLHRElement>, HTMLHRElement>'.
+  Type '{ ref?: Ref<HTMLDivElement> | undefined; key?: Key | null | undefined; defaultChecked?: boolean | undefined; defaultValue?: string | number | readonly string[] | undefined; ... 276 more ...; "data-slot": string; }' is not assignable to type 'ClassAttributes<HTMLHRElement>'.
+    Types of property 'ref' are incompatible.
+      Type 'Ref<HTMLDivElement> | undefined' is not assignable to type 'Ref<HTMLHRElement> | undefined'.
+        Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'Ref<HTMLHRElement> | undefined'.
+          Type 'RefObject<HTMLDivElement | null>' is not assignable to type 'RefObject<HTMLHRElement | null>'.
+            Type 'HTMLDivElement | null' is not assignable to type 'HTMLHRElement | null'.
+              Type 'HTMLDivElement' is missing the following properties from type 'HTMLHRElement': color, noShade, size, width
+src/app/components/ui/resizable.tsx(12,51): error TS2339: Property 'PanelGroup' does not exist on type 'typeof import("/Users/vishal/Development/Github/Navet/Navet/node_modules/.pnpm/react-resizable-panels@4.7.1_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/react-resizable-panels/dist/react-resizable-panels")'.
+src/app/components/ui/resizable.tsx(14,25): error TS2339: Property 'PanelGroup' does not exist on type 'typeof import("/Users/vishal/Development/Github/Navet/Navet/node_modules/.pnpm/react-resizable-panels@4.7.1_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/react-resizable-panels/dist/react-resizable-panels")'.
+src/app/components/ui/resizable.tsx(30,51): error TS2339: Property 'PanelResizeHandle' does not exist on type 'typeof import("/Users/vishal/Development/Github/Navet/Navet/node_modules/.pnpm/react-resizable-panels@4.7.1_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/react-resizable-panels/dist/react-resizable-panels")'.
+src/app/components/ui/resizable.tsx(34,25): error TS2339: Property 'PanelResizeHandle' does not exist on type 'typeof import("/Users/vishal/Development/Github/Navet/Navet/node_modules/.pnpm/react-resizable-panels@4.7.1_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/react-resizable-panels/dist/react-resizable-panels")'.
+src/app/components/ui/resizable.tsx(47,26): error TS2339: Property 'PanelResizeHandle' does not exist on type 'typeof import("/Users/vishal/Development/Github/Navet/Navet/node_modules/.pnpm/react-resizable-panels@4.7.1_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/react-resizable-panels/dist/react-resizable-panels")'.
+src/app/config/runtime-config.ts(24,64): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+src/app/config/runtime-config.ts(25,62): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+src/app/contexts/edit-mode-context.tsx(2,31): error TS2307: Cannot find module '../components/card-size-selector' or its corresponding type declarations.
+src/app/data/devices.ts(1,31): error TS2307: Cannot find module '../components/card-size-selector' or its corresponding type declarations.
+src/app/data/mock-devices.ts(37,7): error TS2353: Object literal may only specify known properties, and 'type' does not exist in type 'WeatherDevice'.
+src/app/features/calendar/components/calendar-card.tsx(41,9): error TS6133: '_isLarge' is declared but its value is never read.
+src/app/features/calendar/components/calendar-card.tsx(66,11): error TS2322: Type '{ theme: ThemeType; textPrimary: string; iconBg: string; iconColor: string; dayName: string; monthName: string; dayNumber: number; }' is not assignable to type 'IntrinsicAttributes & CalendarDateDisplayProps'.
+  Property 'theme' does not exist on type 'IntrinsicAttributes & CalendarDateDisplayProps'.
+src/app/features/calendar/components/calendar/calendar-small-view.tsx(28,16): error TS2552: Cannot find name 'Clock'. Did you mean 'Lock'?
+src/app/features/calendar/components/calendar/use-calendar-theme.ts(1,32): error TS2307: Cannot find module '../../contexts/theme-context' or its corresponding type declarations.
+src/app/features/climate/components/climate-card.tsx(46,9): error TS6133: '_isLarge' is declared but its value is never read.
+src/app/features/climate/components/climate/use-climate-theme.ts(1,32): error TS2307: Cannot find module '../../contexts/theme-context' or its corresponding type declarations.
+src/app/features/climate/components/hvac-card/index.tsx(48,9): error TS6133: '_isLarge' is declared but its value is never read.
+src/app/features/climate/components/hvac-card/index.tsx(142,62): error TS2339: Property 'onPointerDown' does not exist on type '{ type: "button"; 'aria-label': string; onClick: (event: MouseEvent<HTMLButtonElement, MouseEvent>) => void; }'.
+src/app/features/dashboard/components/AddCardDialogView.tsx(4,15): error TS2459: Module '"./AddCardDialogContainer"' declares 'CardTemplate' locally, but it is not exported.
+src/app/features/dashboard/components/setup-wizard.tsx(4,27): error TS2307: Cannot find module '../contexts/config-context' or its corresponding type declarations.
+src/app/features/dashboard/components/setup-wizard.tsx(5,26): error TS2307: Cannot find module '../contexts/theme-context' or its corresponding type declarations.
+src/app/features/dashboard/components/setup-wizard.tsx(6,35): error TS2307: Cannot find module './figma/ImageWithFallback' or its corresponding type declarations.
+src/app/features/dashboard/components/setup-wizard.tsx(183,15): error TS2607: JSX element class does not support attributes because it does not have a 'props' property.
+src/app/features/dashboard/components/setup-wizard.tsx(183,16): error TS2786: 'Lock' cannot be used as a JSX component.
+  Its type '{ new (): Lock; prototype: Lock; }' is not a valid JSX element type.
+    Type '{ new (): Lock; prototype: Lock; }' is not assignable to type 'new (props: any, context: any) => Component<any, any, any>'.
+      Type 'Lock' is missing the following properties from type 'Component<any, any, any>': context, setState, forceUpdate, render, and 2 more.
+src/app/features/dashboard/components/SetupWizardView.tsx(3,35): error TS2307: Cannot find module '../../shared/components/ImageWithFallback' or its corresponding type declarations.
+src/app/features/dashboard/components/SetupWizardView.tsx(81,19): error TS2552: Cannot find name 'setSuccess'. Did you mean 'success'?
+src/app/features/dashboard/components/SetupWizardView.tsx(82,19): error TS2304: Cannot find name 'setError'.
+src/app/features/dashboard/components/SetupWizardView.tsx(106,19): error TS2304: Cannot find name 'setSuccess'.
+src/app/features/dashboard/components/SetupWizardView.tsx(107,19): error TS2304: Cannot find name 'setError'.
+src/app/features/dashboard/components/widget-card.tsx(74,11): error TS2322: Type '{ size: CardSize; initialNote: string; onNoteChange: (note: string) => void; }' is not assignable to type 'IntrinsicAttributes & Omit<NoteWidgetProps, "size">'.
+  Property 'size' does not exist on type 'IntrinsicAttributes & Omit<NoteWidgetProps, "size">'.
+src/app/features/lighting/components/switch-card.tsx(142,62): error TS2339: Property 'onPointerDown' does not exist on type '{ type: "button"; 'aria-label': string; onClick: (event: MouseEvent<HTMLButtonElement, MouseEvent>) => void; }'.
+src/app/features/media/components/media-card.tsx(137,13): error TS2322: Type '{ isOpen: true; onOpenChange: () => void; albumArt: string; title: string; artist: string; isPlaying: boolean; volume: number; isMuted: boolean; isLight: boolean; onTogglePlay: () => void; onToggleMute: () => void; onVolumeChange: (newVolume: number) => void; }' is not assignable to type 'IntrinsicAttributes & MediaDialogProps'.
+  Property 'isLight' does not exist on type 'IntrinsicAttributes & MediaDialogProps'.
+src/app/features/media/components/media/media-medium-view.tsx(76,16): error TS2552: Cannot find name 'Pause'. Did you mean 'onpause'?
+src/app/features/media/components/media/media-medium-view.tsx(78,16): error TS2304: Cannot find name 'Play'.
+src/app/features/notifications/components/notifications/notification-header.tsx(2,35): error TS2307: Cannot find module '../../contexts/theme-context' or its corresponding type declarations.
+src/app/features/notifications/components/notifications/notification-item.tsx(2,35): error TS2307: Cannot find module '../../contexts/theme-context' or its corresponding type declarations.
+src/app/features/power/components/power-card.tsx(29,9): error TS6133: '_isLarge' is declared but its value is never read.
+src/app/features/rss/components/rss-feed-card.tsx(79,9): error TS6133: '_isLarge' is declared but its value is never read.
+src/app/features/rss/components/RSSFeedCardContainer.tsx(79,9): error TS6133: '_isLarge' is declared but its value is never read.
+src/app/features/rss/components/RSSFeedCardContainer.tsx(95,7): error TS2322: Type '((size: CardSize) => void) | undefined' is not assignable to type '((size: string) => void) | undefined'.
+  Type '(size: CardSize) => void' is not assignable to type '(size: string) => void'.
+    Types of parameters 'size' and 'size' are incompatible.
+      Type 'string' is not assignable to type 'CardSize'.
+src/app/features/rss/components/RSSFeedCardView.tsx(114,29): error TS2322: Type 'string' is not assignable to type 'CardSize'.
+src/app/features/security/components/cover-card.tsx(71,9): error TS6133: '_cardId' is declared but its value is never read.
+src/app/features/security/components/cover-card.tsx(77,9): error TS6133: '_isLarge' is declared but its value is never read.
+src/app/features/security/components/cover-card.tsx(196,13): error TS2322: Type 'ComponentType<SVGProps<SVGSVGElement>>' is not assignable to type 'LucideIcon'.
+  Property '$$typeof' is missing in type 'ComponentClass<SVGProps<SVGSVGElement>, any>' but required in type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>'.
+src/app/features/security/components/cover-card.tsx(201,60): error TS2339: Property 'onPointerDown' does not exist on type '{ type: "button"; 'aria-label': string; onClick: (event: MouseEvent<HTMLButtonElement, MouseEvent>) => void; }'.
+src/app/features/security/components/CoverCardContainer.tsx(21,9): error TS2304: Cannot find name 'CardSize'.
+src/app/features/security/components/CoverCardContainer.tsx(22,36): error TS2304: Cannot find name 'CardSize'.
+src/app/features/security/components/CoverCardContainer.tsx(30,42): error TS2304: Cannot find name 'Blinds'.
+src/app/features/security/components/CoverCardContainer.tsx(31,42): error TS2304: Cannot find name 'Blinds'.
+src/app/features/security/components/CoverCardContainer.tsx(32,39): error TS2304: Cannot find name 'Home'.
+src/app/features/security/components/CoverCardContainer.tsx(33,42): error TS2304: Cannot find name 'DoorOpen'.
+src/app/features/security/components/CoverCardContainer.tsx(34,33): error TS2304: Cannot find name 'Fence'.
+src/app/features/security/components/CoverCardContainer.tsx(35,37): error TS2304: Cannot find name 'SunDim'.
+src/app/features/security/components/CoverCardContainer.tsx(36,39): error TS2304: Cannot find name 'Square'.
+src/app/features/security/components/CoverCardContainer.tsx(37,33): error TS2304: Cannot find name 'DoorOpen'.
+src/app/features/sensors/components/grouped-sensor-card.tsx(27,3): error TS2339: Property '_room' does not exist on type 'GroupedSensorCardProps'.
+src/app/features/sensors/components/grouped-sensor-card.tsx(27,3): error TS6133: '_room' is declared but its value is never read.
+src/app/features/sensors/components/grouped-sensor-card.tsx(46,9): error TS6133: '_isLarge' is declared but its value is never read.
+src/app/features/sensors/components/grouped-sensor-card.tsx(125,9): error TS2322: Type '(newSensors: SensorReading[]) => void' is not assignable to type '(sensors: SensorReading[]) => void'.
+  Types of parameters 'newSensors' and 'sensors' are incompatible.
+    Type 'SensorReading[]' is not assignable to type 'import("/Users/vishal/Development/Github/Navet/Navet/src/app/features/sensors/components/sensors/sensor-types").SensorReading[]'.
+      Property 'id' is missing in type 'SensorReading' but required in type 'import("/Users/vishal/Development/Github/Navet/Navet/src/app/features/sensors/components/sensors/sensor-types").SensorReading'.
+src/app/features/sensors/components/sensor-group-settings-dialog.tsx(372,77): error TS2304: Cannot find name 'Gauge'.
+src/app/features/sensors/components/sensor-group-settings-dialog.tsx(375,43): error TS2339: Property 'id' does not exist on type 'SensorReading'.
+src/app/features/sensors/components/SensorGroupSettingsContainer.tsx(3,33): error TS2307: Cannot find module '../../shared/components/custom-scrollbar' or its corresponding type declarations.
+src/app/features/sensors/components/SensorGroupSettingsContainer.tsx(342,11): error TS2322: Type 'RefObject<HTMLInputElement | null>' is not assignable to type 'RefObject<HTMLInputElement>'.
+  Type 'HTMLInputElement | null' is not assignable to type 'HTMLInputElement'.
+    Type 'null' is not assignable to type 'HTMLInputElement'.
+src/app/features/sensors/components/SensorGroupSettingsView.tsx(185,45): error TS2345: Argument of type '(prev: any) => any' is not assignable to parameter of type 'number'.
+src/app/features/sensors/components/SensorGroupSettingsView.tsx(185,46): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/app/features/sensors/components/SensorGroupSettingsView.tsx(190,45): error TS2345: Argument of type '(prev: any) => number' is not assignable to parameter of type 'number'.
+src/app/features/sensors/components/SensorGroupSettingsView.tsx(190,46): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+src/app/features/settings/components/AppearanceSection.tsx(195,18): error TS2304: Cannot find name 'X'.
+src/app/features/settings/components/AppearanceSection.tsx(202,16): error TS2304: Cannot find name 'ImageIcon'.
+src/app/features/settings/components/settings-panel.tsx(2,25): error TS2307: Cannot find module '../contexts/auth-context' or its corresponding type declarations.
+src/app/features/settings/components/settings-panel.tsx(3,61): error TS2307: Cannot find module '../contexts/theme-context' or its corresponding type declarations.
+src/app/features/settings/components/SettingsContainer.tsx(34,9): error TS6133: '_handleWallpaperUpload' is declared but its value is never read.
+src/app/features/settings/components/SettingsContainer.tsx(58,9): error TS6133: '_handleRemoveWallpaper' is declared but its value is never read.
+src/app/features/settings/components/SettingsContainer.tsx(106,6): error TS2739: Type '{ theme: ThemeType; setTheme: (theme: ThemeType) => void; primaryColor: PrimaryColor; setPrimaryColor: (color: PrimaryColor) => void; ... 11 more ...; handleResetConnection: () => void; }' is missing the following properties from type 'SettingsViewProps': handleWallpaperUpload, handleRemoveWallpaper
+src/app/features/settings/components/SettingsView.tsx(49,9): error TS6133: '_bgColor' is declared but its value is never read.
+src/app/features/settings/components/SettingsView.tsx(50,9): error TS6133: '_cardBg' is declared but its value is never read.
+src/app/features/settings/components/SettingsView.tsx(54,9): error TS6133: '_borderColor' is declared but its value is never read.
+src/app/features/vacuum/components/vacuum-card.tsx(49,9): error TS6133: '_isLarge' is declared but its value is never read.
+src/app/features/vacuum/components/vacuum-card.tsx(88,31): error TS2339: Property 'iconBg' does not exist on type '{ cleaning: { gradient: string; border: string; iconBg: string; accent: string; glow: string; }; returning: { gradient: string; border: string; iconBg: string; accent: string; glow: string; }; docked: { gradient: string; border: string; iconBg: string; accent: string; glow: string; }; paused: { ...; }; error: { ...;...'.
+src/app/features/vacuum/components/vacuum-card.tsx(91,69): error TS2339: Property 'accent' does not exist on type '{ cleaning: { gradient: string; border: string; iconBg: string; accent: string; glow: string; }; returning: { gradient: string; border: string; iconBg: string; accent: string; glow: string; }; docked: { gradient: string; border: string; iconBg: string; accent: string; glow: string; }; paused: { ...; }; error: { ...;...'.
+src/app/features/vacuum/components/vacuum-card.tsx(144,9): error TS2322: Type '{ isOpen: boolean; onClose: () => void; onStartCleaning: () => void; onReturnHome: () => void; name: string; theme: ThemeType; }' is not assignable to type 'IntrinsicAttributes & VacuumSettingsDialogProps'.
+  Property 'onStartCleaning' does not exist on type 'IntrinsicAttributes & VacuumSettingsDialogProps'.
+src/app/features/vacuum/components/vacuum/vacuum-settings-dialog.tsx(24,52): error TS2322: Type '{ title: string; onClose: () => void; theme: "light" | "dark" | "contrast"; }' is not assignable to type 'IntrinsicAttributes & DialogHeaderProps'.
+  Property 'onClose' does not exist on type 'IntrinsicAttributes & DialogHeaderProps'.
+src/app/features/weather/components/weather-card/index.tsx(63,9): error TS6133: '_isMedium' is declared but its value is never read.
+src/app/features/wifi/components/wifi-card.tsx(31,9): error TS6133: '_isLarge' is declared but its value is never read.
+src/app/hooks/use-click-outside.ts(31,3): error TS2322: Type 'RefObject<T | null>' is not assignable to type 'RefObject<T>'.
+  Type 'T | null' is not assignable to type 'T'.
+    'T' could be instantiated with an arbitrary type which could be unrelated to 'T | null'.
+src/app/hooks/use-device-map.ts(115,11): error TS2345: Argument of type 'DeviceWithType | undefined' is not assignable to parameter of type 'DeviceWithType'.
+  Type 'undefined' is not assignable to type 'DeviceWithType'.
+src/app/hooks/use-ha-devices.ts(47,23): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+src/app/services/device.service.ts(20,28): error TS7006: Parameter 'device' implicitly has an 'any' type.
+src/app/services/device.service.ts(35,28): error TS7006: Parameter 'device' implicitly has an 'any' type.
+src/app/services/device.service.ts(56,28): error TS7006: Parameter 'device' implicitly has an 'any' type.
+src/app/utils/card-renderer.tsx(184,11): error TS2322: Type '{ name: string; room: string; initialState: boolean | undefined; }' is not assignable to type 'IntrinsicAttributes & Omit<LockCardProps, "room">'.
+  Property 'room' does not exist on type 'IntrinsicAttributes & Omit<LockCardProps, "room">'.

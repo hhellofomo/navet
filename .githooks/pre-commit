@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -eu
+
+pnpm check
+node scripts/check-typecheck-baseline.mjs
+node scripts/check-docs-relevance.mjs

@@ -152,6 +152,7 @@ The current dashboard build includes a few runtime-focused optimizations:
 - Stable device-map reuse to avoid rerendering unchanged cards
 - Manual dashboard entity mode for curated Home Assistant card selection
 - Local dashboard config export/import for layout and preference backup
+- Configurable entity card interaction styles with a live preview in Settings
 - Optional no-animation mode for slower devices such as Raspberry Pi deployments
 
 ## Remaining Limitation
