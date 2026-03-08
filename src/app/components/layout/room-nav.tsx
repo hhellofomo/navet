@@ -1,7 +1,7 @@
 import { DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Check, Edit3, Plus } from 'lucide-react';
+import { Check, Edit3, LayoutGrid, Lightbulb } from 'lucide-react';
 import { memo } from 'react';
 import { useTheme } from '@/app/hooks';
 import { getThemeColorValue } from '@/app/utils/theme-colors';
@@ -102,7 +102,7 @@ export const RoomNav = memo(function RoomNav({
             onClick={onAddEntity}
             className={`p-2 rounded-lg transition-colors flex items-center gap-2 px-3 ${inactiveBg} ${hoverBg}`}
           >
-            <Plus className={`w-4 h-4 ${textSecondary}`} />
+            <Lightbulb className={`w-4 h-4 ${textSecondary}`} />
             <span className={`text-xs font-medium hidden md:inline ${textSecondary}`}>
               {addEntityLabel}
             </span>
@@ -115,7 +115,7 @@ export const RoomNav = memo(function RoomNav({
             onClick={onAddCard}
             className={`p-2 rounded-lg transition-colors flex items-center gap-2 px-3 ${inactiveBg} ${hoverBg}`}
           >
-            <Plus className={`w-4 h-4 ${textSecondary}`} />
+            <LayoutGrid className={`w-4 h-4 ${textSecondary}`} />
             <span className={`text-xs font-medium hidden md:inline ${textSecondary}`}>
               Add Card
             </span>

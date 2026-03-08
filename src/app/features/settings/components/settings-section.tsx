@@ -18,6 +18,16 @@ import {
 import { type ReactNode, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { InteractionPreviewCard } from '@/app/components/shared/interaction-preview-card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/app/components/ui/alert-dialog';
 import { PRIMARY_COLOR_OPTIONS, THEME_OPTIONS } from '@/app/constants/theme-options';
 import { useAuth } from '@/app/contexts/auth-context';
 import { useConfig } from '@/app/contexts/config-context';
@@ -27,7 +37,11 @@ import {
   useDashboardEntitiesStore,
   useSettingsStore,
 } from '@/app/stores';
-import { exportDashboardConfig, importDashboardConfig } from '@/app/utils/dashboard-config';
+import { useNavigationStore } from '@/app/stores/navigation-store';
+import {
+  downloadDashboardConfig,
+  importDashboardConfigFromFile,
+} from '@/app/utils/dashboard-config';
 import { readFileAsDataUrl, validateImageFile } from '@/app/utils/image-upload';
 import { getThemeColorValue } from '@/app/utils/theme-colors';
 
@@ -125,8 +139,12 @@ export function SettingsSection() {
   const hiddenEntityIds = useDashboardEntitiesStore((state) => state.hiddenEntityIds);
   const showAllEntities = useDashboardEntitiesStore((state) => state.showAllEntities);
   const reopenOnboarding = useDashboardEntitiesStore((state) => state.reopenOnboarding);
+  const setActiveSection = useNavigationStore((state) => state.setActiveSection);
+  const setCurrentRoom = useNavigationStore((state) => state.setCurrentRoom);
   const [showLicense, setShowLicense] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [showRevealAllConfirm, setShowRevealAllConfirm] = useState(false);
+  const [showRestartOnboardingConfirm, setShowRestartOnboardingConfirm] = useState(false);
   const importInputRef = useRef<HTMLInputElement | null>(null);
 
   const navItems: SectionNavItem[] = [
@@ -177,17 +195,7 @@ export function SettingsSection() {
   };
 
   const handleExportDashboardConfig = () => {
-    const payload = exportDashboardConfig();
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    const dateStamp = new Date().toISOString().slice(0, 10);
-
-    link.href = url;
-    link.download = `navet-dashboard-config-${dateStamp}.json`;
-    link.click();
-
-    URL.revokeObjectURL(url);
+    downloadDashboardConfig();
     toast.success('Dashboard config exported');
   };
 
@@ -196,9 +204,7 @@ export function SettingsSection() {
     if (!file) return;
 
     try {
-      const content = await file.text();
-      const parsed = JSON.parse(content);
-      importDashboardConfig(parsed);
+      await importDashboardConfigFromFile(file);
       toast.success('Dashboard config imported. Reloading...');
       window.setTimeout(() => {
         window.location.reload();
@@ -458,7 +464,7 @@ export function SettingsSection() {
             <div className="flex flex-wrap gap-3">
               <button
                 type="button"
-                onClick={showAllEntities}
+                onClick={() => setShowRevealAllConfirm(true)}
                 disabled={hiddenEntityIds.length === 0}
                 className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${
                   hiddenEntityIds.length === 0
@@ -471,7 +477,7 @@ export function SettingsSection() {
               </button>
               <button
                 type="button"
-                onClick={reopenOnboarding}
+                onClick={() => setShowRestartOnboardingConfirm(true)}
                 className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${softBg} ${hoverBg} ${textColor}`}
               >
                 <Scale className="h-4 w-4" />
@@ -482,6 +488,56 @@ export function SettingsSection() {
               Hidden right now: {hiddenEntityIds.length}. Restart onboarding if you want to choose
               between starting full or blank again.
             </p>
+
+            <AlertDialog open={showRevealAllConfirm} onOpenChange={setShowRevealAllConfirm}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Add all removed entities back?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will put every currently removed entity back onto the dashboard at once.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      showAllEntities();
+                      setShowRevealAllConfirm(false);
+                    }}
+                  >
+                    Add All
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog
+              open={showRestartOnboardingConfirm}
+              onOpenChange={setShowRestartOnboardingConfirm}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Restart onboarding?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will reopen the startup wizard so you can choose whether to begin with all
+                    entities, a blank dashboard, or import a config file.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      setActiveSection('home');
+                      setCurrentRoom('All');
+                      reopenOnboarding();
+                      setShowRestartOnboardingConfirm(false);
+                    }}
+                  >
+                    Restart
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </SettingsItem>
 
           <SettingsItem

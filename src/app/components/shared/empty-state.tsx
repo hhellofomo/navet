@@ -5,6 +5,7 @@ interface EmptyStateProps {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   description: string;
+  actionIcon?: React.ComponentType<{ className?: string }>;
   actionLabel?: string;
   onAction?: () => void;
 }
@@ -13,6 +14,7 @@ export const EmptyState = memo(function EmptyState({
   icon: Icon,
   title,
   description,
+  actionIcon: ActionIcon,
   actionLabel,
   onAction,
 }: EmptyStateProps) {
@@ -38,8 +40,9 @@ export const EmptyState = memo(function EmptyState({
           <button
             type="button"
             onClick={onAction}
-            className="mt-6 px-4 py-2 rounded-xl bg-gray-900 text-white text-sm font-medium"
+            className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900 text-white text-sm font-medium"
           >
+            {ActionIcon && <ActionIcon className="h-4 w-4" />}
             {actionLabel}
           </button>
         )}
