@@ -1,4 +1,7 @@
+import type { LucideIcon } from 'lucide-react';
+import { Blinds, DoorOpen, Fence, Home, Square, SunDim } from 'lucide-react';
 import { memo, useState } from 'react';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useTheme } from '../../../hooks';
 import { CoverCardView } from './CoverCardView';
 
@@ -23,10 +26,7 @@ interface CoverCardContainerProps {
   isEditMode: boolean;
 }
 
-const deviceClassConfig: Record<
-  DeviceClass,
-  { label: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }
-> = {
+const deviceClassConfig: Record<DeviceClass, { label: string; icon: LucideIcon }> = {
   blind: { label: 'Window Blinds', icon: Blinds },
   shade: { label: 'Roller Shades', icon: Blinds },
   curtain: { label: 'Curtains', icon: Home },

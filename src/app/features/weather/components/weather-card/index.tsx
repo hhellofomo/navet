@@ -60,7 +60,6 @@ export const WeatherCard = memo(function WeatherCard({
 }: WeatherCardProps) {
   const { theme } = useTheme();
   const isSmall = size === 'extra-small' || size === 'small';
-  const _isMedium = size === 'medium';
   const isLarge = size === 'large';
 
   // Get current date and time

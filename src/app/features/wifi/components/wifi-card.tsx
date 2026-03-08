@@ -28,7 +28,6 @@ export const WifiCard = memo(function WifiCard({
   // Size-specific styling with intelligent layout adaptation
   const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
-  const _isLarge = size === 'large';
   const padding = isSmall ? 'p-4' : 'p-5';
 
   // Theme-aware colors

@@ -43,7 +43,6 @@ export const ClimateCard = memo(function ClimateCard({
   // Size-specific styling with intelligent layout adaptation
   const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
-  const _isLarge = size === 'large';
   const padding = isSmall ? 'p-4' : 'p-5';
   const isOff = mode === 'off';
   const resolvedIconBg = theme === 'light' && isOff ? 'bg-gray-300/70' : iconBg;

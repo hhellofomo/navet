@@ -1,4 +1,4 @@
-import type { CardSize } from '../components/card-size-selector';
+import type { CardSize } from '../components/shared/card-size-selector';
 
 export interface LightDevice {
   id: string;

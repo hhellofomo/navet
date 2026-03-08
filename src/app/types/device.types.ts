@@ -52,6 +52,8 @@ export interface WeatherDevice extends BaseDevice {
   sunset: string;
   daylight: string;
   rainForecast: string;
+  highTemp: number;
+  lowTemp: number;
   forecast: Array<{
     day: string;
     condition: string;

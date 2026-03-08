@@ -26,7 +26,6 @@ export const PowerCard = memo(function PowerCard({
   // Size-specific styling with intelligent layout adaptation
   const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
-  const _isLarge = size === 'large';
   const padding = isSmall ? 'p-4' : 'p-5';
 
   // Samsung-style energy comparison data

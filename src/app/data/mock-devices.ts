@@ -34,7 +34,6 @@ export const DEVICES: DeviceCollection = {
   weather: [
     {
       id: 'weather-1',
-      type: 'weather',
       name: 'Weather',
       room: 'Living Room',
       location: 'Valencia, Spain',

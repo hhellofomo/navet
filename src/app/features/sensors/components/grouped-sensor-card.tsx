@@ -26,7 +26,7 @@ interface GroupedSensorCardProps {
 export const GroupedSensorCard = memo(function GroupedSensorCard({
   id,
   name,
-  _room,
+  room: _room,
   sensors,
   size,
   onSizeChange,
@@ -45,7 +45,6 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
   // Size-specific styling with intelligent layout adaptation
   const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
-  const _isLarge = size === 'large';
   const padding = isSmall ? 'p-4' : 'p-5';
 
   const colors = theme === 'light' ? lightColorMap[accentColor] : darkColorMap[accentColor];

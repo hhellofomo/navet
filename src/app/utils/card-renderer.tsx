@@ -181,11 +181,7 @@ export const renderCard = ({
 
     case 'locks':
       return (
-        <LockCard
-          name={device.name as string}
-          room={device.room as string}
-          initialState={device.state as boolean | undefined}
-        />
+        <LockCard name={device.name as string} initialState={device.state as boolean | undefined} />
       );
 
     case 'persons':
