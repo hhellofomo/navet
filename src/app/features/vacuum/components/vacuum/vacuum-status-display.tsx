@@ -21,7 +21,7 @@ export function VacuumStatusDisplay({
   isSmall,
 }: VacuumStatusDisplayProps) {
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
+  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
 
   const getStatusText = () => {
     switch (currentStatus) {

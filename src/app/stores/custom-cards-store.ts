@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import type { CardSize } from '../components/shared/card-size-selector';
 
 export type CardType = 'calendar' | 'news' | 'weather' | 'photo' | 'note';
 
 export interface CustomCard {
   id: string;
   type: CardType;
-  size: 'small' | 'medium' | 'large';
+  size: CardSize;
   room: string;
   data?: Record<string, unknown>;
   createdAt: number;
@@ -16,7 +17,7 @@ interface CustomCardsState {
   cards: CustomCard[];
   addCard: (
     type: CardType,
-    size: 'small' | 'medium' | 'large',
+    size: CardSize,
     room: string,
     data?: Record<string, unknown>
   ) => CustomCard;

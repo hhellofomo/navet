@@ -86,7 +86,7 @@ const RoomSection = memo(function RoomSection({
   }, [isEditMode]);
 
   const estimatedRows = Math.max(1, Math.ceil(totalItems / 4));
-  const placeholderHeight = estimatedRows * 220;
+  const placeholderHeight = estimatedRows * 120;
 
   return (
     <div
@@ -111,7 +111,7 @@ const RoomSection = memo(function RoomSection({
 
       {isVisible ? (
         <SortableContext items={orderedRoomIds} strategy={rectSortingStrategy}>
-          <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-2 md:gap-3 lg:gap-4 auto-rows-[180px] md:auto-rows-[190px]">
+          <div className="grid justify-start grid-flow-col-dense grid-cols-[repeat(auto-fit,190px)] gap-2 md:gap-3 lg:gap-4 auto-rows-[91px] md:auto-rows-[89px] lg:auto-rows-[87px]">
             {orderedRoomIds.map((id, index) => {
               const device = deviceMap.get(id);
               if (device) {
@@ -240,7 +240,7 @@ export const AllViewGrid = memo(function AllViewGrid({
   const textColor =
     theme === 'light' ? 'text-gray-900' : theme === 'contrast' ? 'text-white' : 'text-white';
   const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-400';
+    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
 
   return (
     <div className="space-y-8">

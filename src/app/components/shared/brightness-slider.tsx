@@ -1,6 +1,7 @@
 import * as Slider from '@radix-ui/react-slider';
 import { memo } from 'react';
 import { useTheme } from '../../contexts/theme-context';
+import type { CardSize } from './card-size-selector';
 
 interface BrightnessSliderProps {
   value: number;
@@ -8,7 +9,7 @@ interface BrightnessSliderProps {
   onCommit?: (value: number) => void;
   disabled?: boolean;
   showLabel?: boolean;
-  size?: 'small' | 'medium' | 'large';
+  size?: CardSize;
   onClick?: (e: React.MouseEvent) => void;
 }
 
@@ -22,10 +23,11 @@ export const BrightnessSlider = memo(function BrightnessSlider({
   onClick,
 }: BrightnessSliderProps) {
   const { theme, primaryColor } = useTheme();
-  const heightClass = size === 'small' ? 'h-5' : 'h-6';
-  const trackHeightClass = size === 'small' ? 'h-1' : 'h-1';
-  const thumbSizeClass = size === 'small' ? 'w-4 h-4' : 'w-5 h-5';
-  const labelColor = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
+  const isCompact = size === 'extra-small' || size === 'small';
+  const heightClass = isCompact ? 'h-5' : 'h-6';
+  const trackHeightClass = 'h-1';
+  const thumbSizeClass = isCompact ? 'w-4 h-4' : 'w-5 h-5';
+  const labelColor = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
   const valueColor = theme === 'light' ? 'text-gray-900' : 'text-white';
   const trackBg = theme === 'light' ? 'bg-gray-200' : 'bg-white/10';
   const colorMap = {
@@ -49,6 +51,7 @@ export const BrightnessSlider = memo(function BrightnessSlider({
         </div>
       )}
       <Slider.Root
+        data-card-interactive
         value={[value]}
         onValueChange={(val) => onChange(val[0])}
         onValueCommit={(val) => onCommit?.(val[0])}

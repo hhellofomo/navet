@@ -81,7 +81,7 @@ export function SensorGroupSettingsView({
                 <Dialog.Title className="text-xl font-semibold text-white">
                   {groupName} Settings
                 </Dialog.Title>
-                <Dialog.Description className="text-sm mt-1 text-gray-400">
+                <Dialog.Description className="text-sm mt-1 text-gray-300">
                   Manage sensors for this group
                 </Dialog.Description>
               </div>
@@ -92,7 +92,7 @@ export function SensorGroupSettingsView({
                   onClick={handleCancel}
                   className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all"
                 >
-                  <X className="w-5 h-5 text-gray-400" />
+                  <X className="w-5 h-5 text-gray-300" />
                 </button>
               </Dialog.Close>
             </div>
@@ -106,7 +106,7 @@ export function SensorGroupSettingsView({
 
                 {selectedSensors.length === 0 ? (
                   <div className="bg-white/5 rounded-2xl p-4 text-center">
-                    <p className="text-xs text-gray-400">Search and add sensors below</p>
+                    <p className="text-xs text-gray-300">Search and add sensors below</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -127,7 +127,7 @@ export function SensorGroupSettingsView({
                               <p className="text-xs font-medium text-white truncate">
                                 {sensor.label}
                               </p>
-                              <p className="text-xs text-gray-400">
+                              <p className="text-xs text-gray-300">
                                 {sensor.value} {sensor.unit}
                               </p>
                             </div>
@@ -153,7 +153,7 @@ export function SensorGroupSettingsView({
 
                 {/* Search Input */}
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                   <input
                     ref={inputRef}
                     type="text"
@@ -273,7 +273,7 @@ export function SensorGroupSettingsView({
                                   <p className="text-xs font-medium text-white truncate">
                                     {highlightMatch(sensor.label)}
                                   </p>
-                                  <p className="text-xs text-gray-400">
+                                  <p className="text-xs text-gray-300">
                                     {sensor.value} {sensor.unit} · {sensor.category}
                                   </p>
                                 </div>
@@ -288,7 +288,7 @@ export function SensorGroupSettingsView({
                         </div>
                       ) : (
                         <div className="p-6 text-center">
-                          <p className="text-xs text-gray-400">No sensors match "{searchQuery}"</p>
+                          <p className="text-xs text-gray-300">No sensors match "{searchQuery}"</p>
                         </div>
                       )}
                     </CustomScrollbar>

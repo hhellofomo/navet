@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import type { CardSize } from './card-size-selector';
 
 interface ColorTemperature {
   value: number;
@@ -13,7 +14,7 @@ interface ColorTemperaturePresetsProps {
   isOn: boolean;
   onTempChange: (temp: number) => void;
   onClearColor: () => void;
-  size?: 'small' | 'medium' | 'large';
+  size?: CardSize;
 }
 
 export const ColorTemperaturePresets = memo(function ColorTemperaturePresets({
@@ -25,15 +26,14 @@ export const ColorTemperaturePresets = memo(function ColorTemperaturePresets({
   onClearColor,
   size = 'medium',
 }: ColorTemperaturePresetsProps) {
-  const buttonSize = size === 'small' ? 'w-8 h-8' : size === 'medium' ? 'w-10 h-10' : 'w-12 h-12';
-  const scaleSelected =
-    size === 'small' ? 'scale-110' : size === 'medium' ? 'scale-110' : 'scale-[1.15]';
-  const glowSize =
-    size === 'small'
-      ? { blur: '12px', spread: '24px', opacity: '80', opacity2: '40' }
-      : size === 'medium'
-        ? { blur: '16px', spread: '32px', opacity: '90', opacity2: '50' }
-        : { blur: '20px', spread: '40px', opacity: '95', opacity2: '60' };
+  const isCompact = size === 'extra-small' || size === 'small';
+  const buttonSize = isCompact ? 'w-8 h-8' : size === 'medium' ? 'w-10 h-10' : 'w-12 h-12';
+  const scaleSelected = isCompact ? 'scale-110' : size === 'medium' ? 'scale-110' : 'scale-[1.15]';
+  const glowSize = isCompact
+    ? { blur: '12px', spread: '24px', opacity: '80', opacity2: '40' }
+    : size === 'medium'
+      ? { blur: '16px', spread: '32px', opacity: '90', opacity2: '50' }
+      : { blur: '20px', spread: '40px', opacity: '95', opacity2: '60' };
 
   return (
     <>

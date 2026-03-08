@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import type { ThemeType } from '../../../contexts/theme-context';
 import type { CardTemplate, CardType } from './AddCardDialogContainer';
 
@@ -11,8 +12,8 @@ interface AddCardDialogViewProps {
   cardTemplates: CardTemplate[];
   selectedType: CardType | null;
   setSelectedType: (type: CardType) => void;
-  selectedSize: 'small' | 'medium' | 'large';
-  setSelectedSize: (size: 'small' | 'medium' | 'large') => void;
+  selectedSize: CardSize;
+  setSelectedSize: (size: CardSize) => void;
   selectedTemplate: CardTemplate | undefined;
   getColorValue: (color: string) => string;
   handleAdd: () => void;
@@ -37,7 +38,7 @@ export function AddCardDialogView({
 
   const bgColor = theme === 'light' ? 'bg-white' : 'bg-gray-900';
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+  const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
   const borderColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
   const cardBg = theme === 'light' ? 'bg-gray-50' : 'bg-white/5';
   const hoverBg = theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10';
@@ -121,7 +122,7 @@ export function AddCardDialogView({
             <div>
               <h3 className={`text-sm font-medium ${textColor} mb-3`}>Choose a size</h3>
               <div className="flex gap-3">
-                {(['small', 'medium', 'large'] as const).map((size) => (
+                {(['extra-small', 'small', 'medium', 'large'] as const).map((size) => (
                   <button
                     type="button"
                     key={size}
@@ -139,8 +140,22 @@ export function AddCardDialogView({
                       <div
                         className="mx-auto mb-2 rounded"
                         style={{
-                          width: size === 'small' ? '24px' : size === 'medium' ? '40px' : '56px',
-                          height: size === 'small' ? '24px' : size === 'medium' ? '40px' : '56px',
+                          width:
+                            size === 'extra-small'
+                              ? '24px'
+                              : size === 'small'
+                                ? '24px'
+                                : size === 'medium'
+                                  ? '40px'
+                                  : '56px',
+                          height:
+                            size === 'extra-small'
+                              ? '12px'
+                              : size === 'small'
+                                ? '24px'
+                                : size === 'medium'
+                                  ? '24px'
+                                  : '48px',
                           backgroundColor:
                             selectedSize === size
                               ? getColorValue(primaryColor)

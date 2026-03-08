@@ -122,7 +122,7 @@ export const IconPicker = memo(function IconPicker({
       {/* Search Bar */}
       <div className="relative mb-4">
         <Search
-          className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-500 ${isLightOn ? 'text-gray-400' : 'text-gray-600'}`}
+          className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-500 ${isLightOn ? 'text-gray-300' : 'text-gray-600'}`}
         />
         <input
           type="text"

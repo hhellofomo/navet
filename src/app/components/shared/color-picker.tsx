@@ -1,12 +1,13 @@
 import { memo } from 'react';
 import { useTheme } from '../../contexts/theme-context';
+import type { CardSize } from './card-size-selector';
 
 interface ColorPickerProps {
   colors: string[];
   selectedColor: string | null;
   isOn: boolean;
   onColorChange: (color: string) => void;
-  size?: 'small' | 'medium' | 'large';
+  size?: CardSize;
 }
 
 export const ColorPicker = memo(function ColorPicker({
@@ -17,7 +18,8 @@ export const ColorPicker = memo(function ColorPicker({
   size = 'medium',
 }: ColorPickerProps) {
   const { theme } = useTheme();
-  const buttonSize = size === 'small' ? 'w-8 h-8' : size === 'medium' ? 'w-10 h-10' : 'w-12 h-12';
+  const isCompact = size === 'extra-small' || size === 'small';
+  const buttonSize = isCompact ? 'w-8 h-8' : size === 'medium' ? 'w-10 h-10' : 'w-12 h-12';
   const ringOffset = theme === 'light' ? 'ring-offset-white' : 'ring-offset-gray-900';
 
   return (

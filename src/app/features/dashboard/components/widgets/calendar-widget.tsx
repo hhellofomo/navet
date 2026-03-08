@@ -1,4 +1,5 @@
 import { Calendar as CalendarIcon, Clock } from 'lucide-react';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useTheme } from '@/app/contexts/theme-context';
 
 interface CalendarEvent {
@@ -18,7 +19,7 @@ const mockEvents: CalendarEvent[] = [
 ];
 
 interface CalendarWidgetProps {
-  size?: 'small' | 'medium' | 'large';
+  size?: CardSize;
 }
 
 export function CalendarWidget({ size = 'medium' }: CalendarWidgetProps) {
@@ -28,7 +29,7 @@ export function CalendarWidget({ size = 'medium' }: CalendarWidgetProps) {
     theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : 'bg-white/10';
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
   const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-400';
+    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
   const border = theme === 'light' ? 'border-gray-200/50' : 'border-white/10';
 
   const getColorValue = (color: string) => {
@@ -46,7 +47,7 @@ export function CalendarWidget({ size = 'medium' }: CalendarWidgetProps) {
   };
 
   const displayEvents =
-    size === 'small'
+    size === 'extra-small' || size === 'small'
       ? mockEvents.slice(0, 2)
       : size === 'medium'
         ? mockEvents.slice(0, 3)
@@ -69,7 +70,7 @@ export function CalendarWidget({ size = 'medium' }: CalendarWidgetProps) {
         </div>
         <div className="flex-1 min-w-0">
           <h3 className={`text-sm font-semibold ${textPrimary}`}>Calendar</h3>
-          <p className="text-[10px] text-gray-400 truncate mt-0.5">Widget</p>
+          <p className="text-[10px] text-gray-300 truncate mt-0.5">Widget</p>
         </div>
       </div>
 
@@ -94,7 +95,7 @@ export function CalendarWidget({ size = 'medium' }: CalendarWidgetProps) {
         ))}
       </div>
 
-      {size !== 'small' && (
+      {size !== 'extra-small' && size !== 'small' && (
         <button
           type="button"
           className={`mt-4 w-full py-2 rounded-lg text-xs font-medium transition-colors ${textSecondary}`}

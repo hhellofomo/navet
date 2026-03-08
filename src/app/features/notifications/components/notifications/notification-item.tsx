@@ -49,7 +49,7 @@ export function NotificationItem({
 
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
   const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-400';
+    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
   const textMuted = theme === 'light' ? 'text-gray-500' : 'text-gray-500';
   const hoverBg =
     theme === 'light'

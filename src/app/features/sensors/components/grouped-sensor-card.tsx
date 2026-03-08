@@ -41,14 +41,14 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
   const { theme } = useTheme();
 
   // Size-specific styling with intelligent layout adaptation
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const _isLarge = size === 'large';
   const padding = isSmall ? 'p-4' : 'p-5';
 
   const colors = theme === 'light' ? lightColorMap[accentColor] : darkColorMap[accentColor];
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
+  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
 
   // Get primary icon (first sensor's icon or default)
   const PrimaryIcon = selectedSensors[0]?.icon ? iconMap[selectedSensors[0].icon] : Gauge;
@@ -85,7 +85,7 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
               >
                 {name}
               </h3>
-              <p className="text-[10px] text-gray-400 truncate mt-0.5">Sensor Group</p>
+              <p className="text-[10px] text-gray-300 truncate mt-0.5">Sensor Group</p>
             </div>
             <div
               className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${colors.iconBg} flex items-center justify-center flex-shrink-0`}

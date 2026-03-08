@@ -1,4 +1,5 @@
 import { Clock, ExternalLink, Newspaper } from 'lucide-react';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useTheme } from '@/app/contexts/theme-context';
 
 interface NewsArticle {
@@ -49,7 +50,7 @@ const mockArticles: NewsArticle[] = [
 ];
 
 interface NewsWidgetProps {
-  size?: 'small' | 'medium' | 'large';
+  size?: CardSize;
 }
 
 export function NewsWidget({ size = 'large' }: NewsWidgetProps) {
@@ -59,7 +60,7 @@ export function NewsWidget({ size = 'large' }: NewsWidgetProps) {
     theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : 'bg-white/10';
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
   const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-400';
+    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
   const border = theme === 'light' ? 'border-gray-200/50' : 'border-white/10';
   const dividerColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
 
@@ -78,7 +79,7 @@ export function NewsWidget({ size = 'large' }: NewsWidgetProps) {
   };
 
   const displayArticles =
-    size === 'small'
+    size === 'extra-small' || size === 'small'
       ? mockArticles.slice(0, 2)
       : size === 'medium'
         ? mockArticles.slice(0, 3)
@@ -101,7 +102,7 @@ export function NewsWidget({ size = 'large' }: NewsWidgetProps) {
         </div>
         <div className="flex-1 min-w-0">
           <h3 className={`text-sm font-semibold ${textPrimary}`}>News Feed</h3>
-          <p className="text-[10px] text-gray-400 truncate mt-0.5">Widget</p>
+          <p className="text-[10px] text-gray-300 truncate mt-0.5">Widget</p>
         </div>
       </div>
 
@@ -147,7 +148,7 @@ export function NewsWidget({ size = 'large' }: NewsWidgetProps) {
         ))}
       </div>
 
-      {size !== 'small' && (
+      {size !== 'extra-small' && size !== 'small' && (
         <button
           type="button"
           className={`mt-4 w-full py-2 rounded-lg text-xs font-medium transition-colors ${textSecondary}`}

@@ -68,6 +68,7 @@ export const exportDashboardConfig = (): DashboardConfigPayload => {
       defaultView: settingsState.defaultView,
       compactMode: settingsState.compactMode,
       disableAnimations: settingsState.disableAnimations,
+      entityInteractionMode: settingsState.entityInteractionMode,
     },
     navigation: {
       currentRoom: navigationState.currentRoom,
@@ -123,6 +124,8 @@ export const importDashboardConfig = (value: unknown) => {
     defaultView: (settings.defaultView as string | undefined) ?? 'all',
     compactMode: Boolean(settings.compactMode),
     disableAnimations: Boolean(settings.disableAnimations),
+    entityInteractionMode:
+      settings.entityInteractionMode === 'control-first' ? 'control-first' : 'toggle-first',
   });
 
   useNavigationStore.setState({

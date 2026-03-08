@@ -1,11 +1,16 @@
 import type { LucideIcon } from 'lucide-react';
-import { Settings } from 'lucide-react';
-import { memo } from 'react';
+import { Settings2 } from 'lucide-react';
+import { type ButtonHTMLAttributes, memo } from 'react';
 import { BrightnessPresetsInline } from '@/app/components/shared/brightness-presets-inline';
 import { BrightnessSlider } from '@/app/components/shared/brightness-slider';
 import { useTheme } from '@/app/contexts/theme-context';
 import { CustomColorTrigger } from './custom-color-trigger';
 import { LightCardHeader } from './light-card-header';
+
+type HeaderIconButtonProps = Pick<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'aria-label' | 'onClick' | 'onPointerDown'
+>;
 
 interface LightCardMediumProps {
   name: string;
@@ -19,7 +24,10 @@ interface LightCardMediumProps {
   onBrightnessChange: (value: number) => void;
   onBrightnessCommit: (value: number) => void;
   onColorChange: (color: string) => void;
-  onSettingsClick: () => void;
+  iconButtonProps: HeaderIconButtonProps;
+  settingsButtonProps: HeaderIconButtonProps;
+  showSettingsButton: boolean;
+  showPresetOverflow: boolean;
 }
 
 export const LightCardMedium = memo(function LightCardMedium({
@@ -33,7 +41,10 @@ export const LightCardMedium = memo(function LightCardMedium({
   onBrightnessChange,
   onBrightnessCommit,
   onColorChange,
-  onSettingsClick,
+  iconButtonProps,
+  settingsButtonProps,
+  showSettingsButton,
+  showPresetOverflow,
 }: Omit<LightCardMediumProps, 'room'>) {
   const { theme } = useTheme();
   const buttonBg =
@@ -42,7 +53,15 @@ export const LightCardMedium = memo(function LightCardMedium({
 
   return (
     <>
-      <LightCardHeader name={name} isOn={isOn} IconComponent={IconComponent} size="medium" />
+      <LightCardHeader
+        name={name}
+        isOn={isOn}
+        IconComponent={IconComponent}
+        size="medium"
+        iconAriaLabel={iconButtonProps['aria-label']}
+        onIconClick={iconButtonProps.onClick}
+        onIconPointerDown={iconButtonProps.onPointerDown}
+      />
 
       <div className="flex-1 flex flex-col justify-end gap-4">
         {/* Brightness slider */}
@@ -55,15 +74,18 @@ export const LightCardMedium = memo(function LightCardMedium({
         />
 
         {/* Color controls */}
-        <div className="flex gap-2 items-center">
-          <BrightnessPresetsInline
-            presets={brightnessPresets}
-            currentBrightness={brightness}
-            isOn={isOn}
-            onBrightnessChange={onBrightnessCommit}
-            size="medium"
-            maxVisible={4}
-          />
+        <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <BrightnessPresetsInline
+              presets={brightnessPresets}
+              currentBrightness={brightness}
+              isOn={isOn}
+              onBrightnessChange={onBrightnessCommit}
+              size="medium"
+              maxVisible={showPresetOverflow ? 3 : undefined}
+              overflow={showPresetOverflow ? 'menu' : 'hide'}
+            />
+          </div>
 
           {supportsColorControl && (
             <CustomColorTrigger
@@ -74,20 +96,14 @@ export const LightCardMedium = memo(function LightCardMedium({
             />
           )}
 
-          {/* Spacer */}
-          <div className="flex-1" />
-
-          <button
-            type="button"
-            aria-label={`Open settings for ${name}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              onSettingsClick();
-            }}
-            className={`w-8 h-8 shrink-0 self-center rounded-full ${buttonBg} transition-all flex items-center justify-center cursor-pointer`}
-          >
-            <Settings className={`w-3.5 h-3.5 ${buttonText}`} />
-          </button>
+          {showSettingsButton && (
+            <button
+              {...settingsButtonProps}
+              className={`ml-auto w-8 h-8 shrink-0 self-center rounded-full ${buttonBg} transition-all flex items-center justify-center cursor-pointer`}
+            >
+              <Settings2 className={`w-3.5 h-3.5 ${buttonText}`} />
+            </button>
+          )}
         </div>
       </div>
     </>

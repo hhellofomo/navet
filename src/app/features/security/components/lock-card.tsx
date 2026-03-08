@@ -33,7 +33,7 @@ export const LockCard = memo(function LockCard({
         <div className="flex items-start justify-between mb-2">
           <div className="min-w-0 flex-1">
             <h3 className={`font-semibold truncate text-xs ${textColor}`}>{name}</h3>
-            <p className="text-[10px] text-gray-400 truncate mt-0.5">Lock</p>
+            <p className="text-[10px] text-gray-300 truncate mt-0.5">Lock</p>
           </div>
           <div
             className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-500 ${cardColors.iconBg}`}

@@ -49,7 +49,7 @@ export function MediaMediumView({
           <div className={`font-bold truncate text-sm ${isLight ? 'text-gray-900' : 'text-white'}`}>
             {title}
           </div>
-          <div className={`text-xs truncate ${isLight ? 'text-gray-500' : 'text-gray-400'}`}>
+          <div className={`text-xs truncate ${isLight ? 'text-gray-500' : 'text-gray-300'}`}>
             {artist}
           </div>
         </div>
@@ -121,7 +121,7 @@ export function MediaMediumView({
             />
           </div>
           <span
-            className={`text-[10px] w-6 text-right ${isLight ? 'text-gray-500' : 'text-gray-400'}`}
+            className={`text-[10px] w-6 text-right ${isLight ? 'text-gray-500' : 'text-gray-300'}`}
           >
             {isMuted ? 0 : volume}
           </span>

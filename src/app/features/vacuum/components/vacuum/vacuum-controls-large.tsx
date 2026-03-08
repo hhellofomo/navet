@@ -1,4 +1,4 @@
-import { Home, Pause, Play, Settings } from 'lucide-react';
+import { Home, Pause, Play, Settings2 } from 'lucide-react';
 
 interface VacuumControlsLargeProps {
   currentStatus: 'cleaning' | 'returning' | 'docked' | 'paused' | 'idle';
@@ -57,7 +57,7 @@ export function VacuumControlsLarge({
         }}
         className={`w-10 h-10 rounded-full ${btnBg} transition-all flex items-center justify-center`}
       >
-        <Settings className={`w-5 h-5 ${btnText}`} />
+        <Settings2 className={`w-5 h-5 ${btnText}`} />
       </button>
     </div>
   );

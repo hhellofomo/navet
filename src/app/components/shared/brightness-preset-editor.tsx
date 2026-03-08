@@ -107,7 +107,7 @@ export const BrightnessPresetEditor = memo(function BrightnessPresetEditor({
             >
               Only apply to this light
             </Label>
-            <p className={`mt-1 text-xs ${isOn ? 'text-gray-400' : 'text-gray-500'}`}>
+            <p className={`mt-1 text-xs ${isOn ? 'text-gray-300' : 'text-gray-500'}`}>
               Leave this off to update brightness preset values and ordering for all lights.
             </p>
           </div>
@@ -175,7 +175,7 @@ const BrightnessPresetEditorRow = memo(function BrightnessPresetEditorRow({
           <IconComponent className="w-4 h-4 text-white" aria-hidden="true" />
         </div>
         <div className="min-w-0">
-          <div className={`text-sm font-medium ${isOn ? 'text-white' : 'text-gray-400'}`}>
+          <div className={`text-sm font-medium ${isOn ? 'text-white' : 'text-gray-300'}`}>
             {preset.label}
           </div>
         </div>
@@ -199,7 +199,7 @@ const BrightnessPresetEditorRow = memo(function BrightnessPresetEditorRow({
         className={`w-20 rounded-xl border px-3 py-2 text-sm font-semibold transition-colors ${
           isOn
             ? 'border-white/15 bg-white/10 text-white'
-            : 'border-white/10 bg-white/5 text-gray-400'
+            : 'border-white/10 bg-white/5 text-gray-300'
         }`}
       />
       <span className={`text-xs ${isOn ? 'text-gray-300' : 'text-gray-500'}`}>%</span>

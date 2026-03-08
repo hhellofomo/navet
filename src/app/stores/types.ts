@@ -1,3 +1,5 @@
+import type { CardSize } from '../components/shared/card-size-selector';
+import type { EntityInteractionMode } from './settings-store';
 import type { PrimaryColor, ThemeMode } from './theme-store';
 
 export type ThemeType = ThemeMode;
@@ -44,6 +46,7 @@ interface UserSettings {
   defaultView: 'all' | string;
   compactMode: boolean;
   disableAnimations: boolean;
+  entityInteractionMode: EntityInteractionMode;
 }
 
 export interface SettingsState extends UserSettings {
@@ -56,7 +59,7 @@ export type CardType = 'calendar' | 'news' | 'weather' | 'photo' | 'note';
 export interface CustomCard {
   id: string;
   type: CardType;
-  size: 'small' | 'medium' | 'large';
+  size: CardSize;
   room: string;
   data?: Record<string, unknown>;
   createdAt: number;
@@ -66,7 +69,7 @@ export interface CustomCardsState {
   cards: CustomCard[];
   addCard: (
     type: CardType,
-    size: 'small' | 'medium' | 'large',
+    size: CardSize,
     room: string,
     data?: Record<string, unknown>
   ) => CustomCard;

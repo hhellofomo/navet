@@ -23,7 +23,7 @@ export const CaptionValue = memo(function CaptionValue({
 }: CaptionValueProps) {
   const { theme } = useTheme();
   const justifyClass = align === 'right' ? 'justify-end' : 'justify-start';
-  const defaultCaptionColor = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
+  const defaultCaptionColor = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
   const defaultValueColor = theme === 'light' ? 'text-gray-900' : 'text-white';
 
   return (

@@ -45,7 +45,7 @@ export const MediaCard = memo(function MediaCard({
   const cardId = 'media-1';
 
   // Size-specific styling with intelligent layout adaptation
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const isLarge = size === 'large';
   const padding = isSmall ? 'p-4' : isLarge ? 'p-6' : 'p-5';

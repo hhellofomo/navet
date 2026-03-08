@@ -44,7 +44,7 @@ export const VacuumCard = memo(function VacuumCard({
   const { theme, colors } = useTheme();
 
   // Size-specific styling with intelligent layout adaptation
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const _isLarge = size === 'large';
   const padding = isSmall ? 'p-4' : 'p-5';
@@ -81,7 +81,7 @@ export const VacuumCard = memo(function VacuumCard({
               >
                 {name}
               </h3>
-              <p className="text-[10px] text-gray-400 truncate mt-0.5">Vacuum</p>
+              <p className="text-[10px] text-gray-300 truncate mt-0.5">Vacuum</p>
             </div>
             <div
               className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${

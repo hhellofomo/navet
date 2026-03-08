@@ -66,7 +66,7 @@ export const Header = memo(function Header() {
   const textPrimary =
     theme === 'light' ? 'text-gray-900' : theme === 'contrast' ? 'text-white' : 'text-white';
   const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-400';
+    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
   const inputBg =
     theme === 'light' ? 'bg-gray-100' : theme === 'contrast' ? 'bg-black/50' : 'bg-white/5';
   const placeholder =
@@ -150,7 +150,7 @@ export const Header = memo(function Header() {
             <div className="flex items-center gap-1.5">
               <Clock3 className="h-3.5 w-3.5" />
               <span>March 7, 2026</span>
-              <span aria-hidden="true" className="text-gray-400">
+              <span aria-hidden="true" className="text-gray-300">
                 |
               </span>
               <span>Saturday</span>

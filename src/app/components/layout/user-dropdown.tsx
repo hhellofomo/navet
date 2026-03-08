@@ -55,9 +55,9 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
   // Theme colors
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
   const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-400';
+    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
   const textMuted =
-    theme === 'light' ? 'text-gray-500' : theme === 'contrast' ? 'text-gray-400' : 'text-gray-500';
+    theme === 'light' ? 'text-gray-500' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-500';
   const cardBg =
     theme === 'light' ? 'bg-white/95' : theme === 'contrast' ? 'bg-gray-950/95' : 'bg-gray-900/95';
   const border =

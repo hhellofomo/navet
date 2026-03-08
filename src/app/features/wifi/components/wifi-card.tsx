@@ -26,7 +26,7 @@ export const WifiCard = memo(function WifiCard({
   const { theme } = useTheme();
 
   // Size-specific styling with intelligent layout adaptation
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const _isLarge = size === 'large';
   const padding = isSmall ? 'p-4' : 'p-5';
@@ -36,7 +36,7 @@ export const WifiCard = memo(function WifiCard({
     theme === 'light' ? 'from-white to-green-50/80' : 'from-green-900/90 to-green-950/95';
   const cardBorder = theme === 'light' ? 'border-gray-200/80' : 'border-green-700/30';
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
+  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
   const iconBg = theme === 'light' ? 'bg-green-100' : 'bg-green-500/20';
   const iconColor = theme === 'light' ? 'text-green-600' : 'text-green-400';
   const glowGradient = theme === 'light' ? 'from-green-50/40' : 'from-green-500/5';
@@ -65,7 +65,7 @@ export const WifiCard = memo(function WifiCard({
             >
               Wi-Fi
             </h3>
-            <p className="text-[10px] text-gray-400 truncate mt-0.5">Network</p>
+            <p className="text-[10px] text-gray-300 truncate mt-0.5">Network</p>
             {!isSmall && <p className={`text-xs ${textSecondary} truncate`}>{networkName}</p>}
           </div>
           <div

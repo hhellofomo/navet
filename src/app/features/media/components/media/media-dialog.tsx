@@ -35,7 +35,7 @@ export function MediaDialog({
         <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md max-h-[85vh] overflow-y-auto backdrop-blur-xl rounded-3xl p-8 border border-pink-700/20 shadow-2xl z-50 animate-in fade-in zoom-in duration-200 bg-gradient-to-br from-pink-900/95 to-purple-950/95 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="mb-6">
             <Dialog.Title className="text-xl font-semibold text-white">{title}</Dialog.Title>
-            <Dialog.Description className="text-sm mt-1 text-gray-400">{artist}</Dialog.Description>
+            <Dialog.Description className="text-sm mt-1 text-gray-300">{artist}</Dialog.Description>
           </div>
 
           <div className="space-y-6">

@@ -1,8 +1,9 @@
 import { type ButtonHTMLAttributes, memo, type ReactNode } from 'react';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 
 interface RoundButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  size?: 'small' | 'medium' | 'large';
+  size?: CardSize;
   variant?: 'default' | 'primary';
   className?: string;
 }
@@ -21,6 +22,7 @@ export const RoundButton = memo(function RoundButton({
   ...props
 }: RoundButtonProps) {
   const sizeClasses = {
+    'extra-small': 'w-7 h-7',
     small: 'w-7 h-7',
     medium: 'w-8 h-8',
     large: 'w-12 h-12',
