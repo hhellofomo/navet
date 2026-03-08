@@ -1,5 +1,5 @@
 import { ExternalLink, Github, Heart } from 'lucide-react';
-import type { ThemeType } from '../../../contexts/theme-context';
+import type { ThemeType } from '../../../hooks';
 
 interface CreditsSectionProps {
   theme: ThemeType;

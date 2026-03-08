@@ -1,6 +1,6 @@
 import { ChevronRight, Rss } from 'lucide-react';
 import { CardSizeSelector } from '../../../components/shared/card-size-selector';
-import type { PrimaryColor, ThemeType } from '../../../contexts/theme-context';
+import type { PrimaryColor, ThemeType } from '../../../hooks';
 
 interface RSSItem {
   id: string;

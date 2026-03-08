@@ -2,7 +2,7 @@ import { AlertCircle, Eye, EyeOff, Home, Key, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../../contexts/auth-context';
 import { useConfig } from '../../contexts/config-context';
-import { useTheme } from '../../contexts/theme-context';
+import { useTheme } from '../../hooks';
 
 export function LoginPage() {
   const [url, setUrl] = useState('');

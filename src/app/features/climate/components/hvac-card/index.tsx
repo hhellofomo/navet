@@ -4,7 +4,7 @@ import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-si
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { CardWrapper } from '@/app/components/ui/card-wrapper';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 import { HVACSettingsDialog } from '../hvac-settings-dialog';
 import { HVACGauge } from './hvac-gauge';
 import { HVACModeControls } from './hvac-mode-controls';

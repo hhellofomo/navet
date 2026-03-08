@@ -16,7 +16,7 @@ import { memo, useState } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 
 type CoverState = 'open' | 'closed' | 'opening' | 'closing';
 type DeviceClass =

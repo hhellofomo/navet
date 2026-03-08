@@ -1,17 +1,19 @@
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { useEditModeContext } from '../../contexts/edit-mode-context';
-import { useSearch } from '../../contexts/search-context';
-import { useTheme } from '../../contexts/theme-context';
+import { useSearch, useTheme } from '../../hooks';
 import type { CustomCard } from '../../hooks/use-custom-cards';
 import type { DeviceWithType } from '../../types/device.types';
+import { getDeviceRoom, UNKNOWN_ROOM_LABEL } from '../../utils/device-location';
 import { DashboardCardItem } from './components/dashboard-card-item';
 
 interface AllViewGridProps {
   deviceMap: Map<string, DeviceWithType>;
   rooms: string[];
   cardOrders: Record<string, string[]>;
+  isEditMode: boolean;
+  cardSizes: Record<string, CardSize>;
+  updateCardSize: (id: string, size: CardSize) => void;
   customCards?: CustomCard[];
   onDeleteCard?: (cardId: string) => void;
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
@@ -99,7 +101,11 @@ const RoomSection = memo(function RoomSection({
       <div className="flex items-center gap-3 mb-4">
         <h2
           className={`text-lg md:text-xl font-semibold ${
-            room === 'Unknown Room' ? (theme === 'light' ? 'text-gray-700' : textColor) : textColor
+            room === UNKNOWN_ROOM_LABEL
+              ? theme === 'light'
+                ? 'text-gray-700'
+                : textColor
+              : textColor
           }`}
         >
           {room}
@@ -170,13 +176,15 @@ export const AllViewGrid = memo(function AllViewGrid({
   deviceMap,
   rooms,
   cardOrders,
+  isEditMode,
+  cardSizes,
+  updateCardSize,
   customCards = [],
   onDeleteCard,
   onUpdateCard,
   onRemoveEntity,
   allowEntityRemoval = false,
 }: AllViewGridProps) {
-  const { isEditMode, cardSizes, updateCardSize } = useEditModeContext();
   const { isSearchActive, filteredDeviceIds } = useSearch();
   const { theme } = useTheme();
   const deferredFilteredDeviceIds = useDeferredValue(filteredDeviceIds);
@@ -202,9 +210,7 @@ export const AllViewGrid = memo(function AllViewGrid({
         return;
       }
 
-      const room = (
-        'room' in device ? device.room : 'location' in device ? device.location : null
-      ) as string | null;
+      const room = getDeviceRoom(device);
       if (room) {
         if (!grouped[room]) {
           grouped[room] = [];

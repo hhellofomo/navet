@@ -69,6 +69,11 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **Local Config Backup** - Export and restore dashboard layout/preferences from a JSON file
 - **Tree-shakeable** - Only imports what's actually used
 
+### 🧱 Architecture
+- **Direct Hook APIs** - Theme, navigation, search, and Home Assistant access now use hook modules directly instead of passthrough provider wrappers
+- **Shared Utilities** - Device room lookup, theme color resolution, wallpaper upload handling, notification styling, and vacuum status helpers are centralized to reduce fan-out edits
+- **Consistent Persistence** - Storage keys and session/config persistence are standardized behind shared helpers
+
 ## 🚀 Installation
 
 ### Prerequisites

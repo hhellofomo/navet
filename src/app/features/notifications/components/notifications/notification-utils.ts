@@ -1,3 +1,8 @@
+import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import type { PrimaryColor } from '@/app/hooks';
+import { getThemeColorValue } from '@/app/utils/theme-colors';
+import type { Notification } from './use-notifications';
+
 export const formatTimestamp = (date: Date): string => {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
@@ -11,16 +16,33 @@ export const formatTimestamp = (date: Date): string => {
   return `${diffDays}d ago`;
 };
 
-export const getColorValue = (color: string): string => {
-  const colors: Record<string, string> = {
-    orange: '#f97316',
-    blue: '#3b82f6',
-    green: '#22c55e',
-    purple: '#a855f7',
-    pink: '#ec4899',
-    red: '#ef4444',
-    yellow: '#eab308',
-    teal: '#14b8a6',
-  };
-  return colors[color] || colors.blue;
-};
+export const getColorValue = getThemeColorValue;
+
+export function getNotificationIcon(type: Notification['type']) {
+  switch (type) {
+    case 'success':
+      return CheckCircle;
+    case 'warning':
+      return AlertTriangle;
+    case 'error':
+      return AlertCircle;
+    default:
+      return Info;
+  }
+}
+
+export function getNotificationColor(
+  type: Notification['type'],
+  primaryColor: PrimaryColor
+): string {
+  switch (type) {
+    case 'success':
+      return '#22c55e';
+    case 'warning':
+      return '#eab308';
+    case 'error':
+      return '#ef4444';
+    default:
+      return getColorValue(primaryColor);
+  }
+}

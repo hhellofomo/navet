@@ -3,7 +3,7 @@ import { Settings2 } from 'lucide-react';
 import { type ButtonHTMLAttributes, memo } from 'react';
 import { BrightnessPresetsInline } from '@/app/components/shared/brightness-presets-inline';
 import { BrightnessSlider } from '@/app/components/shared/brightness-slider';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 import { CustomColorTrigger } from './custom-color-trigger';
 import { LightCardHeader } from './light-card-header';
 

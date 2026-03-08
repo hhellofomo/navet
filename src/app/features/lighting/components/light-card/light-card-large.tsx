@@ -4,7 +4,7 @@ import { BrightnessPresetsInline } from '@/app/components/shared/brightness-pres
 import { BrightnessSlider } from '@/app/components/shared/brightness-slider';
 import { ColorPicker } from '@/app/components/shared/color-picker';
 import { PRESET_COLORS } from '@/app/constants/light-constants';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 import { CustomColorTrigger } from './custom-color-trigger';
 import { LightCardHeader } from './light-card-header';
 

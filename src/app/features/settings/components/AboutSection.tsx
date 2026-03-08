@@ -1,5 +1,5 @@
 import { Info } from 'lucide-react';
-import type { ThemeType } from '../../../contexts/theme-context';
+import type { ThemeType } from '../../../hooks';
 
 interface AboutSectionProps {
   theme: ThemeType;

@@ -3,8 +3,8 @@ import { Power, Settings2 } from 'lucide-react';
 import { memo, useState } from 'react';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
-import { useTheme } from '@/app/contexts/theme-context';
 import { iconMap } from '@/app/features/sensors/components/sensors/sensor-types';
+import { useTheme } from '@/app/hooks';
 import type { DeviceMetric } from '@/app/types/device.types';
 
 interface SwitchCardProps {

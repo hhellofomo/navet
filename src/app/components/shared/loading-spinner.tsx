@@ -1,6 +1,7 @@
 import { Loader2 } from 'lucide-react';
 import { memo } from 'react';
-import { useTheme } from '../../contexts/theme-context';
+import { useTheme } from '../../hooks';
+import { getThemeColorValue } from '../../utils/theme-colors';
 
 interface LoadingSpinnerProps {
   message?: string;
@@ -14,22 +15,7 @@ export const LoadingSpinner = memo(function LoadingSpinner({
   const { theme, primaryColor } = useTheme();
 
   const bgColor = theme === 'light' ? 'bg-gray-50' : 'bg-[#0a0a0a]';
-  const _textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
   const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
-
-  const getColorValue = (color: string): string => {
-    const colors: Record<string, string> = {
-      orange: '#f97316',
-      blue: '#3b82f6',
-      green: '#22c55e',
-      purple: '#a855f7',
-      pink: '#ec4899',
-      red: '#ef4444',
-      yellow: '#eab308',
-      teal: '#14b8a6',
-    };
-    return colors[color] || colors.orange;
-  };
 
   const containerClasses = fullScreen
     ? `fixed inset-0 ${bgColor} flex items-center justify-center z-50`
@@ -38,7 +24,10 @@ export const LoadingSpinner = memo(function LoadingSpinner({
   return (
     <div className={containerClasses}>
       <div className="flex flex-col items-center gap-4">
-        <Loader2 className="w-8 h-8 animate-spin" style={{ color: getColorValue(primaryColor) }} />
+        <Loader2
+          className="w-8 h-8 animate-spin"
+          style={{ color: getThemeColorValue(primaryColor) }}
+        />
         <p className={`text-sm ${mutedColor}`}>{message}</p>
       </div>
     </div>

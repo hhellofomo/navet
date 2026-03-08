@@ -1,5 +1,7 @@
-import { Palette } from 'lucide-react';
-import type { PrimaryColor, ThemeType } from '../../../contexts/theme-context';
+import { Image as ImageIcon, Palette, X } from 'lucide-react';
+import type { PrimaryColorOption, ThemeOption } from '../../../constants/theme-options';
+import type { PrimaryColor, ThemeType } from '../../../hooks';
+import { readFileAsDataUrl, validateImageFile } from '../../../utils/image-upload';
 
 interface AppearanceSectionProps {
   theme: ThemeType;
@@ -8,8 +10,8 @@ interface AppearanceSectionProps {
   setPrimaryColor: (color: PrimaryColor) => void;
   wallpaper: string | null;
   setWallpaper: (wallpaper: string | null) => void;
-  themeOptions: Array<{ value: ThemeType; label: string; description: string }>;
-  colorOptions: Array<{ value: PrimaryColor; label: string; color: string }>;
+  themeOptions: ThemeOption[];
+  colorOptions: PrimaryColorOption[];
   getColorValue: (color: PrimaryColor) => string;
 }
 
@@ -32,28 +34,21 @@ export function AppearanceSection({
   const borderColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
   const hoverBg = theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-white/5';
 
-  const handleWallpaperUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleWallpaperUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Check if file is an image
-    if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file');
+    const validationError = validateImageFile(file);
+    if (validationError) {
+      alert(validationError);
       return;
     }
 
-    // Check file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Image size should be less than 5MB');
-      return;
+    try {
+      setWallpaper(await readFileAsDataUrl(file));
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to read image file');
     }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      setWallpaper(result);
-    };
-    reader.readAsDataURL(file);
   };
 
   const handleRemoveWallpaper = () => {

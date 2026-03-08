@@ -1,7 +1,7 @@
 import { Gauge } from 'lucide-react';
 import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 import { SensorGroupSettingsDialog } from './sensor-group-settings-dialog';
 import { GridSensorDisplay } from './sensors/grid-sensor-display';
 import { darkColorMap, lightColorMap } from './sensors/sensor-colors';

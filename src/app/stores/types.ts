@@ -19,7 +19,7 @@ export interface EditModeState {
   toggleEditMode: () => void;
 }
 
-import type { Section } from '../contexts/navigation-context';
+import type { Section } from '../hooks';
 
 export interface NavigationState {
   currentRoom: string;

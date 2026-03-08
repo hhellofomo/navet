@@ -1,13 +1,11 @@
+import { STORAGE_KEYS } from '../constants/storage-keys';
 import { useCustomCardsStore } from '../stores/custom-cards-store';
 import { useDashboardEntitiesStore } from '../stores/dashboard-entities-store';
 import { useLightPresetStore } from '../stores/light-preset-store';
 import { useNavigationStore } from '../stores/navigation-store';
 import { useSettingsStore } from '../stores/settings-store';
 import { useThemeStore } from '../stores/theme-store';
-
-const CARD_SIZES_STORAGE_KEY = 'ha-dashboard-card-sizes';
-const CARD_ORDERS_STORAGE_KEY = 'ha-dashboard-card-orders';
-const ROOM_ORDER_STORAGE_KEY = 'ha-dashboard-room-order';
+import { storage } from './storage';
 
 interface DashboardConfigPayload {
   version: 1;
@@ -34,12 +32,7 @@ interface DashboardConfigPayload {
 }
 
 const parseStoredJson = <T>(key: string, fallback: T): T => {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
-  }
+  return storage.get(key, fallback);
 };
 
 export const exportDashboardConfig = (): DashboardConfigPayload => {
@@ -84,9 +77,9 @@ export const exportDashboardConfig = (): DashboardConfigPayload => {
       globalBrightnessPresetOrder: lightPresetState.globalBrightnessPresetOrder,
       lightPresetConfigs: lightPresetState.lightPresetConfigs,
     },
-    cardSizes: parseStoredJson<Record<string, string>>(CARD_SIZES_STORAGE_KEY, {}),
-    cardOrders: parseStoredJson<Record<string, string[]>>(CARD_ORDERS_STORAGE_KEY, {}),
-    roomOrder: parseStoredJson<string[]>(ROOM_ORDER_STORAGE_KEY, []),
+    cardSizes: parseStoredJson<Record<string, string>>(STORAGE_KEYS.cardSizes, {}),
+    cardOrders: parseStoredJson<Record<string, string[]>>(STORAGE_KEYS.cardOrders, {}),
+    roomOrder: parseStoredJson<string[]>(STORAGE_KEYS.roomOrder, []),
   };
 };
 
@@ -157,16 +150,7 @@ export const importDashboardConfig = (value: unknown) => {
       >['lightPresetConfigs']) ?? {},
   });
 
-  localStorage.setItem(
-    CARD_SIZES_STORAGE_KEY,
-    JSON.stringify(isRecord(value.cardSizes) ? value.cardSizes : {})
-  );
-  localStorage.setItem(
-    CARD_ORDERS_STORAGE_KEY,
-    JSON.stringify(isRecord(value.cardOrders) ? value.cardOrders : {})
-  );
-  localStorage.setItem(
-    ROOM_ORDER_STORAGE_KEY,
-    JSON.stringify(Array.isArray(value.roomOrder) ? value.roomOrder : [])
-  );
+  storage.set(STORAGE_KEYS.cardSizes, isRecord(value.cardSizes) ? value.cardSizes : {});
+  storage.set(STORAGE_KEYS.cardOrders, isRecord(value.cardOrders) ? value.cardOrders : {});
+  storage.set(STORAGE_KEYS.roomOrder, Array.isArray(value.roomOrder) ? value.roomOrder : []);
 };

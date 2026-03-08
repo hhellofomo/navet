@@ -1,6 +1,8 @@
-import { Cloud, CloudRain, CloudSnow, Droplets, Sun, Wind } from 'lucide-react';
+import { Droplets, Sun, Wind } from 'lucide-react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/contexts/theme-context';
+import { WeatherIcon } from '@/app/features/weather/components/weather-card/weather-icon';
+import { useTheme } from '@/app/hooks';
+import { getThemeColorValue } from '@/app/utils/theme-colors';
 
 interface WeatherForecast {
   day: string;
@@ -31,35 +33,6 @@ export function WeatherWidget({ size = 'medium' }: WeatherWidgetProps) {
     theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
   const border = theme === 'light' ? 'border-gray-200/50' : 'border-white/10';
 
-  const getColorValue = (color: string) => {
-    const colors: Record<string, string> = {
-      blue: '#007AFF',
-      purple: '#AF52DE',
-      pink: '#FF2D55',
-      red: '#FF3B30',
-      orange: '#FF9500',
-      yellow: '#FFCC00',
-      green: '#34C759',
-      teal: '#5AC8FA',
-    };
-    return colors[color] || colors.blue;
-  };
-
-  const getWeatherIcon = (condition: string) => {
-    switch (condition) {
-      case 'sunny':
-        return <Sun className="w-5 h-5" />;
-      case 'cloudy':
-        return <Cloud className="w-5 h-5" />;
-      case 'rainy':
-        return <CloudRain className="w-5 h-5" />;
-      case 'snowy':
-        return <CloudSnow className="w-5 h-5" />;
-      default:
-        return <Cloud className="w-5 h-5" />;
-    }
-  };
-
   const displayForecast =
     size === 'extra-small' || size === 'small'
       ? []
@@ -78,8 +51,8 @@ export function WeatherWidget({ size = 'medium' }: WeatherWidgetProps) {
             <div
               className="w-12 h-12 rounded-xl flex items-center justify-center"
               style={{
-                backgroundColor: `${getColorValue(primaryColor)}20`,
-                color: getColorValue(primaryColor),
+                backgroundColor: `${getThemeColorValue(primaryColor)}20`,
+                color: getThemeColorValue(primaryColor),
               }}
             >
               <Sun className="w-6 h-6" />
@@ -129,7 +102,7 @@ export function WeatherWidget({ size = 'medium' }: WeatherWidgetProps) {
                     backgroundColor: theme === 'light' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.05)',
                   }}
                 >
-                  {getWeatherIcon(day.condition)}
+                  <WeatherIcon condition={day.condition} className="w-5 h-5" />
                 </div>
                 <div className="flex items-center gap-2">
                   <p className={`text-sm font-medium ${textPrimary}`}>{day.high}°</p>

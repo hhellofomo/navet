@@ -1,4 +1,5 @@
-import type { PrimaryColor, ThemeType } from '../../../contexts/theme-context';
+import type { PrimaryColorOption, ThemeOption } from '../../../constants/theme-options';
+import type { PrimaryColor, ThemeType } from '../../../hooks';
 import { AboutSection } from './AboutSection';
 import { AppearanceSection } from './AppearanceSection';
 import { ConnectionSection } from './ConnectionSection';
@@ -19,13 +20,11 @@ interface SettingsViewProps {
   setShowLicense: (show: boolean) => void;
   showTerms: boolean;
   setShowTerms: (show: boolean) => void;
-  themeOptions: Array<{ value: ThemeType; label: string; description: string }>;
-  colorOptions: Array<{ value: PrimaryColor; label: string; color: string }>;
+  themeOptions: ThemeOption[];
+  colorOptions: PrimaryColorOption[];
   getColorValue: (color: PrimaryColor) => string;
   handleLogout: () => void;
   handleResetConnection: () => void;
-  handleWallpaperUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handleRemoveWallpaper: () => void;
 }
 
 export function SettingsView({
@@ -46,12 +45,8 @@ export function SettingsView({
   handleLogout,
   handleResetConnection,
 }: SettingsViewProps) {
-  const _bgColor = theme === 'light' ? 'bg-gray-50' : 'bg-[#0a0a0a]';
-  const _cardBg =
-    theme === 'light' ? 'bg-white' : theme === 'contrast' ? 'bg-gray-950' : 'bg-gray-900';
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
   const subtleColor = theme === 'light' ? 'text-gray-500' : 'text-gray-500';
-  const _borderColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
 
   return (
     <div className="h-full overflow-y-auto p-4 md:p-6">

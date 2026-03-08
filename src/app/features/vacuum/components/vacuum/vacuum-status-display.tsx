@@ -1,8 +1,9 @@
 import { MapPin } from 'lucide-react';
 import { BatteryIndicator } from './battery-indicator';
+import { getVacuumStatusColorClass, getVacuumStatusText, type VacuumStatus } from './vacuum-utils';
 
 interface VacuumStatusDisplayProps {
-  currentStatus: 'cleaning' | 'returning' | 'docked' | 'paused' | 'idle';
+  currentStatus: VacuumStatus;
   battery: number;
   cleanedArea: string;
   cleaningTime: string;
@@ -23,29 +24,6 @@ export function VacuumStatusDisplay({
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
   const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
 
-  const getStatusText = () => {
-    switch (currentStatus) {
-      case 'cleaning':
-        return 'Cleaning';
-      case 'returning':
-        return 'Returning to dock';
-      case 'docked':
-        return 'Docked';
-      case 'paused':
-        return 'Paused';
-      default:
-        return 'Idle';
-    }
-  };
-
-  const statusColors: Record<string, string> = {
-    cleaning: 'text-blue-500',
-    returning: 'text-amber-500',
-    docked: 'text-green-500',
-    paused: 'text-gray-500',
-    idle: 'text-gray-500',
-  };
-
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -54,8 +32,8 @@ export function VacuumStatusDisplay({
             <MapPin className="w-3 h-3" />
             {room}
           </div>
-          <div className={`font-medium ${statusColors[currentStatus] || 'text-gray-500'}`}>
-            {getStatusText()}
+          <div className={`font-medium ${getVacuumStatusColorClass(currentStatus)}`}>
+            {getVacuumStatusText(currentStatus)}
           </div>
         </div>
         <div className="text-right">

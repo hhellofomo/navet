@@ -1,6 +1,5 @@
 import type { HassEntity } from 'home-assistant-js-websocket';
 import { useMemo } from 'react';
-import { useHomeAssistantContext } from '../contexts/home-assistant-context';
 import type {
   ClimateDevice,
   CoverDevice,
@@ -11,12 +10,14 @@ import type {
   PersonDevice,
   SwitchDevice,
 } from '../types/device.types';
+import { UNKNOWN_ROOM_LABEL } from '../utils/device-location';
+import { useHomeAssistant } from './use-home-assistant';
 
 /**
  * Maps Home Assistant entities to Navet device structure
  */
 export const useHADevices = (): DeviceCollection => {
-  const { areas, deviceRegistry, entities, entityRegistry } = useHomeAssistantContext();
+  const { areas, deviceRegistry, entities, entityRegistry } = useHomeAssistant();
 
   return useMemo(() => {
     const brightnessToPercent = (entityId: string, entity: HassEntity): number => {
@@ -183,7 +184,7 @@ export const useHADevices = (): DeviceCollection => {
         entity.attributes?.room ||
         entity.attributes?.area ||
         entity.attributes?.zone ||
-        'Unknown Room'
+        UNKNOWN_ROOM_LABEL
       );
     };
 

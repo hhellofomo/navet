@@ -1,6 +1,5 @@
 import { useState } from 'react';
-
-type VacuumStatus = 'cleaning' | 'returning' | 'docked' | 'paused' | 'idle';
+import type { VacuumStatus } from './vacuum-utils';
 
 interface UseVacuumControlProps {
   initialStatus: VacuumStatus;

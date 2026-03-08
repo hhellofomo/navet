@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 import { type ButtonHTMLAttributes, memo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 
 interface LightCardHeaderProps {
   name: string;

@@ -1,5 +1,5 @@
 import { Bell, Check, Trash2, X } from 'lucide-react';
-import type { PrimaryColor } from '../../contexts/theme-context';
+import type { PrimaryColor } from '@/app/hooks';
 
 interface NotificationHeaderProps {
   onClose: () => void;

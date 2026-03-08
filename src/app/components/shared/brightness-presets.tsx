@@ -1,6 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 import { memo } from 'react';
-import { useTheme } from '../../contexts/theme-context';
+import { useTheme } from '../../hooks';
 
 interface BrightnessPreset {
   icon: LucideIcon;

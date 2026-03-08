@@ -1,5 +1,5 @@
 import { memo, useState } from 'react';
-import { useTheme } from '../../../contexts/theme-context';
+import { useTheme } from '../../../hooks';
 import { CoverCardView } from './CoverCardView';
 
 type CoverState = 'open' | 'closed' | 'opening' | 'closing';

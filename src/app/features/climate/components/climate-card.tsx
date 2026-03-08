@@ -1,7 +1,7 @@
 import { Thermometer } from 'lucide-react';
 import { memo, useState } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 import { ClimateLargeView } from './climate/climate-large-view';
 import { ClimateMediumView } from './climate/climate-medium-view';
 import { ClimateSmallView } from './climate/climate-small-view';

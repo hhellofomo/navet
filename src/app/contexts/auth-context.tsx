@@ -1,12 +1,16 @@
 import { createContext, type ReactNode, useCallback, useContext, useState } from 'react';
-import { getRuntimeConfig } from '../config/runtime-config';
+import { STORAGE_KEYS } from '../constants/storage-keys';
+import {
+  clearStoredSessionConfig,
+  normalizeSessionConfig,
+  readInitialSessionConfig,
+  type SessionConfig,
+  writeStoredSessionConfig,
+} from '../session/session';
 import { homeAssistantStore } from '../stores/home-assistant-store';
 import { useConfig } from './config-context';
 
-interface AuthConfig {
-  url: string;
-  token: string;
-}
+type AuthConfig = SessionConfig;
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -17,49 +21,22 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const AUTH_STORAGE_KEY = 'ha_auth_config';
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { clearConfig, saveConfig } = useConfig();
-  const [config, setConfig] = useState<AuthConfig | null>(() => {
-    // Load from localStorage on mount
-    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch {
-        return null;
-      }
-    }
-
-    const { hassUrl, token } = getRuntimeConfig();
-
-    if (hassUrl && token) {
-      return {
-        url: hassUrl,
-        token: token,
-      };
-    }
-
-    return null;
-  });
+  const [config, setConfig] = useState<AuthConfig | null>(() =>
+    readInitialSessionConfig(STORAGE_KEYS.authConfig)
+  );
 
   const isAuthenticated = config !== null;
 
   const login = useCallback(
     async (url: string, token: string) => {
-      // Remove trailing slash from URL
-      const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url;
-
-      const authConfig: AuthConfig = {
-        url: cleanUrl,
-        token: token.trim(),
-      };
+      const authConfig = normalizeSessionConfig({ url, token });
 
       setConfig(authConfig);
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authConfig));
+      writeStoredSessionConfig(STORAGE_KEYS.authConfig, authConfig);
 
-      // Also save to config context for Home Assistant connection
+      // Keep the connection config in sync with the authenticated session.
       const saved = await saveConfig(authConfig);
       return saved;
     },
@@ -69,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     homeAssistantStore.getState().disconnect();
     setConfig(null);
-    localStorage.removeItem(AUTH_STORAGE_KEY);
+    clearStoredSessionConfig(STORAGE_KEYS.authConfig);
     clearConfig();
   }, [clearConfig]);
 

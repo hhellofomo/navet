@@ -1,6 +1,6 @@
 /**
  * HVAC Card styling utilities
- * These functions are now deprecated - use the theme context directly in components
+ * These functions are now deprecated - use the theme hook directly in components
  * Kept for backward compatibility
  */
 

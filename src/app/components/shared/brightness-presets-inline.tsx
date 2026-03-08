@@ -2,7 +2,7 @@ import * as Popover from '@radix-ui/react-popover';
 import type { LucideIcon } from 'lucide-react';
 import { MoreHorizontal } from 'lucide-react';
 import { memo } from 'react';
-import { useTheme } from '../../contexts/theme-context';
+import { useTheme } from '../../hooks';
 import type { CardSize } from './card-size-selector';
 
 interface BrightnessPreset {

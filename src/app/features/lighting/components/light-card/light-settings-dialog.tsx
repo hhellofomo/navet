@@ -9,7 +9,7 @@ import { CustomScrollbar } from '@/app/components/shared/custom-scrollbar';
 import { DialogHeader } from '@/app/components/shared/dialog-header';
 import { IconPicker } from '@/app/components/shared/icon-picker';
 import { PRESET_COLORS } from '@/app/constants/light-constants';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 import type { BrightnessPresetKey } from '@/app/stores/light-preset-store';
 
 interface LightSettingsDialogProps {

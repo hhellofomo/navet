@@ -1,10 +1,14 @@
 import { createContext, type ReactNode, useCallback, useContext, useState } from 'react';
-import { getRuntimeConfig } from '../config/runtime-config';
+import { STORAGE_KEYS } from '../constants/storage-keys';
+import {
+  clearStoredSessionConfig,
+  normalizeSessionConfig,
+  readInitialSessionConfig,
+  type SessionConfig,
+  writeStoredSessionConfig,
+} from '../session/session';
 
-export interface HAConfig {
-  url: string;
-  token: string;
-}
+export type HAConfig = SessionConfig;
 
 interface ConfigContextType {
   config: HAConfig | null;
@@ -16,26 +20,10 @@ interface ConfigContextType {
 
 const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 
-const CONFIG_STORAGE_KEY = 'ha-dashboard-config';
-
 export function ConfigProvider({ children }: { children: ReactNode }) {
   const [config, setConfig] = useState<HAConfig | null>(() => {
     try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        const stored = localStorage.getItem(CONFIG_STORAGE_KEY);
-        if (stored) {
-          return JSON.parse(stored);
-        }
-      }
-
-      const { hassUrl, token } = getRuntimeConfig();
-
-      if (hassUrl && token) {
-        return {
-          url: hassUrl,
-          token: token,
-        };
-      }
+      return readInitialSessionConfig(STORAGE_KEYS.haConfig);
     } catch (_error) {}
     return null;
   });
@@ -69,16 +57,12 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
 
   const saveConfig = useCallback(async (newConfig: HAConfig): Promise<boolean> => {
     try {
-      const cleanUrl = newConfig.url.endsWith('/') ? newConfig.url.slice(0, -1) : newConfig.url;
-      const configToSave = { ...newConfig, url: cleanUrl };
+      const configToSave = normalizeSessionConfig(newConfig);
 
       // Save config directly without testing
       // (Testing will fail in development due to CORS)
       setConfig(configToSave);
-
-      if (typeof window !== 'undefined' && window.localStorage) {
-        localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(configToSave));
-      }
+      writeStoredSessionConfig(STORAGE_KEYS.haConfig, configToSave);
 
       return true;
     } catch (_error) {
@@ -88,10 +72,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
 
   const clearConfig = useCallback(() => {
     setConfig(null);
-
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.removeItem(CONFIG_STORAGE_KEY);
-    }
+    clearStoredSessionConfig(STORAGE_KEYS.haConfig);
   }, []);
 
   return (

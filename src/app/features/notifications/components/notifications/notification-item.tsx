@@ -1,5 +1,5 @@
-import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
-import type { PrimaryColor } from '../../contexts/theme-context';
+import type { PrimaryColor } from '@/app/hooks';
+import { getNotificationColor, getNotificationIcon } from './notification-utils';
 import type { Notification } from './use-notifications';
 
 interface NotificationItemProps {
@@ -21,32 +21,6 @@ export function NotificationItem({
   getColorValue,
   formatTimestamp,
 }: NotificationItemProps) {
-  const getNotificationIcon = (type: Notification['type']) => {
-    switch (type) {
-      case 'success':
-        return <CheckCircle className="w-4 h-4" />;
-      case 'warning':
-        return <AlertTriangle className="w-4 h-4" />;
-      case 'error':
-        return <AlertCircle className="w-4 h-4" />;
-      default:
-        return <Info className="w-4 h-4" />;
-    }
-  };
-
-  const getNotificationColor = (type: Notification['type']) => {
-    switch (type) {
-      case 'success':
-        return '#22c55e';
-      case 'warning':
-        return '#eab308';
-      case 'error':
-        return '#ef4444';
-      default:
-        return getColorValue(primaryColor);
-    }
-  };
-
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
   const textSecondary =
     theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
@@ -59,6 +33,7 @@ export function NotificationItem({
         : 'hover:bg-white/5';
   const itemBg =
     theme === 'light' ? 'bg-gray-50' : theme === 'contrast' ? 'bg-black/30' : 'bg-white/5';
+  const NotificationIcon = getNotificationIcon(notification.type);
 
   return (
     <div
@@ -68,9 +43,9 @@ export function NotificationItem({
         {/* Icon */}
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-white"
-          style={{ backgroundColor: getNotificationColor(notification.type) }}
+          style={{ backgroundColor: getNotificationColor(notification.type, primaryColor) }}
         >
-          {getNotificationIcon(notification.type)}
+          <NotificationIcon className="w-4 h-4" />
         </div>
 
         {/* Content */}
