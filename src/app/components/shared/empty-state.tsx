@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { useTheme } from '../../hooks';
+import { useTheme } from '@/app/hooks';
 
 interface EmptyStateProps {
   icon: React.ComponentType<{ className?: string }>;

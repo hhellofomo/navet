@@ -1,5 +1,5 @@
 import type { CardSize } from '../components/shared/card-size-selector';
-import type { SensorIconType } from '../features/sensors/components/sensors/sensor-types';
+import type { SensorIconType } from '../features/sensors';
 
 export interface DeviceMetric {
   label: string;

@@ -1,7 +1,7 @@
 import { Loader2 } from 'lucide-react';
 import { memo } from 'react';
-import { useTheme } from '../../hooks';
-import { getThemeColorValue } from '../../utils/theme-colors';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { useTheme } from '@/app/hooks';
 
 interface LoadingSpinnerProps {
   message?: string;

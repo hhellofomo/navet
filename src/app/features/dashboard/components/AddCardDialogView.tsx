@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import type { ThemeType } from '../../../hooks';
+import type { ThemeType } from '@/app/hooks';
 import type { CardTemplate, CardType } from './AddCardDialogContainer';
 
 interface AddCardDialogViewProps {

@@ -29,7 +29,7 @@ import {
   ZapOff,
 } from 'lucide-react';
 import { memo, useState } from 'react';
-import { useTheme } from '../../hooks';
+import { useTheme } from '@/app/hooks';
 
 interface IconPickerProps {
   selectedIcon: string;

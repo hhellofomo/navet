@@ -1,12 +1,12 @@
-import { STORAGE_KEYS } from '../constants/storage-keys';
-import { isSection } from '../navigation/sections';
-import { useCustomCardsStore } from '../stores/custom-cards-store';
-import { useDashboardEntitiesStore } from '../stores/dashboard-entities-store';
-import { useLightPresetStore } from '../stores/light-preset-store';
-import { useNavigationStore } from '../stores/navigation-store';
-import { defaultSettings, useSettingsStore } from '../stores/settings-store';
-import { useThemeStore } from '../stores/theme-store';
-import { storage } from './storage';
+import { STORAGE_KEYS } from '@/app/constants/storage-keys';
+import { useDashboardEntitiesStore } from '@/app/features/dashboard';
+import { useCustomCardsStore } from '@/app/features/dashboard/stores/custom-cards-store';
+import { useLightPresetStore } from '@/app/features/lighting';
+import { isSection } from '@/app/navigation/sections';
+import { useNavigationStore } from '@/app/stores/navigation-store';
+import { defaultSettings, useSettingsStore } from '@/app/stores/settings-store';
+import { useThemeStore } from '@/app/stores/theme-store';
+import { storage } from '@/app/utils/storage';
 
 interface DashboardConfigPayload {
   version: 2;

@@ -1,17 +1,8 @@
 import { ChevronRight, Rss } from 'lucide-react';
-import type { CardSize } from '../../../components/shared/card-size-selector';
-import { CardSizeSelector } from '../../../components/shared/card-size-selector';
-import type { PrimaryColor, ThemeType } from '../../../hooks';
-
-interface RSSItem {
-  id: string;
-  title: string;
-  source: string;
-  timeAgo: string;
-  url: string;
-  excerpt?: string;
-  imageUrl?: string;
-}
+import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import type { PrimaryColor, ThemeType } from '@/app/hooks';
+import type { RSSItem } from './rss-feed-card.types';
 
 interface RSSFeedCardViewProps {
   inEditMode?: boolean;

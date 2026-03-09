@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { type ButtonHTMLAttributes, memo } from 'react';
+import { memo } from 'react';
 import { BrightnessPresetsInline } from '@/app/components/shared/brightness-presets-inline';
 import { BrightnessSlider } from '@/app/components/shared/brightness-slider';
 import { CardActionRow } from '@/app/components/shared/card-action-row';
@@ -7,18 +7,14 @@ import { CardSettingsActionButton } from '@/app/components/shared/card-settings-
 import { useTheme } from '@/app/hooks';
 import { CustomColorTrigger } from './custom-color-trigger';
 import { LightCardHeader } from './light-card-header';
-
-type HeaderIconButtonProps = Pick<
-  ButtonHTMLAttributes<HTMLButtonElement>,
-  'aria-label' | 'onClick' | 'onPointerDown'
->;
+import type { HeaderIconButtonProps, LightBrightnessPreset } from './light-card-types';
 
 interface LightCardMediumProps {
   name: string;
   room: string;
   brightness: number;
   currentColor: string;
-  brightnessPresets: Array<{ brightness: number; icon: LucideIcon; key: string; label: string }>;
+  brightnessPresets: LightBrightnessPreset[];
   isOn: boolean;
   IconComponent: LucideIcon;
   supportsColorControl: boolean;

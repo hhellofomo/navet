@@ -12,13 +12,13 @@ navet/
 ├── 📄 README.md                    ← Main project documentation
 ├── 📄 LICENSE.md                   ← CC BY-NC 4.0 license
 ├── 📄 CONTRIBUTING.md              ← Contribution guidelines
-├── 📄 BRANDING.md                  ← Brand identity (NEW!)
-│
 ├── 📂 docs/                        ← All documentation (NEW!)
 │   ├── 📄 README.md                ← Documentation index
 │   ├── 📄 WIDGETS.md               ← Widget system guide
 │   ├── 📄 TERMS_OF_USE.md          ← Legal and terms
 │   ├── 📄 ATTRIBUTIONS.md          ← Credits (updated)
+│   ├── 📂 branding/                ← Brand documentation
+│   │   └── 📄 BRANDING.md          ← Brand identity guide
 │   │
 │   ├── 📂 archive/                 ← Historical records
 │   │   ├── 📄 CHANGES.md           ← Complete project history
@@ -86,7 +86,7 @@ Professional: ✅ Yes!
 
 ### For Users
 1. Start with **README.md**
-2. Check **BRANDING.md** for project identity
+2. Check **docs/branding/BRANDING.md** for project identity
 3. Browse **docs/** for detailed information
 
 ### For Contributors

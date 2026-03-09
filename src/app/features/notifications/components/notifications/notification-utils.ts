@@ -1,6 +1,6 @@
 import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import type { PrimaryColor } from '@/app/hooks';
-import { getThemeColorValue } from '@/app/utils/theme-colors';
 import type { Notification } from './use-notifications';
 
 export const formatTimestamp = (date: Date): string => {

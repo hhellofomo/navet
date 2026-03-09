@@ -70,9 +70,10 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **Tree-shakeable** - Only imports what's actually used
 
 ### 🧱 Architecture
-- **Direct Hook APIs** - Theme, navigation, search, and Home Assistant access now use hook modules directly instead of passthrough provider wrappers
-- **Shared Utilities** - Device room lookup, theme color resolution, wallpaper upload handling, notification styling, and vacuum status helpers are centralized to reduce fan-out edits
-- **Consistent Persistence** - Storage keys and session/config persistence are standardized behind shared helpers
+- **Feature-Owned Modules** - Dashboard, lighting, settings, sensors, weather, and other major areas expose feature-level entry points under `src/app/features/*`
+- **Feature-Colocated State** - Dashboard and lighting hooks/stores live with their owning features instead of generic global folders
+- **Shared UI Foundation** - Cross-feature pieces such as card sizing, empty states, interaction previews, and theme color helpers live under shared component modules
+- **Consistent Persistence** - Storage keys plus dashboard/light preference persistence are standardized behind shared helpers and feature stores
 
 ## 🚀 Installation
 

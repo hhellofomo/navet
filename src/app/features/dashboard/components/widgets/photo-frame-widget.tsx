@@ -2,8 +2,8 @@ import { ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
 import { useState } from 'react';
 import { ImageWithFallback } from '@/app/components/figma/ImageWithFallback';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useTheme } from '@/app/hooks';
-import { getThemeColorValue } from '@/app/utils/theme-colors';
 
 const mockPhotos = [
   'https://images.unsplash.com/photo-1767858702764-39693c994ee1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYW1pbHklMjB2YWNhdGlvbiUyMGJlYWNofGVufDF8fHx8MTc3MjY4ODE4OXww&ixlib=rb-4.1.0&q=80&w=1080',

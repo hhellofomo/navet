@@ -1,41 +1,9 @@
-import type { LucideIcon } from 'lucide-react';
-import { Blinds, DoorOpen, Fence, Home, Square, SunDim } from 'lucide-react';
 import { memo, useState } from 'react';
-import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '../../../hooks';
+import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
+import { useTheme } from '@/app/hooks';
 import { CoverCardView } from './CoverCardView';
-
-type CoverState = 'open' | 'closed' | 'opening' | 'closing';
-type DeviceClass =
-  | 'blind'
-  | 'shade'
-  | 'curtain'
-  | 'garage'
-  | 'gate'
-  | 'awning'
-  | 'shutter'
-  | 'door';
-
-interface CoverCardContainerProps {
-  name: string;
-  room: string;
-  initialPosition?: number; // 0 = closed, 100 = open
-  initialDeviceClass?: DeviceClass;
-  size: CardSize;
-  onSizeChange: (id: string, size: CardSize) => void;
-  isEditMode: boolean;
-}
-
-const deviceClassConfig: Record<DeviceClass, { label: string; icon: LucideIcon }> = {
-  blind: { label: 'Window Blinds', icon: Blinds },
-  shade: { label: 'Roller Shades', icon: Blinds },
-  curtain: { label: 'Curtains', icon: Home },
-  garage: { label: 'Garage Doors', icon: DoorOpen },
-  gate: { label: 'Gates', icon: Fence },
-  awning: { label: 'Awnings', icon: SunDim },
-  shutter: { label: 'Shutters', icon: Square },
-  door: { label: 'Doors', icon: DoorOpen },
-};
+import { DEVICE_CLASS_CONFIG } from './cover-card.constants';
+import type { CoverCardProps, CoverState, DeviceClass } from './cover-card.types';
 
 export const CoverCardContainer = memo(function CoverCardContainer({
   name,
@@ -45,7 +13,7 @@ export const CoverCardContainer = memo(function CoverCardContainer({
   size,
   onSizeChange,
   isEditMode,
-}: CoverCardContainerProps) {
+}: CoverCardProps) {
   const [position, setPosition] = useState(initialPosition);
   const [deviceClass, setDeviceClass] = useState<DeviceClass>(initialDeviceClass);
   const [coverState, setCoverState] = useState<CoverState>(
@@ -103,6 +71,20 @@ export const CoverCardContainer = memo(function CoverCardContainer({
   const stateDisplay = getStateDisplay();
   const cardColors = position > 50 ? colors.cover.open : colors.cover.closed;
   const cardId = `cover-${name.toLowerCase().replace(/ /g, '-')}`;
+  const cardInteraction = useEntityCardInteractionController({
+    ariaLabel: `${name} cover`,
+    ariaPressed: position > 0,
+    isEditMode,
+    onToggle: () => {
+      if (position > 0) {
+        handleClose();
+        return;
+      }
+      handleOpen();
+    },
+    onOpenControls: () => setIsSettingsOpen(true),
+    onOpenSettings: () => setIsSettingsOpen(true),
+  });
 
   return (
     <CoverCardView
@@ -110,11 +92,14 @@ export const CoverCardContainer = memo(function CoverCardContainer({
       room={room}
       position={position}
       deviceClass={deviceClass}
-      deviceClassConfig={deviceClassConfig}
+      deviceClassConfig={DEVICE_CLASS_CONFIG}
       size={size}
       isEditMode={isEditMode}
       cardId={cardId}
       cardColors={cardColors}
+      cardProps={cardInteraction.cardProps}
+      iconButtonProps={cardInteraction.iconButtonProps}
+      settingsButtonProps={cardInteraction.settingsButtonProps}
       theme={theme}
       stateDisplay={stateDisplay}
       isSettingsOpen={isSettingsOpen}

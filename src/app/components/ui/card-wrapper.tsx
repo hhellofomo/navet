@@ -5,7 +5,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from 'react';
-import { useTheme } from '../../hooks';
+import { useTheme } from '@/app/hooks';
 
 interface CardWrapperProps {
   children: ReactNode;

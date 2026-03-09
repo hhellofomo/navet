@@ -5,7 +5,7 @@ import {
   getHVACGaugeColor,
   getHVACGlowColor,
   getHVACTextShadow,
-} from '@/app/utils/hvac-styles';
+} from '../../utils/hvac-styles';
 
 interface HVACGaugeProps {
   id: string;

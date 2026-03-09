@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';
 import { lazy, Suspense } from 'react';
-import type { CustomCard } from '@/app/stores';
+import type { CustomCard } from '../stores/custom-cards-store';
 
 const CalendarWidget = lazy(async () => {
   const module = await import('./widgets/calendar-widget');

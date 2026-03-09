@@ -1,10 +1,10 @@
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { memo, useCallback, useDeferredValue, useMemo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { useSearch } from '../../hooks';
-import type { CustomCard } from '../../hooks/use-custom-cards';
-import type { DeviceWithType } from '../../types/device.types';
+import { useSearch } from '@/app/hooks';
+import type { DeviceWithType } from '@/app/types/device.types';
 import { DashboardCardItem } from './components/dashboard-card-item';
+import type { CustomCard } from './stores/custom-cards-store';
 
 interface DeviceGridProps {
   orderedCardIds: string[];

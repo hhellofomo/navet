@@ -1,7 +1,7 @@
 import { Clipboard, FlaskConical, Home, Lightbulb, Lock, Settings, Tv, Video } from 'lucide-react';
 import { memo } from 'react';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { type Section, useNavigation, useTheme } from '@/app/hooks';
-import { getThemeColorValue } from '@/app/utils/theme-colors';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 
 export const Sidebar = memo(function Sidebar() {

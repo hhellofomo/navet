@@ -1,30 +1,17 @@
 import { Wind } from 'lucide-react';
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { CardActionRow } from '@/app/components/shared/card-action-row';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
-import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { CardSizeSelector } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
-import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { CardWrapper } from '@/app/components/ui/card-wrapper';
-import { useTheme } from '@/app/hooks';
 import { HVACSettingsDialog } from '../hvac-settings-dialog';
+import type { HVACCardProps } from './hvac-card.types';
 import { HVACGauge } from './hvac-gauge';
 import { HVACModeControls } from './hvac-mode-controls';
 import { HVACTempControls } from './hvac-temp-controls';
-
-interface HVACCardProps {
-  id: string;
-  name: string;
-  room: string;
-  initialTemp?: number;
-  initialCurrentTemp?: number;
-  initialMode?: string;
-  initialState?: boolean;
-  size: CardSize;
-  onSizeChange: (id: string, size: CardSize) => void;
-  isEditMode: boolean;
-}
+import { useHVACCardController } from './use-hvac-card-controller';
 
 export const HVACCard = memo(function HVACCard({
   id,
@@ -38,68 +25,23 @@ export const HVACCard = memo(function HVACCard({
   onSizeChange,
   isEditMode,
 }: HVACCardProps) {
-  const [targetTemp, setTargetTemp] = useState(initialTemp);
-  const [currentTemp] = useState(initialCurrentTemp);
-  const [mode, setMode] = useState(initialMode);
-  const [isOn, setIsOn] = useState(initialState);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { colors, theme } = useTheme();
-
-  // Size-specific styling
-  const isSmall = size === 'extra-small' || size === 'small';
-  const isMedium = size === 'medium';
-
-  // Get theme-aware colors based on mode
-  const getCardColors = () => {
-    if (!isOn) return colors.hvac.off;
-    switch (mode) {
-      case 'cool':
-        return colors.hvac.cooling;
-      case 'heat':
-        return colors.hvac.heating;
-      default:
-        return colors.hvac.off;
-    }
-  };
-
-  const cardColors = getCardColors();
-  const textColor =
-    theme === 'light'
-      ? isOn
-        ? 'text-gray-900'
-        : 'text-gray-500'
-      : isOn
-        ? 'text-white'
-        : 'text-gray-300';
-  const secondaryTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
-  const cardInteraction = useEntityCardInteractionController({
-    ariaLabel: `${name} hvac`,
-    ariaPressed: isOn,
+  const controller = useHVACCardController({
+    name,
+    initialTemp,
+    initialCurrentTemp,
+    initialMode,
+    initialState,
     isEditMode,
-    onToggle: () => setIsOn((current) => !current),
-    onOpenControls: () => setIsSettingsOpen(true),
-    onOpenSettings: () => setIsSettingsOpen(true),
+    size,
   });
-
-  // Light theme overlay - tinted when active, neutral when off
-  const lightOverlay =
-    theme === 'light'
-      ? isOn
-        ? mode === 'cool'
-          ? 'bg-cyan-50/45'
-          : mode === 'heat'
-            ? 'bg-orange-50/45'
-            : 'bg-white/60'
-        : 'bg-white/60'
-      : undefined;
 
   return (
     <>
       <CardWrapper
-        interactionProps={cardInteraction.cardProps}
-        className={`bg-gradient-to-br ${cardColors.gradient} border ${cardColors.border} p-4 ${!isOn ? 'grayscale opacity-40' : ''}`}
-        lightOverlayClassName={lightOverlay}
-        showShadow={isOn}
+        interactionProps={controller.cardInteraction.cardProps}
+        className={`bg-gradient-to-br ${controller.cardColors.gradient} border ${controller.cardColors.border} p-4 ${!controller.isOn ? 'grayscale opacity-40' : ''}`}
+        lightOverlayClassName={controller.lightOverlay}
+        showShadow={controller.isOn}
       >
         {isEditMode && (
           <CardSizeSelector
@@ -109,8 +51,8 @@ export const HVACCard = memo(function HVACCard({
         )}
 
         <div
-          className={`absolute inset-0 bg-gradient-to-br ${cardColors.glow} to-transparent transition-all duration-500`}
-        ></div>
+          className={`absolute inset-0 bg-gradient-to-br ${controller.cardColors.glow} to-transparent transition-all duration-500`}
+        />
 
         <div className="relative z-[2] h-full flex flex-col">
           <EntityCardHeader
@@ -120,92 +62,87 @@ export const HVACCard = memo(function HVACCard({
             leading={
               <EntityCardHeaderIcon
                 IconComponent={Wind}
-                isActive={isOn}
+                isActive={controller.isOn}
                 size={size}
-                ariaLabel={cardInteraction.iconButtonProps['aria-label']}
-                onClick={cardInteraction.iconButtonProps.onClick}
+                ariaLabel={controller.cardInteraction.iconButtonProps['aria-label']}
+                onClick={controller.cardInteraction.iconButtonProps.onClick}
               />
             }
           />
 
-          {/* Content area - adaptive based on size */}
           <div className="flex-1">
-            {isSmall ? (
-              // Small: Compact layout
+            {controller.isSmall ? (
               <div className="flex h-full flex-col gap-2">
-                {/* Target temp display (prominent) */}
                 <div className="mt-auto">
                   <div
-                    className={`text-3xl font-bold ${textColor} leading-none transition-colors duration-500 mb-1`}
+                    className={`text-3xl font-bold ${controller.textColor} leading-none transition-colors duration-500 mb-1`}
                   >
-                    {targetTemp}°C
+                    {controller.targetTemp}°C
                   </div>
-                  <div className={`text-xs ${secondaryTextColor}`}>
-                    Current temperature {currentTemp}°C
+                  <div className={`text-xs ${controller.secondaryTextColor}`}>
+                    Current temperature {controller.currentTemp}°C
                   </div>
                 </div>
 
                 <div className="pt-2">
                   <CardActionRow
-                    theme={theme}
+                    theme={controller.theme}
                     size="small"
                     leftContent={
                       <HVACTempControls
-                        targetTemp={targetTemp}
-                        onTempChange={setTargetTemp}
-                        isOn={isOn}
+                        targetTemp={controller.targetTemp}
+                        onTempChange={controller.setTargetTemp}
+                        isOn={controller.isOn}
                         size="small"
                       />
                     }
                     rightContent={
                       <CardSettingsActionButton
-                        {...cardInteraction.settingsButtonProps}
-                        theme={theme}
+                        {...controller.cardInteraction.settingsButtonProps}
+                        theme={controller.theme}
                         size="small"
                       />
                     }
                   />
                 </div>
               </div>
-            ) : isMedium ? (
-              // Medium: More space for controls
+            ) : controller.isMedium ? (
               <div className="flex h-full flex-col">
-                {/* Target temperature (prominent) */}
                 <div className="mt-auto">
                   <div
-                    className={`text-3xl font-bold ${textColor} leading-none transition-colors duration-500 mb-1`}
+                    className={`text-3xl font-bold ${controller.textColor} leading-none transition-colors duration-500 mb-1`}
                   >
-                    {targetTemp}°C
+                    {controller.targetTemp}°C
                   </div>
-                  <div className={`text-xs ${secondaryTextColor}`}>
-                    Current temperature {currentTemp}°C
+                  <div className={`text-xs ${controller.secondaryTextColor}`}>
+                    Current temperature {controller.currentTemp}°C
                   </div>
                 </div>
 
                 <div className="pt-4">
                   <CardActionRow
-                    theme={theme}
+                    theme={controller.theme}
                     size="medium"
                     leftContent={
                       <>
                         <HVACTempControls
-                          targetTemp={targetTemp}
-                          onTempChange={setTargetTemp}
-                          isOn={isOn}
+                          targetTemp={controller.targetTemp}
+                          onTempChange={controller.setTargetTemp}
+                          isOn={controller.isOn}
                           size="medium"
                         />
                         <HVACModeControls
-                          mode={mode}
-                          isOn={isOn}
-                          onModeChange={setMode}
+                          mode={controller.mode}
+                          isOn={controller.isOn}
+                          onModeChange={controller.setMode}
                           size="medium"
                         />
                       </>
                     }
                     rightContent={
                       <CardSettingsActionButton
-                        {...cardInteraction.settingsButtonProps}
-                        theme={theme}
+                        {...controller.cardInteraction.settingsButtonProps}
+                        theme={controller.theme}
                         size="medium"
                       />
                     }
@@ -213,54 +150,49 @@ export const HVACCard = memo(function HVACCard({
                 </div>
               </div>
             ) : (
-              // Large: Full featured layout with half gauge
               <div className="flex h-full flex-col">
-                {/* Half Temperature Gauge with side buttons */}
                 <div className="flex-1 flex items-center justify-center">
                   <div className="relative flex items-end gap-4">
-                    {/* Temp controls on sides */}
                     <div className="mb-8">
                       <HVACTempControls
-                        targetTemp={targetTemp}
-                        onTempChange={setTargetTemp}
-                        isOn={isOn}
+                        targetTemp={controller.targetTemp}
+                        onTempChange={controller.setTargetTemp}
+                        isOn={controller.isOn}
                         size="large"
                       />
                     </div>
 
-                    {/* Half Gauge */}
                     <HVACGauge
                       id={id}
-                      mode={mode}
-                      targetTemp={targetTemp}
-                      currentTemp={currentTemp}
-                      isOn={isOn}
+                      mode={controller.mode}
+                      targetTemp={controller.targetTemp}
+                      currentTemp={controller.currentTemp}
+                      isOn={controller.isOn}
                     />
 
-                    {/* Spacer for symmetry */}
                     <div className="w-12 h-12 mb-8" />
                   </div>
                 </div>
 
                 <div className="pt-4">
                   <CardActionRow
-                    theme={theme}
+                    theme={controller.theme}
                     size="large"
                     leftContent={
                       <div className="flex items-center gap-3">
-                        <div className={`text-xs ${secondaryTextColor}`}>Mode</div>
+                        <div className={`text-xs ${controller.secondaryTextColor}`}>Mode</div>
                         <HVACModeControls
-                          mode={mode}
-                          isOn={isOn}
-                          onModeChange={setMode}
+                          mode={controller.mode}
+                          isOn={controller.isOn}
+                          onModeChange={controller.setMode}
                           size="large"
                         />
                       </div>
                     }
                     rightContent={
                       <CardSettingsActionButton
-                        {...cardInteraction.settingsButtonProps}
-                        theme={theme}
+                        {...controller.cardInteraction.settingsButtonProps}
+                        theme={controller.theme}
                         size="large"
                       />
                     }
@@ -273,16 +205,16 @@ export const HVACCard = memo(function HVACCard({
       </CardWrapper>
 
       <HVACSettingsDialog
-        isOpen={isSettingsOpen}
-        onOpenChange={setIsSettingsOpen}
+        isOpen={controller.isSettingsOpen}
+        onOpenChange={controller.setIsSettingsOpen}
         name={name}
         room={room}
-        isOn={isOn}
-        mode={mode}
-        targetTemp={targetTemp}
-        currentTemp={currentTemp}
-        onModeChange={setMode}
-        onTogglePower={() => setIsOn(!isOn)}
+        isOn={controller.isOn}
+        mode={controller.mode}
+        targetTemp={controller.targetTemp}
+        currentTemp={controller.currentTemp}
+        onModeChange={controller.setMode}
+        onTogglePower={() => controller.setIsOn(!controller.isOn)}
       />
     </>
   );

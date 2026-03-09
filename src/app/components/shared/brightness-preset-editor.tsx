@@ -19,7 +19,7 @@ import { GripVertical } from 'lucide-react';
 import { memo } from 'react';
 import { Checkbox } from '@/app/components/ui/checkbox';
 import { Label } from '@/app/components/ui/label';
-import type { BrightnessPresetKey } from '@/app/stores/light-preset-store';
+import type { BrightnessPresetKey } from '@/app/features/lighting';
 
 interface BrightnessPresetEditorItem {
   icon: LucideIcon;

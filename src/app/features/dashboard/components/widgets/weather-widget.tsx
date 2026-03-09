@@ -1,8 +1,8 @@
 import { Droplets, Sun, Wind } from 'lucide-react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { WeatherIcon } from '@/app/features/weather/components/weather-card/weather-icon';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { WeatherIcon } from '@/app/features/weather';
 import { useTheme } from '@/app/hooks';
-import { getThemeColorValue } from '@/app/utils/theme-colors';
 
 interface WeatherForecast {
   day: string;

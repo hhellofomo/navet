@@ -1,20 +1,11 @@
-import type { HassEntity } from 'home-assistant-js-websocket';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
+import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
-import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
-import { DEFAULT_LIGHT_ICON, LIGHT_ICON_MAP } from '@/app/constants/icon-map';
-import { TEMP_OPTIONS } from '@/app/constants/light-constants';
-import { useHomeAssistant, useTheme } from '@/app/hooks';
-import { useBrightnessPresets } from '@/app/hooks/use-brightness-presets';
-import { homeAssistantService } from '@/app/services/home-assistant.service';
-import { useLightMemoryStore } from '@/app/stores/light-memory-store';
-import { useLightPresetStore } from '@/app/stores/light-preset-store';
-import { getGradientColors } from '@/app/utils/color-utils';
+import { useTheme } from '@/app/hooks';
 import { LightCardLarge } from './light-card-large';
 import { LightCardMedium } from './light-card-medium';
 import { LightCardSmall } from './light-card-small';
 import { LightSettingsDialog } from './light-settings-dialog';
+import { useLightCardController } from './use-light-card-controller';
 
 interface LightCardProps {
   id: string;
@@ -39,439 +30,19 @@ export const LightCard = memo(function LightCard({
   onSizeChange,
   isEditMode,
 }: LightCardProps) {
-  const [isOn, setIsOn] = useState(initialState);
-  const [brightness, setBrightness] = useState(initialBrightness);
-  const [isAdjustingBrightness, setIsAdjustingBrightness] = useState(false);
-  const [colorTemp, setColorTemp] = useState(roundKelvin(initialTemp));
-  const [isAdjustingTemp, setIsAdjustingTemp] = useState(false);
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  const [customColor, setCustomColor] = useState('#FFA500');
-  const [isOpen, setIsOpen] = useState(false);
-  const [applyBrightnessPresetsToAll, setApplyBrightnessPresetsToAll] = useState(true);
-  const [selectedIcon, setSelectedIcon] = useState(DEFAULT_LIGHT_ICON);
-  const { connection, entities } = useHomeAssistant();
   const { theme } = useTheme();
-  const brightnessPresets = useBrightnessPresets(id);
-  const rememberLightState = useLightMemoryStore((state) => state.rememberState);
-  const setBrightnessPresetValue = useLightPresetStore((state) => state.setBrightnessPresetValue);
-  const setBrightnessPresetOrder = useLightPresetStore((state) => state.setBrightnessPresetOrder);
-  const liveEntity = entities?.[id];
-  const rememberedLightState = useLightMemoryStore.getState().getRememberedState(id);
-  const lastBrightnessRef = useRef(
-    rememberedLightState?.brightness ?? (initialBrightness > 0 ? initialBrightness : 100)
-  );
-  const lastColorTempRef = useRef(rememberedLightState?.colorTemp ?? roundKelvin(initialTemp));
-  const pendingBrightnessRef = useRef<number | null>(null);
-  const brightnessSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pendingStateRef = useRef<boolean | null>(null);
-  const stateSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pendingTempRef = useRef<number | null>(null);
-  const tempSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastKnownColorRef = useRef<string | null>(null);
-
-  const effectiveSelectedColor = selectedColor ?? (isOn ? lastKnownColorRef.current : null);
-  const gradientColors = getGradientColors(isOn, effectiveSelectedColor, theme);
-  const IconComponent = LIGHT_ICON_MAP[selectedIcon] || LIGHT_ICON_MAP[DEFAULT_LIGHT_ICON];
-  const isHomeAssistantLight = Boolean(connection) && id.startsWith('light.');
-  const supportsColorTemperature = supportsColorTemperatureControl(liveEntity);
-  const supportsColorControl = supportsColorSelection(liveEntity);
-  const { max: maxColorTemp, min: minColorTemp } = getSupportedColorTemperatureRange(liveEntity);
-  const tempOptions = TEMP_OPTIONS.filter(
-    (option) => option.value >= minColorTemp && option.value <= maxColorTemp
-  );
-
-  const isExtraSmall = size === 'extra-small';
-  const isSmall = isExtraSmall || size === 'small';
-  const isMedium = size === 'medium';
-  const padding = isExtraSmall ? 'px-3.5 pt-3 pb-4' : isSmall ? 'p-4' : 'p-5';
-
-  useEffect(() => {
-    if (liveEntity) {
-      return;
-    }
-    setIsOn(initialState);
-  }, [initialState, liveEntity]);
-
-  useEffect(() => {
-    if (liveEntity) {
-      return;
-    }
-    setBrightness(initialBrightness);
-    if (initialBrightness > 0) {
-      lastBrightnessRef.current = initialBrightness;
-      rememberLightState(id, { brightness: initialBrightness });
-    }
-  }, [id, initialBrightness, liveEntity, rememberLightState]);
-
-  useEffect(() => {
-    if (liveEntity) {
-      return;
-    }
-    const nextTemp = roundKelvin(initialTemp);
-    setColorTemp(nextTemp);
-    lastColorTempRef.current = nextTemp;
-    rememberLightState(id, { colorTemp: nextTemp });
-  }, [id, initialTemp, liveEntity, rememberLightState]);
-
-  useEffect(() => {
-    if (!liveEntity) {
-      return;
-    }
-
-    const nextIsOn = liveEntity.state === 'on';
-    if (pendingStateRef.current !== null && nextIsOn !== pendingStateRef.current) {
-      return;
-    }
-
-    if (pendingStateRef.current !== null) {
-      pendingStateRef.current = null;
-      if (stateSyncTimeoutRef.current) {
-        clearTimeout(stateSyncTimeoutRef.current);
-        stateSyncTimeoutRef.current = null;
-      }
-    }
-
-    setIsOn(nextIsOn);
-  }, [liveEntity]);
-
-  useEffect(() => {
-    if (!liveEntity) {
-      return;
-    }
-
-    if (isAdjustingBrightness) {
-      return;
-    }
-
-    if (liveEntity.state !== 'on') {
-      return;
-    }
-
-    const brightnessFromEntity = getBrightnessPercent(liveEntity);
-
-    if (
-      pendingBrightnessRef.current !== null &&
-      Math.abs(brightnessFromEntity - pendingBrightnessRef.current) > 1
-    ) {
-      return;
-    }
-
-    if (pendingBrightnessRef.current !== null) {
-      pendingBrightnessRef.current = null;
-      if (brightnessSyncTimeoutRef.current) {
-        clearTimeout(brightnessSyncTimeoutRef.current);
-        brightnessSyncTimeoutRef.current = null;
-      }
-    }
-
-    if (brightnessFromEntity > 0) {
-      lastBrightnessRef.current = brightnessFromEntity;
-      rememberLightState(id, { brightness: brightnessFromEntity });
-    }
-
-    setBrightness(brightnessFromEntity);
-  }, [id, isAdjustingBrightness, liveEntity, rememberLightState]);
-
-  useEffect(() => {
-    return () => {
-      if (brightnessSyncTimeoutRef.current) {
-        clearTimeout(brightnessSyncTimeoutRef.current);
-      }
-      if (stateSyncTimeoutRef.current) {
-        clearTimeout(stateSyncTimeoutRef.current);
-      }
-      if (tempSyncTimeoutRef.current) {
-        clearTimeout(tempSyncTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (liveEntity) {
-      if (isAdjustingTemp) {
-        return;
-      }
-
-      if (liveEntity.state !== 'on') {
-        return;
-      }
-
-      const entityTemp = getReportedColorTempKelvin(liveEntity);
-      if (entityTemp === null) {
-        return;
-      }
-      if (pendingTempRef.current !== null && Math.abs(entityTemp - pendingTempRef.current) > 100) {
-        return;
-      }
-
-      if (pendingTempRef.current !== null) {
-        pendingTempRef.current = null;
-        if (tempSyncTimeoutRef.current) {
-          clearTimeout(tempSyncTimeoutRef.current);
-          tempSyncTimeoutRef.current = null;
-        }
-      }
-
-      const nextTemp = clampKelvin(entityTemp, minColorTemp, maxColorTemp);
-      lastColorTempRef.current = nextTemp;
-      rememberLightState(id, { colorTemp: nextTemp });
-      setColorTemp(nextTemp);
-      return;
-    }
-
-    if (isAdjustingTemp) {
-      return;
-    }
-
-    if (pendingTempRef.current !== null && Math.abs(initialTemp - pendingTempRef.current) > 100) {
-      return;
-    }
-
-    if (pendingTempRef.current !== null) {
-      pendingTempRef.current = null;
-      if (tempSyncTimeoutRef.current) {
-        clearTimeout(tempSyncTimeoutRef.current);
-        tempSyncTimeoutRef.current = null;
-      }
-    }
-
-    const nextTemp = roundKelvin(initialTemp);
-    lastColorTempRef.current = nextTemp;
-    rememberLightState(id, { colorTemp: nextTemp });
-    setColorTemp(nextTemp);
-  }, [
+  const controller = useLightCardController({
     id,
+    name,
+    room,
+    initialState,
+    initialBrightness,
     initialTemp,
-    isAdjustingTemp,
-    liveEntity,
-    maxColorTemp,
-    minColorTemp,
-    rememberLightState,
-  ]);
-
-  useEffect(() => {
-    if (!liveEntity || liveEntity.state !== 'on' || isAdjustingTemp) {
-      return;
-    }
-
-    const reportedColor = getReportedColorHex(liveEntity);
-    setSelectedColor(reportedColor);
-    if (reportedColor) {
-      lastKnownColorRef.current = reportedColor;
-      setCustomColor(reportedColor);
-    }
-  }, [isAdjustingTemp, liveEntity]);
-
-  const syncLightWithHomeAssistant = useCallback(
-    async (options: {
-      state?: 'on' | 'off';
-      brightnessPct?: number;
-      kelvin?: number;
-      rgbColor?: [number, number, number];
-    }) => {
-      if (!isHomeAssistantLight) {
-        return;
-      }
-
-      try {
-        await homeAssistantService.updateLight(id, options);
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Failed to update light');
-        throw error;
-      }
-    },
-    [id, isHomeAssistantLight]
-  );
-
-  const hexToRgb = useCallback((hex: string): [number, number, number] | null => {
-    const normalized = hex.replace('#', '');
-    if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
-      return null;
-    }
-
-    return [
-      parseInt(normalized.slice(0, 2), 16),
-      parseInt(normalized.slice(2, 4), 16),
-      parseInt(normalized.slice(4, 6), 16),
-    ];
-  }, []);
-
-  const handleBrightnessChange = useCallback(
-    (value: number) => {
-      const nextBrightness = clampPercentage(value, 1);
-      setIsAdjustingBrightness(true);
-      setBrightness(nextBrightness);
-      lastBrightnessRef.current = nextBrightness;
-      rememberLightState(id, { brightness: nextBrightness });
-      if (!isOn) setIsOn(true);
-    },
-    [id, isOn, rememberLightState]
-  );
-
-  const handleBrightnessCommit = useCallback(
-    (value: number) => {
-      const nextBrightness = clampPercentage(value, 1);
-      setBrightness(nextBrightness);
-      lastBrightnessRef.current = nextBrightness;
-      rememberLightState(id, { brightness: nextBrightness });
-      setIsAdjustingBrightness(false);
-      pendingBrightnessRef.current = nextBrightness;
-      if (brightnessSyncTimeoutRef.current) {
-        clearTimeout(brightnessSyncTimeoutRef.current);
-      }
-      brightnessSyncTimeoutRef.current = setTimeout(() => {
-        pendingBrightnessRef.current = null;
-        brightnessSyncTimeoutRef.current = null;
-      }, 1500);
-      if (!isOn) setIsOn(true);
-      void syncLightWithHomeAssistant({
-        state: 'on',
-        brightnessPct: nextBrightness,
-      });
-    },
-    [id, isOn, rememberLightState, syncLightWithHomeAssistant]
-  );
-
-  const handleTempChange = useCallback(
-    (temp: number) => {
-      const nextTemp = clampKelvin(temp, minColorTemp, maxColorTemp);
-      setIsAdjustingTemp(true);
-      setColorTemp(nextTemp);
-      lastColorTempRef.current = nextTemp;
-      rememberLightState(id, { colorTemp: nextTemp });
-      setSelectedColor(null);
-      lastKnownColorRef.current = null;
-      if (!isOn) setIsOn(true);
-    },
-    [id, isOn, maxColorTemp, minColorTemp, rememberLightState]
-  );
-
-  const handleTempCommit = useCallback(
-    (temp: number) => {
-      const nextTemp = clampKelvin(temp, minColorTemp, maxColorTemp);
-      setColorTemp(nextTemp);
-      lastColorTempRef.current = nextTemp;
-      rememberLightState(id, { colorTemp: nextTemp });
-      setIsAdjustingTemp(false);
-      pendingTempRef.current = nextTemp;
-      if (tempSyncTimeoutRef.current) {
-        clearTimeout(tempSyncTimeoutRef.current);
-      }
-      tempSyncTimeoutRef.current = setTimeout(() => {
-        pendingTempRef.current = null;
-        tempSyncTimeoutRef.current = null;
-      }, 1500);
-      setSelectedColor(null);
-      lastKnownColorRef.current = null;
-      if (!isOn) setIsOn(true);
-      void syncLightWithHomeAssistant({
-        state: 'on',
-        kelvin: nextTemp,
-      });
-    },
-    [id, isOn, maxColorTemp, minColorTemp, rememberLightState, syncLightWithHomeAssistant]
-  );
-
-  const handleColorChange = useCallback(
-    (color: string) => {
-      setSelectedColor(color);
-      lastKnownColorRef.current = color;
-      if (!isOn) setIsOn(true);
-
-      const rgbColor = hexToRgb(color);
-      if (rgbColor) {
-        void syncLightWithHomeAssistant({
-          state: 'on',
-          rgbColor,
-        });
-      }
-    },
-    [hexToRgb, isOn, syncLightWithHomeAssistant]
-  );
-
-  const handleSettingsClick = useCallback(() => {
-    setIsOpen(true);
-  }, []);
-
-  const toggleLightState = useCallback(
-    (nextIsOn: boolean) => {
-      const latestRememberedState = useLightMemoryStore.getState().getRememberedState(id);
-      const brightnessToRestore =
-        latestRememberedState?.brightness !== undefined
-          ? clampPercentage(latestRememberedState.brightness, 1)
-          : brightness > 0
-            ? brightness
-            : Math.max(1, Math.round(lastBrightnessRef.current));
-      const colorTempToRestore = clampKelvin(lastColorTempRef.current, minColorTemp, maxColorTemp);
-      const rememberedColorTemp =
-        latestRememberedState?.colorTemp !== undefined
-          ? clampKelvin(latestRememberedState.colorTemp, minColorTemp, maxColorTemp)
-          : colorTempToRestore;
-
-      setIsOn(nextIsOn);
-      if (nextIsOn) {
-        setBrightness(brightnessToRestore);
-        setColorTemp(rememberedColorTemp);
-        pendingBrightnessRef.current = brightnessToRestore;
-        pendingTempRef.current = rememberedColorTemp;
-        if (brightnessSyncTimeoutRef.current) {
-          clearTimeout(brightnessSyncTimeoutRef.current);
-        }
-        if (tempSyncTimeoutRef.current) {
-          clearTimeout(tempSyncTimeoutRef.current);
-        }
-        brightnessSyncTimeoutRef.current = setTimeout(() => {
-          pendingBrightnessRef.current = null;
-          brightnessSyncTimeoutRef.current = null;
-        }, 2500);
-        tempSyncTimeoutRef.current = setTimeout(() => {
-          pendingTempRef.current = null;
-          tempSyncTimeoutRef.current = null;
-        }, 2500);
-      }
-      pendingStateRef.current = nextIsOn;
-      if (stateSyncTimeoutRef.current) {
-        clearTimeout(stateSyncTimeoutRef.current);
-      }
-      stateSyncTimeoutRef.current = setTimeout(() => {
-        pendingStateRef.current = null;
-        stateSyncTimeoutRef.current = null;
-      }, 1500);
-
-      void syncLightWithHomeAssistant({
-        state: nextIsOn ? 'on' : 'off',
-        brightnessPct: nextIsOn ? brightnessToRestore : undefined,
-        kelvin: nextIsOn && !selectedColor ? rememberedColorTemp : undefined,
-      }).catch(() => {
-        pendingStateRef.current = null;
-        if (stateSyncTimeoutRef.current) {
-          clearTimeout(stateSyncTimeoutRef.current);
-          stateSyncTimeoutRef.current = null;
-        }
-        setIsOn(!nextIsOn);
-      });
-    },
-    [brightness, id, maxColorTemp, minColorTemp, selectedColor, syncLightWithHomeAssistant]
-  );
-
-  const cardInteraction = useEntityCardInteractionController({
-    ariaLabel: `${name} light`,
-    ariaPressed: isOn,
+    size,
     isEditMode,
-    onToggle: () => toggleLightState(!isOn),
-    onOpenControls: handleSettingsClick,
-    onOpenSettings: handleSettingsClick,
   });
-  const showSettingsButton = cardInteraction.interactionMode !== 'control-first';
-  const showPresetOverflow = showSettingsButton || isSmall;
 
-  const handleCustomColorChange = useCallback(
-    (color: string) => {
-      setCustomColor(color);
-      handleColorChange(color);
-    },
-    [handleColorChange]
-  );
+  const isSmall = size === 'extra-small' || size === 'small';
 
   return (
     <>
@@ -484,40 +55,40 @@ export const LightCard = memo(function LightCard({
         )}
 
         <div
-          {...cardInteraction.cardProps}
-          className={`relative h-full w-full backdrop-blur-xl rounded-3xl ${padding} border overflow-hidden transition-all duration-500 ${!isEditMode ? 'cursor-pointer' : ''} ${
-            gradientColors.customGradient
+          {...controller.cardInteraction.cardProps}
+          className={`relative h-full w-full backdrop-blur-xl rounded-3xl ${controller.padding} border overflow-hidden transition-all duration-500 ${!isEditMode ? 'cursor-pointer' : ''} ${
+            controller.gradientColors.customGradient
               ? ''
-              : `bg-gradient-to-br ${gradientColors.from} ${gradientColors.to} ${gradientColors.border}`
-          } ${!isOn ? 'grayscale opacity-40' : ''} ${theme === 'light' && isOn ? 'shadow-lg' : ''}`}
+              : `bg-gradient-to-br ${controller.gradientColors.from} ${controller.gradientColors.to} ${controller.gradientColors.border}`
+          } ${!controller.isOn ? 'grayscale opacity-40' : ''} ${theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
           style={
-            gradientColors.customGradient
+            controller.gradientColors.customGradient
               ? {
-                  background: gradientColors.customGradient,
-                  borderColor: effectiveSelectedColor ? `${effectiveSelectedColor}66` : undefined,
+                  background: controller.gradientColors.customGradient,
+                  borderColor: controller.selectedColor
+                    ? `${controller.selectedColor}66`
+                    : undefined,
                 }
               : {}
           }
         >
-          {/* Glow effect when on */}
-          {isOn && (
+          {controller.isOn && (
             <div
               className={`absolute -inset-[100%] blur-3xl ${theme === 'light' ? 'opacity-40' : 'opacity-20'}`}
               style={{
-                background: `radial-gradient(circle, ${gradientColors.glow || 'transparent'} 0%, transparent 70%)`,
+                background: `radial-gradient(circle, ${controller.gradientColors.glow || 'transparent'} 0%, transparent 70%)`,
               }}
             />
           )}
 
-          {/* Light theme frosted overlay - warm tint when on, neutral when off */}
           {theme === 'light' && (
             <div
               className="absolute inset-0"
               style={
-                isOn
+                controller.isOn
                   ? {
-                      background: effectiveSelectedColor
-                        ? `linear-gradient(135deg, ${effectiveSelectedColor}2e 0%, rgba(255, 255, 255, 0.38) 100%)`
+                      background: controller.selectedColor
+                        ? `linear-gradient(135deg, ${controller.selectedColor}2e 0%, rgba(255, 255, 255, 0.38) 100%)`
                         : 'rgba(255, 251, 235, 0.3)',
                     }
                   : { background: 'rgba(255, 255, 255, 0.6)' }
@@ -526,7 +97,7 @@ export const LightCard = memo(function LightCard({
           )}
 
           {theme !== 'light' && (
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
           )}
 
           <div className="relative h-full flex flex-col">
@@ -535,53 +106,53 @@ export const LightCard = memo(function LightCard({
                 name={name}
                 room={room}
                 size={size}
-                brightness={brightness}
-                currentColor={effectiveSelectedColor ?? customColor}
-                brightnessPresets={brightnessPresets}
-                isOn={isOn}
-                IconComponent={IconComponent}
-                iconButtonProps={cardInteraction.iconButtonProps}
-                settingsButtonProps={cardInteraction.settingsButtonProps}
-                showSettingsButton={showSettingsButton}
-                showPresetOverflow={showPresetOverflow}
-                supportsColorControl={supportsColorControl}
-                onBrightnessChange={handleBrightnessChange}
-                onBrightnessCommit={handleBrightnessCommit}
-                onColorChange={handleColorChange}
+                brightness={controller.brightness}
+                currentColor={controller.currentColor}
+                brightnessPresets={controller.brightnessPresets}
+                isOn={controller.isOn}
+                IconComponent={controller.IconComponent}
+                iconButtonProps={controller.iconButtonProps}
+                settingsButtonProps={controller.settingsButtonProps}
+                showSettingsButton={controller.showSettingsButton}
+                showPresetOverflow={controller.showPresetOverflow}
+                supportsColorControl={controller.supportsColorControl}
+                onBrightnessChange={controller.onBrightnessChange}
+                onBrightnessCommit={controller.onBrightnessCommit}
+                onColorChange={controller.onColorChange}
               />
-            ) : isMedium ? (
+            ) : size === 'medium' ? (
               <LightCardMedium
                 name={name}
-                brightness={brightness}
-                currentColor={effectiveSelectedColor ?? customColor}
-                brightnessPresets={brightnessPresets}
-                isOn={isOn}
-                IconComponent={IconComponent}
-                iconButtonProps={cardInteraction.iconButtonProps}
-                settingsButtonProps={cardInteraction.settingsButtonProps}
-                showSettingsButton={showSettingsButton}
-                showPresetOverflow={showPresetOverflow}
-                supportsColorControl={supportsColorControl}
-                onBrightnessChange={handleBrightnessChange}
-                onBrightnessCommit={handleBrightnessCommit}
-                onColorChange={handleColorChange}
+                brightness={controller.brightness}
+                currentColor={controller.currentColor}
+                brightnessPresets={controller.brightnessPresets}
+                isOn={controller.isOn}
+                IconComponent={controller.IconComponent}
+                iconButtonProps={controller.iconButtonProps}
+                settingsButtonProps={controller.settingsButtonProps}
+                showSettingsButton={controller.showSettingsButton}
+                showPresetOverflow={controller.showPresetOverflow}
+                supportsColorControl={controller.supportsColorControl}
+                onBrightnessChange={controller.onBrightnessChange}
+                onBrightnessCommit={controller.onBrightnessCommit}
+                onColorChange={controller.onColorChange}
               />
             ) : (
               <LightCardLarge
                 name={name}
-                brightness={brightness}
-                brightnessPresets={brightnessPresets}
-                selectedColor={effectiveSelectedColor}
-                currentColor={effectiveSelectedColor ?? customColor}
-                isOn={isOn}
-                IconComponent={IconComponent}
-                iconButtonProps={cardInteraction.iconButtonProps}
-                settingsButtonProps={cardInteraction.settingsButtonProps}
-                showSettingsButton={showSettingsButton}
-                supportsColorControl={supportsColorControl}
-                onBrightnessChange={handleBrightnessChange}
-                onBrightnessCommit={handleBrightnessCommit}
-                onColorChange={handleColorChange}
+                brightness={controller.brightness}
+                brightnessPresets={controller.brightnessPresets}
+                selectedColor={controller.selectedColor}
+                currentColor={controller.currentColor}
+                isOn={controller.isOn}
+                IconComponent={controller.IconComponent}
+                iconButtonProps={controller.iconButtonProps}
+                settingsButtonProps={controller.settingsButtonProps}
+                showSettingsButton={controller.showSettingsButton}
+                supportsColorControl={controller.supportsColorControl}
+                onBrightnessChange={controller.onBrightnessChange}
+                onBrightnessCommit={controller.onBrightnessCommit}
+                onColorChange={controller.onColorChange}
               />
             )}
           </div>
@@ -589,242 +160,33 @@ export const LightCard = memo(function LightCard({
       </div>
 
       <LightSettingsDialog
-        isOpen={isOpen}
-        onOpenChange={setIsOpen}
+        isOpen={controller.isOpen}
+        onOpenChange={controller.onOpenChange}
         name={name}
         room={room}
-        isOn={isOn}
-        supportsColorTemperature={supportsColorTemperature}
-        supportsColorControl={supportsColorControl}
-        minColorTemp={minColorTemp}
-        maxColorTemp={maxColorTemp}
-        colorTemp={colorTemp}
-        brightnessPresets={brightnessPresets}
-        selectedColor={effectiveSelectedColor}
-        customColor={customColor}
-        brightness={brightness}
-        selectedIcon={selectedIcon}
-        tempOptions={tempOptions}
-        onTempChange={handleTempChange}
-        onTempCommit={handleTempCommit}
-        onColorChange={handleColorChange}
-        onCustomColorChange={handleCustomColorChange}
-        onBrightnessChange={handleBrightnessCommit}
-        applyBrightnessPresetsToAll={applyBrightnessPresetsToAll}
-        onApplyBrightnessPresetsToAllChange={setApplyBrightnessPresetsToAll}
-        onBrightnessPresetValueChange={(key, value) =>
-          setBrightnessPresetValue(id, key, value, applyBrightnessPresetsToAll)
-        }
-        onBrightnessPresetOrderChange={(keys) =>
-          setBrightnessPresetOrder(id, keys, applyBrightnessPresetsToAll)
-        }
-        onIconChange={setSelectedIcon}
+        isOn={controller.isOn}
+        supportsColorTemperature={controller.supportsColorTemperature}
+        supportsColorControl={controller.supportsColorControl}
+        minColorTemp={controller.minColorTemp}
+        maxColorTemp={controller.maxColorTemp}
+        colorTemp={controller.colorTemp}
+        brightnessPresets={controller.brightnessPresets}
+        selectedColor={controller.selectedColor}
+        customColor={controller.customColor}
+        brightness={controller.brightness}
+        selectedIcon={controller.selectedIcon}
+        tempOptions={controller.tempOptions}
+        onTempChange={controller.onTempChange}
+        onTempCommit={controller.onTempCommit}
+        onColorChange={controller.onColorChange}
+        onCustomColorChange={controller.onCustomColorChange}
+        onBrightnessChange={controller.onBrightnessCommit}
+        applyBrightnessPresetsToAll={controller.applyBrightnessPresetsToAll}
+        onApplyBrightnessPresetsToAllChange={controller.onApplyBrightnessPresetsToAllChange}
+        onBrightnessPresetValueChange={controller.onBrightnessPresetValueChange}
+        onBrightnessPresetOrderChange={controller.onBrightnessPresetOrderChange}
+        onIconChange={controller.onIconChange}
       />
     </>
   );
 });
-
-function getBrightnessPercent(entity: HassEntity): number {
-  const brightnessPct = parseNumberish(entity.attributes?.brightness_pct);
-  if (brightnessPct !== null) {
-    return clampPercentage(brightnessPct);
-  }
-
-  const brightness = parseNumberish(entity.attributes?.brightness);
-  if (brightness !== null) {
-    // Home Assistant light brightness is 1..255. Only treat fractional values as 0..1 ratios.
-    if (brightness >= 0 && brightness <= 1) {
-      return clampPercentage(brightness * 100);
-    }
-    return clampPercentage((Math.max(0, Math.min(255, brightness)) / 255) * 100);
-  }
-
-  return entity.state === 'on' ? 100 : 0;
-}
-
-function parseNumberish(value: unknown): number | null {
-  if (typeof value === 'number' && !Number.isNaN(value)) {
-    return value;
-  }
-
-  if (typeof value === 'string') {
-    const parsed = Number.parseFloat(value);
-    if (!Number.isNaN(parsed)) {
-      return parsed;
-    }
-  }
-
-  return null;
-}
-
-function clampPercentage(value: number, min = 0): number {
-  return Math.max(min, Math.min(100, Math.round(value)));
-}
-
-function clampKelvin(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, roundKelvin(value)));
-}
-
-function getReportedColorTempKelvin(entity: HassEntity): number | null {
-  const kelvin = parseNumberish(entity.attributes?.color_temp_kelvin);
-  if (kelvin !== null) {
-    return roundKelvin(kelvin);
-  }
-
-  const mired = parseNumberish(entity.attributes?.color_temp);
-  if (mired !== null && mired > 0) {
-    return roundKelvin(1000000 / mired);
-  }
-
-  return null;
-}
-
-function getReportedColorHex(entity: HassEntity): string | null {
-  const activeColorMode = entity.attributes?.color_mode;
-  if (
-    typeof activeColorMode === 'string' &&
-    !['hs', 'rgb', 'rgbw', 'rgbww', 'xy'].includes(activeColorMode)
-  ) {
-    return null;
-  }
-
-  const rgbColor = entity.attributes?.rgb_color;
-  if (
-    Array.isArray(rgbColor) &&
-    rgbColor.length >= 3 &&
-    rgbColor.every((value) => typeof value === 'number' && Number.isFinite(value))
-  ) {
-    return rgbToHex(rgbColor[0], rgbColor[1], rgbColor[2]);
-  }
-
-  const hsColor = entity.attributes?.hs_color;
-  if (
-    Array.isArray(hsColor) &&
-    hsColor.length >= 2 &&
-    hsColor.every((value) => typeof value === 'number' && Number.isFinite(value)) &&
-    hsColor[1] > 0
-  ) {
-    return hsToHex(hsColor[0], hsColor[1]);
-  }
-
-  return null;
-}
-
-function hsToHex(hue: number, saturation: number): string {
-  const normalizedHue = ((hue % 360) + 360) % 360;
-  const normalizedSaturation = Math.max(0, Math.min(100, saturation)) / 100;
-  const chroma = normalizedSaturation;
-  const segment = normalizedHue / 60;
-  const second = chroma * (1 - Math.abs((segment % 2) - 1));
-  const match = 1 - chroma;
-
-  let red = 0;
-  let green = 0;
-  let blue = 0;
-
-  if (segment >= 0 && segment < 1) {
-    red = chroma;
-    green = second;
-  } else if (segment < 2) {
-    red = second;
-    green = chroma;
-  } else if (segment < 3) {
-    green = chroma;
-    blue = second;
-  } else if (segment < 4) {
-    green = second;
-    blue = chroma;
-  } else if (segment < 5) {
-    red = second;
-    blue = chroma;
-  } else {
-    red = chroma;
-    blue = second;
-  }
-
-  return rgbToHex((red + match) * 255, (green + match) * 255, (blue + match) * 255);
-}
-
-function rgbToHex(red: number, green: number, blue: number): string {
-  return `#${[red, green, blue]
-    .map((value) =>
-      Math.max(0, Math.min(255, Math.round(value)))
-        .toString(16)
-        .padStart(2, '0')
-    )
-    .join('')}`;
-}
-
-function roundKelvin(value: number): number {
-  return Math.round(value / 100) * 100;
-}
-
-function supportsColorTemperatureControl(entity?: HassEntity): boolean {
-  if (!entity) {
-    return true;
-  }
-
-  const colorModes = getSupportedColorModes(entity);
-  return (
-    colorModes.has('color_temp') ||
-    typeof entity.attributes?.color_temp_kelvin === 'number' ||
-    typeof entity.attributes?.color_temp === 'number'
-  );
-}
-
-function supportsColorSelection(entity?: HassEntity): boolean {
-  if (!entity) {
-    return true;
-  }
-
-  const colorModes = getSupportedColorModes(entity);
-  return ['hs', 'rgb', 'rgbw', 'rgbww', 'xy'].some((mode) => colorModes.has(mode));
-}
-
-function getSupportedColorModes(entity: HassEntity): Set<string> {
-  const modes = entity.attributes?.supported_color_modes;
-  if (Array.isArray(modes)) {
-    return new Set(modes.filter((mode): mode is string => typeof mode === 'string'));
-  }
-
-  const colorMode = entity.attributes?.color_mode;
-  if (typeof colorMode === 'string') {
-    return new Set([colorMode]);
-  }
-
-  return new Set();
-}
-
-function getSupportedColorTemperatureRange(entity?: HassEntity): { min: number; max: number } {
-  if (!entity) {
-    return { min: 2700, max: 6500 };
-  }
-
-  const minKelvin = parseNumberish(entity.attributes?.min_color_temp_kelvin);
-  const maxKelvin = parseNumberish(entity.attributes?.max_color_temp_kelvin);
-  if (minKelvin !== null && maxKelvin !== null && minKelvin < maxKelvin) {
-    const normalizedMin = Math.ceil(minKelvin / 100) * 100;
-    const normalizedMax = Math.floor(maxKelvin / 100) * 100;
-    return {
-      min: normalizedMin < normalizedMax ? normalizedMin : roundKelvin(minKelvin),
-      max: normalizedMin < normalizedMax ? normalizedMax : roundKelvin(maxKelvin),
-    };
-  }
-
-  const minMired = parseNumberish(entity.attributes?.min_mireds);
-  const maxMired = parseNumberish(entity.attributes?.max_mireds);
-  if (minMired !== null && maxMired !== null && minMired > 0 && maxMired > 0) {
-    const derivedMaxKelvin = Math.round(1000000 / minMired);
-    const derivedMinKelvin = Math.round(1000000 / maxMired);
-    if (derivedMinKelvin < derivedMaxKelvin) {
-      const normalizedMin = Math.ceil(derivedMinKelvin / 100) * 100;
-      const normalizedMax = Math.floor(derivedMaxKelvin / 100) * 100;
-      return {
-        min: normalizedMin < normalizedMax ? normalizedMin : roundKelvin(derivedMinKelvin),
-        max: normalizedMin < normalizedMax ? normalizedMax : roundKelvin(derivedMaxKelvin),
-      };
-    }
-  }
-
-  return { min: 2700, max: 6500 };
-}

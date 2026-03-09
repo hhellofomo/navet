@@ -1,5 +1,4 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import type { LucideIcon } from 'lucide-react';
 import { memo } from 'react';
 import { BrightnessPresetEditor } from '@/app/components/shared/brightness-preset-editor';
 import { BrightnessPresets } from '@/app/components/shared/brightness-presets';
@@ -10,7 +9,8 @@ import { DialogHeader } from '@/app/components/shared/dialog-header';
 import { IconPicker } from '@/app/components/shared/icon-picker';
 import { PRESET_COLORS } from '@/app/constants/light-constants';
 import { useTheme } from '@/app/hooks';
-import type { BrightnessPresetKey } from '@/app/stores/light-preset-store';
+import type { BrightnessPresetKey } from '../../stores/light-preset-store';
+import type { LightBrightnessPreset } from './light-card-types';
 
 interface LightSettingsDialogProps {
   isOpen: boolean;
@@ -23,12 +23,7 @@ interface LightSettingsDialogProps {
   minColorTemp: number;
   maxColorTemp: number;
   tempOptions: Array<{ value: number; color: string; label: string }>;
-  brightnessPresets: Array<{
-    brightness: number;
-    icon: LucideIcon;
-    key: BrightnessPresetKey;
-    label: string;
-  }>;
+  brightnessPresets: LightBrightnessPreset[];
   colorTemp: number;
   selectedColor: string | null;
   customColor: string;

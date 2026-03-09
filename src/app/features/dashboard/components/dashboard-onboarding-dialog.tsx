@@ -1,7 +1,7 @@
 import { Download, Layers3, Sparkles } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useTheme } from '@/app/hooks';
-import { getThemeColorValue } from '@/app/utils/theme-colors';
 
 interface DashboardOnboardingDialogProps {
   open: boolean;

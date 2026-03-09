@@ -101,9 +101,8 @@ docs/
 ├── archive/                   ← Historical records
 │   ├── CHANGES.md             ← Complete changelog
 │   ├── CLEANUP_SUMMARY.md     ← Organization history
-│   ├── legacy/                ← Superseded root docs
 │   └── status/                ← Historical status summaries
-└── technical/                 ← Developer references (legacy)
+└── technical/                 ← Developer references
 ```
 
 ## 🔍 Finding Information
@@ -119,7 +118,7 @@ docs/
 **By Audience:**
 - **Users** → README.md, WIDGETS.md
 - **Contributors** → CONTRIBUTING.md, design-system/
-- **Developers** → design-system/, archive/CHANGES.md
+- **Developers** → design-system/, technical/, archive/CHANGES.md
 - **Brand / Marketing** → branding/, LOGO_SHOWCASE.md, public/README.md
 - **Legal** → TERMS_OF_USE.md, LICENSE.md
 
