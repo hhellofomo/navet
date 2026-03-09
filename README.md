@@ -66,7 +66,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **Deferred Room Rendering** - Offscreen room groups are deferred in the All view
 - **Smart Re-renders** - Zustand-backed search state and stable device maps reduce dashboard churn
 - **No-Animation Mode** - Optional global animation disable for slower devices
-- **Local Config Backup** - Export and restore dashboard layout/preferences from a JSON file
+- **Local Config Backup** - Export and restore dashboard layout/preferences from a YAML file
 - **Tree-shakeable** - Only imports what's actually used
 
 ### 🧱 Architecture
@@ -174,8 +174,8 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - Restarting onboarding from Settings sends you back to the Home dashboard and reopens the onboarding dialog
 
 #### Dashboard Config
-- In **Settings -> Dashboard Config**, export your local dashboard setup to a JSON file
-- The same config file can be imported later either from Settings or directly from first-run onboarding
+- In **Settings -> Dashboard Config**, export your local dashboard setup to a YAML file
+- Navet imports that YAML file later from Settings or directly from first-run onboarding
 - Import that file later on the same machine or another device to restore:
   - theme and wallpaper
   - room order and card order

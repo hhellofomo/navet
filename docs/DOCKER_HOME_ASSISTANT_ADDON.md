@@ -151,7 +151,7 @@ The current dashboard build includes a few runtime-focused optimizations:
 - Zustand-backed search result state to reduce context fan-out
 - Stable device-map reuse to avoid rerendering unchanged cards
 - Onboarding-based dashboard visibility with add/remove entity curation
-- Local dashboard config export/import for layout and preference backup, including first-run import from onboarding
+- Local dashboard config YAML export/import for layout and preference backup, including first-run import from onboarding
 - Configurable entity card interaction styles with a live preview in Settings
 - Optional no-animation mode for slower devices such as Raspberry Pi deployments
 

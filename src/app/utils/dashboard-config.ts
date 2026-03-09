@@ -1,3 +1,4 @@
+import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import { useDashboardEntitiesStore } from '@/app/features/dashboard';
 import { useCustomCardsStore } from '@/app/features/dashboard/stores/custom-cards-store';
@@ -253,20 +254,25 @@ export const importDashboardConfig = (value: unknown) => {
 
 export const downloadDashboardConfig = () => {
   const payload = exportDashboardConfig();
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const blob = new Blob([stringifyYaml(payload)], { type: 'application/yaml' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   const dateStamp = new Date().toISOString().slice(0, 10);
 
   link.href = url;
-  link.download = `navet-dashboard-config-${dateStamp}.json`;
+  link.download = `navet-dashboard-config-${dateStamp}.yaml`;
   link.click();
 
   URL.revokeObjectURL(url);
 };
 
 export const importDashboardConfigFromFile = async (file: File) => {
+  const lowerName = file.name.toLowerCase();
+  if (!lowerName.endsWith('.yaml') && !lowerName.endsWith('.yml')) {
+    throw new Error('Unsupported dashboard config file. Use a .yaml or .yml export.');
+  }
+
   const content = await file.text();
-  const parsed = JSON.parse(content);
+  const parsed = parseYaml(content);
   importDashboardConfig(parsed);
 };
