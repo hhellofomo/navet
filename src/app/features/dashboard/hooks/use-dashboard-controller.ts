@@ -36,6 +36,7 @@ export interface DashboardController {
   ) => infer T
     ? T
     : never;
+  dashboardArrivalVariant: 'all' | 'blank' | 'import' | null;
   deviceMap: ReturnType<typeof useDeviceMap>['deviceMap'];
   connecting: boolean;
   devicesLoaded: boolean;
@@ -47,34 +48,45 @@ export interface DashboardController {
   handleDragEnd: (_event: DragEndEvent) => void;
   handleDragOver: (event: DragOverEvent) => void;
   handleImportDashboardConfig: (file: File) => Promise<void>;
+  handleOnboardingImportDashboardConfig: (file: File) => Promise<void>;
   handleRemoveEntity: (entityId: string) => void;
   handleUpdateCard: (cardId: string, data: Record<string, unknown>) => void;
   hiddenEntityIds: string[];
+  isOnboardingClosing: boolean;
   isEditMode: boolean;
   lightDeviceMap: ReturnType<typeof useDeviceMap>['deviceMap'];
   lightRooms: string[];
   onboardingCompleted: boolean;
+  onCompleteOnboardingClose: () => void;
   onCloseAddCardDialog: () => void;
   onCloseAddEntityDialog: () => void;
   onOpenAddCardDialog: () => void;
   onOpenAddEntityDialog: () => void;
   onToggleEditMode: () => void;
   orderedCardIds: string[];
+  onDismissImportedDashboardReveal: () => void;
   onMoveRoom: (activeRoom: string, overRoom: string) => void;
   roomOrder: string[];
   sensors: ReturnType<typeof useSensors>;
   setActiveSection: (section: Section) => void;
+  showImportedDashboardReveal: boolean;
   showAddCardDialog: boolean;
   showAddEntityDialog: boolean;
   updateCardSize: ReturnType<typeof useCardState>['updateCardSize'];
 }
 
 export function useDashboardController(): DashboardController {
+  type OnboardingTransition = 'all' | 'blank' | 'import' | null;
+
   const { activeSection, setActiveSection } = useNavigation();
   const { connected, connecting } = useHomeAssistant();
   const [devicesLoaded, setDevicesLoaded] = useState(false);
   const [showAddCardDialog, setShowAddCardDialog] = useState(false);
   const [showAddEntityDialog, setShowAddEntityDialog] = useState(false);
+  const [onboardingTransition, setOnboardingTransition] = useState<OnboardingTransition>(null);
+  const [dashboardArrivalVariant, setDashboardArrivalVariant] =
+    useState<OnboardingTransition>(null);
+  const [showImportedDashboardReveal, setShowImportedDashboardReveal] = useState(false);
   const hiddenEntityIds = useDashboardEntitiesStore((state) => state.hiddenEntityIds);
   const onboardingCompleted = useDashboardEntitiesStore((state) => state.onboardingCompleted);
   const completeOnboarding = useDashboardEntitiesStore((state) => state.completeOnboarding);
@@ -168,17 +180,51 @@ export function useDashboardController(): DashboardController {
     }
   }, []);
 
+  const handleOnboardingImportDashboardConfig = useCallback(
+    async (file: File) => {
+      try {
+        await importDashboardConfigFromFile(file);
+        setActiveSection('home');
+        changeRoom('All');
+        setOnboardingTransition('import');
+        toast.success('Dashboard config restored');
+      } catch {
+        toast.error('Failed to import dashboard config');
+      }
+    },
+    [changeRoom, setActiveSection]
+  );
+
+  const handleCompleteOnboardingClose = useCallback(() => {
+    if (onboardingTransition === 'all') {
+      completeOnboarding(allEntityIds, false);
+    } else if (onboardingTransition === 'blank') {
+      completeOnboarding(allEntityIds, true);
+    } else if (onboardingTransition === 'import') {
+      useDashboardEntitiesStore.setState((state) => ({
+        ...state,
+        onboardingCompleted: true,
+      }));
+    } else {
+      return;
+    }
+
+    setDashboardArrivalVariant(onboardingTransition);
+    setOnboardingTransition(null);
+    setShowImportedDashboardReveal(true);
+  }, [allEntityIds, completeOnboarding, onboardingTransition]);
+
   const handleChooseAllEntities = useCallback(() => {
     setActiveSection('home');
     changeRoom('All');
-    completeOnboarding(allEntityIds, false);
-  }, [allEntityIds, changeRoom, completeOnboarding, setActiveSection]);
+    setOnboardingTransition('all');
+  }, [changeRoom, setActiveSection]);
 
   const handleChooseBlankDashboard = useCallback(() => {
     setActiveSection('home');
     changeRoom('All');
-    completeOnboarding(allEntityIds, true);
-  }, [allEntityIds, changeRoom, completeOnboarding, setActiveSection]);
+    setOnboardingTransition('blank');
+  }, [changeRoom, setActiveSection]);
 
   const handleUpdateCard = useCallback(
     (cardId: string, data: Record<string, unknown>) => {
@@ -197,6 +243,7 @@ export function useDashboardController(): DashboardController {
     cardSizes,
     changeRoom,
     customCards,
+    dashboardArrivalVariant,
     deviceMap,
     connecting,
     devicesLoaded,
@@ -208,15 +255,22 @@ export function useDashboardController(): DashboardController {
     handleDragEnd,
     handleDragOver,
     handleImportDashboardConfig,
+    handleOnboardingImportDashboardConfig,
     handleRemoveEntity,
     handleUpdateCard,
     hiddenEntityIds,
+    isOnboardingClosing: onboardingTransition !== null,
     isEditMode,
     lightDeviceMap,
     lightRooms,
     onboardingCompleted,
+    onCompleteOnboardingClose: handleCompleteOnboardingClose,
     onCloseAddCardDialog: () => setShowAddCardDialog(false),
     onCloseAddEntityDialog: () => setShowAddEntityDialog(false),
+    onDismissImportedDashboardReveal: () => {
+      setDashboardArrivalVariant(null);
+      setShowImportedDashboardReveal(false);
+    },
     onMoveRoom: moveRoom,
     onOpenAddCardDialog: () => setShowAddCardDialog(true),
     onOpenAddEntityDialog: () => setShowAddEntityDialog(true),
@@ -225,6 +279,7 @@ export function useDashboardController(): DashboardController {
     roomOrder,
     sensors,
     setActiveSection,
+    showImportedDashboardReveal,
     showAddCardDialog,
     showAddEntityDialog,
     updateCardSize,

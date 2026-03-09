@@ -10,7 +10,6 @@ interface RoomSectionProps {
   room: string;
   orderedRoomIds: string[];
   totalItems: number;
-  theme: 'light' | 'dark' | 'contrast';
   textColor: string;
   textSecondary: string;
   isEditMode: boolean;
@@ -29,7 +28,6 @@ export const RoomSection = memo(function RoomSection({
   room,
   orderedRoomIds,
   totalItems,
-  theme,
   textColor,
   textSecondary,
   isEditMode,
@@ -86,15 +84,7 @@ export const RoomSection = memo(function RoomSection({
       }}
     >
       <div className="flex items-center gap-3 mb-4">
-        <h2
-          className={`text-lg md:text-xl font-semibold ${
-            room === UNKNOWN_ROOM_LABEL
-              ? theme === 'light'
-                ? 'text-gray-700'
-                : textColor
-              : textColor
-          }`}
-        >
+        <h2 className={`text-lg md:text-xl font-semibold ${room === UNKNOWN_ROOM_LABEL ? textSecondary : textColor}`}>
           {room}
         </h2>
         <span className={`text-xs md:text-sm ${textSecondary}`}>

@@ -6,6 +6,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/app/components/ui/dropdown-menu';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import type { ThemeType } from '@/app/hooks/use-theme';
 
 type CardActionRowSize = 'small' | 'medium' | 'large';
 
@@ -18,17 +20,18 @@ interface CardActionOverflowItem {
 }
 
 interface CardActionRowProps {
-  theme: 'light' | 'dark' | 'contrast';
+  theme: ThemeType;
   size?: CardActionRowSize;
   leftContent?: ReactNode;
   rightContent?: ReactNode;
   overflowItems?: CardActionOverflowItem[];
 }
 
-function getActionButtonClasses(theme: 'light' | 'dark' | 'contrast') {
+function getActionButtonClasses(theme: ThemeType) {
+  const surface = getThemeSurfaceTokens(theme);
   return theme === 'light'
     ? 'bg-gray-900/10 text-gray-900 hover:bg-gray-900/20'
-    : 'bg-white/10 text-white hover:bg-white/20';
+    : `${surface.subtleBg} text-white ${surface.hoverBg}`;
 }
 
 function getActionButtonSize(size: CardActionRowSize) {
@@ -77,16 +80,17 @@ function CardActionOverflowMenu({
   size,
   items,
 }: {
-  theme: 'light' | 'dark' | 'contrast';
+  theme: ThemeType;
   size: CardActionRowSize;
   items: CardActionOverflowItem[];
 }) {
   const buttonClasses = getActionButtonClasses(theme);
   const actionSize = getActionButtonSize(size);
+  const surface = getThemeSurfaceTokens(theme);
   const menuSurface =
     theme === 'light'
       ? 'border-gray-200/80 bg-white/95 text-gray-900'
-      : 'border-white/10 bg-[#121214]/95 text-white';
+      : `${surface.border} ${surface.panel} text-white`;
 
   return (
     <DropdownMenu>

@@ -1,7 +1,8 @@
 import { Bell } from 'lucide-react';
+import type { ThemeType } from '@/app/hooks/use-theme';
 
 interface NotificationEmptyStateProps {
-  theme: 'light' | 'dark' | 'contrast';
+  theme: ThemeType;
 }
 
 export function NotificationEmptyState({ theme }: NotificationEmptyStateProps) {

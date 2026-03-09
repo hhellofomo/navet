@@ -15,8 +15,9 @@ interface DashboardLayoutProps {
  */
 export const DashboardLayout = memo(function DashboardLayout({ children }: DashboardLayoutProps) {
   const { theme, wallpaper, primaryColor } = useTheme();
+  const isGlass = theme === 'glass';
 
-  const bgColor = theme === 'light' ? 'bg-gray-50' : 'bg-[#0a0a0a]';
+  const bgColor = theme === 'light' ? 'bg-gray-50' : theme === 'contrast' ? 'bg-black' : isGlass ? 'bg-slate-950' : 'bg-[#0a0a0a]';
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
 
   return (
@@ -42,8 +43,19 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
               background:
                 theme === 'light'
                   ? `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}50, ${getThemeColorValue(primaryColor)}30, transparent 70%)`
+                  : theme === 'contrast'
+                    ? `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}24, ${getThemeColorValue(primaryColor)}12, transparent 58%)`
+                    : isGlass
+                      ? `radial-gradient(circle at 16% 18%, ${getThemeColorValue(primaryColor)}55 0%, transparent 34%), radial-gradient(circle at 84% 12%, rgba(255,255,255,0.18) 0%, transparent 26%), linear-gradient(135deg, rgba(255,255,255,0.12), transparent 58%)`
                   : `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}40, ${getThemeColorValue(primaryColor)}20, transparent 60%)`,
-              mixBlendMode: theme === 'light' ? 'multiply' : 'color',
+              mixBlendMode:
+                theme === 'light'
+                  ? 'multiply'
+                  : theme === 'contrast'
+                    ? 'screen'
+                    : isGlass
+                      ? 'screen'
+                      : 'color',
             }}
           />
 
@@ -55,10 +67,25 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
                 theme === 'light'
                   ? 'rgba(249, 250, 251, 0.50)'
                   : theme === 'contrast'
-                    ? 'rgba(3, 7, 18, 0.70)'
+                    ? 'rgba(0, 0, 0, 0.84)'
+                    : isGlass
+                      ? 'rgba(7, 12, 22, 0.46)'
                     : 'rgba(10, 10, 10, 0.55)',
             }}
           />
+        </div>
+      )}
+
+      {isGlass && !wallpaper && (
+        <div className="fixed inset-0 z-0 overflow-hidden">
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(circle at 14% 18%, rgba(255,255,255,0.14) 0%, transparent 26%), radial-gradient(circle at 82% 14%, rgba(255,255,255,0.08) 0%, transparent 24%), radial-gradient(circle at 18% 80%, rgba(59,130,246,0.18) 0%, transparent 28%), radial-gradient(circle at 78% 72%, rgba(255,255,255,0.06) 0%, transparent 22%), linear-gradient(180deg, rgba(12,18,32,0.96), rgba(7,10,18,0.98))',
+            }}
+          />
+          <div className="absolute inset-0 backdrop-blur-[36px]" />
         </div>
       )}
 

@@ -7,7 +7,7 @@ interface SettingsSystemSectionProps {
 }
 
 export function SettingsSystemSection({ controller }: SettingsSystemSectionProps) {
-  const { config, disableAnimations, handleResetConnection, styles, theme, updateSettings } =
+  const { config, disableAnimations, handleResetConnection, styles, updateSettings } =
     controller;
 
   return (
@@ -34,9 +34,6 @@ export function SettingsSystemSection({ controller }: SettingsSystemSectionProps
                 type="button"
                 key={option.label}
                 onClick={() => updateSettings({ disableAnimations: option.value })}
-                className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
-                  isActive ? 'shadow-sm' : ''
-                }`}
                 style={
                   isActive
                     ? {
@@ -44,9 +41,12 @@ export function SettingsSystemSection({ controller }: SettingsSystemSectionProps
                         color: '#ffffff',
                       }
                     : {
-                        color: theme === 'light' ? '#4b5563' : '#d1d5db',
+                        color: undefined,
                       }
                 }
+                className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
+                  isActive ? 'shadow-sm' : styles.chipTextColor
+                }`}
                 aria-pressed={isActive}
               >
                 {option.label}

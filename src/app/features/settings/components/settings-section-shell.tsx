@@ -74,18 +74,21 @@ export function SettingsItem({ title, description, styles, children }: SettingsI
 export function SettingsHero({ navItems, styles }: SettingsHeroProps) {
   return (
     <section
-      className={`relative overflow-hidden rounded-[36px] border ${styles.borderColor} px-6 py-8 md:px-8 md:py-10`}
-      style={{
-        background:
-          styles.textColor === 'text-gray-900'
-            ? `linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.9) 72%, ${styles.accentColor}0f 100%)`
-            : `linear-gradient(180deg, rgba(18,18,20,0.96) 0%, rgba(12,12,14,0.92) 72%, ${styles.accentColor}12 100%)`,
-      }}
+      className={`relative overflow-hidden rounded-[36px] border px-6 py-8 md:px-8 md:py-10 ${styles.borderColor} ${styles.cardBg}`}
     >
       <div
-        className="absolute right-[-40px] top-[-40px] h-44 w-44 rounded-full blur-3xl"
-        style={{ backgroundColor: `${styles.accentColor}22` }}
+        className="absolute inset-x-0 top-0 h-px"
+        style={{ background: `linear-gradient(90deg, transparent, ${styles.accentColor}88, transparent)` }}
       />
+      <div
+        className="absolute right-[-36px] top-[-28px] h-36 w-36 rounded-full blur-3xl"
+        style={{ backgroundColor: `${styles.accentColor}18` }}
+      />
+      <div
+        className="absolute left-[-20px] bottom-[-44px] h-32 w-32 rounded-full blur-3xl"
+        style={{ backgroundColor: `${styles.accentColor}10` }}
+      />
+      <div className={`absolute inset-0 bg-gradient-to-br ${styles.softBg} opacity-35`} />
 
       <div className="relative">
         <p
@@ -108,7 +111,7 @@ export function SettingsHero({ navItems, styles }: SettingsHeroProps) {
             <a
               key={id}
               href={`#${id}`}
-              className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium transition-colors ${styles.chipBg} ${styles.chipHoverBg} ${styles.mutedColor}`}
+              className={`flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-colors ${styles.borderColor} ${styles.chipBg} ${styles.chipHoverBg} ${styles.mutedColor}`}
             >
               <Icon className="h-3.5 w-3.5" />
               <span>{label}</span>

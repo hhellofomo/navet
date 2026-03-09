@@ -1,6 +1,7 @@
 import { Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
 import { useTheme } from '@/app/hooks';
 import type { DeviceWithType } from '@/app/types/device.types';
@@ -32,15 +33,16 @@ export function AddEntityDialog({
   actionLabel = 'Add',
 }: AddEntityDialogProps) {
   const { theme, primaryColor } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const [query, setQuery] = useState('');
 
-  const bgColor = theme === 'light' ? 'bg-white' : 'bg-gray-900';
-  const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
-  const borderColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
-  const cardBg = theme === 'light' ? 'bg-gray-50' : 'bg-white/5';
-  const hoverBg = theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10';
-  const inputBg = theme === 'light' ? 'bg-gray-100' : 'bg-white/5';
+  const bgColor = theme === 'light' ? 'bg-white' : theme === 'contrast' ? 'bg-gray-900' : surface.panel;
+  const textColor = surface.textPrimary;
+  const mutedColor = surface.textSecondary;
+  const borderColor = surface.border;
+  const cardBg = surface.panelMuted;
+  const hoverBg = surface.hoverBg;
+  const inputBg = theme === 'contrast' ? 'bg-black/50' : surface.inputBg;
 
   const availableDevices = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -79,7 +81,7 @@ export function AddEntityDialog({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${surface.dialogBackdrop}`}>
       <div
         className={`${bgColor} rounded-2xl border ${borderColor} w-full max-w-2xl max-h-[80vh] overflow-hidden`}
         style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)' }}

@@ -74,7 +74,6 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
       >
         <div className={`absolute inset-0 bg-gradient-to-br ${colors.glow} to-transparent`}></div>
 
-        {/* Light theme frosted overlay */}
         {theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
 
         <div className="relative h-full flex flex-col">

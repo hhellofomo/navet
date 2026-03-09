@@ -1,6 +1,7 @@
 import { Hand, Lightbulb, MoreHorizontal, Settings2, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import type { EntityInteractionMode } from '@/app/stores';
 import { getInteractionPreview } from './entity-card-interaction-controller';
 
@@ -19,12 +20,13 @@ export function InteractionPreviewCard({
 }: InteractionPreviewCardProps) {
   const [isOn, setIsOn] = useState(true);
   const [brightness, setBrightness] = useState(60);
+  const surface = getThemeSurfaceTokens(isLightTheme ? 'light' : 'glass');
   const preview = getInteractionPreview(mode);
   const showsTrailingButton = mode === 'toggle-first';
-  const surfaceClass = isLightTheme ? 'bg-white border-gray-200/70' : 'bg-black/20 border-white/10';
+  const surfaceClass = isLightTheme ? 'bg-white border-gray-200/70' : `${surface.panel} ${surface.border}`;
   const cardClass = isLightTheme
     ? 'bg-gray-50/90 border-gray-200/80'
-    : 'bg-white/5 border-white/10';
+    : 'bg-white/8 border-white/12';
   const textClass = isOn
     ? isLightTheme
       ? 'text-gray-900'

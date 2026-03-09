@@ -1,6 +1,7 @@
 import { Clipboard, FlaskConical, Lightbulb, Lock, Tv, Video } from 'lucide-react';
 import { memo } from 'react';
 import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-size-selector';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { DEVICES } from '@/app/data/mock-devices';
 import { renderCard } from '@/app/features/dashboard';
 import { useDeviceMap, useTheme } from '@/app/hooks';
@@ -61,17 +62,13 @@ const noopHandleSizeChange = () => {};
 
 const MockEntityGrid = memo(function MockEntityGrid({ devices }: { devices: DeviceWithType[] }) {
   const { theme } = useTheme();
-  const textSecondary = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
+  const surface = getThemeSurfaceTokens(theme);
 
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-3">
-        <h2
-          className={`text-lg md:text-xl font-semibold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}
-        >
-          All Mock Entities
-        </h2>
-        <span className={`text-xs md:text-sm ${textSecondary}`}>
+        <h2 className={`text-lg md:text-xl font-semibold ${surface.textPrimary}`}>All Mock Entities</h2>
+        <span className={`text-xs md:text-sm ${surface.textSecondary}`}>
           {devices.length} {devices.length === 1 ? 'entity' : 'entities'}
         </span>
       </div>
@@ -98,24 +95,24 @@ const MockEntityGrid = memo(function MockEntityGrid({ devices }: { devices: Devi
 export function MockEntitiesSection() {
   const { deviceMap } = useDeviceMap(DEVICES);
   const { theme } = useTheme();
-  const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const subtleColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
-  const borderColor =
-    theme === 'light' ? 'border-gray-200/80 bg-white/92' : 'border-white/10 bg-gray-900/88';
+  const surface = getThemeSurfaceTokens(theme);
+  const isGlass = theme === 'glass';
   const mockDevices = Array.from(deviceMap.values());
 
   return (
     <div className="space-y-8">
-      <section className={`rounded-[32px] border px-6 py-6 md:px-8 md:py-8 ${borderColor}`}>
+      <section
+        className={`rounded-[32px] border px-6 py-6 md:px-8 md:py-8 ${surface.panel} ${surface.borderStrong} ${isGlass ? 'backdrop-blur-2xl' : ''}`}
+      >
         <div className="flex items-start gap-4">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-500/15">
             <FlaskConical className="h-5 w-5 text-orange-500" />
           </div>
           <div className="min-w-0">
-            <h1 className={`text-xl font-semibold tracking-tight md:text-2xl ${textColor}`}>
+            <h1 className={`text-xl font-semibold tracking-tight md:text-2xl ${surface.textPrimary}`}>
               Temporary Mock Entities
             </h1>
-            <p className={`mt-2 max-w-3xl text-sm leading-relaxed ${subtleColor}`}>
+            <p className={`mt-2 max-w-3xl text-sm leading-relaxed ${surface.textSecondary}`}>
               This section holds your local mock entities so you can keep previewing cards that are
               not fully integrated into the live Home Assistant dashboard yet.
             </p>

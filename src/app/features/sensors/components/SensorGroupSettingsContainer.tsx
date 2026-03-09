@@ -1,6 +1,8 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { memo } from 'react';
 import { CustomScrollbar } from '@/app/components/shared/custom-scrollbar';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { useTheme } from '@/app/hooks';
 import { SensorGroupSettingsView } from './SensorGroupSettingsView';
 import { SENSOR_GROUP_COLOR_MAP } from './sensor-group-settings.data';
 import type { SensorGroupSettingsDialogProps } from './sensor-group-settings.types';
@@ -17,6 +19,8 @@ export const SensorGroupSettingsContainer = memo(function SensorGroupSettingsCon
   onSensorsUpdate,
 }: SensorGroupSettingsDialogProps) {
   const colors = SENSOR_GROUP_COLOR_MAP[accentColor];
+  const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const controller = useSensorGroupSettings({
     currentSensors,
     maxSensors,
@@ -34,7 +38,9 @@ export const SensorGroupSettingsContainer = memo(function SensorGroupSettingsCon
       }}
     >
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 animate-in fade-in" />
+        <Dialog.Overlay
+          className={`fixed inset-0 z-50 animate-in fade-in ${surface.dialogBackdrop}`}
+        />
         <SensorGroupSettingsView
           groupName={groupName}
           selectedSensors={controller.selectedSensors}
@@ -47,6 +53,7 @@ export const SensorGroupSettingsContainer = memo(function SensorGroupSettingsCon
           setHighlightedIndex={controller.setHighlightedIndex}
           inputRef={controller.inputRef}
           colors={colors}
+          theme={theme}
           filteredSensors={controller.filteredSensors}
           iconMap={iconMap}
           handleAddSensor={controller.handleAddSensor}

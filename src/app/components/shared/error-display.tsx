@@ -1,5 +1,6 @@
 import { AlertTriangle, RefreshCw, X } from 'lucide-react';
 import { memo } from 'react';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useError } from '@/app/contexts/error-context';
 import { useTheme } from '@/app/hooks';
 
@@ -13,16 +14,16 @@ export const ErrorDisplay = memo(function ErrorDisplay({
   showClose = true,
 }: ErrorDisplayProps) {
   const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const { error, clearError } = useError();
 
   if (!error) return null;
 
-  const bgColor = theme === 'light' ? 'bg-gray-50' : 'bg-[#0a0a0a]';
-  const cardBg =
-    theme === 'light' ? 'bg-white' : theme === 'contrast' ? 'bg-gray-950' : 'bg-gray-900';
-  const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
-  const borderColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
+  const bgColor = surface.appBg;
+  const cardBg = theme === 'light' ? 'bg-white' : theme === 'contrast' ? 'bg-gray-950' : surface.panel;
+  const textColor = surface.textPrimary;
+  const mutedColor = surface.textSecondary;
+  const borderColor = surface.border;
 
   return (
     <div className={`fixed inset-0 ${bgColor} flex items-center justify-center z-50 p-4`}>
@@ -39,7 +40,7 @@ export const ErrorDisplay = memo(function ErrorDisplay({
               <button
                 type="button"
                 onClick={clearError}
-                className={`w-8 h-8 rounded-lg ${theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/5'} flex items-center justify-center transition-colors`}
+                className={`w-8 h-8 rounded-lg ${surface.hoverBg} flex items-center justify-center transition-colors`}
               >
                 <X className={`w-4 h-4 ${mutedColor}`} />
               </button>

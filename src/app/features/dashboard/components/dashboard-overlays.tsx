@@ -26,9 +26,11 @@ export function DashboardOverlays({ controller }: DashboardOverlaysProps) {
     handleAddEntity,
     handleChooseAllEntities,
     handleChooseBlankDashboard,
-    handleImportDashboardConfig,
+    handleOnboardingImportDashboardConfig,
     hiddenEntityIds,
+    isOnboardingClosing,
     onboardingCompleted,
+    onCompleteOnboardingClose,
     onCloseAddCardDialog,
     onCloseAddEntityDialog,
     showAddCardDialog,
@@ -67,13 +69,15 @@ export function DashboardOverlays({ controller }: DashboardOverlaysProps) {
         />
       )}
 
-      {!onboardingCompleted && allEntityIds.length > 0 && (
+      {(!onboardingCompleted || isOnboardingClosing) && allEntityIds.length > 0 && (
         <Suspense fallback={null}>
           <DashboardOnboardingDialog
             open
             onChooseAll={handleChooseAllEntities}
             onChooseBlank={handleChooseBlankDashboard}
-            onImportConfig={handleImportDashboardConfig}
+            onImportConfig={handleOnboardingImportDashboardConfig}
+            phase={isOnboardingClosing ? 'closing' : 'idle'}
+            onClosingAnimationComplete={onCompleteOnboardingClose}
           />
         </Suspense>
       )}

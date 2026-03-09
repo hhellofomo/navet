@@ -1,6 +1,7 @@
 import { Wifi } from 'lucide-react';
 import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 
 interface WifiCardProps {
@@ -24,6 +25,8 @@ export const WifiCard = memo(function WifiCard({
 }: WifiCardProps) {
   const cardId = 'wifi-1';
   const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
+  const isGlass = theme === 'glass';
 
   // Size-specific styling with intelligent layout adaptation
   const isSmall = size === 'extra-small' || size === 'small';
@@ -32,13 +35,17 @@ export const WifiCard = memo(function WifiCard({
 
   // Theme-aware colors
   const cardGradient =
-    theme === 'light' ? 'from-white to-green-50/80' : 'from-green-900/90 to-green-950/95';
-  const cardBorder = theme === 'light' ? 'border-gray-200/80' : 'border-green-700/30';
-  const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
-  const iconBg = theme === 'light' ? 'bg-green-100' : 'bg-green-500/20';
-  const iconColor = theme === 'light' ? 'text-green-600' : 'text-green-400';
-  const glowGradient = theme === 'light' ? 'from-green-50/40' : 'from-green-500/5';
+    theme === 'light'
+      ? 'from-white to-green-50/80'
+      : isGlass
+        ? 'from-white/16 via-green-200/10 to-white/[0.03]'
+        : 'from-green-900/90 to-green-950/95';
+  const cardBorder = theme === 'light' ? 'border-gray-200/80' : isGlass ? surface.border : 'border-green-700/30';
+  const textPrimary = surface.textPrimary;
+  const textSecondary = theme === 'light' ? 'text-gray-500' : surface.textSecondary;
+  const iconBg = theme === 'light' ? 'bg-green-100' : isGlass ? 'bg-green-300/24 border border-green-100/20' : 'bg-green-500/24 border border-green-300/18';
+  const iconColor = theme === 'light' ? 'text-green-700' : isGlass ? 'text-green-100' : 'text-green-300';
+  const glowGradient = theme === 'light' ? 'from-green-50/40' : isGlass ? 'from-white/10 via-green-300/10' : 'from-green-500/5';
 
   return (
     <div
@@ -54,7 +61,9 @@ export const WifiCard = memo(function WifiCard({
       <div className={`absolute inset-0 bg-gradient-to-br ${glowGradient} to-transparent`}></div>
 
       {/* Light theme frosted overlay */}
-      {theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
+      {(theme === 'light' || isGlass) && (
+        <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`} />
+      )}
 
       <div className="relative h-full flex flex-col">
         <div className={`flex items-start justify-between ${isSmall ? 'mb-1' : 'mb-2'}`}>
@@ -64,7 +73,7 @@ export const WifiCard = memo(function WifiCard({
             >
               Wi-Fi
             </h3>
-            <p className="text-[10px] text-gray-300 truncate mt-0.5">Network</p>
+            <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5`}>Network</p>
             {!isSmall && <p className={`text-xs ${textSecondary} truncate`}>{networkName}</p>}
           </div>
           <div

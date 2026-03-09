@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-export type ThemeMode = 'light' | 'dark' | 'contrast';
+export type ThemeMode = 'light' | 'dark' | 'contrast' | 'glass';
 export type PrimaryColor =
   | 'blue'
   | 'purple'

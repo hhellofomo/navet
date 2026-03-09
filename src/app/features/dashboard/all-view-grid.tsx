@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import type { AllViewGridProps } from './all-view-grid.types';
 import { RoomSection } from './components/room-section';
@@ -19,6 +20,7 @@ export const AllViewGrid = memo(function AllViewGrid({
   usesHideAction = false,
 }: AllViewGridProps) {
   const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const { customCardMap, handleSizeChange, roomSections } = useAllViewGrid({
     cardOrders,
     customCards,
@@ -27,10 +29,8 @@ export const AllViewGrid = memo(function AllViewGrid({
     updateCardSize,
   });
 
-  const textColor =
-    theme === 'light' ? 'text-gray-900' : theme === 'contrast' ? 'text-white' : 'text-white';
-  const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
+  const textColor = surface.textPrimary;
+  const textSecondary = surface.textSecondary;
 
   return (
     <div className="space-y-8">
@@ -40,7 +40,6 @@ export const AllViewGrid = memo(function AllViewGrid({
           room={section.room}
           orderedRoomIds={section.orderedRoomIds}
           totalItems={section.totalItems}
-          theme={theme}
           textColor={textColor}
           textSecondary={textSecondary}
           isEditMode={isEditMode}

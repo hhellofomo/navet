@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import { NotificationEmptyState } from './notification-empty-state';
 import { NotificationHeader } from './notification-header';
@@ -14,6 +15,7 @@ interface NotificationPanelProps {
 export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const { theme, primaryColor } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, clearAll } =
     useNotifications();
 
@@ -30,14 +32,8 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
     }
   }, [isOpen, onClose]);
 
-  const cardBg =
-    theme === 'light' ? 'bg-white/95' : theme === 'contrast' ? 'bg-gray-950/95' : 'bg-gray-900/95';
-  const border =
-    theme === 'light'
-      ? 'border-gray-200'
-      : theme === 'contrast'
-        ? 'border-white/20'
-        : 'border-white/10';
+  const cardBg = surface.panel;
+  const border = surface.border;
 
   if (!isOpen) return null;
 

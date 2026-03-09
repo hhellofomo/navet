@@ -1,8 +1,9 @@
+import type { ThemeType } from '@/app/hooks/use-theme';
 import { getVacuumBatteryGradientClass } from './vacuum-utils';
 
 interface BatteryIndicatorProps {
   battery: number;
-  theme: 'light' | 'dark' | 'contrast';
+  theme: ThemeType;
 }
 
 export function BatteryIndicator({ battery, theme }: BatteryIndicatorProps) {

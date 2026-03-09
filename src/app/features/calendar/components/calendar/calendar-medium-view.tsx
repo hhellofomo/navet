@@ -1,9 +1,10 @@
+import type { ThemeType } from '@/app/hooks/use-theme';
 import { CalendarEventItem } from './calendar-event-item';
 import type { CalendarEvent } from './types';
 
 interface CalendarMediumViewProps {
   mediumEvents: CalendarEvent[];
-  theme: 'light' | 'dark' | 'contrast';
+  theme: ThemeType;
   textPrimary: string;
   textSecondary: string;
   hoverText: string;

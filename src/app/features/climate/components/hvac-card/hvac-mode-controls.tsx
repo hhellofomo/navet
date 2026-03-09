@@ -1,6 +1,7 @@
 import { Flame, Snowflake, Wind } from 'lucide-react';
 import { memo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import type { ThemeType } from '@/app/hooks/use-theme';
 import { useTheme } from '@/app/hooks';
 import { getHVACModeButtonColor } from '../../utils/hvac-styles';
 
@@ -30,7 +31,7 @@ export const HVACModeControls = memo(function HVACModeControls({
           onModeChange('cool');
         }}
         disabled={!isOn}
-        className={`${buttonSize} rounded-full transition-all flex items-center justify-center disabled:opacity-50 ${getHVACModeButtonColor('cool', mode, isOn, theme)}`}
+        className={`${buttonSize} rounded-full transition-all flex items-center justify-center disabled:opacity-50 ${getHVACModeButtonColor('cool', mode, isOn, theme as ThemeType)}`}
       >
         <Snowflake className={iconSize} />
       </button>
@@ -41,7 +42,7 @@ export const HVACModeControls = memo(function HVACModeControls({
           onModeChange('heat');
         }}
         disabled={!isOn}
-        className={`${buttonSize} rounded-full transition-all flex items-center justify-center disabled:opacity-50 ${getHVACModeButtonColor('heat', mode, isOn, theme)}`}
+        className={`${buttonSize} rounded-full transition-all flex items-center justify-center disabled:opacity-50 ${getHVACModeButtonColor('heat', mode, isOn, theme as ThemeType)}`}
       >
         <Flame className={iconSize} />
       </button>
@@ -52,7 +53,7 @@ export const HVACModeControls = memo(function HVACModeControls({
           onModeChange('fan');
         }}
         disabled={!isOn}
-        className={`${buttonSize} rounded-full transition-all flex items-center justify-center disabled:opacity-50 ${getHVACModeButtonColor('fan', mode, isOn, theme)}`}
+        className={`${buttonSize} rounded-full transition-all flex items-center justify-center disabled:opacity-50 ${getHVACModeButtonColor('fan', mode, isOn, theme as ThemeType)}`}
       >
         <Wind className={iconSize} />
       </button>

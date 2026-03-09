@@ -1,5 +1,6 @@
 import { AlertCircle, Eye, EyeOff, Home, Key, Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useAuth } from '@/app/contexts/auth-context';
 import { useConfig } from '@/app/contexts/config-context';
 import { useTheme } from '@/app/hooks';
@@ -14,6 +15,7 @@ export function LoginPage() {
   const { login } = useAuth();
   const { testConnection } = useConfig();
   const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,35 +71,47 @@ export function LoginPage() {
 
   // Theme colors
   const bgPrimary =
-    theme === 'light' ? 'bg-gray-50' : theme === 'contrast' ? 'bg-black' : 'bg-[#0f0f0f]';
+    theme === 'light' ? 'bg-gray-50' : theme === 'contrast' ? 'bg-black' : theme === 'glass' ? 'bg-slate-950' : 'bg-[#0f0f0f]';
 
   const cardBg =
-    theme === 'light' ? 'bg-white/80' : theme === 'contrast' ? 'bg-gray-950/95' : 'bg-gray-900/40';
+    theme === 'light'
+      ? 'bg-white/80'
+      : theme === 'contrast'
+        ? 'bg-gray-950/95'
+        : theme === 'glass'
+          ? 'bg-white/10'
+          : 'bg-gray-900/40';
 
   const border =
     theme === 'light'
       ? 'border-gray-200'
       : theme === 'contrast'
         ? 'border-white/30'
+        : theme === 'glass'
+          ? 'border-white/20'
         : 'border-white/10';
 
   const inputBg =
-    theme === 'light' ? 'bg-gray-100' : theme === 'contrast' ? 'bg-black/50' : 'bg-white/5';
+    theme === 'light'
+      ? 'bg-gray-100'
+      : theme === 'contrast'
+        ? 'bg-black/50'
+        : theme === 'glass'
+          ? 'bg-white/8'
+          : 'bg-white/5';
 
   const inputFocus =
     theme === 'light'
       ? 'focus:bg-white focus:border-orange-500'
       : theme === 'contrast'
         ? 'focus:bg-black/70 focus:border-orange-500'
+        : theme === 'glass'
+          ? 'focus:bg-white/12 focus:border-orange-400'
         : 'focus:bg-white/10 focus:border-orange-500/50';
 
-  const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-
-  const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
-
-  const textMuted =
-    theme === 'light' ? 'text-gray-500' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-500';
+  const textPrimary = surface.textPrimary;
+  const textSecondary = surface.textSecondary;
+  const textMuted = theme === 'contrast' ? 'text-gray-300' : surface.textMuted;
 
   return (
     <div className={`min-h-screen ${bgPrimary} flex items-center justify-center p-4`}>

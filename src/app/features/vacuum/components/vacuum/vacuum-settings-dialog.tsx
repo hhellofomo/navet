@@ -1,6 +1,8 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Home, Play } from 'lucide-react';
 import { DialogHeader } from '@/app/components/shared/dialog-header';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import type { ThemeType } from '@/app/hooks/use-theme';
 
 interface VacuumSettingsDialogProps {
   isOpen: boolean;
@@ -8,7 +10,8 @@ interface VacuumSettingsDialogProps {
   onStartCleaning: () => void;
   onReturnHome: () => void;
   name: string;
-  theme: 'light' | 'dark' | 'contrast';
+  theme: ThemeType;
+  accentColorValue: string;
 }
 
 export function VacuumSettingsDialog({
@@ -18,17 +21,26 @@ export function VacuumSettingsDialog({
   onReturnHome,
   name,
   theme,
+  accentColorValue,
 }: VacuumSettingsDialogProps) {
-  const bgColor = theme === 'light' ? 'bg-white' : 'bg-gray-900';
-  const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const borderColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
+  const surface = getThemeSurfaceTokens(theme);
+  const isGlass = theme === 'glass';
+  const textColor = surface.textPrimary;
+  const secondaryButton = `${surface.subtleBg} ${surface.hoverBg} ${surface.textPrimary}`;
+  const optionButton = `${surface.inputBg} border ${surface.border} ${surface.textSecondary}`;
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={onClose}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
+        <Dialog.Overlay className={`fixed inset-0 z-50 ${surface.dialogBackdrop}`} />
         <Dialog.Content
-          className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md rounded-2xl border ${borderColor} ${bgColor} shadow-2xl z-50 overflow-hidden`}
+          className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md rounded-2xl border shadow-2xl z-50 overflow-hidden ${
+            theme === 'light'
+              ? 'bg-white'
+              : isGlass
+                ? 'bg-white/10 backdrop-blur-2xl'
+                : 'bg-gray-900'
+          } ${surface.border}`}
         >
           <div className="p-6 pb-0">
             <DialogHeader
@@ -47,7 +59,7 @@ export function VacuumSettingsDialog({
                   <button
                     type="button"
                     key={mode}
-                    className="py-3 rounded-xl text-sm font-medium transition-all border-2 border-white/10 bg-white/5 text-gray-300 hover:border-blue-500/50"
+                    className={`py-3 rounded-xl text-sm font-medium transition-all border-2 hover:opacity-100 ${optionButton}`}
                   >
                     {mode}
                   </button>
@@ -63,7 +75,7 @@ export function VacuumSettingsDialog({
                   <button
                     type="button"
                     key={speed}
-                    className="py-3 rounded-xl text-sm font-medium transition-all border-2 border-white/10 bg-white/5 text-gray-300 hover:border-blue-500/50"
+                    className={`py-3 rounded-xl text-sm font-medium transition-all border-2 hover:opacity-100 ${optionButton}`}
                   >
                     {speed}
                   </button>
@@ -78,7 +90,8 @@ export function VacuumSettingsDialog({
                 <button
                   type="button"
                   onClick={onStartCleaning}
-                  className="w-full py-3 bg-blue-500 hover:bg-blue-600 rounded-xl text-white font-medium transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-xl text-white font-medium transition-colors flex items-center justify-center gap-2"
+                  style={{ backgroundColor: accentColorValue }}
                 >
                   <Play className="w-4 h-4" />
                   Start Cleaning
@@ -86,7 +99,7 @@ export function VacuumSettingsDialog({
                 <button
                   type="button"
                   onClick={onReturnHome}
-                  className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white font-medium transition-colors flex items-center justify-center gap-2"
+                  className={`w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 ${secondaryButton}`}
                 >
                   <Home className="w-4 h-4" />
                   Return to Dock

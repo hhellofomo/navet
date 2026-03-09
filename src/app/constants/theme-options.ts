@@ -14,6 +14,11 @@ export type PrimaryColorOption = {
 
 export const THEME_OPTIONS: ThemeOption[] = [
   {
+    value: 'glass',
+    label: 'Liquid Glass',
+    description: 'Frosted translucent panels with luminous accents',
+  },
+  {
     value: 'dark',
     label: 'Dark',
     description: 'Subtle gradients with muted colors',

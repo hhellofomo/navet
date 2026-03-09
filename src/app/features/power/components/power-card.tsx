@@ -1,6 +1,7 @@
 import { TrendingDown, Zap } from 'lucide-react';
 import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 
 interface PowerCardProps {
@@ -22,6 +23,8 @@ export const PowerCard = memo(function PowerCard({
 }: PowerCardProps) {
   const cardId = 'power-1';
   const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
+  const isGlass = theme === 'glass';
 
   // Size-specific styling with intelligent layout adaptation
   const isSmall = size === 'extra-small' || size === 'small';
@@ -38,18 +41,22 @@ export const PowerCard = memo(function PowerCard({
 
   // Theme-aware colors
   const cardGradient =
-    theme === 'light' ? 'from-white to-yellow-50/80' : 'from-yellow-900/90 to-yellow-950/95';
-  const cardBorder = theme === 'light' ? 'border-gray-200/80' : 'border-yellow-700/30';
-  const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
-  const iconBg = theme === 'light' ? 'bg-cyan-100' : 'bg-cyan-500/20';
-  const iconColor = theme === 'light' ? 'text-cyan-600' : 'text-cyan-400';
-  const accentColor = theme === 'light' ? 'text-cyan-700' : 'text-cyan-400';
-  const glowGradient = theme === 'light' ? 'from-yellow-50/40' : 'from-blue-500/5';
-  const progressBg = theme === 'light' ? 'bg-gray-200' : 'bg-white/10';
-  const savingBg = theme === 'light' ? 'bg-green-100' : 'bg-green-500/20';
-  const savingText = theme === 'light' ? 'text-green-700' : 'text-green-400';
-  const infoBg = theme === 'light' ? 'bg-gray-100' : 'bg-white/5';
+    theme === 'light'
+      ? 'from-white to-yellow-50/80'
+      : isGlass
+        ? 'from-white/16 via-yellow-200/10 to-white/[0.03]'
+        : 'from-yellow-900/90 to-yellow-950/95';
+  const cardBorder = theme === 'light' ? 'border-gray-200/80' : isGlass ? surface.border : 'border-yellow-700/30';
+  const textPrimary = surface.textPrimary;
+  const textSecondary = theme === 'light' ? 'text-gray-500' : surface.textSecondary;
+  const iconBg = theme === 'light' ? 'bg-cyan-100' : isGlass ? 'bg-cyan-300/24 border border-cyan-100/20' : 'bg-cyan-500/24 border border-cyan-300/18';
+  const iconColor = theme === 'light' ? 'text-cyan-700' : isGlass ? 'text-cyan-100' : 'text-cyan-300';
+  const accentColor = theme === 'light' ? 'text-cyan-700' : isGlass ? 'text-cyan-200' : 'text-cyan-400';
+  const glowGradient = theme === 'light' ? 'from-yellow-50/40' : isGlass ? 'from-white/10 via-cyan-300/10' : 'from-blue-500/5';
+  const progressBg = theme === 'light' ? 'bg-gray-200' : isGlass ? 'bg-white/12' : 'bg-white/10';
+  const savingBg = theme === 'light' ? 'bg-green-100' : isGlass ? 'bg-green-300/16' : 'bg-green-500/20';
+  const savingText = theme === 'light' ? 'text-green-700' : isGlass ? 'text-green-200' : 'text-green-400';
+  const infoBg = theme === 'light' ? 'bg-gray-100' : isGlass ? 'bg-white/8' : 'bg-white/5';
 
   return (
     <div
@@ -65,7 +72,9 @@ export const PowerCard = memo(function PowerCard({
       <div className={`absolute inset-0 bg-gradient-to-br ${glowGradient} to-transparent`}></div>
 
       {/* Light theme frosted overlay */}
-      {theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
+      {(theme === 'light' || isGlass) && (
+        <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`} />
+      )}
 
       <div className="relative h-full flex flex-col">
         <div className={`flex items-start justify-between ${isSmall ? 'mb-1' : 'mb-2'}`}>
@@ -75,7 +84,7 @@ export const PowerCard = memo(function PowerCard({
             >
               Energy Usage
             </h3>
-            <p className="text-[10px] text-gray-300 truncate mt-0.5">Power</p>
+            <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5`}>Power</p>
           </div>
           <div
             className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${iconBg} flex items-center justify-center flex-shrink-0`}
