@@ -1,8 +1,8 @@
 import { ArrowLeft, Check, Download, Layers3, Palette, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
-import { useTheme } from '@/app/hooks';
 import { PRIMARY_COLOR_OPTIONS, THEME_OPTIONS } from '@/app/constants/theme-options';
+import { useTheme } from '@/app/hooks';
 import type { PrimaryColor, ThemeType } from '@/app/hooks/use-theme';
 
 interface DashboardOnboardingDialogProps {
@@ -44,6 +44,15 @@ export function DashboardOnboardingDialog({
     setSelectedAccent(primaryColor);
   }, [open, primaryColor, theme]);
 
+  useEffect(() => {
+    if (phase !== 'closing' || !onClosingAnimationComplete) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(onClosingAnimationComplete, 900);
+    return () => window.clearTimeout(timeoutId);
+  }, [onClosingAnimationComplete, phase]);
+
   if (!open) return null;
 
   const previewTheme = step === 'theme' ? selectedTheme : theme;
@@ -82,15 +91,6 @@ export function DashboardOnboardingDialog({
       : previewTheme === 'glass'
         ? 'bg-white/[0.06] border-white/16'
         : 'bg-white/[0.045] border-white/10';
-
-  useEffect(() => {
-    if (phase !== 'closing' || !onClosingAnimationComplete) {
-      return;
-    }
-
-    const timeoutId = window.setTimeout(onClosingAnimationComplete, 900);
-    return () => window.clearTimeout(timeoutId);
-  }, [onClosingAnimationComplete, phase]);
 
   const handleImportFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -236,7 +236,8 @@ export function DashboardOnboardingDialog({
                 Start with a blank dashboard
               </h3>
               <p className={`mt-2 text-sm leading-relaxed ${mutedColor}`}>
-                Start with an empty dashboard, then add back only the entities you want from Add Entity.
+                Start with an empty dashboard, then add back only the entities you want from Add
+                Entity.
               </p>
             </button>
 
@@ -357,7 +358,6 @@ export function DashboardOnboardingDialog({
                   })}
                 </div>
               </div>
-
             </div>
 
             <div className={`rounded-[28px] border ${panelInset} p-5`}>
@@ -373,19 +373,23 @@ export function DashboardOnboardingDialog({
                       ? `linear-gradient(180deg, rgba(255,255,255,0.96), ${accentColor}10)`
                       : previewTheme === 'glass'
                         ? `linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05))`
-                      : previewTheme === 'contrast'
-                        ? `linear-gradient(180deg, rgba(0,0,0,1), rgba(0,0,0,0.985))`
-                        : `linear-gradient(180deg, rgba(17,24,39,0.94), rgba(3,7,18,0.96))`,
+                        : previewTheme === 'contrast'
+                          ? `linear-gradient(180deg, rgba(0,0,0,1), rgba(0,0,0,0.985))`
+                          : `linear-gradient(180deg, rgba(17,24,39,0.94), rgba(3,7,18,0.96))`,
                 }}
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className={`text-sm font-semibold ${textColor}`}>Navet</p>
-                    <p className={`text-xs ${mutedColor}`}>{THEME_OPTIONS.find((option) => option.value === selectedTheme)?.label} mode</p>
+                    <p className={`text-xs ${mutedColor}`}>
+                      {THEME_OPTIONS.find((option) => option.value === selectedTheme)?.label} mode
+                    </p>
                   </div>
                   <div
                     className="h-3 w-16 rounded-full"
-                    style={{ background: `linear-gradient(90deg, ${accentColor}, ${accentColor}88)` }}
+                    style={{
+                      background: `linear-gradient(90deg, ${accentColor}, ${accentColor}88)`,
+                    }}
                   />
                 </div>
                 <div className="mt-5 grid gap-3">
@@ -404,13 +408,13 @@ export function DashboardOnboardingDialog({
                               ? index === 0
                                 ? `${accentColor}18`
                                 : 'rgba(255,255,255,0.06)'
-                            : previewTheme === 'contrast'
-                              ? index === 0
-                                ? `${accentColor}18`
-                                : 'rgba(255,255,255,0.02)'
-                            : index === 0
-                              ? `${accentColor}16`
-                              : 'rgba(255,255,255,0.05)',
+                              : previewTheme === 'contrast'
+                                ? index === 0
+                                  ? `${accentColor}18`
+                                  : 'rgba(255,255,255,0.02)'
+                                : index === 0
+                                  ? `${accentColor}16`
+                                  : 'rgba(255,255,255,0.05)',
                       }}
                     >
                       <div className="flex items-center gap-3">
@@ -428,7 +432,7 @@ export function DashboardOnboardingDialog({
                                   ? 'rgba(203, 213, 225, 0.96)'
                                   : previewTheme === 'glass'
                                     ? 'rgba(255,255,255,0.82)'
-                                  : 'rgba(255,255,255,0.86)',
+                                    : 'rgba(255,255,255,0.86)',
                             }}
                           />
                           <div
@@ -440,7 +444,7 @@ export function DashboardOnboardingDialog({
                                   ? 'rgba(226, 232, 240, 0.95)'
                                   : previewTheme === 'glass'
                                     ? 'rgba(255,255,255,0.32)'
-                                  : 'rgba(255,255,255,0.26)',
+                                    : 'rgba(255,255,255,0.26)',
                             }}
                           />
                         </div>

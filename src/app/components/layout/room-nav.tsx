@@ -112,9 +112,7 @@ export const RoomNav = memo(function RoomNav({
           </button>
         )}
 
-        {isEditMode && (
-          <div aria-hidden="true" className={`mx-1 h-6 w-px ${dividerClass}`} />
-        )}
+        {isEditMode && <div aria-hidden="true" className={`mx-1 h-6 w-px ${dividerClass}`} />}
 
         <button
           type="button"

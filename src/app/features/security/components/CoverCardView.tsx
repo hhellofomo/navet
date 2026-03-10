@@ -76,7 +76,9 @@ export function CoverCardView({
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
   const secondaryTextColor = surface.textSecondary;
   const buttonBg =
-    theme === 'light' ? 'bg-gray-900/10 hover:bg-gray-900/20' : `${surface.subtleBg} ${surface.hoverBg}`;
+    theme === 'light'
+      ? 'bg-gray-900/10 hover:bg-gray-900/20'
+      : `${surface.subtleBg} ${surface.hoverBg}`;
   const buttonText = theme === 'light' ? 'text-gray-900' : 'text-white';
   const sliderTrackBg = theme === 'light' ? 'bg-gray-200' : isGlass ? 'bg-white/12' : 'bg-white/10';
   const actionBtnClass =
@@ -103,7 +105,9 @@ export function CoverCardView({
 
       {/* Light theme frosted overlay */}
       {(theme === 'light' || isGlass) && (
-        <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`} />
+        <div
+          className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`}
+        />
       )}
       <div className="relative h-full flex flex-col">
         <EntityCardHeader
@@ -306,7 +310,9 @@ export function CoverCardView({
       {/* Device Class Settings Dialog */}
       <Dialog.Root open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className={`fixed inset-0 z-50 animate-in fade-in ${surface.dialogBackdrop}`} />
+          <Dialog.Overlay
+            className={`fixed inset-0 z-50 animate-in fade-in ${surface.dialogBackdrop}`}
+          />
           <Dialog.Content
             className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 backdrop-blur-xl border rounded-3xl p-6 w-[90vw] max-w-md z-50 shadow-2xl animate-in fade-in zoom-in duration-200 ${
               theme === 'glass'
@@ -343,7 +349,11 @@ export function CoverCardView({
                     <div className="flex flex-col items-center gap-2">
                       <div
                         className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                          isSelected ? 'bg-indigo-500/30' : theme === 'glass' ? 'bg-white/12' : 'bg-white/10'
+                          isSelected
+                            ? 'bg-indigo-500/30'
+                            : theme === 'glass'
+                              ? 'bg-white/12'
+                              : 'bg-white/10'
                         }`}
                       >
                         <Icon
@@ -368,7 +378,9 @@ export function CoverCardView({
                 <button
                   type="button"
                   className={`flex-1 py-2.5 rounded-xl text-white text-sm font-medium transition-colors ${
-                    theme === 'glass' ? 'bg-white/8 hover:bg-white/12' : 'bg-white/5 hover:bg-white/10'
+                    theme === 'glass'
+                      ? 'bg-white/8 hover:bg-white/12'
+                      : 'bg-white/5 hover:bg-white/10'
                   }`}
                 >
                   Cancel

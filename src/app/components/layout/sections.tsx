@@ -67,7 +67,9 @@ const MockEntityGrid = memo(function MockEntityGrid({ devices }: { devices: Devi
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-3">
-        <h2 className={`text-lg md:text-xl font-semibold ${surface.textPrimary}`}>All Mock Entities</h2>
+        <h2 className={`text-lg md:text-xl font-semibold ${surface.textPrimary}`}>
+          All Mock Entities
+        </h2>
         <span className={`text-xs md:text-sm ${surface.textSecondary}`}>
           {devices.length} {devices.length === 1 ? 'entity' : 'entities'}
         </span>
@@ -109,7 +111,9 @@ export function MockEntitiesSection() {
             <FlaskConical className="h-5 w-5 text-orange-500" />
           </div>
           <div className="min-w-0">
-            <h1 className={`text-xl font-semibold tracking-tight md:text-2xl ${surface.textPrimary}`}>
+            <h1
+              className={`text-xl font-semibold tracking-tight md:text-2xl ${surface.textPrimary}`}
+            >
               Temporary Mock Entities
             </h1>
             <p className={`mt-2 max-w-3xl text-sm leading-relaxed ${surface.textSecondary}`}>

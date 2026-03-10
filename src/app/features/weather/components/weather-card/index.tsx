@@ -84,14 +84,20 @@ export const WeatherCard = memo(function WeatherCard({
         : 'bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-slate-700/30';
   const textPrimary = surface.textPrimary;
   const textSecondary = theme === 'light' ? 'text-gray-500' : surface.textSecondary;
-  const iconBg = theme === 'light' ? 'bg-blue-100' : isGlass ? 'bg-blue-300/24 border border-blue-100/20' : 'bg-blue-500/24 border border-blue-300/18';
+  const iconBg =
+    theme === 'light'
+      ? 'bg-blue-100'
+      : isGlass
+        ? 'bg-blue-300/24 border border-blue-100/20'
+        : 'bg-blue-500/24 border border-blue-300/18';
   const glowOverlay =
     theme === 'light'
       ? 'from-blue-50/30 via-transparent to-cyan-50/30'
       : isGlass
         ? 'from-white/10 via-blue-300/10 to-cyan-200/08'
-      : 'from-blue-500/5 via-transparent to-cyan-500/5';
-  const dashedBorder = theme === 'light' ? 'border-gray-300' : isGlass ? 'border-white/18' : 'border-slate-600';
+        : 'from-blue-500/5 via-transparent to-cyan-500/5';
+  const dashedBorder =
+    theme === 'light' ? 'border-gray-300' : isGlass ? 'border-white/18' : 'border-slate-600';
 
   return (
     <CardWrapper className={`${cardBg} p-5`}>

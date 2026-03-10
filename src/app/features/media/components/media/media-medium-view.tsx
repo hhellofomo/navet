@@ -34,9 +34,15 @@ export function MediaMediumView({
   onVolumeChange,
 }: MediaMediumViewProps) {
   const surface = getThemeSurfaceTokens(theme);
-  const buttonSurface = isLight ? 'bg-gray-900/10 hover:bg-gray-900/20' : `${surface.subtleBg} ${surface.hoverBg}`;
+  const buttonSurface = isLight
+    ? 'bg-gray-900/10 hover:bg-gray-900/20'
+    : `${surface.subtleBg} ${surface.hoverBg}`;
   const iconColor = isLight ? 'text-gray-800' : surface.textPrimary;
-  const volumeTrack = isLight ? 'bg-gray-900/15' : theme === 'glass' ? 'bg-white/12' : 'bg-white/20';
+  const volumeTrack = isLight
+    ? 'bg-gray-900/15'
+    : theme === 'glass'
+      ? 'bg-white/12'
+      : 'bg-white/20';
   return (
     <div className="flex-1 flex items-stretch gap-3 -m-5">
       {/* Album art with blending */}
@@ -60,9 +66,7 @@ export function MediaMediumView({
 
       <div className="flex-1 flex flex-col justify-center gap-3 min-w-0 pr-5 py-5">
         <div>
-          <div className={`font-bold truncate text-sm ${surface.textPrimary}`}>
-            {title}
-          </div>
+          <div className={`font-bold truncate text-sm ${surface.textPrimary}`}>{title}</div>
           <div className={`text-xs truncate ${isLight ? 'text-gray-500' : surface.textSecondary}`}>
             {artist}
           </div>
@@ -118,9 +122,7 @@ export function MediaMediumView({
               <Volume2 className={`w-3 h-3 ${iconColor}`} />
             )}
           </button>
-          <div
-            className={`flex-1 relative h-1 ${volumeTrack} rounded-full overflow-hidden`}
-          >
+          <div className={`flex-1 relative h-1 ${volumeTrack} rounded-full overflow-hidden`}>
             <div
               className="absolute left-0 top-0 h-full bg-pink-500 transition-all duration-150"
               style={{ width: isMuted ? '0%' : `${volume}%` }}

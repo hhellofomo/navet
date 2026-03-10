@@ -17,7 +17,14 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
   const { theme, wallpaper, primaryColor } = useTheme();
   const isGlass = theme === 'glass';
 
-  const bgColor = theme === 'light' ? 'bg-gray-50' : theme === 'contrast' ? 'bg-black' : isGlass ? 'bg-slate-950' : 'bg-[#0a0a0a]';
+  const bgColor =
+    theme === 'light'
+      ? 'bg-gray-50'
+      : theme === 'contrast'
+        ? 'bg-black'
+        : isGlass
+          ? 'bg-slate-950'
+          : 'bg-[#0a0a0a]';
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
 
   return (
@@ -47,7 +54,7 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
                     ? `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}24, ${getThemeColorValue(primaryColor)}12, transparent 58%)`
                     : isGlass
                       ? `radial-gradient(circle at 16% 18%, ${getThemeColorValue(primaryColor)}55 0%, transparent 34%), radial-gradient(circle at 84% 12%, rgba(255,255,255,0.18) 0%, transparent 26%), linear-gradient(135deg, rgba(255,255,255,0.12), transparent 58%)`
-                  : `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}40, ${getThemeColorValue(primaryColor)}20, transparent 60%)`,
+                      : `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}40, ${getThemeColorValue(primaryColor)}20, transparent 60%)`,
               mixBlendMode:
                 theme === 'light'
                   ? 'multiply'
@@ -70,7 +77,7 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
                     ? 'rgba(0, 0, 0, 0.84)'
                     : isGlass
                       ? 'rgba(7, 12, 22, 0.46)'
-                    : 'rgba(10, 10, 10, 0.55)',
+                      : 'rgba(10, 10, 10, 0.55)',
             }}
           />
         </div>

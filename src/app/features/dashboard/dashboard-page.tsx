@@ -1,5 +1,5 @@
-import { DashboardArrivalReveal } from './components/dashboard-arrival-reveal';
 import { LoadingSpinner } from '@/app/components/shared/loading-spinner';
+import { DashboardArrivalReveal } from './components/dashboard-arrival-reveal';
 import { DashboardOverlays } from './components/dashboard-overlays';
 import { DashboardSectionRouter } from './components/dashboard-section-router';
 import { useDashboardController } from './hooks/use-dashboard-controller';

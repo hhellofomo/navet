@@ -78,7 +78,9 @@ export function SettingsHero({ navItems, styles }: SettingsHeroProps) {
     >
       <div
         className="absolute inset-x-0 top-0 h-px"
-        style={{ background: `linear-gradient(90deg, transparent, ${styles.accentColor}88, transparent)` }}
+        style={{
+          background: `linear-gradient(90deg, transparent, ${styles.accentColor}88, transparent)`,
+        }}
       />
       <div
         className="absolute right-[-36px] top-[-28px] h-36 w-36 rounded-full blur-3xl"

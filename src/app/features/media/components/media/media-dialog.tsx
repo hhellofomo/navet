@@ -33,7 +33,9 @@ export function MediaDialog({
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
-  const controlSurface = isGlass ? `${surface.subtleBg} ${surface.hoverBg}` : 'bg-white/10 hover:bg-white/20';
+  const controlSurface = isGlass
+    ? `${surface.subtleBg} ${surface.hoverBg}`
+    : 'bg-white/10 hover:bg-white/20';
   const volumeTrack = isGlass ? 'bg-white/12' : 'bg-white/20';
   const presetButton = (isActive: boolean) =>
     isActive
@@ -44,15 +46,23 @@ export function MediaDialog({
   return (
     <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className={`fixed inset-0 z-50 animate-in fade-in ${surface.dialogBackdrop}`} />
-        <Dialog.Content className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md max-h-[85vh] overflow-y-auto backdrop-blur-xl rounded-3xl p-8 border shadow-2xl z-50 animate-in fade-in zoom-in duration-200 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${
-          isGlass
-            ? 'bg-gradient-to-br from-white/12 via-pink-300/10 to-white/[0.04] border-white/18'
-            : 'bg-gradient-to-br from-pink-900/95 to-purple-950/95 border-pink-700/20'
-        }`}>
+        <Dialog.Overlay
+          className={`fixed inset-0 z-50 animate-in fade-in ${surface.dialogBackdrop}`}
+        />
+        <Dialog.Content
+          className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md max-h-[85vh] overflow-y-auto backdrop-blur-xl rounded-3xl p-8 border shadow-2xl z-50 animate-in fade-in zoom-in duration-200 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${
+            isGlass
+              ? 'bg-gradient-to-br from-white/12 via-pink-300/10 to-white/[0.04] border-white/18'
+              : 'bg-gradient-to-br from-pink-900/95 to-purple-950/95 border-pink-700/20'
+          }`}
+        >
           <div className="mb-6">
-            <Dialog.Title className={`text-xl font-semibold ${surface.textPrimary}`}>{title}</Dialog.Title>
-            <Dialog.Description className={`text-sm mt-1 ${surface.textSecondary}`}>{artist}</Dialog.Description>
+            <Dialog.Title className={`text-xl font-semibold ${surface.textPrimary}`}>
+              {title}
+            </Dialog.Title>
+            <Dialog.Description className={`text-sm mt-1 ${surface.textSecondary}`}>
+              {artist}
+            </Dialog.Description>
           </div>
 
           <div className="space-y-6">
@@ -96,7 +106,9 @@ export function MediaDialog({
             <div>
               <div className="flex items-center justify-between mb-3">
                 <span className={`text-sm font-medium ${surface.textSecondary}`}>Volume</span>
-                <span className={`text-sm font-semibold ${surface.textPrimary}`}>{isMuted ? 0 : volume}%</span>
+                <span className={`text-sm font-semibold ${surface.textPrimary}`}>
+                  {isMuted ? 0 : volume}%
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <button
@@ -129,7 +141,9 @@ export function MediaDialog({
 
             {/* Quick Volume Presets */}
             <div>
-              <span className={`text-sm font-medium ${surface.textSecondary} mb-3 block`}>Quick Volume</span>
+              <span className={`text-sm font-medium ${surface.textSecondary} mb-3 block`}>
+                Quick Volume
+              </span>
               <div className="grid grid-cols-4 gap-2">
                 {[25, 50, 75, 100].map((vol) => (
                   <button

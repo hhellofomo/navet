@@ -71,7 +71,13 @@ export function LoginPage() {
 
   // Theme colors
   const bgPrimary =
-    theme === 'light' ? 'bg-gray-50' : theme === 'contrast' ? 'bg-black' : theme === 'glass' ? 'bg-slate-950' : 'bg-[#0f0f0f]';
+    theme === 'light'
+      ? 'bg-gray-50'
+      : theme === 'contrast'
+        ? 'bg-black'
+        : theme === 'glass'
+          ? 'bg-slate-950'
+          : 'bg-[#0f0f0f]';
 
   const cardBg =
     theme === 'light'
@@ -89,7 +95,7 @@ export function LoginPage() {
         ? 'border-white/30'
         : theme === 'glass'
           ? 'border-white/20'
-        : 'border-white/10';
+          : 'border-white/10';
 
   const inputBg =
     theme === 'light'
@@ -107,7 +113,7 @@ export function LoginPage() {
         ? 'focus:bg-black/70 focus:border-orange-500'
         : theme === 'glass'
           ? 'focus:bg-white/12 focus:border-orange-400'
-        : 'focus:bg-white/10 focus:border-orange-500/50';
+          : 'focus:bg-white/10 focus:border-orange-500/50';
 
   const textPrimary = surface.textPrimary;
   const textSecondary = surface.textSecondary;

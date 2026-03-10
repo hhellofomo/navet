@@ -58,12 +58,18 @@ interface NewsWidgetProps {
 export function NewsWidget({ size = 'large' }: NewsWidgetProps) {
   const { theme, primaryColor } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
-  const bgColor = theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : surface.panel;
+  const bgColor =
+    theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : surface.panel;
   const textPrimary = surface.textPrimary;
   const textSecondary = surface.textSecondary;
   const border = theme === 'light' ? 'border-gray-200/50' : surface.border;
   const dividerColor = theme === 'light' ? 'border-gray-200' : surface.border;
-  const subtleFill = theme === 'light' ? '#f3f4f6' : theme === 'contrast' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.08)';
+  const subtleFill =
+    theme === 'light'
+      ? '#f3f4f6'
+      : theme === 'contrast'
+        ? 'rgba(255,255,255,0.05)'
+        : 'rgba(255,255,255,0.08)';
 
   const displayArticles =
     size === 'extra-small' || size === 'small'

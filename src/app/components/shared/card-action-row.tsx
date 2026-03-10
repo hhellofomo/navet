@@ -1,12 +1,12 @@
 import { type LucideIcon, MoreHorizontal } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/app/components/ui/dropdown-menu';
-import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import type { ThemeType } from '@/app/hooks/use-theme';
 
 type CardActionRowSize = 'small' | 'medium' | 'large';

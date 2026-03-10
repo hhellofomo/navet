@@ -36,7 +36,8 @@ export function AddEntityDialog({
   const surface = getThemeSurfaceTokens(theme);
   const [query, setQuery] = useState('');
 
-  const bgColor = theme === 'light' ? 'bg-white' : theme === 'contrast' ? 'bg-gray-900' : surface.panel;
+  const bgColor =
+    theme === 'light' ? 'bg-white' : theme === 'contrast' ? 'bg-gray-900' : surface.panel;
   const textColor = surface.textPrimary;
   const mutedColor = surface.textSecondary;
   const borderColor = surface.border;
@@ -81,7 +82,9 @@ export function AddEntityDialog({
   if (!open) return null;
 
   return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${surface.dialogBackdrop}`}>
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${surface.dialogBackdrop}`}
+    >
       <div
         className={`${bgColor} rounded-2xl border ${borderColor} w-full max-w-2xl max-h-[80vh] overflow-hidden`}
         style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)' }}

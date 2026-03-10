@@ -67,33 +67,37 @@ export const Sidebar = memo(function Sidebar() {
     <>
       {/* Desktop Sidebar */}
       <div
-        className={`fixed left-0 top-0 h-full w-16 ${surface.shellPanel} border-r flex-col items-center pt-8 pb-6 gap-[38px] hidden md:flex z-50`}
+        className={`fixed left-0 top-0 hidden h-full w-16 ${surface.shellPanel} border-r md:flex z-50`}
       >
-        <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center mb-4">
-          <ImageWithFallback src="/logo.svg" alt="Brand Logo" className="w-10 h-10" />
+        <div className="flex w-full justify-center pt-8">
+          <div className="flex h-10 w-10 items-center justify-center">
+            <ImageWithFallback src="/logo.svg" alt="Brand Logo" className="h-10 w-10" />
+          </div>
         </div>
 
-        <div className="flex flex-col gap-4">
-          {menuItems.map((item, index) => (
-            <button
-              type="button"
-              key={index}
-              onClick={item.onClick}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-                activeSection === item.section ? '' : inactiveColor
-              }`}
-              style={
-                activeSection === item.section
-                  ? {
-                      backgroundColor: `${activeColorValue}20`,
-                      color: activeColorValue,
-                    }
-                  : undefined
-              }
-            >
-              <item.icon className="w-5 h-5" />
-            </button>
-          ))}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex flex-col gap-4">
+            {menuItems.map((item, index) => (
+              <button
+                type="button"
+                key={index}
+                onClick={item.onClick}
+                className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${
+                  activeSection === item.section ? '' : inactiveColor
+                }`}
+                style={
+                  activeSection === item.section
+                    ? {
+                        backgroundColor: `${activeColorValue}20`,
+                        color: activeColorValue,
+                      }
+                    : undefined
+                }
+              >
+                <item.icon className="h-5 w-5" />
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

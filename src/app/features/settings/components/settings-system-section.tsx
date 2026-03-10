@@ -7,8 +7,7 @@ interface SettingsSystemSectionProps {
 }
 
 export function SettingsSystemSection({ controller }: SettingsSystemSectionProps) {
-  const { config, disableAnimations, handleResetConnection, styles, updateSettings } =
-    controller;
+  const { config, disableAnimations, handleResetConnection, styles, updateSettings } = controller;
 
   return (
     <SettingsSectionShell

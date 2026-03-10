@@ -23,7 +23,9 @@ export function InteractionPreviewCard({
   const surface = getThemeSurfaceTokens(isLightTheme ? 'light' : 'glass');
   const preview = getInteractionPreview(mode);
   const showsTrailingButton = mode === 'toggle-first';
-  const surfaceClass = isLightTheme ? 'bg-white border-gray-200/70' : `${surface.panel} ${surface.border}`;
+  const surfaceClass = isLightTheme
+    ? 'bg-white border-gray-200/70'
+    : `${surface.panel} ${surface.border}`;
   const cardClass = isLightTheme
     ? 'bg-gray-50/90 border-gray-200/80'
     : 'bg-white/8 border-white/12';

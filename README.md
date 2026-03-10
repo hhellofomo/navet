@@ -28,7 +28,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 
 ### 🎨 Design
 - **iOS-Inspired Interface** - Frosted glass cards with blur effects and smooth animations
-- **3 Theme Modes** - Light, Dark, and High Contrast
+- **4 Theme Modes** - Liquid Glass, Dark, Light, and High Contrast
 - **8 Primary Colors** - Customizable accent colors
 - **Responsive Grid** - 2 columns (mobile) → 4 (tablet) → 6 (desktop)
 - **Adaptive Cards** - Extra-Small, Small, Medium, and Large card sizes
@@ -147,7 +147,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 
 #### Themes
 - Access **Settings** from the user menu
-- Choose from **3 modes**: Light, Dark, Contrast
+- Choose from **4 modes**: Liquid Glass, Dark, Light, Contrast
 - Select from **8 colors**: Blue, Purple, Green, Orange, Pink, Red, Teal, Yellow
 
 #### Card Interaction Style

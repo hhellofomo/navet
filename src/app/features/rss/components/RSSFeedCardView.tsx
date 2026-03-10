@@ -193,7 +193,11 @@ export function RSSFeedCardView({
                     {item.imageUrl && (
                       <div
                         className={`w-20 h-20 rounded-lg ${
-                          theme === 'light' ? 'bg-gray-100' : theme === 'glass' ? 'bg-white/8' : 'bg-white/10'
+                          theme === 'light'
+                            ? 'bg-gray-100'
+                            : theme === 'glass'
+                              ? 'bg-white/8'
+                              : 'bg-white/10'
                         } overflow-hidden flex-shrink-0`}
                       >
                         <img

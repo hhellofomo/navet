@@ -73,18 +73,13 @@ export const EntityCardHeaderIcon = memo(function EntityCardHeaderIcon({
     <IconComponent
       aria-hidden="true"
       className={`${iconSize} transition-colors duration-500 ${
-        !isActive && theme === 'light'
-          ? 'text-gray-700'
-          : !isActive
-            ? surface.textSecondary
-            : ''
+        !isActive && theme === 'light' ? 'text-gray-700' : !isActive ? surface.textSecondary : ''
       }`}
       style={
         isActive
           ? {
               color: activeColor.text,
-              filter:
-                theme === 'light' ? undefined : 'drop-shadow(0 1px 4px rgba(0, 0, 0, 0.18))',
+              filter: theme === 'light' ? undefined : 'drop-shadow(0 1px 4px rgba(0, 0, 0, 0.18))',
             }
           : undefined
       }
