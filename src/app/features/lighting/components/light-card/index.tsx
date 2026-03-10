@@ -60,7 +60,7 @@ export const LightCard = memo(function LightCard({
             controller.gradientColors.customGradient
               ? ''
               : `bg-gradient-to-br ${controller.gradientColors.from} ${controller.gradientColors.to} ${controller.gradientColors.border}`
-          } ${!controller.isOn ? 'grayscale opacity-40' : ''} ${theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
+          } ${!controller.isOn ? 'opacity-85' : ''} ${theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
           style={
             controller.gradientColors.customGradient
               ? {

@@ -113,6 +113,14 @@ Users can customize the primary color used throughout the interface:
 - Selection indicators
 - Focus states
 
+#### Shared Theme Primitives
+
+Recent UI cleanup moved repeated theme logic into shared primitives so cross-theme behavior can be changed in one place:
+
+- **Entity icon pill styles** - centralized under shared theme helpers for all 4 themes
+- **Interactive nav/action pills** - centralized for active/inactive, light/dark/contrast/glass behavior
+- **Theme surface tokens** - still define the shared panel, border, text, and input surfaces used by these primitives
+
 #### Implementation
 ```tsx
 const { theme, setTheme, primaryColor, setPrimaryColor } = useTheme();
@@ -164,7 +172,9 @@ Manages section navigation state across desktop and mobile layouts through a dir
 - **Height**: Auto with safe area padding
 - **Layout**: 5 icons in horizontal row
 - **Icons**: 20px with label underneath
-- **Active state**: Primary color text and background
+- **Active state**: theme-aware shared pill treatment
+- **Inactive state**: transparent/ghost buttons; only the selected item carries the pill
+- **Scroll behavior**: slides down and hides on downward scroll, returns when the user is near the top
 - **Sections shown**: Home, Security, Lights, Media, Mock, Settings
 
 #### Implementation
@@ -197,6 +207,7 @@ Full-page settings interface with card-based organization.
 - **Interaction mode**: choose between tap toggles and tap opens controls
 - **Entity restore action**: add all removed entities back to the dashboard
 - **Onboarding reset**: restart the first-launch dashboard choice
+- **Shared segmented controls**: current dashboard/system control groups are a candidate for the same primitive-based refactor pattern used by icon/nav pills
 
 **3. Connection**
 - **Connection Status**: Shows Home Assistant URL

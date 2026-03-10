@@ -39,7 +39,7 @@ export const HVACCard = memo(function HVACCard({
     <>
       <CardWrapper
         interactionProps={controller.cardInteraction.cardProps}
-        className={`bg-gradient-to-br ${controller.cardColors.gradient} border ${controller.cardColors.border} p-4 ${!controller.isOn ? 'grayscale opacity-40' : ''}`}
+        className={`bg-gradient-to-br ${controller.cardColors.gradient} border ${controller.cardColors.border} p-4 ${!controller.isOn ? 'opacity-85' : ''}`}
         lightOverlayClassName={controller.lightOverlay}
         showShadow={controller.isOn}
       >

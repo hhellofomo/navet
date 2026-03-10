@@ -39,7 +39,7 @@ export function SettingsSectionShell({
       <div className="px-6 py-6 md:px-8 md:py-8">
         <div className="flex items-start gap-4">
           <div
-            className={`flex h-11 w-11 items-center justify-center rounded-2xl ${styles.iconBg}`}
+            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border ${styles.borderColor} ${styles.iconBg}`}
           >
             <Icon className={`h-5 w-5 ${styles.mutedColor}`} />
           </div>

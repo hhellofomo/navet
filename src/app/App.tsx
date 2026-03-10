@@ -1,4 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { NetworkStatusBanner } from './components/shared/network-status-banner';
+import { PwaUpdatePrompt } from './components/shared/pwa-update-prompt';
 import { Toaster } from './components/ui/sonner';
 import { AuthProvider, useAuth } from './contexts/auth-context';
 import { ConfigProvider, useConfig } from './contexts/config-context';
@@ -14,6 +16,9 @@ function AppContent() {
   const { config: haConfig } = useConfig();
   const { connected, connecting, connect } = useHomeAssistant();
   const disableAnimations = useSettingsStore((state) => state.disableAnimations);
+  const [isOnline, setIsOnline] = useState(() =>
+    typeof navigator === 'undefined' ? true : navigator.onLine
+  );
 
   useEffect(() => {
     const configToUse = authConfig || haConfig;
@@ -34,8 +39,23 @@ function AppContent() {
     };
   }, [disableAnimations]);
 
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   return (
     <>
+      <PwaUpdatePrompt />
+      <NetworkStatusBanner connected={connected} connecting={connecting} isOnline={isOnline} />
       <Toaster />
       {!isAuthenticated ? <LoginPage /> : <DashboardPage />}
     </>

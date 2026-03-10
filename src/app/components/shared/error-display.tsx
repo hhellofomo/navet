@@ -20,8 +20,7 @@ export const ErrorDisplay = memo(function ErrorDisplay({
   if (!error) return null;
 
   const bgColor = surface.appBg;
-  const cardBg =
-    theme === 'light' ? 'bg-white' : theme === 'contrast' ? 'bg-gray-950' : surface.panel;
+  const cardBg = theme === 'light' ? 'bg-white' : surface.panel;
   const textColor = surface.textPrimary;
   const mutedColor = surface.textSecondary;
   const borderColor = surface.border;

@@ -63,6 +63,7 @@ export const LightCardMedium = memo(function LightCardMedium({
           value={brightness}
           onChange={onBrightnessChange}
           onCommit={onBrightnessCommit}
+          isOn={isOn}
           size="medium"
           onClick={(e) => e.stopPropagation()}
         />

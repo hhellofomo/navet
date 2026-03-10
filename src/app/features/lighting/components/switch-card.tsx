@@ -18,7 +18,7 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
           props.isEditMode
             ? 'cursor-move active:cursor-grabbing'
             : 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]'
-        } ${!controller.isOn ? 'grayscale opacity-40' : ''} ${controller.theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
+        } ${!controller.isOn ? 'opacity-85' : ''} ${controller.theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
       >
         <div
           className={`absolute inset-0 bg-gradient-to-br ${controller.cardColors.glow} to-transparent transition-all duration-500`}

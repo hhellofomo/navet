@@ -72,6 +72,7 @@ export const LightCardSmall = memo(function LightCardSmall({
                 value={brightness}
                 onChange={onBrightnessChange}
                 onCommit={onBrightnessCommit}
+                isOn={isOn}
                 size="extra-small"
                 showLabel={false}
                 onClick={(e) => e.stopPropagation()}
@@ -87,6 +88,7 @@ export const LightCardSmall = memo(function LightCardSmall({
             value={brightness}
             onChange={onBrightnessChange}
             onCommit={onBrightnessCommit}
+            isOn={isOn}
             size="small"
             showLabel
             onClick={(e) => e.stopPropagation()}

@@ -2,6 +2,23 @@ import { defineConfig } from 'vite'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
+
+function getPackageName(id: string) {
+  const parts = id.split('node_modules/')
+  const packagePath = parts.at(-1)
+  if (!packagePath) {
+    return null
+  }
+
+  const segments = packagePath.split('/')
+
+  if (segments[0]?.startsWith('@') && segments[1]) {
+    return `${segments[0]}/${segments[1]}`
+  }
+
+  return segments[0] ?? null
+}
 
 export default defineConfig({
   envPrefix: ['VITE_', 'NAVET_'],
@@ -10,6 +27,57 @@ export default defineConfig({
     // Tailwind is not being actively used – do not remove them
     react(),
     tailwindcss(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      injectRegister: false,
+      manifestFilename: 'site.webmanifest',
+      includeAssets: [
+        'favicon.svg',
+        'favicon-32x32.svg',
+        'apple-touch-icon.png',
+        'logo.svg',
+        'logo-horizontal.svg',
+        'logo-horizontal-light.svg',
+        'pwa-192.png',
+        'pwa-512.png',
+      ],
+      manifest: {
+        name: 'Navet',
+        short_name: 'Navet',
+        description: 'A smart home dashboard built for calm, app-like control surfaces.',
+        start_url: '/',
+        scope: '/',
+        display: 'standalone',
+        orientation: 'portrait-primary',
+        background_color: '#0a0a0a',
+        theme_color: '#0a0a0a',
+        categories: ['productivity', 'utilities', 'lifestyle'],
+        icons: [
+          {
+            src: '/pwa-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any maskable',
+          },
+          {
+            src: '/pwa-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable',
+          },
+          {
+            src: '/favicon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'any',
+          },
+        ],
+      },
+      workbox: {
+        navigateFallback: '/index.html',
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest}'],
+      },
+    }),
   ],
   resolve: {
     alias: {
@@ -20,6 +88,67 @@ export default defineConfig({
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
+
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) {
+            return undefined
+          }
+
+          const packageName = getPackageName(id)
+          if (!packageName) {
+            return undefined
+          }
+
+          if (packageName === 'react' || packageName === 'react-dom' || packageName === 'scheduler') {
+            return 'react-vendor'
+          }
+
+          if (packageName.startsWith('@radix-ui/') || packageName === 'vaul') {
+            return 'radix-vendor'
+          }
+
+          if (
+            packageName === 'recharts' ||
+            packageName.startsWith('d3-') ||
+            packageName === 'internmap' ||
+            packageName === 'robust-predicates'
+          ) {
+            return 'charts-vendor'
+          }
+
+          if (
+            packageName === '@dnd-kit/core' ||
+            packageName === '@dnd-kit/sortable' ||
+            packageName === '@dnd-kit/utilities'
+          ) {
+            return 'dnd-vendor'
+          }
+
+          if (packageName === 'home-assistant-js-websocket') {
+            return 'ha-vendor'
+          }
+
+          if (packageName === 'lucide-react') {
+            return 'icons-vendor'
+          }
+
+          if (
+            packageName === 'embla-carousel-react' ||
+            packageName === 'react-day-picker' ||
+            packageName === 'cmdk' ||
+            packageName === 'date-fns'
+          ) {
+            return 'ui-vendor'
+          }
+
+          return 'vendor'
+        },
+      },
+    },
+  },
 
 
   server: {

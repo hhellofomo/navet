@@ -36,14 +36,13 @@ export function AddEntityDialog({
   const surface = getThemeSurfaceTokens(theme);
   const [query, setQuery] = useState('');
 
-  const bgColor =
-    theme === 'light' ? 'bg-white' : theme === 'contrast' ? 'bg-gray-900' : surface.panel;
+  const bgColor = theme === 'light' ? 'bg-white' : surface.panel;
   const textColor = surface.textPrimary;
   const mutedColor = surface.textSecondary;
   const borderColor = surface.border;
   const cardBg = surface.panelMuted;
   const hoverBg = surface.hoverBg;
-  const inputBg = theme === 'contrast' ? 'bg-black/50' : surface.inputBg;
+  const inputBg = surface.inputBg;
 
   const availableDevices = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();

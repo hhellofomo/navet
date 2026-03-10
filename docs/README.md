@@ -17,6 +17,7 @@ Complete documentation for the Navet smart home dashboard.
   - Managing widgets
   - Creating custom widgets
   - Widget storage and API
+- **[Main README](../README.md#installable-pwa)** - Installable PWA shell and build verification
 - **[Docker and Home Assistant Add-on](DOCKER_HOME_ASSISTANT_ADDON.md)** - Packaging and deployment guide
   - Standalone Docker image
   - Home Assistant add-on structure
@@ -72,6 +73,9 @@ Complete documentation for the Navet smart home dashboard.
 **Run Navet in Docker or as a Home Assistant add-on:**
 → See [Docker and Home Assistant Add-on](DOCKER_HOME_ASSISTANT_ADDON.md)
 
+**Understand the installable PWA shell and offline app behavior:**
+→ See [Main README -> Installable PWA](../README.md#installable-pwa)
+
 **Understand recent performance work:**
 → See [Docker and Home Assistant Add-on -> Current Performance Work](DOCKER_HOME_ASSISTANT_ADDON.md#current-performance-work)
 
@@ -109,6 +113,7 @@ docs/
 
 **By Topic:**
 - **Features** → WIDGETS.md
+- **PWA / installability** → README.md
 - **Design** → design-system/
 - **Branding** → branding/
 - **Legal** → TERMS_OF_USE.md, LICENSE.md
