@@ -1,5 +1,6 @@
 import { type LucideIcon, MoreHorizontal } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import {
   DropdownMenu,
@@ -27,18 +28,11 @@ interface CardActionRowProps {
   overflowItems?: CardActionOverflowItem[];
 }
 
-function getActionButtonClasses(theme: ThemeType) {
-  const surface = getThemeSurfaceTokens(theme);
-  return theme === 'light'
-    ? 'bg-gray-900/10 text-gray-900 hover:bg-gray-900/20'
-    : `${surface.subtleBg} text-white ${surface.hoverBg}`;
-}
-
 function getActionButtonSize(size: CardActionRowSize) {
   if (size === 'small') {
     return {
-      button: 'h-7 w-7',
-      icon: 'h-3 w-3',
+      button: 'h-8 w-8',
+      icon: 'h-3.5 w-3.5',
     };
   }
 
@@ -84,7 +78,6 @@ function CardActionOverflowMenu({
   size: CardActionRowSize;
   items: CardActionOverflowItem[];
 }) {
-  const buttonClasses = getActionButtonClasses(theme);
   const actionSize = getActionButtonSize(size);
   const surface = getThemeSurfaceTokens(theme);
   const menuSurface =
@@ -95,14 +88,16 @@ function CardActionOverflowMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
-          type="button"
+        <RoundControlButton
+          theme={theme}
+          size={size}
+          variant="neutral"
           aria-label="More actions"
-          className={`${actionSize.button} shrink-0 rounded-full ${buttonClasses} flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95`}
+          className="hover:scale-105 active:scale-95"
           onClick={(event) => event.stopPropagation()}
         >
           <MoreHorizontal className={actionSize.icon} />
-        </button>
+        </RoundControlButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"

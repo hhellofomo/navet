@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import { LightCardLarge } from './light-card-large';
 import { LightCardMedium } from './light-card-medium';
@@ -41,6 +42,7 @@ export const LightCard = memo(function LightCard({
     size,
     isEditMode,
   });
+  const stateSurface = getCardStateSurfaceTokens(theme, controller.isOn);
 
   const isSmall = size === 'extra-small' || size === 'small';
 
@@ -56,11 +58,11 @@ export const LightCard = memo(function LightCard({
 
         <div
           {...controller.cardInteraction.cardProps}
-          className={`relative h-full w-full backdrop-blur-xl rounded-3xl ${controller.padding} border overflow-hidden transition-all duration-500 ${!isEditMode ? 'cursor-pointer' : ''} ${
+          className={`relative h-full w-full backdrop-blur-xl rounded-3xl ${controller.padding} border overflow-hidden transition-all duration-500 ${stateSurface.containerClassName} ${!isEditMode ? 'cursor-pointer' : ''} ${
             controller.gradientColors.customGradient
               ? ''
               : `bg-gradient-to-br ${controller.gradientColors.from} ${controller.gradientColors.to} ${controller.gradientColors.border}`
-          } ${!controller.isOn ? 'opacity-85' : ''} ${theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
+          } ${theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
           style={
             controller.gradientColors.customGradient
               ? {
@@ -98,6 +100,10 @@ export const LightCard = memo(function LightCard({
 
           {theme !== 'light' && (
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
+          )}
+
+          {stateSurface.overlayClassName && (
+            <div className={`absolute inset-0 ${stateSurface.overlayClassName}`} />
           )}
 
           <div className="relative h-full flex flex-col">

@@ -5,6 +5,7 @@ import { BrightnessSlider } from '@/app/components/shared/brightness-slider';
 import { CardActionRow } from '@/app/components/shared/card-action-row';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
 import { ColorPicker } from '@/app/components/shared/color-picker';
+import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { PRESET_COLORS } from '@/app/constants/light-constants';
 import { useTheme } from '@/app/hooks';
 import { CustomColorTrigger } from './custom-color-trigger';
@@ -46,8 +47,9 @@ export const LightCardLarge = memo(function LightCardLarge({
   showSettingsButton,
 }: Omit<LightCardLargeProps, 'room'>) {
   const { theme } = useTheme();
-  const secondaryTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
-  const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
+  const stateSurface = getCardStateSurfaceTokens(theme, isOn);
+  const secondaryTextColor = stateSurface.secondaryTextClassName;
+  const textColor = stateSurface.primaryTextClassName;
 
   return (
     <>

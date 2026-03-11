@@ -9,6 +9,9 @@ interface UseMediaCardControllerParams {
   initialState: 'playing' | 'paused' | 'idle' | 'off';
   initialVolume: number;
   initialMuted: boolean;
+  initialElapsedSeconds?: number;
+  initialDurationSeconds?: number;
+  initialPositionUpdatedAt?: string;
 }
 
 export function useMediaCardController({
@@ -17,12 +20,17 @@ export function useMediaCardController({
   initialState,
   initialVolume,
   initialMuted,
+  initialElapsedSeconds,
+  initialDurationSeconds,
+  initialPositionUpdatedAt,
 }: UseMediaCardControllerParams) {
   const { config: authConfig } = useAuth();
   const [state, setState] = useState(initialState);
   const [volume, setVolume] = useState(initialVolume);
   const [isMuted, setIsMuted] = useState(initialMuted);
   const [isOpen, setIsOpen] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(initialElapsedSeconds ?? 0);
+  const [durationSeconds, setDurationSeconds] = useState(initialDurationSeconds ?? 0);
 
   useEffect(() => {
     setState(initialState);
@@ -35,6 +43,14 @@ export function useMediaCardController({
   useEffect(() => {
     setIsMuted(initialMuted);
   }, [initialMuted]);
+
+  useEffect(() => {
+    setElapsedSeconds(initialElapsedSeconds ?? 0);
+  }, [initialElapsedSeconds]);
+
+  useEffect(() => {
+    setDurationSeconds(initialDurationSeconds ?? 0);
+  }, [initialDurationSeconds]);
 
   const albumArt = useMemo(() => {
     if (!entityPicture) {
@@ -49,6 +65,41 @@ export function useMediaCardController({
   }, [authConfig, entityPicture]);
 
   const isPlaying = state === 'playing';
+
+  useEffect(() => {
+    if (!isPlaying) {
+      return;
+    }
+
+    const getBaseElapsed = () => {
+      if (!initialPositionUpdatedAt) {
+        return initialElapsedSeconds ?? 0;
+      }
+
+      const updatedAtMs = Date.parse(initialPositionUpdatedAt);
+      if (Number.isNaN(updatedAtMs)) {
+        return initialElapsedSeconds ?? 0;
+      }
+
+      const driftSeconds = Math.max(0, Math.floor((Date.now() - updatedAtMs) / 1000));
+      return (initialElapsedSeconds ?? 0) + driftSeconds;
+    };
+
+    const syncElapsed = () => {
+      const nextElapsed = Math.min(
+        durationSeconds || Number.POSITIVE_INFINITY,
+        Math.max(0, getBaseElapsed())
+      );
+      setElapsedSeconds(nextElapsed);
+    };
+
+    syncElapsed();
+    const timerId = window.setInterval(syncElapsed, 1000);
+
+    return () => {
+      window.clearInterval(timerId);
+    };
+  }, [durationSeconds, initialElapsedSeconds, initialPositionUpdatedAt, isPlaying]);
 
   const runAction = useCallback(async (action: () => Promise<void>, errorMessage: string) => {
     try {
@@ -121,9 +172,12 @@ export function useMediaCardController({
   return {
     albumArt,
     closeDialog,
+    durationSeconds,
+    elapsedSeconds,
     handleNext,
     handlePrevious,
     handleVolumeChange,
+    isOff: state === 'off',
     isMuted,
     isOpen,
     isPlaying,

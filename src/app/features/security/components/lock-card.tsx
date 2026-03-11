@@ -2,6 +2,7 @@ import { DoorClosed, DoorOpen, Lock, Unlock } from 'lucide-react';
 import { memo, useState } from 'react';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { useTheme } from '@/app/hooks';
 
 interface LockCardProps {
@@ -50,10 +51,12 @@ export const LockCard = memo(function LockCard({
         />
 
         <div className="flex-1 flex flex-col items-center justify-center">
-          <button
-            type="button"
+          <RoundControlButton
+            theme={theme}
+            size="large"
+            variant="emphasis"
             onClick={() => setIsLocked(!isLocked)}
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-105 ${
+            className={`h-12 w-12 transition-all duration-500 hover:scale-105 ${
               isLocked
                 ? 'bg-gradient-to-br from-green-400 to-green-600 shadow-lg shadow-green-500/50'
                 : 'bg-gradient-to-br from-red-400 to-red-600 shadow-lg shadow-red-500/50'
@@ -64,7 +67,7 @@ export const LockCard = memo(function LockCard({
             ) : (
               <Unlock className="w-6 h-6 text-white" />
             )}
-          </button>
+          </RoundControlButton>
 
           <div className="text-center mt-3">
             <div

@@ -1,7 +1,7 @@
 import { Home, Pause, Play } from 'lucide-react';
 import { CardActionRow } from '@/app/components/shared/card-action-row';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
-import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import type { VacuumStatus } from './vacuum-utils';
 
@@ -24,10 +24,6 @@ export function VacuumControlsCompact({
   theme,
   accentColorValue,
 }: VacuumControlsCompactProps) {
-  const surface = getThemeSurfaceTokens(theme);
-  const btnClass = `${surface.subtleBg} ${surface.hoverBg}`;
-  const btnText = theme === 'light' ? 'text-gray-700' : surface.textSecondary;
-
   return (
     <CardActionRow
       theme={theme}
@@ -35,33 +31,39 @@ export function VacuumControlsCompact({
       leftContent={
         <>
           {currentStatus === 'cleaning' ? (
-            <button
-              type="button"
+            <RoundControlButton
+              theme={theme}
+              size="medium"
+              variant="neutral"
               onClick={onPause}
-              className={`h-8 w-8 rounded-full ${btnClass} transition-colors flex items-center justify-center`}
+              className="transition-colors"
             >
-              <Pause className={`h-3.5 w-3.5 ${btnText}`} />
-            </button>
+              <Pause className="h-3.5 w-3.5" />
+            </RoundControlButton>
           ) : (
-            <button
-              type="button"
+            <RoundControlButton
+              theme={theme}
+              size="medium"
+              variant="emphasis"
               onClick={onStartCleaning}
-              className="h-8 w-8 rounded-full transition-colors flex items-center justify-center shadow-lg"
+              className="shadow-lg"
               style={{
                 backgroundColor: accentColorValue,
                 boxShadow: `0 8px 18px ${accentColorValue}45`,
               }}
             >
               <Play className="h-3.5 w-3.5 text-white" />
-            </button>
+            </RoundControlButton>
           )}
-          <button
-            type="button"
+          <RoundControlButton
+            theme={theme}
+            size="medium"
+            variant="neutral"
             onClick={onReturnHome}
-            className={`h-8 w-8 rounded-full ${btnClass} transition-colors flex items-center justify-center`}
+            className="transition-colors"
           >
-            <Home className={`h-3.5 w-3.5 ${btnText}`} />
-          </button>
+            <Home className="h-3.5 w-3.5" />
+          </RoundControlButton>
         </>
       }
       rightContent={

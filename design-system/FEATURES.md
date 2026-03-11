@@ -119,6 +119,8 @@ Recent UI cleanup moved repeated theme logic into shared primitives so cross-the
 
 - **Entity icon pill styles** - centralized under shared theme helpers for all 4 themes
 - **Interactive nav/action pills** - centralized for active/inactive, light/dark/contrast/glass behavior
+- **Round control button** - shared circular action control primitive for card actions across lighting, media, HVAC, security, and vacuum cards
+- **Card state surface tokens** - centralized off/inactive card shell, overlay, text, and media-artwork dimming treatment for light, HVAC, switch, and media cards
 - **Theme surface tokens** - still define the shared panel, border, text, and input surfaces used by these primitives
 
 ---
@@ -151,6 +153,28 @@ setTheme('light');
 // Change primary color
 setPrimaryColor('blue');
 ```
+
+---
+
+## Media System
+
+### Media Card Path
+
+**Location**: `/src/app/features/media/components/media-card/`
+
+Navet now uses a live Home Assistant-backed media card flow instead of a mock-only media stub.
+
+#### Current Behavior
+- **Home Assistant media player wiring** - media cards map real `media_player` entities into playback state, volume, mute, metadata, artwork, and elapsed-time UI
+- **Artwork-led layouts** - small, medium, and large media cards use full-bleed artwork surfaces rather than a separate album-art tile pattern
+- **Shared transport controls** - previous, play/pause, next, volume, and details actions use the shared round control button primitive
+- **Theme-aware inactive treatment** - media off state now follows the same shared card-state surface token system used by other cards
+- **Top-left playback indicator** - the visualizer animates while media is playing, and elapsed time appears beside it only during active playback
+
+#### Notes
+- Elapsed time is shown only when Home Assistant playback is active
+- Artwork is rendered only when the entity exposes artwork; Navet no longer injects a default placeholder image
+- The media dialog and card views share the same transport/action visual language
 
 ---
 

@@ -1,8 +1,8 @@
 import { lazy, memo, Suspense } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
-import albumArt from '@/assets/847d39d7e328a23edbec0f0c53ec4c57b6f1d6fb.png';
 import { MediaLargeView } from '../media/media-large-view';
 import { MediaMediumView } from '../media/media-medium-view';
 import { MediaSmallView } from '../media/media-small-view';
@@ -23,6 +23,9 @@ interface MediaCardProps {
   state: 'playing' | 'paused' | 'idle' | 'off';
   volume: number;
   isMuted: boolean;
+  elapsedSeconds?: number;
+  durationSeconds?: number;
+  positionUpdatedAt?: string;
   size: CardSize;
   onSizeChange: (id: string, size: CardSize) => void;
   isEditMode: boolean;
@@ -38,6 +41,9 @@ export const MediaCard = memo(function MediaCard({
   state,
   volume: initialVolume,
   isMuted: initialMuted,
+  elapsedSeconds: initialElapsedSeconds,
+  durationSeconds: initialDurationSeconds,
+  positionUpdatedAt: initialPositionUpdatedAt,
   size,
   onSizeChange,
   isEditMode,
@@ -47,9 +53,12 @@ export const MediaCard = memo(function MediaCard({
   const {
     albumArt: resolvedAlbumArt,
     closeDialog,
+    durationSeconds,
+    elapsedSeconds,
     handleNext,
     handlePrevious,
     handleVolumeChange,
+    isOff,
     isPlaying,
     isMuted,
     isOpen,
@@ -63,12 +72,15 @@ export const MediaCard = memo(function MediaCard({
     initialState: state,
     initialVolume,
     initialMuted,
+    initialElapsedSeconds,
+    initialDurationSeconds,
+    initialPositionUpdatedAt,
   });
+  const stateSurface = getCardStateSurfaceTokens(theme, !isOff);
 
   const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const isLarge = size === 'large';
-  const artwork = resolvedAlbumArt ?? albumArt;
   const padding = isSmall ? 'p-4' : isLarge ? 'p-6' : 'p-5';
   const isLight = theme === 'light';
   const isGlass = theme === 'glass';
@@ -94,7 +106,7 @@ export const MediaCard = memo(function MediaCard({
   return (
     <>
       <div
-        className={`relative h-full backdrop-blur-xl rounded-3xl ${padding} border ${cardBorder} ${cardShadow} ${shellBg} overflow-hidden`}
+        className={`relative h-full backdrop-blur-xl rounded-3xl ${padding} border ${cardBorder} ${cardShadow} ${shellBg} ${stateSurface.containerClassName} overflow-hidden`}
       >
         {isEditMode && (
           <CardSizeSelector
@@ -104,36 +116,52 @@ export const MediaCard = memo(function MediaCard({
         )}
 
         <div className="absolute inset-0 overflow-hidden">
-          <img
-            src={artwork}
-            alt="Album art"
-            className={`absolute inset-0 w-full h-full object-cover blur-3xl scale-110 ${artworkOpacity}`}
-          />
+          {resolvedAlbumArt ? (
+            <img
+              src={resolvedAlbumArt}
+              alt=""
+              aria-hidden="true"
+              className={`absolute inset-0 h-full w-full object-cover blur-3xl scale-110 ${artworkOpacity} ${stateSurface.artworkClassName}`}
+            />
+          ) : null}
           <div className={`absolute inset-0 ${artworkOverlay}`}></div>
         </div>
 
         <div className={`absolute inset-0 bg-gradient-to-br ${artworkGlow} to-transparent`}></div>
 
+        {stateSurface.overlayClassName && (
+          <div className={`absolute inset-0 ${stateSurface.overlayClassName}`}></div>
+        )}
+
         <div className="relative h-full flex flex-col">
           {isSmall ? (
             <MediaSmallView
-              albumArt={artwork}
+              artwork={resolvedAlbumArt}
               title={title}
               artist={artist}
+              isActive={!isOff}
               isPlaying={isPlaying}
+              volume={volume}
+              elapsedSeconds={elapsedSeconds}
               theme={theme}
+              onPrevious={handlePrevious}
+              onTogglePlay={togglePlay}
+              onNext={handleNext}
+              onVolumeChange={handleVolumeChange}
               onOpenDialog={openDialog}
             />
           ) : isMedium ? (
             <MediaMediumView
-              albumArt={artwork}
+              artwork={resolvedAlbumArt}
               title={title}
               artist={artist}
+              isActive={!isOff}
               isPlaying={isPlaying}
               volume={volume}
               isMuted={isMuted}
-              isLight={isLight}
+              elapsedSeconds={elapsedSeconds}
               theme={theme}
+              onOpenDialog={openDialog}
               onPrevious={handlePrevious}
               onTogglePlay={togglePlay}
               onNext={handleNext}
@@ -142,14 +170,16 @@ export const MediaCard = memo(function MediaCard({
             />
           ) : (
             <MediaLargeView
-              albumArt={artwork}
+              artwork={resolvedAlbumArt}
               title={title}
               artist={artist}
+              isActive={!isOff}
               isPlaying={isPlaying}
               volume={volume}
               isMuted={isMuted}
-              isLight={isLight}
+              elapsedSeconds={elapsedSeconds}
               theme={theme}
+              onOpenDialog={openDialog}
               onPrevious={handlePrevious}
               onTogglePlay={togglePlay}
               onNext={handleNext}
@@ -165,12 +195,14 @@ export const MediaCard = memo(function MediaCard({
           <MediaDialog
             isOpen={isOpen}
             onOpenChange={closeDialog}
-            albumArt={artwork}
+            artwork={resolvedAlbumArt}
             title={title}
             artist={artist}
             isPlaying={isPlaying}
             volume={volume}
             isMuted={isMuted}
+            elapsedSeconds={elapsedSeconds}
+            durationSeconds={durationSeconds}
             onTogglePlay={togglePlay}
             onToggleMute={toggleMute}
             onVolumeChange={handleVolumeChange}

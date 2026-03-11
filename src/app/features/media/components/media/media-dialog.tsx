@@ -1,17 +1,21 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
+import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
+import { formatMediaTime } from './media-time';
 
 interface MediaDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  albumArt: string;
+  artwork?: string | null;
   title: string;
   artist: string;
   isPlaying: boolean;
   volume: number;
   isMuted: boolean;
+  elapsedSeconds: number;
+  durationSeconds: number;
   onTogglePlay: () => void;
   onToggleMute: () => void;
   onVolumeChange: (value: number) => void;
@@ -20,12 +24,14 @@ interface MediaDialogProps {
 export function MediaDialog({
   isOpen,
   onOpenChange,
-  albumArt,
+  artwork,
   title,
   artist,
   isPlaying,
   volume,
   isMuted,
+  elapsedSeconds,
+  durationSeconds,
   onTogglePlay,
   onToggleMute,
   onVolumeChange,
@@ -33,10 +39,8 @@ export function MediaDialog({
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
-  const controlSurface = isGlass
-    ? `${surface.subtleBg} ${surface.hoverBg}`
-    : 'bg-white/10 hover:bg-white/20';
-  const volumeTrack = isGlass ? 'bg-white/12' : 'bg-white/20';
+  const displayElapsed = formatMediaTime(elapsedSeconds);
+  const displayDuration = durationSeconds > 0 ? formatMediaTime(durationSeconds) : '--:--';
   const presetButton = (isActive: boolean) =>
     isActive
       ? 'border-pink-500 bg-pink-500/20 text-white scale-105'
@@ -67,43 +71,57 @@ export function MediaDialog({
 
           <div className="space-y-6">
             {/* Album Art */}
-            <div className="flex justify-center">
-              <img
-                src={albumArt}
-                alt={`${title} by ${artist}`}
-                className="w-48 h-48 rounded-3xl object-cover shadow-2xl"
-              />
-            </div>
+            {artwork ? (
+              <div className="flex justify-center">
+                <img
+                  src={artwork}
+                  alt={`${title} by ${artist}`}
+                  className="h-48 w-48 rounded-3xl object-cover shadow-2xl"
+                />
+              </div>
+            ) : null}
 
             {/* Playback Controls */}
             <div className="flex items-center justify-center gap-6">
-              <button
-                type="button"
-                className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${controlSurface}`}
+              <RoundControlButton
+                theme={theme}
+                size="large"
+                variant="neutral"
+                className="h-12 w-12 transition-colors"
               >
-                <SkipBack className={`w-6 h-6 ${surface.textPrimary}`} />
-              </button>
-              <button
-                type="button"
+                <SkipBack className="h-6 w-6" />
+              </RoundControlButton>
+              <RoundControlButton
+                theme={theme}
+                size="large"
+                variant="emphasis"
                 onClick={onTogglePlay}
-                className="w-16 h-16 rounded-full bg-pink-500 hover:bg-pink-600 flex items-center justify-center transition-colors shadow-lg shadow-pink-500/50"
+                className="h-16 w-16 transition-colors"
               >
                 {isPlaying ? (
-                  <Pause className="w-7 h-7 text-white" fill="white" />
+                  <Pause className="h-7 w-7" fill="currentColor" />
                 ) : (
-                  <Play className="w-7 h-7 text-white" fill="white" />
+                  <Play className="h-7 w-7" fill="currentColor" />
                 )}
-              </button>
-              <button
-                type="button"
-                className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${controlSurface}`}
+              </RoundControlButton>
+              <RoundControlButton
+                theme={theme}
+                size="large"
+                variant="neutral"
+                className="h-12 w-12 transition-colors"
               >
-                <SkipForward className={`w-6 h-6 ${surface.textPrimary}`} />
-              </button>
+                <SkipForward className="h-6 w-6" />
+              </RoundControlButton>
             </div>
 
             {/* Volume Control */}
             <div>
+              {isPlaying && (
+                <div className="mb-3 flex items-center justify-between">
+                  <span className={`text-sm ${surface.textSecondary}`}>{displayElapsed}</span>
+                  <span className={`text-sm ${surface.textSecondary}`}>{displayDuration}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between mb-3">
                 <span className={`text-sm font-medium ${surface.textSecondary}`}>Volume</span>
                 <span className={`text-sm font-semibold ${surface.textPrimary}`}>
@@ -111,20 +129,18 @@ export function MediaDialog({
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                <button
-                  type="button"
+                <RoundControlButton
+                  theme={theme}
+                  size="medium"
+                  variant="neutral"
                   onClick={onToggleMute}
-                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${controlSurface}`}
+                  className="h-10 w-10 transition-colors"
                 >
-                  {isMuted ? (
-                    <VolumeX className={`w-5 h-5 ${surface.textPrimary}`} />
-                  ) : (
-                    <Volume2 className={`w-5 h-5 ${surface.textPrimary}`} />
-                  )}
-                </button>
-                <div className={`flex-1 relative h-2 rounded-full overflow-hidden ${volumeTrack}`}>
+                  {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                </RoundControlButton>
+                <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-white/20">
                   <div
-                    className="absolute left-0 top-0 h-full bg-pink-500 transition-all duration-150"
+                    className="absolute left-0 top-0 h-full bg-white transition-all duration-150"
                     style={{ width: isMuted ? '0%' : `${volume}%` }}
                   />
                   <input

@@ -7,6 +7,7 @@ import { CardSettingsActionButton } from '@/app/components/shared/card-settings-
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import type { ThemeType } from '@/app/hooks';
 import type { CoverIconButtonProps, DeviceClass, DeviceClassConfig } from './cover-card.types';
@@ -145,28 +146,32 @@ export function CoverCardView({
               size="small"
               leftContent={
                 <>
-                  <button
-                    type="button"
+                  <RoundControlButton
+                    theme={theme}
+                    size="small"
+                    variant="neutral"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleOpen();
                     }}
-                    className={`h-7 w-7 rounded-full ${buttonBg} hover:scale-105 transition-all flex items-center justify-center`}
+                    className={`hover:scale-105 ${buttonBg}`}
                     title="Open"
                   >
                     <ChevronUp className={`h-3 w-3 ${buttonText}`} />
-                  </button>
-                  <button
-                    type="button"
+                  </RoundControlButton>
+                  <RoundControlButton
+                    theme={theme}
+                    size="small"
+                    variant="neutral"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleStop();
                     }}
-                    className={`h-7 w-7 rounded-full ${buttonBg} hover:scale-105 transition-all flex items-center justify-center`}
+                    className={`hover:scale-105 ${buttonBg}`}
                     title="Stop"
                   >
                     <Square className={`h-3 w-3 ${buttonText}`} />
-                  </button>
+                  </RoundControlButton>
                 </>
               }
               overflowItems={[

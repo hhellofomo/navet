@@ -36,6 +36,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 ### 🏠 Smart Home Control
 - **Multi-Entity Support** - Lights, HVAC, switches, covers, locks, sensors, media players, vacuums, and more
 - **Unified Climate Controls** - Home Assistant climate entities now render through the HVAC card and settings flow across the dashboard
+- **Home Assistant Media Controls** - Media player cards now use live Home Assistant playback, volume, mute, metadata, elapsed-time, and artwork data instead of mock-only state
 - **Real-Time Updates** - Live state updates from your smart home system
 - **Quick Actions** - Toggle, adjust, and control devices with intuitive controls
 - **Room Organization** - Organized by rooms with dedicated room views
@@ -76,6 +77,8 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **Feature-Colocated State** - Dashboard and lighting hooks/stores live with their owning features instead of generic global folders
 - **Shared UI Foundation** - Cross-feature pieces such as card sizing, empty states, interaction previews, and theme color helpers live under shared component modules
 - **Shared Visual Primitives** - Cross-theme icon pills and interactive nav/action pills are centralized behind reusable shared primitives instead of feature-level inline theme branches
+- **Shared Card State Styling** - Off/inactive card treatment for light, HVAC, switch, and media cards now resolves through one shared card-state surface token helper
+- **Artwork-Led Media Layouts** - Small, medium, and large media cards now use full-bleed artwork-driven layouts with a shared transport-control language
 - **Single Climate Card Path** - The legacy `ClimateCard` implementation has been removed; climate entities now use `HVACCard` only
 - **Consistent Persistence** - Storage keys plus dashboard/light preference persistence are standardized behind shared helpers and feature stores
 
@@ -168,6 +171,7 @@ pnpm build
 - Choose from **4 modes**: Liquid Glass, Dark, Light, Contrast
 - Select from **8 colors**: Blue, Purple, Green, Orange, Pink, Red, Teal, Yellow
 - Shared theme-sensitive pieces such as entity icon pills and nav/action pills now resolve through reusable shared primitives rather than per-feature inline styling
+- Inactive/off card shells and text treatment now also resolve through a shared card-state primitive instead of per-card opacity tweaks
 
 #### Card Interaction Style
 - In **Settings -> Dashboard**, choose how entity cards respond to taps

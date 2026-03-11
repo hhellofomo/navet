@@ -3,7 +3,9 @@ import type { LucideIcon } from 'lucide-react';
 import { MoreHorizontal } from 'lucide-react';
 import { memo } from 'react';
 import { useTheme } from '@/app/hooks';
+import { getCardActionControlSizes } from './card-action-control-sizes';
 import type { CardSize } from './card-size-selector';
+import { getRoundControlStyles } from './theme/round-control-styles';
 
 interface BrightnessPreset {
   icon: LucideIcon;
@@ -33,8 +35,12 @@ export const BrightnessPresetsInline = memo(function BrightnessPresetsInline({
 }: BrightnessPresetsInlineProps) {
   const { theme, primaryColor } = useTheme();
   const isCompact = size === 'extra-small' || size === 'small';
-  const buttonSize = isCompact ? 'w-7 h-7' : size === 'medium' ? 'w-8 h-8' : 'w-9 h-9';
-  const iconSize = isCompact ? 'w-3 h-3' : size === 'medium' ? 'w-4 h-4' : 'w-4 h-4';
+  const controlSizes = getCardActionControlSizes(
+    isCompact ? 'small' : size === 'large' ? 'large' : 'medium'
+  );
+  const buttonSize = controlSizes.button;
+  const iconSize = controlSizes.icon;
+  const roundControl = getRoundControlStyles(theme);
   const gap = size === 'large' ? 'gap-2' : 'gap-1.5';
   const visiblePresets = maxVisible ? presets.slice(0, maxVisible) : presets;
   const overflowPresets = maxVisible ? presets.slice(maxVisible) : [];
@@ -51,20 +57,12 @@ export const BrightnessPresetsInline = memo(function BrightnessPresetsInline({
   const activeColor = colorMap[primaryColor];
   const neutralSelectedBg = theme === 'light' ? '#9ca3af' : 'rgba(255,255,255,0.22)';
   const neutralSelectedRing = theme === 'light' ? '#d1d5db' : 'rgba(255,255,255,0.16)';
-  const selectedClasses =
-    theme === 'light' ? 'text-white ring-2 scale-105' : 'text-white ring-2 scale-105';
-  const unselectedClasses =
-    theme === 'light'
-      ? 'bg-gray-900/10 text-gray-900 hover:bg-gray-900/18'
-      : 'bg-white/15 text-white hover:bg-white/25';
+  const selectedClasses = `${roundControl.selectedText} ring-2 scale-105`;
   const disabledSelectedClasses =
     theme === 'light'
       ? 'cursor-not-allowed text-white ring-2 scale-105 opacity-70'
       : 'cursor-not-allowed text-white ring-2 scale-105 opacity-70';
-  const disabledUnselectedClasses =
-    theme === 'light'
-      ? 'cursor-not-allowed bg-gray-900/10 text-gray-500 opacity-50'
-      : 'cursor-not-allowed bg-white/15 text-white/60 opacity-50';
+  const disabledUnselectedClasses = roundControl.disabledButton;
 
   return (
     <fieldset
@@ -121,7 +119,7 @@ export const BrightnessPresetsInline = memo(function BrightnessPresetsInline({
                   : disabledUnselectedClasses
                 : isSelected
                   ? selectedClasses
-                  : `${unselectedClasses} cursor-pointer hover:scale-105 active:scale-95`
+                  : `${roundControl.defaultButton} cursor-pointer hover:scale-105 active:scale-95`
             }`}
           >
             <IconComponent className={iconSize} aria-hidden="true" />
@@ -171,19 +169,9 @@ const BrightnessOverflowMenu = memo(function BrightnessOverflowMenu({
     teal: '#14b8a6',
   } as const;
   const activeColor = colorMap[primaryColor];
-  const triggerClasses =
-    theme === 'light'
-      ? 'bg-gray-900/10 text-gray-900 hover:bg-gray-900/18'
-      : 'bg-white/15 text-white hover:bg-white/25';
-  const disabledTriggerClasses =
-    theme === 'light'
-      ? 'opacity-50 cursor-not-allowed bg-gray-900/10 text-gray-500'
-      : 'opacity-50 cursor-not-allowed bg-white/15 text-white/60';
-  const selectedClasses = 'text-white ring-2 scale-105';
-  const unselectedClasses =
-    theme === 'light'
-      ? 'bg-gray-900/10 text-gray-900 hover:bg-gray-900/18'
-      : 'bg-white/15 text-white hover:bg-white/25';
+  const roundControl = getRoundControlStyles(theme);
+  const selectedClasses = `${roundControl.selectedText} ring-2 scale-105`;
+  const unselectedClasses = roundControl.defaultButton;
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
@@ -193,8 +181,8 @@ const BrightnessOverflowMenu = memo(function BrightnessOverflowMenu({
           aria-label="More brightness presets"
           className={`${buttonSize} rounded-full transition-all duration-300 flex items-center justify-center ${
             !isOn
-              ? disabledTriggerClasses
-              : `cursor-pointer ${triggerClasses} hover:scale-105 active:scale-95`
+              ? roundControl.disabledButton
+              : `cursor-pointer ${roundControl.defaultButton} hover:scale-105 active:scale-95`
           }`}
           onClick={(e) => e.stopPropagation()}
         >

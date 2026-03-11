@@ -78,6 +78,9 @@ export interface MediaDevice extends BaseDevice {
   state: 'playing' | 'paused' | 'idle' | 'off';
   volume: number;
   isMuted: boolean;
+  elapsedSeconds?: number;
+  durationSeconds?: number;
+  positionUpdatedAt?: string;
 }
 
 // WiFi device

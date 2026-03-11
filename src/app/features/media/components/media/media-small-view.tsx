@@ -1,76 +1,160 @@
-import { Pause, Play } from 'lucide-react';
-import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { Pause, Play, SkipBack, SkipForward } from 'lucide-react';
+import { getCardActionControlSizes } from '@/app/components/shared/card-action-control-sizes';
+import { RoundControlButton } from '@/app/components/shared/round-control-button';
+import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import type { ThemeType } from '@/app/hooks/use-theme';
+import { getMediaControlStyles } from './media-control-styles';
+import { formatMediaTime } from './media-time';
+import { MediaVisualizerButton } from './media-visualizer-button';
 
 interface MediaSmallViewProps {
-  albumArt: string;
+  artwork?: string | null;
   title: string;
   artist: string;
+  isActive: boolean;
   isPlaying: boolean;
+  volume: number;
+  elapsedSeconds: number;
   theme: ThemeType;
+  onPrevious: () => void;
+  onTogglePlay: () => void;
+  onNext: () => void;
+  onVolumeChange: (value: number) => void;
   onOpenDialog: () => void;
 }
 
 export function MediaSmallView({
-  albumArt,
+  artwork,
   title,
   artist,
+  isActive,
   isPlaying,
+  volume,
+  elapsedSeconds,
   theme,
+  onPrevious,
+  onTogglePlay,
+  onNext,
+  onVolumeChange,
   onOpenDialog,
 }: MediaSmallViewProps) {
-  const surface = getThemeSurfaceTokens(theme);
-  const isLight = theme === 'light';
-  const isGlass = theme === 'glass';
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onOpenDialog();
-    }
-  };
+  const displayVolume = Math.max(0, Math.min(100, volume));
+  const overlay =
+    theme === 'light'
+      ? 'bg-[radial-gradient(circle_at_78%_34%,rgba(255,255,255,0.16),transparent_18%),linear-gradient(180deg,rgba(0,0,0,0.28),rgba(0,0,0,0.12)_34%,rgba(0,0,0,0.52))]'
+      : theme === 'glass'
+        ? 'bg-[radial-gradient(circle_at_78%_34%,rgba(255,255,255,0.14),transparent_18%),linear-gradient(180deg,rgba(2,6,23,0.2),rgba(2,6,23,0.08)_34%,rgba(2,6,23,0.48))]'
+        : 'bg-[radial-gradient(circle_at_78%_34%,rgba(255,255,255,0.08),transparent_18%),linear-gradient(180deg,rgba(0,0,0,0.24),rgba(0,0,0,0.12)_34%,rgba(0,0,0,0.56))]';
+  const stateSurface = getCardStateSurfaceTokens(theme, isActive);
+  const iconTone = stateSurface.primaryTextClassName;
+  const subtitleTone = stateSurface.secondaryTextClassName;
+  const displayElapsed = formatMediaTime(elapsedSeconds);
+  const controls = getMediaControlStyles(theme);
+  const controlSizes = getCardActionControlSizes('small');
+  const primaryControlSizes = getCardActionControlSizes('medium');
 
   return (
-    <button
-      type="button"
-      className="absolute inset-0 -m-4 group"
-      onClick={(e) => {
-        e.stopPropagation();
-        onOpenDialog();
-      }}
-      onKeyDown={handleKeyDown}
-    >
-      <img src={albumArt} alt={`${title} by ${artist}`} className="w-full h-full object-cover" />
-      {/* Subtle gradient overlay for depth */}
-      <div
-        className={`absolute inset-0 ${
-          isLight
-            ? 'bg-gradient-to-b from-white/30 via-transparent to-white/60 opacity-60 group-hover:opacity-40'
-            : isGlass
-              ? 'bg-gradient-to-b from-slate-950/20 via-transparent to-slate-950/56 opacity-65 group-hover:opacity-45'
-              : 'bg-gradient-to-b from-black/30 via-transparent to-black/60 opacity-60 group-hover:opacity-40'
-        } transition-opacity`}
-      ></div>
-      {/* Play indicator on hover */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-        <div
-          className={`w-16 h-16 rounded-full ${
-            isLight ? 'bg-white/40' : isGlass ? surface.subtleBg : 'bg-black/40'
-          } backdrop-blur-md flex items-center justify-center`}
-        >
-          {isPlaying ? (
-            <Pause
-              className={`w-8 h-8 ${isLight ? 'text-gray-800' : surface.textPrimary}`}
-              fill={isLight ? '#1f2937' : 'white'}
+    <div className="relative -m-4 flex h-[calc(100%+2rem)] flex-col overflow-hidden rounded-[inherit]">
+      {artwork ? (
+        <img
+          src={artwork}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      ) : null}
+      <div className={`absolute inset-0 ${overlay}`} />
+
+      <div className="relative flex h-full flex-col p-4">
+        <div className="flex items-center gap-2.5">
+          <MediaVisualizerButton
+            isPlaying={isPlaying}
+            onClick={(event) => {
+              event.stopPropagation();
+              onOpenDialog();
+            }}
+            className={iconTone}
+          />
+          {isPlaying && <span className={`text-[11px] ${subtitleTone}`}>{displayElapsed}</span>}
+        </div>
+
+        <div className="mt-auto flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <div className={`truncate text-sm font-medium ${iconTone}`}>{title}</div>
+            <div className={`mt-0.5 truncate text-[13px] ${subtitleTone}`}>{artist}</div>
+          </div>
+
+          <RoundControlButton
+            theme={theme}
+            size="medium"
+            variant="emphasis"
+            aria-label={isPlaying ? 'Pause playback' : 'Resume playback'}
+            onClick={(event) => {
+              event.stopPropagation();
+              onTogglePlay();
+            }}
+            className="h-12 w-12 hover:scale-[1.03] active:scale-95"
+          >
+            {isPlaying ? (
+              <Pause className={primaryControlSizes.icon} fill="currentColor" />
+            ) : (
+              <Play className={primaryControlSizes.icon} fill="currentColor" />
+            )}
+          </RoundControlButton>
+        </div>
+
+        <div className="mt-6 flex items-center gap-2">
+          <RoundControlButton
+            theme={theme}
+            size="small"
+            variant="neutral"
+            aria-label="Previous track"
+            onClick={(event) => {
+              event.stopPropagation();
+              onPrevious();
+            }}
+            className="transition-colors"
+          >
+            <SkipBack className={controlSizes.icon} />
+          </RoundControlButton>
+
+          <div className="relative flex-1">
+            <div
+              className={`absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 ${controls.trackBase}`}
             />
-          ) : (
-            <Play
-              className={`w-8 h-8 ${isLight ? 'text-gray-800' : surface.textPrimary}`}
-              fill={isLight ? '#1f2937' : 'white'}
+            <div
+              className={`absolute left-0 top-1/2 h-px -translate-y-1/2 ${controls.trackFill}`}
+              style={{ width: `${displayVolume}%` }}
             />
-          )}
+            <div
+              className={`absolute top-1/2 h-4 w-px -translate-y-1/2 rounded-full ${controls.trackThumb}`}
+              style={{ left: `calc(${displayVolume}% - 0.5px)` }}
+            />
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={displayVolume}
+              onChange={(event) => onVolumeChange(parseInt(event.target.value, 10))}
+              className="absolute inset-0 h-6 w-full -translate-y-1/2 cursor-pointer opacity-0"
+            />
+          </div>
+
+          <RoundControlButton
+            theme={theme}
+            size="small"
+            variant="neutral"
+            aria-label="Next track"
+            onClick={(event) => {
+              event.stopPropagation();
+              onNext();
+            }}
+            className="transition-colors"
+          >
+            <SkipForward className={controlSizes.icon} />
+          </RoundControlButton>
         </div>
       </div>
-    </button>
+    </div>
   );
 }
