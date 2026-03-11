@@ -63,6 +63,7 @@ Complete feature implementation guide:
 6. **Theme Customization** - Four theme modes (Liquid Glass, Dark, Light, High Contrast) with 8 primary color options
 7. **Section-Based Navigation** - Organized into dedicated sections (Home, Security, Tasks, Locks, Lights, Media, Mock, Settings)
 8. **Shared Primitives First** - Cross-theme icon pills and nav/action pills should resolve through shared primitives before feature-level custom styling is added
+9. **One Climate Card Pattern** - Climate entities should use the HVAC card pattern; do not reintroduce a parallel legacy climate-card implementation
 
 ### Authentication System
 - **Login Page** - Secure authentication with Home Assistant URL and long-lived access token
@@ -150,6 +151,7 @@ When creating a new card component:
 /src/app/features/dashboard/  → Dashboard layout, routing, and card registry
 /src/app/features/settings/   → Settings page and section implementations
 /src/app/features/lighting/   → Light cards, presets, and feature-owned stores
+/src/app/features/climate/    → HVAC card, settings dialog, and climate-specific styles
 /src/app/features/auth/login-page.tsx → Login interface
 /src/app/contexts/auth-context.tsx → Authentication state management
 /src/app/hooks/use-theme.ts   → Theme and color customization

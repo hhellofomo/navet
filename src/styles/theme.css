@@ -313,12 +313,46 @@
     padding-top: max(env(safe-area-inset-top), 0px);
   }
 
+  .safe-area-pt-3 {
+    padding-top: 0.75rem;
+  }
+
+  .safe-area-pt-4 {
+    padding-top: 1rem;
+  }
+
+  .safe-area-pt-5 {
+    padding-top: 1.25rem;
+  }
+
+  .safe-area-pt-8 {
+    padding-top: 2rem;
+  }
+
   .safe-area-pb {
     padding-bottom: max(env(safe-area-inset-bottom), 0px);
   }
 
   .safe-area-bottom-offset {
-    bottom: max(env(safe-area-inset-bottom), 0px);
+    bottom: max(calc(env(safe-area-inset-bottom) - 8px), 0px);
+  }
+
+  @media (display-mode: standalone), (display-mode: fullscreen) {
+    .safe-area-pt-3 {
+      padding-top: calc(0.75rem + max(env(safe-area-inset-top), 0px));
+    }
+
+    .safe-area-pt-4 {
+      padding-top: calc(1rem + max(env(safe-area-inset-top), 0px));
+    }
+
+    .safe-area-pt-5 {
+      padding-top: calc(1.25rem + max(env(safe-area-inset-top), 0px));
+    }
+
+    .safe-area-pt-8 {
+      padding-top: calc(2rem + max(env(safe-area-inset-top), 0px));
+    }
   }
 
   /* iOS-style wiggle animation for edit mode */

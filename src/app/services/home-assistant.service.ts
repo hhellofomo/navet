@@ -318,6 +318,43 @@ class HomeAssistantService {
     );
   }
 
+  async updateMediaPlayerPlayback(
+    entityId: string,
+    action: 'toggle' | 'play' | 'pause' | 'previous' | 'next'
+  ): Promise<void> {
+    const service =
+      action === 'toggle'
+        ? 'media_play_pause'
+        : action === 'play'
+          ? 'media_play'
+          : action === 'pause'
+            ? 'media_pause'
+            : action === 'previous'
+              ? 'media_previous_track'
+              : 'media_next_track';
+
+    await this.callService('media_player', service, {}, { entity_id: entityId });
+  }
+
+  async setMediaPlayerVolume(entityId: string, volumePct: number): Promise<void> {
+    const volumeLevel = Math.max(0, Math.min(1, volumePct / 100));
+    await this.callService(
+      'media_player',
+      'volume_set',
+      { volume_level: volumeLevel },
+      { entity_id: entityId }
+    );
+  }
+
+  async setMediaPlayerMute(entityId: string, isMuted: boolean): Promise<void> {
+    await this.callService(
+      'media_player',
+      'volume_mute',
+      { is_volume_muted: isMuted },
+      { entity_id: entityId }
+    );
+  }
+
   /**
    * Close the connection
    */

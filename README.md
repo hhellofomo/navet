@@ -35,6 +35,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 
 ### 🏠 Smart Home Control
 - **Multi-Entity Support** - Lights, HVAC, switches, covers, locks, sensors, media players, vacuums, and more
+- **Unified Climate Controls** - Home Assistant climate entities now render through the HVAC card and settings flow across the dashboard
 - **Real-Time Updates** - Live state updates from your smart home system
 - **Quick Actions** - Toggle, adjust, and control devices with intuitive controls
 - **Room Organization** - Organized by rooms with dedicated room views
@@ -75,6 +76,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **Feature-Colocated State** - Dashboard and lighting hooks/stores live with their owning features instead of generic global folders
 - **Shared UI Foundation** - Cross-feature pieces such as card sizing, empty states, interaction previews, and theme color helpers live under shared component modules
 - **Shared Visual Primitives** - Cross-theme icon pills and interactive nav/action pills are centralized behind reusable shared primitives instead of feature-level inline theme branches
+- **Single Climate Card Path** - The legacy `ClimateCard` implementation has been removed; climate entities now use `HVACCard` only
 - **Consistent Persistence** - Storage keys plus dashboard/light preference persistence are standardized behind shared helpers and feature stores
 
 ## 🚀 Installation

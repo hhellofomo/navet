@@ -74,6 +74,10 @@ export interface MediaDevice extends BaseDevice {
   room: string;
   title: string;
   artist: string;
+  entityPicture?: string;
+  state: 'playing' | 'paused' | 'idle' | 'off';
+  volume: number;
+  isMuted: boolean;
 }
 
 // WiFi device

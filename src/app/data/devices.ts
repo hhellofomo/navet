@@ -44,6 +44,10 @@ export interface MediaDevice {
   room: string;
   title: string;
   artist: string;
+  entityPicture?: string;
+  state: 'playing' | 'paused' | 'idle' | 'off';
+  volume: number;
+  isMuted: boolean;
   size: CardSize;
 }
 
@@ -185,6 +189,9 @@ export const devices: Devices = {
       room: 'Living Room',
       title: 'Blinding Lights',
       artist: 'The Weeknd',
+      state: 'playing',
+      volume: 72,
+      isMuted: false,
       size: 'large',
     },
   ],

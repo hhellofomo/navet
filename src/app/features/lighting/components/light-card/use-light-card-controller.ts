@@ -312,6 +312,17 @@ export function useLightCardController({
     [id, isHomeAssistantLight]
   );
 
+  const schedulePendingStateReset = useCallback((nextIsOn: boolean, delayMs = 1500) => {
+    pendingStateRef.current = nextIsOn;
+    if (stateSyncTimeoutRef.current) {
+      clearTimeout(stateSyncTimeoutRef.current);
+    }
+    stateSyncTimeoutRef.current = setTimeout(() => {
+      pendingStateRef.current = null;
+      stateSyncTimeoutRef.current = null;
+    }, delayMs);
+  }, []);
+
   const hexToRgb = useCallback((hex: string): [number, number, number] | null => {
     const normalized = hex.replace('#', '');
     if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
@@ -334,9 +345,20 @@ export function useLightCardController({
       rememberLightState(id, { brightness: nextBrightness });
       if (!isOn) {
         setIsOn(true);
+        schedulePendingStateReset(true);
+        void syncLightWithHomeAssistant({ state: 'on', brightnessPct: nextBrightness }).catch(
+          () => {
+            pendingStateRef.current = null;
+            if (stateSyncTimeoutRef.current) {
+              clearTimeout(stateSyncTimeoutRef.current);
+              stateSyncTimeoutRef.current = null;
+            }
+            setIsOn(false);
+          }
+        );
       }
     },
-    [id, isOn, rememberLightState]
+    [id, isOn, rememberLightState, schedulePendingStateReset, syncLightWithHomeAssistant]
   );
 
   const onBrightnessCommit = useCallback(
@@ -455,14 +477,7 @@ export function useLightCardController({
           tempSyncTimeoutRef.current = null;
         }, 2500);
       }
-      pendingStateRef.current = nextIsOn;
-      if (stateSyncTimeoutRef.current) {
-        clearTimeout(stateSyncTimeoutRef.current);
-      }
-      stateSyncTimeoutRef.current = setTimeout(() => {
-        pendingStateRef.current = null;
-        stateSyncTimeoutRef.current = null;
-      }, 1500);
+      schedulePendingStateReset(nextIsOn);
 
       void syncLightWithHomeAssistant({
         state: nextIsOn ? 'on' : 'off',
@@ -477,7 +492,15 @@ export function useLightCardController({
         setIsOn(!nextIsOn);
       });
     },
-    [brightness, id, maxColorTemp, minColorTemp, selectedColor, syncLightWithHomeAssistant]
+    [
+      brightness,
+      id,
+      maxColorTemp,
+      minColorTemp,
+      schedulePendingStateReset,
+      selectedColor,
+      syncLightWithHomeAssistant,
+    ]
   );
 
   const handleSettingsClick = useCallback(() => {
