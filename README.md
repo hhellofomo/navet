@@ -47,7 +47,8 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **Custom Widgets** - Add Calendar, News, Weather, Photo Frame, and Quick Note widgets
 - **Entity Visibility Control** - Start with all entities, a blank board, or import a saved config, then add/remove entities as needed
 - **Search & Filter** - Real-time search filters dashboard view
-- **All View** - See all devices grouped by room
+- **All View Modes** - Switch the `All` room between custom, room, type, or flat grouping
+- **Dashboard Menu** - The room-bar dashboard menu now groups add/view/edit actions plus config export in one dropdown
 - **Notifications** - System notifications panel
 - **Settings** - Comprehensive theme and customization options
 - **User Management** - Login system with user profiles
@@ -67,6 +68,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 ### ⚡ Performance
 - **Lazy-Loaded UI** - Settings, add-card flows, widgets, and media dialogs load on demand
 - **Deferred Room Rendering** - Offscreen room groups are deferred in the All view
+- **Virtualized Entity Picker** - The Add Entity dialog window-renders large Home Assistant entity lists
 - **Smart Re-renders** - Zustand-backed search state and stable device maps reduce dashboard churn
 - **No-Animation Mode** - Optional global animation disable for slower devices
 - **Local Config Backup** - Export and restore dashboard layout/preferences from a YAML file
@@ -184,7 +186,7 @@ pnpm build
 
 #### Room Navigation
 - Use **room tabs** to filter by room
-- **All** view shows everything grouped by room
+- In **All**, use the **Dashboard** dropdown to switch between **Custom**, **Room**, **Type**, and **No Grouping**
 - Device counts shown for each room
 - The selected dashboard section and room both persist across refresh
 

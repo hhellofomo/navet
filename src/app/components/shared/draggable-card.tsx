@@ -4,7 +4,6 @@ import type { CSSProperties } from 'react';
 
 interface DraggableCardProps {
   id: string;
-  index: number;
   isEditMode: boolean;
   isSortable?: boolean;
   children: React.ReactNode;
@@ -23,8 +22,7 @@ export function DraggableCard({
     disabled: !isSortable,
   });
 
-  // Only apply drag transform when actually moving (non-zero transform values)
-  // This prevents inline styles from overriding the CSS wiggle animation
+  // Only apply drag transform when the card is actually moving.
   const hasTransform = transform && (transform.x !== 0 || transform.y !== 0);
 
   const style: CSSProperties = hasTransform
@@ -43,9 +41,9 @@ export function DraggableCard({
       {...(isSortable ? listeners : {})}
       className={`h-full relative transition-opacity duration-200 ${className} ${
         isDragging ? 'opacity-40 z-50' : 'opacity-100'
-      } ${
-        isEditMode && !isDragging ? 'cursor-move animate-wiggle [&_*]:cursor-inherit' : ''
-      } ${isEditMode ? 'active:cursor-grabbing [&_*]:active:cursor-inherit' : ''}`}
+      } ${isEditMode && !isDragging ? 'cursor-move [&_*]:cursor-inherit' : ''} ${
+        isEditMode ? 'active:cursor-grabbing [&_*]:active:cursor-inherit' : ''
+      }`}
     >
       {children}
     </div>

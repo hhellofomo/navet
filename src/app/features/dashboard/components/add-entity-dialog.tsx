@@ -1,5 +1,5 @@
 import { Search, X } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
@@ -20,6 +20,10 @@ interface AddEntityDialogProps {
   actionLabel?: string;
 }
 
+const ENTITY_ROW_HEIGHT = 88;
+const ENTITY_LIST_HEIGHT = 420;
+const ENTITY_LIST_OVERSCAN = 6;
+
 export function AddEntityDialog({
   open,
   onClose,
@@ -35,6 +39,8 @@ export function AddEntityDialog({
   const { theme, primaryColor } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const [query, setQuery] = useState('');
+  const [scrollTop, setScrollTop] = useState(0);
+  const listRef = useRef<HTMLDivElement | null>(null);
 
   const bgColor = theme === 'light' ? 'bg-white' : surface.panel;
   const textColor = surface.textPrimary;
@@ -77,6 +83,24 @@ export function AddEntityDialog({
         return leftName.localeCompare(rightName);
       });
   }, [addedEntityIds, currentRoom, deviceMap, query, visibleEntityIds]);
+
+  const listResetKey = `${open}:${currentRoom}:${query}:${visibleEntityIds?.join(',') ?? ''}`;
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: this effect intentionally resets virtualization state when the list identity changes
+  useEffect(() => {
+    setScrollTop(0);
+    listRef.current?.scrollTo({ top: 0 });
+  }, [listResetKey]);
+
+  const visibleCount = Math.ceil(ENTITY_LIST_HEIGHT / ENTITY_ROW_HEIGHT);
+  const startIndex = Math.max(0, Math.floor(scrollTop / ENTITY_ROW_HEIGHT) - ENTITY_LIST_OVERSCAN);
+  const endIndex = Math.min(
+    availableDevices.length,
+    startIndex + visibleCount + ENTITY_LIST_OVERSCAN * 2
+  );
+  const virtualDevices = availableDevices.slice(startIndex, endIndex);
+  const topSpacerHeight = startIndex * ENTITY_ROW_HEIGHT;
+  const totalHeight = availableDevices.length * ENTITY_ROW_HEIGHT;
 
   if (!open) return null;
 
@@ -121,35 +145,46 @@ export function AddEntityDialog({
           </div>
         </div>
 
-        <div className="max-h-[420px] overflow-y-auto p-6 pt-4 space-y-3">
+        <div
+          ref={listRef}
+          className="max-h-[420px] overflow-y-auto p-6 pt-4"
+          onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
+        >
           {availableDevices.length > 0 ? (
-            availableDevices.map((device) => {
-              const name = typeof device.name === 'string' ? device.name : device.id;
-              const room = getDeviceRoomLabel(device);
-              const typeLabel = getDeviceTypeLabel(device.type);
+            <div className="relative" style={{ height: totalHeight || ENTITY_LIST_HEIGHT }}>
+              <div
+                className="absolute inset-x-0 top-0 space-y-3"
+                style={{ transform: `translateY(${topSpacerHeight}px)` }}
+              >
+                {virtualDevices.map((device) => {
+                  const name = typeof device.name === 'string' ? device.name : device.id;
+                  const room = getDeviceRoomLabel(device);
+                  const typeLabel = getDeviceTypeLabel(device.type);
 
-              return (
-                <div
-                  key={device.id}
-                  className={`flex items-center justify-between gap-4 rounded-xl border ${borderColor} ${cardBg} p-4`}
-                >
-                  <div className="min-w-0">
-                    <p className={`text-sm font-medium ${textColor} truncate`}>{name}</p>
-                    <p className={`text-xs ${mutedColor} truncate mt-1`}>
-                      {typeLabel} · {room}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => onAddEntity(device.id)}
-                    className="px-3 py-2 rounded-lg text-xs font-medium text-white"
-                    style={{ backgroundColor: getThemeColorValue(primaryColor) }}
-                  >
-                    {actionLabel}
-                  </button>
-                </div>
-              );
-            })
+                  return (
+                    <div
+                      key={device.id}
+                      className={`flex h-[76px] items-center justify-between gap-4 rounded-xl border ${borderColor} ${cardBg} p-4`}
+                    >
+                      <div className="min-w-0">
+                        <p className={`text-sm font-medium ${textColor} truncate`}>{name}</p>
+                        <p className={`text-xs ${mutedColor} truncate mt-1`}>
+                          {typeLabel} · {room}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => onAddEntity(device.id)}
+                        className="px-3 py-2 rounded-lg text-xs font-medium text-white"
+                        style={{ backgroundColor: getThemeColorValue(primaryColor) }}
+                      >
+                        {actionLabel}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           ) : (
             <div className={`rounded-xl border ${borderColor} ${cardBg} p-8 text-center`}>
               <p className={`text-sm font-medium ${textColor}`}>No entities available</p>

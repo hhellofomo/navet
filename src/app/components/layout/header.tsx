@@ -40,7 +40,6 @@ export const Header = memo(function Header() {
 
     const matchingIds: string[] = [];
 
-    // Search through all device types
     const searchInDevices = <T extends { id: string }>(
       deviceArray: T[] | undefined,
       searchFields: (keyof T)[]
@@ -58,20 +57,25 @@ export const Header = memo(function Header() {
       });
     };
 
-    // Search all device types
-    searchInDevices(devices.lights, ['name', 'room']);
-    searchInDevices(devices.hvac, ['name', 'room']);
-    searchInDevices(devices.switches, ['name', 'room']);
-    searchInDevices(devices.covers, ['name', 'room']);
-    searchInDevices(devices.locks, ['name', 'room']);
-    searchInDevices(devices.media, ['name', 'room']);
-    searchInDevices(devices.persons, ['name', 'location']);
-    searchInDevices(devices.sensors, ['name', 'room']);
-    searchInDevices(devices.vacuums, ['name', 'room']);
-    searchInDevices(devices.climate, ['name']);
-    searchInDevices(devices.weather, ['name', 'location']);
-    searchInDevices(devices.power, ['name']);
-    searchInDevices(devices.wifi, ['name', 'room']);
+    const searchActions = [
+      () => searchInDevices(devices.lights, ['name', 'room']),
+      () => searchInDevices(devices.hvac, ['name', 'room']),
+      () => searchInDevices(devices.switches, ['name', 'room']),
+      () => searchInDevices(devices.covers, ['name', 'room']),
+      () => searchInDevices(devices.locks, ['name', 'room']),
+      () => searchInDevices(devices.media, ['name', 'room']),
+      () => searchInDevices(devices.persons, ['name', 'location']),
+      () => searchInDevices(devices.sensors, ['name', 'room']),
+      () => searchInDevices(devices.vacuums, ['name', 'room']),
+      () => searchInDevices(devices.climate, ['name']),
+      () => searchInDevices(devices.weather, ['name', 'location']),
+      () => searchInDevices(devices.power, ['name']),
+      () => searchInDevices(devices.wifi, ['name', 'room']),
+    ];
+
+    searchActions.forEach((searchAction) => {
+      searchAction();
+    });
 
     setFilteredDeviceIds(matchingIds);
   }, [searchQuery, devices, setFilteredDeviceIds]);
@@ -147,7 +151,7 @@ export const Header = memo(function Header() {
   );
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-8 gap-4">
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div className="flex items-center gap-4 md:gap-6 flex-1">
         <div>
           <h1 className={`text-2xl md:text-4xl font-bold ${textPrimary} mb-1`}>

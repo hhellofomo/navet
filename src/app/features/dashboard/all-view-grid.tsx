@@ -12,6 +12,7 @@ export const AllViewGrid = memo(function AllViewGrid({
   isEditMode,
   cardSizes,
   updateCardSize,
+  grouping,
   customCards = [],
   onDeleteCard,
   onUpdateCard,
@@ -25,6 +26,7 @@ export const AllViewGrid = memo(function AllViewGrid({
     cardOrders,
     customCards,
     deviceMap,
+    grouping,
     rooms,
     updateCardSize,
   });
@@ -36,10 +38,12 @@ export const AllViewGrid = memo(function AllViewGrid({
     <div className="space-y-8">
       {roomSections.map((section) => (
         <RoomSection
-          key={section.room}
-          room={section.room}
-          orderedRoomIds={section.orderedRoomIds}
+          key={section.key}
+          title={section.title}
+          orderedIds={section.orderedIds}
           totalItems={section.totalItems}
+          mutedTitle={section.mutedTitle}
+          showHeader={section.showHeader}
           textColor={textColor}
           textSecondary={textSecondary}
           isEditMode={isEditMode}
