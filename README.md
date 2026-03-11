@@ -125,6 +125,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - Navet now ships with a service worker, install manifest, offline shell, and update prompt
 - The app can be installed from supported desktop and mobile browsers
 - Offline mode currently preserves the app shell and clearly signals that live Home Assistant data still requires connectivity
+- Installed iOS mode now respects safe-area insets so the header and mobile bottom navigation stay clear of the status area and rounded bottom corners
 
 ### Build Verification
 
