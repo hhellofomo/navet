@@ -1,4 +1,4 @@
-import { Wind } from 'lucide-react';
+import { Flame, Snowflake, Wind } from 'lucide-react';
 import { memo } from 'react';
 import { CardActionRow } from '@/app/components/shared/card-action-row';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
@@ -21,6 +21,7 @@ export const HVACCard = memo(function HVACCard({
   initialTemp = 21,
   initialCurrentTemp = 22,
   initialMode = 'cool',
+  initialAction,
   initialState = true,
   size,
   onSizeChange,
@@ -31,11 +32,18 @@ export const HVACCard = memo(function HVACCard({
     initialTemp,
     initialCurrentTemp,
     initialMode,
+    initialAction,
     initialState,
     isEditMode,
     size,
   });
   const stateSurface = getCardStateSurfaceTokens(controller.theme, controller.isOn);
+  const targetTemperatureLabel =
+    controller.targetTemp < controller.currentTemp
+      ? `Cooling down to ${controller.targetTemp}°C`
+      : `Heat to ${controller.targetTemp}°C`;
+  const HeaderIcon =
+    controller.visualMode === 'heat' ? Flame : controller.visualMode === 'cool' ? Snowflake : Wind;
 
   return (
     <>
@@ -52,9 +60,15 @@ export const HVACCard = memo(function HVACCard({
           />
         )}
 
-        <div
-          className={`absolute inset-0 bg-gradient-to-br ${controller.cardColors.glow} to-transparent transition-all duration-500`}
-        />
+        {controller.isOn && (
+          <div
+            className={`absolute inset-0 bg-gradient-to-br ${controller.cardColors.glow} to-transparent transition-all duration-500`}
+          />
+        )}
+
+        {controller.theme !== 'light' && (
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
+        )}
 
         {stateSurface.overlayClassName && (
           <div className={`absolute inset-0 ${stateSurface.overlayClassName}`} />
@@ -69,7 +83,7 @@ export const HVACCard = memo(function HVACCard({
             subtitleClassName={stateSurface.mutedTextClassName}
             leading={
               <EntityCardHeaderIcon
-                IconComponent={Wind}
+                IconComponent={HeaderIcon}
                 isActive={controller.isOn}
                 size={size}
                 ariaLabel={controller.cardInteraction.iconButtonProps['aria-label']}
@@ -85,10 +99,10 @@ export const HVACCard = memo(function HVACCard({
                   <div
                     className={`text-3xl font-bold ${stateSurface.primaryTextClassName} leading-none transition-colors duration-500 mb-1`}
                   >
-                    {controller.targetTemp}°C
+                    {controller.currentTemp}°C
                   </div>
                   <div className={`text-xs ${stateSurface.secondaryTextClassName}`}>
-                    Current temperature {controller.currentTemp}°C
+                    {targetTemperatureLabel}
                   </div>
                 </div>
 
@@ -121,10 +135,10 @@ export const HVACCard = memo(function HVACCard({
                   <div
                     className={`text-3xl font-bold ${stateSurface.primaryTextClassName} leading-none transition-colors duration-500 mb-1`}
                   >
-                    {controller.targetTemp}°C
+                    {controller.currentTemp}°C
                   </div>
                   <div className={`text-xs ${stateSurface.secondaryTextClassName}`}>
-                    Current temperature {controller.currentTemp}°C
+                    {targetTemperatureLabel}
                   </div>
                 </div>
 
@@ -141,7 +155,7 @@ export const HVACCard = memo(function HVACCard({
                           size="medium"
                         />
                         <HVACModeControls
-                          mode={controller.mode}
+                          mode={controller.visualMode}
                           isOn={controller.isOn}
                           onModeChange={controller.setMode}
                           size="medium"
@@ -174,7 +188,7 @@ export const HVACCard = memo(function HVACCard({
 
                     <HVACGauge
                       id={id}
-                      mode={controller.mode}
+                      mode={controller.visualMode}
                       targetTemp={controller.targetTemp}
                       currentTemp={controller.currentTemp}
                       isOn={controller.isOn}
@@ -192,7 +206,7 @@ export const HVACCard = memo(function HVACCard({
                       <div className="flex items-center gap-3">
                         <div className={`text-xs ${stateSurface.secondaryTextClassName}`}>Mode</div>
                         <HVACModeControls
-                          mode={controller.mode}
+                          mode={controller.visualMode}
                           isOn={controller.isOn}
                           onModeChange={controller.setMode}
                           size="large"

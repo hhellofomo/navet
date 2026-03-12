@@ -1,4 +1,4 @@
-import { ListMusic, Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
+import { Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 import { getCardActionControlSizes } from '@/app/components/shared/card-action-control-sizes';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
@@ -93,6 +93,7 @@ export function MediaMediumView({
         artRegionClassName="w-[42%]"
         imagePaddingClassName=""
         imageClassName="object-cover object-left"
+        subduedFallback={!artwork && !isActive}
       />
 
       <div className="relative z-[1] grid h-full w-full grid-cols-[44%_minmax(0,1fr)]">
@@ -220,22 +221,6 @@ export function MediaMediumView({
               ) : (
                 <Volume2 className={controlSizes.icon} />
               )}
-            </RoundControlButton>
-
-            <RoundControlButton
-              theme={theme}
-              size="small"
-              variant="neutral"
-              aria-label="Open media details"
-              onClick={(event) => {
-                event.stopPropagation();
-                onOpenDialog();
-              }}
-              className="border backdrop-blur-xl transition-colors"
-              iconClassName="!text-white/90"
-              style={neutralButtonStyle}
-            >
-              <ListMusic className={controlSizes.icon} />
             </RoundControlButton>
           </div>
         </div>

@@ -75,6 +75,7 @@ export function MediaMediumVerticalView({
         artRegionClassName="h-[52%]"
         imagePaddingClassName=""
         imageClassName="object-cover object-top"
+        subduedFallback={!artwork && !isActive}
       />
 
       <div className="relative z-[1] flex h-full flex-col">

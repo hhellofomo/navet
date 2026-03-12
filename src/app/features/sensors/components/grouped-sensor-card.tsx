@@ -7,6 +7,7 @@ import {
 } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
 import { useTheme } from '@/app/hooks';
 import { SensorGroupSettingsDialog } from './sensor-group-settings';
 import {
@@ -55,6 +56,7 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
   const padding = isSmall ? 'p-4' : 'p-5';
 
   const colors = theme === 'light' ? lightColorMap[accentColor] : darkColorMap[accentColor];
+  const shell = getAccentCardShellTokens(theme, accentColor);
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
   const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
 
@@ -77,11 +79,10 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
       <button
         type="button"
         onClick={() => setIsSettingsOpen(true)}
-        className={`relative h-full w-full bg-gradient-to-br ${colors.gradient} backdrop-blur-xl rounded-3xl ${padding} border ${colors.border} overflow-hidden cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform text-left ${theme === 'light' ? 'shadow-lg' : ''}`}
+        className={`relative h-full w-full backdrop-blur-xl rounded-3xl ${padding} overflow-hidden cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform text-left ${shell.containerClassName}`}
       >
-        <div className={`absolute inset-0 bg-gradient-to-br ${colors.glow} to-transparent`}></div>
-
-        {theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
+        <div className={`absolute inset-0 ${shell.glowClassName}`}></div>
+        {shell.overlayClassName && <div className={`absolute inset-0 ${shell.overlayClassName}`} />}
 
         <div className="relative h-full flex flex-col">
           <EntityCardHeader

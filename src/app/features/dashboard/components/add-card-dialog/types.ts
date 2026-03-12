@@ -8,7 +8,7 @@ export interface AddCardDialogContainerProps {
   currentRoom: string;
 }
 
-export type CardType = 'calendar' | 'news' | 'weather' | 'photo' | 'note';
+export type CardType = 'calendar' | 'news' | 'photo' | 'note';
 
 export interface CardTemplate {
   id: CardType;

@@ -53,7 +53,7 @@ export interface SettingsState extends UserSettings {
   resetSettings: () => void;
 }
 
-export type CardType = 'calendar' | 'news' | 'weather' | 'photo' | 'note';
+export type CardType = 'calendar' | 'news' | 'photo' | 'note';
 
 export interface CustomCard {
   id: string;

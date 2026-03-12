@@ -22,11 +22,6 @@ const PhotoFrameWidget = lazy(async () => {
   return { default: module.PhotoFrameWidget };
 });
 
-const WeatherWidget = lazy(async () => {
-  const module = await import('./widgets/weather-widget');
-  return { default: module.WeatherWidget };
-});
-
 interface WidgetCardProps {
   card: CustomCard;
   isEditMode: boolean;
@@ -59,9 +54,6 @@ export function WidgetCard({ card, isEditMode, onDelete, onUpdate }: WidgetCardP
       break;
     case 'news':
       widgetContent = <NewsWidget size={card.size} />;
-      break;
-    case 'weather':
-      widgetContent = <WeatherWidget size={card.size} />;
       break;
     case 'photo':
       widgetContent = <PhotoFrameWidget size={card.size} />;

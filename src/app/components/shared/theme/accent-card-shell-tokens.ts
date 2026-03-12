@@ -7,7 +7,7 @@ type AccentCardShell = {
   overlayClassName: string | null;
 };
 
-type AccentFamily = 'yellow' | 'green' | 'teal' | 'blue';
+type AccentFamily = 'yellow' | 'green' | 'teal' | 'blue' | 'purple' | 'amber' | 'emerald';
 
 const ACCENT_CONFIG: Record<
   AccentFamily,
@@ -56,6 +56,33 @@ const ACCENT_CONFIG: Record<
     lightGlow: 'from-blue-50/30 via-transparent to-cyan-50/30',
     darkGlow: 'from-blue-500/5 via-transparent to-cyan-500/5',
     glassGlow: 'from-white/10 via-blue-300/10 to-cyan-200/08',
+  },
+  purple: {
+    lightGradient: 'from-white to-purple-50/80',
+    darkGradient: 'from-purple-900/90 to-purple-950/95',
+    darkBorder: 'border-purple-700/30',
+    glassGradient: 'from-white/16 via-purple-200/10 to-white/[0.03]',
+    lightGlow: 'from-purple-50/40',
+    darkGlow: 'from-purple-500/5',
+    glassGlow: 'from-white/10 via-purple-300/10',
+  },
+  amber: {
+    lightGradient: 'from-white to-amber-50/80',
+    darkGradient: 'from-amber-900/90 to-amber-950/95',
+    darkBorder: 'border-amber-700/30',
+    glassGradient: 'from-white/16 via-amber-200/10 to-white/[0.03]',
+    lightGlow: 'from-amber-50/40',
+    darkGlow: 'from-amber-500/5',
+    glassGlow: 'from-white/10 via-amber-300/10',
+  },
+  emerald: {
+    lightGradient: 'from-white to-emerald-50/80',
+    darkGradient: 'from-emerald-900/90 to-emerald-950/95',
+    darkBorder: 'border-emerald-700/30',
+    glassGradient: 'from-white/16 via-emerald-200/10 to-white/[0.03]',
+    lightGlow: 'from-emerald-50/40',
+    darkGlow: 'from-emerald-500/5',
+    glassGlow: 'from-white/10 via-emerald-300/10',
   },
 };
 

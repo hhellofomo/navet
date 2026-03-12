@@ -21,16 +21,16 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
             : 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]'
         } ${stateSurface.containerClassName} ${controller.theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
       >
-        <div
-          className={`absolute inset-0 bg-gradient-to-br ${controller.cardColors.glow} to-transparent transition-all duration-500`}
-        />
-
-        {(controller.theme === 'light' || controller.theme === 'glass') && (
+        {controller.isOn && (
           <div
-            className={`absolute inset-0 ${
-              controller.theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'
-            }`}
+            className={`absolute inset-0 bg-gradient-to-br ${controller.cardColors.glow} to-transparent transition-all duration-500`}
           />
+        )}
+
+        {controller.theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
+
+        {controller.theme !== 'light' && (
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
         )}
 
         {stateSurface.overlayClassName && (

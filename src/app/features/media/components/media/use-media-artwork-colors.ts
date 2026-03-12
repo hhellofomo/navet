@@ -34,11 +34,11 @@ const FALLBACK_COLORS: Record<ThemeType, MediaArtworkPalette> = {
     gradientEnd: 'rgb(0, 0, 0)',
   },
   glass: {
-    dominant: 'rgb(51, 65, 85)',
-    vibrant: 'rgb(148, 163, 184)',
-    darkMuted: 'rgb(30, 41, 59)',
-    highlight: 'rgb(226, 232, 240)',
-    gradientEnd: 'rgb(30, 41, 59)',
+    dominant: 'rgb(62, 62, 66)',
+    vibrant: 'rgb(168, 168, 176)',
+    darkMuted: 'rgb(36, 36, 40)',
+    highlight: 'rgb(244, 244, 245)',
+    gradientEnd: 'rgb(28, 28, 32)',
   },
 };
 

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 
-export type CardType = 'calendar' | 'news' | 'weather' | 'photo' | 'note';
+export type CardType = 'calendar' | 'news' | 'photo' | 'note';
 
 export interface CustomCard {
   id: string;
@@ -62,6 +62,21 @@ export const useCustomCardsStore = create<CustomCardsState>()(
     {
       name: 'ha-dashboard-custom-cards',
       storage: createJSONStorage(() => localStorage),
+      migrate: (persistedState) => {
+        const state = persistedState as CustomCardsState | undefined;
+        if (!state) {
+          return {
+            cards: [],
+          };
+        }
+
+        return {
+          ...state,
+          cards: (state.cards as Array<Omit<CustomCard, 'type'> & { type: string }>).filter(
+            (card) => card.type !== 'weather'
+          ),
+        };
+      },
     }
   )
 );

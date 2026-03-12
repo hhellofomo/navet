@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+
+const LEGACY_SEARCH_STORAGE_KEY = 'ha-dashboard-search';
 
 interface SearchState {
   searchQuery: string;
@@ -9,29 +10,25 @@ interface SearchState {
   clearSearch: () => void;
 }
 
-export const useSearchStore = create<SearchState>()(
-  persist(
-    (set) => ({
-      searchQuery: '',
-      filteredDeviceIds: [],
-      setSearchQuery: (searchQuery) => set({ searchQuery }),
-      setFilteredDeviceIds: (filteredDeviceIds) =>
-        set((state) => {
-          if (
-            state.filteredDeviceIds.length === filteredDeviceIds.length &&
-            state.filteredDeviceIds.every((id, index) => id === filteredDeviceIds[index])
-          ) {
-            return state;
-          }
+export const useSearchStore = create<SearchState>()((set) => ({
+  searchQuery: '',
+  filteredDeviceIds: [],
+  setSearchQuery: (searchQuery) => set({ searchQuery }),
+  setFilteredDeviceIds: (filteredDeviceIds) =>
+    set((state) => {
+      if (
+        state.filteredDeviceIds.length === filteredDeviceIds.length &&
+        state.filteredDeviceIds.every((id, index) => id === filteredDeviceIds[index])
+      ) {
+        return state;
+      }
 
-          return { filteredDeviceIds };
-        }),
-      clearSearch: () => set({ searchQuery: '', filteredDeviceIds: [] }),
+      return { filteredDeviceIds };
     }),
-    {
-      name: 'ha-dashboard-search',
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ searchQuery: state.searchQuery }),
-    }
-  )
-);
+  clearSearch: () => set({ searchQuery: '', filteredDeviceIds: [] }),
+}));
+
+if (typeof window !== 'undefined') {
+  window.localStorage.removeItem(LEGACY_SEARCH_STORAGE_KEY);
+  useSearchStore.setState({ searchQuery: '', filteredDeviceIds: [] });
+}

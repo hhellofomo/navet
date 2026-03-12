@@ -68,8 +68,9 @@ export const renderCard = ({
           name={device.name as string}
           room={device.room as string}
           initialTemp={device.temperature as number | undefined}
-          initialCurrentTemp={device.temperature as number | undefined}
+          initialCurrentTemp={device.currentTemperature as number | undefined}
           initialMode={device.mode as string | undefined}
+          initialAction={device.action as string | undefined}
           initialState={(device.mode as string | undefined) !== 'off'}
           size={size}
           onSizeChange={handleSizeChange}
@@ -131,8 +132,8 @@ export const renderCard = ({
           }
           highTemp={device.highTemp as number}
           lowTemp={device.lowTemp as number}
-          size={size}
-          onSizeChange={handleSizeChange}
+          size="large"
+          onSizeChange={() => {}}
           isEditMode={isEditMode}
         />
       );

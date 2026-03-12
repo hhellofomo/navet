@@ -62,10 +62,10 @@ export const LightCard = memo(function LightCard({
 
         <div
           {...controller.cardInteraction.cardProps}
-          className={`relative h-full w-full backdrop-blur-xl rounded-3xl ${controller.padding} border overflow-hidden transition-all duration-500 ${stateSurface.containerClassName} ${!isEditMode ? 'cursor-pointer' : ''} ${
+          className={`relative h-full w-full backdrop-blur-xl rounded-3xl ${controller.padding} border ${controller.gradientColors.border} overflow-hidden transition-all duration-500 ${stateSurface.containerClassName} ${!isEditMode ? 'cursor-pointer' : ''} ${
             controller.gradientColors.customGradient
               ? ''
-              : `bg-gradient-to-br ${controller.gradientColors.from} ${controller.gradientColors.to} ${controller.gradientColors.border}`
+              : `bg-gradient-to-br ${controller.gradientColors.from} ${controller.gradientColors.to}`
           } ${theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
           style={
             controller.gradientColors.customGradient

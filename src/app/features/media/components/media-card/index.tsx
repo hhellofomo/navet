@@ -76,7 +76,7 @@ export const MediaCard = memo(function MediaCard({
   onSizeChange,
   isEditMode,
 }: MediaCardProps) {
-  const { theme } = useTheme();
+  const { theme, colors } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const mediaSize = getCompactCardSize(size);
   const {
@@ -113,26 +113,32 @@ export const MediaCard = memo(function MediaCard({
   const padding = isSmall ? 'p-4' : isMediumVertical ? 'p-6' : 'p-5';
   const isLight = theme === 'light';
   const isGlass = theme === 'glass';
+  const inactiveShellBg = `bg-gradient-to-br ${colors.media.off.gradient}`;
+  const inactiveShellBorder = colors.media.off.border;
   const cardBorder = isLight
     ? 'border-gray-200/50'
     : isGlass
       ? surface.border
       : 'border-pink-700/20';
-  const cardShadow = isLight ? 'shadow-lg' : surface.cardShadow;
+  const cardShadow = isOff ? '' : isLight ? 'shadow-lg' : surface.cardShadow;
   const hasArtwork = Boolean(resolvedAlbumArt);
   const shellBg = hasArtwork
     ? 'bg-transparent'
-    : isLight
-      ? 'bg-white/70'
-      : isGlass
-        ? 'bg-white/8'
-        : 'bg-black/20';
+    : isOff
+      ? inactiveShellBg
+      : isLight
+        ? 'bg-white/70'
+        : isGlass
+          ? 'bg-white/8'
+          : 'bg-black/20';
+  const shellBorder = isOff ? inactiveShellBorder : cardBorder;
   const shellBlur = hasArtwork ? '' : 'backdrop-blur-xl';
+  const shellOverlayClassName = isOff && !hasArtwork ? null : stateSurface.overlayClassName;
 
   return (
     <>
       <div
-        className={`relative h-full rounded-3xl ${padding} border ${cardBorder} ${cardShadow} ${shellBg} ${shellBlur} ${stateSurface.containerClassName} overflow-hidden`}
+        className={`relative h-full rounded-3xl ${padding} border ${shellBorder} ${cardShadow} ${shellBg} ${shellBlur} ${stateSurface.containerClassName} overflow-hidden`}
       >
         {isEditMode && (
           <CardSizeSelector
@@ -144,8 +150,8 @@ export const MediaCard = memo(function MediaCard({
           />
         )}
 
-        {stateSurface.overlayClassName && (
-          <div className={`absolute inset-0 ${stateSurface.overlayClassName}`}></div>
+        {shellOverlayClassName && (
+          <div className={`absolute inset-0 ${shellOverlayClassName}`}></div>
         )}
 
         <div className="relative h-full flex flex-col">
