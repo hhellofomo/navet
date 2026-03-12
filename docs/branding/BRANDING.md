@@ -92,8 +92,9 @@ The logo represents **"the hub"** concept with:
 ## Legal
 
 **Name**: Navet  
-**Copyright**: © 2025 Navet Contributors  
-**License**: CC BY-NC 4.0  
+**Copyright**: © 2026 Navet Contributors  
+**Code License**: AGPL-3.0-only  
+**Brand Policy**: See [TRADEMARK_POLICY.md](TRADEMARK_POLICY.md)  
 **Repository**: https://github.com/awesomestvi/navet
 
 ---

@@ -18,7 +18,7 @@ The widget system allows users to add customizable cards to their dashboard beyo
 
 ### Key Features
 
-- **5 Built-in Widget Types** - Calendar, News, Weather, Photo Frame, Quick Note
+- **4 Built-in Widget Types** - Calendar, News, Photo Frame, Quick Note
 - **3 Size Options** - Small, Medium, Large (adapts to grid)
 - **Room Assignment** - Widgets can be assigned to specific rooms or "All"
 - **Persistent Storage** - Saves to localStorage automatically
@@ -65,27 +65,7 @@ Shows latest news headlines from various sources.
 
 ---
 
-### 3. Weather Widget
-
-Displays current weather and 5-day forecast.
-
-**Features:**
-- Current temperature
-- Weather condition icon
-- Wind speed
-- Humidity levels
-- 5-day forecast
-
-**Best Sizes:** Medium, Large
-
-**Use Cases:**
-- Daily weather check
-- Trip planning
-- Outdoor activity planning
-
----
-
-### 4. Photo Frame Widget
+### 3. Photo Frame Widget
 
 Beautiful photo carousel with navigation.
 
@@ -104,7 +84,7 @@ Beautiful photo carousel with navigation.
 
 ---
 
-### 5. Quick Note Widget
+### 4. Quick Note Widget
 
 Editable sticky note for quick reminders.
 
@@ -134,10 +114,9 @@ Click the **Add Card** button that appears in edit mode.
 
 ### Step 3: Choose Widget Type
 
-Select from 5 available widget types:
+Select from 4 available widget types:
 - Calendar
 - News Feed
-- Weather
 - Photo Frame
 - Quick Note
 
@@ -182,7 +161,7 @@ Click **Add Widget** to add it to your current room.
 3. Click **Save** to persist changes
 
 **Other Widgets:**
-Currently use mock data. Future updates will add settings dialogs for customization.
+Calendar, news, and photo widgets remain custom dashboard widgets. Weather is now provided by the Home Assistant weather entity card rather than a custom widget.
 
 ## 🔧 Creating Custom Widgets
 

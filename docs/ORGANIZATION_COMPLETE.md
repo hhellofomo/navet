@@ -10,7 +10,7 @@ Successfully reorganized all documentation into a professional, easy-to-navigate
 navet/
 │
 ├── 📄 README.md                    ← Main project documentation
-├── 📄 LICENSE.md                   ← CC BY-NC 4.0 license
+├── 📄 LICENSE.md                   ← AGPL-3.0 code license
 ├── 📄 CONTRIBUTING.md              ← Contribution guidelines
 ├── 📂 docs/                        ← All documentation (NEW!)
 │   ├── 📄 README.md                ← Documentation index
