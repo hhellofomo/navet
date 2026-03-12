@@ -120,9 +120,12 @@ export const Sidebar = memo(function Sidebar() {
 
       {/* Mobile Bottom Navigation */}
       <div
-        className={`safe-area-bottom-offset fixed inset-x-0 z-50 px-2 pb-2 transition-transform duration-300 md:hidden ${
-          isMobileNavHidden ? 'translate-y-[calc(100%+1rem)]' : 'translate-y-0'
-        }`}
+        className="safe-area-bottom-offset fixed inset-x-0 z-50 px-2 pb-2 transition-transform duration-300 md:hidden"
+        style={{
+          transform: isMobileNavHidden
+            ? 'translateY(calc(100% + max(env(safe-area-inset-bottom), 0px) + 1rem))'
+            : 'translateY(0)',
+        }}
       >
         <div
           className={`relative overflow-hidden rounded-[28px] border ${surface.borderStrong} ${isGlass ? 'shadow-[0_-10px_40px_rgba(15,23,42,0.32)]' : 'shadow-lg'}`}
@@ -141,7 +144,6 @@ export const Sidebar = memo(function Sidebar() {
             <>
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.24),transparent_48%)]" />
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.12),rgba(15,23,42,0.32))]" />
-              <div className="pointer-events-none absolute inset-x-6 top-0 h-px bg-white/45" />
             </>
           ) : null}
 
@@ -160,7 +162,7 @@ export const Sidebar = memo(function Sidebar() {
                 key={index}
                 onClick={item.onClick}
                 active={activeSection === item.section}
-                className={`flex min-w-0 flex-col items-center gap-1 rounded-xl px-2 py-2 transition-colors ${
+                className={`flex min-w-0 flex-1 basis-0 flex-col items-center gap-1 rounded-[20px] px-2 py-2 transition-colors ${
                   activeSection === item.section ? '' : inactiveColor
                 }`}
               >

@@ -114,7 +114,7 @@ export const RoomNav = memo(function RoomNav({
   const stickyOffset = 'calc(env(safe-area-inset-top, 0px) + 8px)';
   const stickyShellClass = getStickyBarSurfaceClass(theme, isStickyActive);
   const showAllViewGrouping = activeRoom === 'All' && onAllViewGroupingChange;
-  const actionPillClassName = `flex items-center gap-2 rounded-lg p-2 px-3 transition-colors ${inactiveBg} ${hoverBg}`;
+  const actionPillClassName = `flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs md:gap-2 md:px-3 md:py-2 md:text-sm transition-colors ${inactiveBg} ${hoverBg}`;
   const dropdownItemClassName = `rounded-xl px-3 py-2 ${surface.textPrimary} ${hoverBg}`;
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -223,7 +223,7 @@ export const RoomNav = memo(function RoomNav({
               onClick={onToggleEditMode}
               active={isEditMode}
               intent="action"
-              className={`flex items-center gap-2 rounded-lg p-2 px-3 transition-colors ${
+              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs md:gap-2 md:px-3 md:py-2 md:text-sm transition-colors ${
                 isEditMode ? 'shadow-sm' : `${inactiveBg} ${hoverBg}`
               }`}
             >

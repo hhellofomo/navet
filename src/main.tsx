@@ -6,6 +6,18 @@ import './styles/index.css';
 registerPwaServiceWorker();
 
 const container = document.getElementById('root');
+const bootScreen = document.getElementById('app-boot');
 if (container) {
   createRoot(container).render(<App />);
+
+  window.requestAnimationFrame(() => {
+    if (!bootScreen) {
+      return;
+    }
+
+    bootScreen.setAttribute('data-state', 'hidden');
+    window.setTimeout(() => {
+      bootScreen.remove();
+    }, 240);
+  });
 }
