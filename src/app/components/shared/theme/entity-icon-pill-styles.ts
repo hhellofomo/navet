@@ -1,5 +1,9 @@
 import type { CSSProperties } from 'react';
-import type { CardSize } from '@/app/components/shared/card-size-selector';
+import {
+  type CardSize,
+  isCompactCardSize,
+  isExtraSmallCardSize,
+} from '@/app/components/shared/card-size-selector';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import type { PrimaryColor, ThemeType } from '@/app/hooks/use-theme';
 
@@ -22,11 +26,11 @@ const accentColorMap: Record<PrimaryColor, { bg: string; text: string }> = {
 };
 
 function getBadgeSizeClass(size: CardSize) {
-  if (size === 'extra-small') {
+  if (isExtraSmallCardSize(size)) {
     return 'h-7 w-7';
   }
 
-  if (size === 'small' || size === 'medium') {
+  if (isCompactCardSize(size) || size === 'medium') {
     return 'h-8 w-8';
   }
 
@@ -34,11 +38,11 @@ function getBadgeSizeClass(size: CardSize) {
 }
 
 function getIconSizeClass(size: CardSize) {
-  if (size === 'extra-small') {
+  if (isExtraSmallCardSize(size)) {
     return 'h-3.5 w-3.5';
   }
 
-  if (size === 'small' || size === 'medium') {
+  if (isCompactCardSize(size) || size === 'medium') {
     return 'h-4 w-4';
   }
 

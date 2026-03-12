@@ -37,12 +37,15 @@ export const DashboardCardItem = memo(function DashboardCardItem({
 }: DashboardCardItemProps) {
   const RemoveActionIcon = usesHideAction ? EyeOff : X;
   const removeAriaLabel = 'Remove entity from dashboard';
+  const spanClass =
+    device?.type === 'media' && size === 'large' ? 'col-span-1 row-span-4' : getCardSpanClass(size);
+  const editControlSize = device?.type === 'media' && size === 'large' ? 'medium' : size;
 
   return (
-    <DraggableCard id={id} isEditMode={isEditMode} className={getCardSpanClass(size)}>
+    <DraggableCard id={id} isEditMode={isEditMode} className={spanClass}>
       {device && isEditMode && allowEntityRemoval && onRemoveEntity && (
         <CardEditActionButton
-          cardSize={size}
+          cardSize={editControlSize}
           Icon={RemoveActionIcon}
           placement="top-left"
           variant={usesHideAction ? 'neutral' : 'destructive'}

@@ -1,10 +1,12 @@
 import type { LucideIcon } from 'lucide-react';
 import { memo } from 'react';
-import { BrightnessPresetsInline } from '@/app/components/shared/brightness-presets-inline';
-import { BrightnessSlider } from '@/app/components/shared/brightness-slider';
 import { CardActionRow } from '@/app/components/shared/card-action-row';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
-import { ColorPicker } from '@/app/components/shared/color-picker';
+import {
+  BrightnessPresetsInline,
+  BrightnessSlider,
+  ColorPicker,
+} from '@/app/components/shared/device-editor';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { PRESET_COLORS } from '@/app/constants/light-constants';
 import { useTheme } from '@/app/hooks';

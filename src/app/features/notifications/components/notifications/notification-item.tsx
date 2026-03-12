@@ -1,4 +1,5 @@
 import type { PrimaryColor, ThemeType } from '@/app/hooks';
+import { getNotificationSurfaceTokens } from './notification-surface-tokens';
 import { getNotificationColor, getNotificationIcon } from './notification-utils';
 import type { Notification } from './use-notifications';
 
@@ -21,23 +22,12 @@ export function NotificationItem({
   getColorValue,
   formatTimestamp,
 }: NotificationItemProps) {
-  const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
-  const textMuted = theme === 'light' ? 'text-gray-500' : 'text-gray-500';
-  const hoverBg =
-    theme === 'light'
-      ? 'hover:bg-gray-50'
-      : theme === 'contrast'
-        ? 'hover:bg-white/10'
-        : 'hover:bg-white/5';
-  const itemBg =
-    theme === 'light' ? 'bg-gray-50' : theme === 'contrast' ? 'bg-black/30' : 'bg-white/5';
+  const surface = getNotificationSurfaceTokens(theme);
   const NotificationIcon = getNotificationIcon(notification.type);
 
   return (
     <div
-      className={`p-4 ${hoverBg} transition-all relative group ${!notification.read ? itemBg : ''}`}
+      className={`group relative p-4 transition-all ${surface.hoverClassName} ${!notification.read ? surface.unreadItemClassName : ''}`}
     >
       <div className="flex gap-3">
         {/* Icon */}
@@ -51,12 +41,14 @@ export function NotificationItem({
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
-            <h4 className={`text-sm font-medium ${textPrimary}`}>{notification.title}</h4>
-            <span className={`text-xs ${textMuted} flex-shrink-0`}>
+            <h4 className={`text-sm font-medium ${surface.textPrimary}`}>{notification.title}</h4>
+            <span className={`shrink-0 text-xs ${surface.textMuted}`}>
               {formatTimestamp(notification.timestamp)}
             </span>
           </div>
-          <p className={`text-xs ${textSecondary} mb-2 leading-relaxed`}>{notification.message}</p>
+          <p className={`mb-2 text-xs leading-relaxed ${surface.textSecondary}`}>
+            {notification.message}
+          </p>
 
           {/* Actions */}
           <div className="flex items-center gap-2">
@@ -64,7 +56,7 @@ export function NotificationItem({
               <button
                 type="button"
                 onClick={() => onMarkAsRead(notification.id)}
-                className={`text-xs font-medium ${textMuted} hover:${textPrimary} transition-colors`}
+                className={`text-xs font-medium ${surface.textMuted} transition-colors hover:opacity-80`}
                 style={{
                   color: getColorValue(primaryColor),
                 }}

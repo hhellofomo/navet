@@ -1,9 +1,8 @@
 import type { LucideIcon } from 'lucide-react';
 import { memo } from 'react';
-import { BrightnessPresetsInline } from '@/app/components/shared/brightness-presets-inline';
-import { BrightnessSlider } from '@/app/components/shared/brightness-slider';
 import { CardActionRow } from '@/app/components/shared/card-action-row';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
+import { BrightnessPresetsInline, BrightnessSlider } from '@/app/components/shared/device-editor';
 import { useTheme } from '@/app/hooks';
 import { CustomColorTrigger } from './custom-color-trigger';
 import { LightCardHeader } from './light-card-header';

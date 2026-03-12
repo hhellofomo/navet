@@ -1,25 +1,23 @@
 import { Bell } from 'lucide-react';
 import type { ThemeType } from '@/app/hooks/use-theme';
+import { getNotificationSurfaceTokens } from './notification-surface-tokens';
 
 interface NotificationEmptyStateProps {
   theme: ThemeType;
 }
 
 export function NotificationEmptyState({ theme }: NotificationEmptyStateProps) {
-  const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textMuted = theme === 'light' ? 'text-gray-500' : 'text-gray-500';
-  const itemBg =
-    theme === 'light' ? 'bg-gray-50' : theme === 'contrast' ? 'bg-black/30' : 'bg-white/5';
+  const surface = getNotificationSurfaceTokens(theme);
 
   return (
     <div className="p-8 text-center">
       <div
-        className={`w-16 h-16 mx-auto mb-3 rounded-full ${itemBg} flex items-center justify-center`}
+        className={`mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full ${surface.emptyStateIconBgClassName}`}
       >
-        <Bell className={`w-8 h-8 ${textMuted}`} />
+        <Bell className={`h-8 w-8 ${surface.textMuted}`} />
       </div>
-      <p className={`text-sm font-medium ${textPrimary} mb-1`}>No notifications</p>
-      <p className={`text-xs ${textMuted}`}>You're all caught up!</p>
+      <p className={`mb-1 text-sm font-medium ${surface.textPrimary}`}>No notifications</p>
+      <p className={`text-xs ${surface.textMuted}`}>You're all caught up!</p>
     </div>
   );
 }

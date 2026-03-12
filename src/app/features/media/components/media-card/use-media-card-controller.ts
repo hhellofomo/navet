@@ -14,6 +14,40 @@ interface UseMediaCardControllerParams {
   initialPositionUpdatedAt?: string;
 }
 
+function normalizeMediaArtworkUrl(entityPicture: string, hassUrl?: string) {
+  if (!entityPicture) {
+    return null;
+  }
+
+  if (entityPicture.startsWith('/api/')) {
+    return entityPicture;
+  }
+
+  if (!entityPicture.startsWith('http://') && !entityPicture.startsWith('https://')) {
+    return hassUrl ? `${hassUrl}${entityPicture}` : entityPicture;
+  }
+
+  if (!hassUrl) {
+    return entityPicture;
+  }
+
+  try {
+    const resolvedArtworkUrl = new URL(entityPicture);
+    const resolvedHassUrl = new URL(hassUrl);
+
+    if (
+      resolvedArtworkUrl.origin === resolvedHassUrl.origin &&
+      resolvedArtworkUrl.pathname.startsWith('/api/')
+    ) {
+      return `${resolvedArtworkUrl.pathname}${resolvedArtworkUrl.search}`;
+    }
+  } catch {
+    return entityPicture;
+  }
+
+  return entityPicture;
+}
+
 export function useMediaCardController({
   entityId,
   entityPicture,
@@ -57,11 +91,7 @@ export function useMediaCardController({
       return null;
     }
 
-    if (entityPicture.startsWith('http://') || entityPicture.startsWith('https://')) {
-      return entityPicture;
-    }
-
-    return authConfig ? `${authConfig.url}${entityPicture}` : entityPicture;
+    return normalizeMediaArtworkUrl(entityPicture, authConfig?.url);
   }, [authConfig, entityPicture]);
 
   const isPlaying = state === 'playing';

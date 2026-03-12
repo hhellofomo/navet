@@ -1,7 +1,8 @@
 import { Calendar as CalendarIcon, Clock } from 'lucide-react';
-import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useTheme } from '@/app/hooks';
+import { getDashboardWidgetSurfaceTokens } from './widget-surface-tokens';
 
 interface CalendarEvent {
   id: string;
@@ -25,25 +26,17 @@ interface CalendarWidgetProps {
 
 export function CalendarWidget({ size = 'medium' }: CalendarWidgetProps) {
   const { theme, primaryColor } = useTheme();
+  const surface = getDashboardWidgetSurfaceTokens(theme);
+  const isCompact = isCompactCardSize(size);
 
-  const bgColor =
-    theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : 'bg-white/10';
-  const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
-  const border = theme === 'light' ? 'border-gray-200/50' : 'border-white/10';
-
-  const displayEvents =
-    size === 'extra-small' || size === 'small'
-      ? mockEvents.slice(0, 2)
-      : size === 'medium'
-        ? mockEvents.slice(0, 3)
-        : mockEvents;
+  const displayEvents = isCompact
+    ? mockEvents.slice(0, 2)
+    : size === 'medium'
+      ? mockEvents.slice(0, 3)
+      : mockEvents;
 
   return (
-    <div
-      className={`${bgColor} backdrop-blur-xl rounded-2xl p-4 border ${border} h-full flex flex-col`}
-    >
+    <div className={`${surface.panelClassName} h-full flex flex-col`}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <div
@@ -56,8 +49,8 @@ export function CalendarWidget({ size = 'medium' }: CalendarWidgetProps) {
           <CalendarIcon className="w-5 h-5" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className={`text-sm font-semibold ${textPrimary}`}>Calendar</h3>
-          <p className="text-[10px] text-gray-300 truncate mt-0.5">Widget</p>
+          <h3 className={`text-sm font-semibold ${surface.textPrimary}`}>Calendar</h3>
+          <p className={`mt-0.5 truncate text-[10px] ${surface.textMuted}`}>Widget</p>
         </div>
       </div>
 
@@ -70,10 +63,10 @@ export function CalendarWidget({ size = 'medium' }: CalendarWidgetProps) {
               style={{ backgroundColor: event.color }}
             />
             <div className="flex-1 min-w-0">
-              <p className={`text-sm font-medium ${textPrimary} truncate`}>{event.title}</p>
+              <p className={`text-sm font-medium ${surface.textPrimary} truncate`}>{event.title}</p>
               <div className="flex items-center gap-2 mt-1">
-                <Clock className={`w-3 h-3 ${textSecondary}`} />
-                <p className={`text-xs ${textSecondary}`}>
+                <Clock className={`w-3 h-3 ${surface.textSecondary}`} />
+                <p className={`text-xs ${surface.textSecondary}`}>
                   {event.time} • {event.date}
                 </p>
               </div>
@@ -82,11 +75,11 @@ export function CalendarWidget({ size = 'medium' }: CalendarWidgetProps) {
         ))}
       </div>
 
-      {size !== 'extra-small' && size !== 'small' && (
+      {!isCompact && (
         <button
           type="button"
-          className={`mt-4 w-full py-2 rounded-lg text-xs font-medium transition-colors ${textSecondary}`}
-          style={{ backgroundColor: theme === 'light' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.05)' }}
+          className={`mt-4 w-full rounded-lg py-2 text-xs font-medium transition-colors ${surface.textSecondary}`}
+          style={{ backgroundColor: surface.subtleFill }}
         >
           View All Events
         </button>

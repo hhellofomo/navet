@@ -1,8 +1,8 @@
 import { Clock, ExternalLink, Newspaper } from 'lucide-react';
-import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
-import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
+import { getDashboardWidgetSurfaceTokens } from './widget-surface-tokens';
 
 interface NewsArticle {
   id: string;
@@ -57,31 +57,17 @@ interface NewsWidgetProps {
 
 export function NewsWidget({ size = 'large' }: NewsWidgetProps) {
   const { theme, primaryColor } = useTheme();
-  const surface = getThemeSurfaceTokens(theme);
-  const bgColor =
-    theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : surface.panel;
-  const textPrimary = surface.textPrimary;
-  const textSecondary = surface.textSecondary;
-  const border = theme === 'light' ? 'border-gray-200/50' : surface.border;
-  const dividerColor = theme === 'light' ? 'border-gray-200' : surface.border;
-  const subtleFill =
-    theme === 'light'
-      ? '#f3f4f6'
-      : theme === 'contrast'
-        ? 'rgba(255,255,255,0.05)'
-        : 'rgba(255,255,255,0.08)';
+  const surface = getDashboardWidgetSurfaceTokens(theme);
+  const isCompact = isCompactCardSize(size);
 
-  const displayArticles =
-    size === 'extra-small' || size === 'small'
-      ? mockArticles.slice(0, 2)
-      : size === 'medium'
-        ? mockArticles.slice(0, 3)
-        : mockArticles;
+  const displayArticles = isCompact
+    ? mockArticles.slice(0, 2)
+    : size === 'medium'
+      ? mockArticles.slice(0, 3)
+      : mockArticles;
 
   return (
-    <div
-      className={`${bgColor} backdrop-blur-xl rounded-2xl p-4 border ${border} h-full flex flex-col`}
-    >
+    <div className={`${surface.panelClassName} h-full flex flex-col`}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <div
@@ -94,7 +80,7 @@ export function NewsWidget({ size = 'large' }: NewsWidgetProps) {
           <Newspaper className="w-5 h-5" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className={`text-sm font-semibold ${textPrimary}`}>News Feed</h3>
+          <h3 className={`text-sm font-semibold ${surface.textPrimary}`}>News Feed</h3>
           <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5`}>Widget</p>
         </div>
       </div>
@@ -117,35 +103,35 @@ export function NewsWidget({ size = 'large' }: NewsWidgetProps) {
                   </span>
                 </div>
                 <p
-                  className={`text-sm font-medium ${textPrimary} mb-1 group-hover:underline line-clamp-2`}
+                  className={`mb-1 line-clamp-2 text-sm font-medium ${surface.textPrimary} group-hover:underline`}
                 >
                   {article.title}
                 </p>
                 <div className="flex items-center gap-2">
-                  <p className={`text-xs ${textSecondary}`}>{article.source}</p>
-                  <span className={`text-xs ${textSecondary}`}>•</span>
+                  <p className={`text-xs ${surface.textSecondary}`}>{article.source}</p>
+                  <span className={`text-xs ${surface.textSecondary}`}>•</span>
                   <div className="flex items-center gap-1">
-                    <Clock className={`w-3 h-3 ${textSecondary}`} />
-                    <p className={`text-xs ${textSecondary}`}>{article.time}</p>
+                    <Clock className={`h-3 w-3 ${surface.textSecondary}`} />
+                    <p className={`text-xs ${surface.textSecondary}`}>{article.time}</p>
                   </div>
                 </div>
               </div>
               <ExternalLink
-                className={`w-4 h-4 ${textSecondary} opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0`}
+                className={`h-4 w-4 flex-shrink-0 ${surface.textSecondary} opacity-0 transition-opacity group-hover:opacity-100`}
               />
             </div>
             {index < displayArticles.length - 1 && (
-              <div className={`border-t ${dividerColor} mt-3`} />
+              <div className={`mt-3 border-t ${surface.dividerClassName}`} />
             )}
           </div>
         ))}
       </div>
 
-      {size !== 'extra-small' && size !== 'small' && (
+      {!isCompact && (
         <button
           type="button"
-          className={`mt-4 w-full py-2 rounded-lg text-xs font-medium transition-colors ${textSecondary}`}
-          style={{ backgroundColor: subtleFill }}
+          className={`mt-4 w-full rounded-lg py-2 text-xs font-medium transition-colors ${surface.textSecondary}`}
+          style={{ backgroundColor: surface.subtleFill }}
         >
           View All News
         </button>

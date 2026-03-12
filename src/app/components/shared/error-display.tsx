@@ -19,16 +19,10 @@ export const ErrorDisplay = memo(function ErrorDisplay({
 
   if (!error) return null;
 
-  const bgColor = surface.appBg;
-  const cardBg = theme === 'light' ? 'bg-white' : surface.panel;
-  const textColor = surface.textPrimary;
-  const mutedColor = surface.textSecondary;
-  const borderColor = surface.border;
-
   return (
-    <div className={`fixed inset-0 ${bgColor} flex items-center justify-center z-50 p-4`}>
+    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${surface.appBg}`}>
       <div
-        className={`${cardBg} rounded-2xl border ${borderColor} max-w-md w-full overflow-hidden`}
+        className={`max-w-md w-full overflow-hidden rounded-2xl border ${surface.panel} ${surface.border}`}
       >
         <div className="p-6 space-y-4">
           {/* Icon and Close Button */}
@@ -42,18 +36,18 @@ export const ErrorDisplay = memo(function ErrorDisplay({
                 onClick={clearError}
                 className={`w-8 h-8 rounded-lg ${surface.hoverBg} flex items-center justify-center transition-colors`}
               >
-                <X className={`w-4 h-4 ${mutedColor}`} />
+                <X className={`w-4 h-4 ${surface.textSecondary}`} />
               </button>
             )}
           </div>
 
           {/* Error Message */}
           <div className="space-y-2">
-            <h3 className={`text-lg font-semibold ${textColor}`}>Connection Error</h3>
-            <p className={`text-sm ${textColor}`}>{error.message}</p>
+            <h3 className={`text-lg font-semibold ${surface.textPrimary}`}>Connection Error</h3>
+            <p className={`text-sm ${surface.textPrimary}`}>{error.message}</p>
             {error.details && (
               <p
-                className={`text-xs ${mutedColor} font-mono bg-red-500/5 p-3 rounded-lg border border-red-500/10`}
+                className={`rounded-lg border border-red-500/10 bg-red-500/5 p-3 font-mono text-xs ${surface.textSecondary}`}
               >
                 {error.details}
               </p>
@@ -76,7 +70,7 @@ export const ErrorDisplay = memo(function ErrorDisplay({
           )}
 
           {/* Help Text */}
-          <div className={`text-xs ${mutedColor} space-y-1`}>
+          <div className={`space-y-1 text-xs ${surface.textSecondary}`}>
             <p className="font-medium">Common issues:</p>
             <ul className="list-disc list-inside space-y-0.5 ml-2">
               <li>Smart home system is not running or unreachable</li>

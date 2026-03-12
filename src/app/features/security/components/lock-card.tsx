@@ -4,6 +4,7 @@ import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { useTheme } from '@/app/hooks';
+import { getSecurityCardSurfaceTokens } from './security-card-surface-tokens';
 
 interface LockCardProps {
   name: string;
@@ -17,23 +18,21 @@ export const LockCard = memo(function LockCard({
 }: Omit<LockCardProps, 'room'>) {
   const [isLocked, setIsLocked] = useState(initialState);
   const { theme, colors } = useTheme();
-  const isGlass = theme === 'glass';
+  const securitySurface = getSecurityCardSurfaceTokens(theme);
 
   const cardColors = isLocked ? colors.lock.locked : colors.lock.unlocked;
 
   return (
     <div
-      className={`relative h-full bg-gradient-to-br ${cardColors.gradient} backdrop-blur-xl rounded-3xl p-4 border ${cardColors.border} overflow-hidden transition-all duration-500 ${theme === 'light' ? 'shadow-lg' : ''}`}
+      className={`relative h-full overflow-hidden rounded-3xl border bg-gradient-to-br p-4 backdrop-blur-xl transition-all duration-500 ${cardColors.gradient} ${cardColors.border} ${securitySurface.containerShadowClassName}`}
     >
       <div
         className={`absolute inset-0 bg-gradient-to-br ${cardColors.glow} to-transparent transition-all duration-500`}
       ></div>
 
       {/* Light theme frosted overlay */}
-      {(theme === 'light' || isGlass) && (
-        <div
-          className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`}
-        />
+      {securitySurface.overlayClassName && (
+        <div className={`absolute inset-0 ${securitySurface.overlayClassName}`} />
       )}
 
       <div className="relative h-full flex flex-col">
@@ -75,12 +74,12 @@ export const LockCard = memo(function LockCard({
                 isLocked
                   ? theme === 'light'
                     ? 'text-green-700'
-                    : isGlass
+                    : theme === 'glass'
                       ? 'text-green-200'
                       : 'text-green-400'
                   : theme === 'light'
                     ? 'text-red-700'
-                    : isGlass
+                    : theme === 'glass'
                       ? 'text-red-200'
                       : 'text-red-400'
               } transition-colors duration-500`}

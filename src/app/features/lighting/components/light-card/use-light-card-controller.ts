@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { type CardSize, isExtraSmallCardSize } from '@/app/components/shared/card-size-selector';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { DEFAULT_LIGHT_ICON, LIGHT_ICON_MAP } from '@/app/constants/icon-map';
 import { TEMP_OPTIONS } from '@/app/constants/light-constants';
@@ -123,7 +123,7 @@ export function useLightCardController({
     (option) => option.value >= minColorTemp && option.value <= maxColorTemp
   );
 
-  const isExtraSmall = size === 'extra-small';
+  const isExtraSmall = isExtraSmallCardSize(size);
   const isSmall = isExtraSmall || size === 'small';
   const padding = isExtraSmall ? 'px-3.5 pt-3 pb-4' : isSmall ? 'p-4' : 'p-5';
 
@@ -356,7 +356,10 @@ export function useLightCardController({
             setIsOn(false);
           }
         );
+        return;
       }
+
+      void syncLightWithHomeAssistant({ state: 'on', brightnessPct: nextBrightness });
     },
     [id, isOn, rememberLightState, schedulePendingStateReset, syncLightWithHomeAssistant]
   );

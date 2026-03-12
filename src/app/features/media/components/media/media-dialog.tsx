@@ -3,7 +3,9 @@ import { Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-rea
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
+import { MediaFallbackArtwork } from './media-fallback-artwork';
 import { formatMediaTime } from './media-time';
+import { useMediaArtworkColors } from './use-media-artwork-colors';
 
 interface MediaDialogProps {
   isOpen: boolean;
@@ -39,7 +41,8 @@ export function MediaDialog({
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
-  const displayElapsed = formatMediaTime(elapsedSeconds);
+  const palette = useMediaArtworkColors(artwork, theme, 'media-dialog', `${title}::${artist}`);
+  const displayRemaining = formatMediaTime(Math.max(0, durationSeconds - elapsedSeconds));
   const displayDuration = durationSeconds > 0 ? formatMediaTime(durationSeconds) : '--:--';
   const presetButton = (isActive: boolean) =>
     isActive
@@ -71,15 +74,20 @@ export function MediaDialog({
 
           <div className="space-y-6">
             {/* Album Art */}
-            {artwork ? (
-              <div className="flex justify-center">
+            <div className="flex justify-center">
+              {artwork ? (
                 <img
                   src={artwork}
                   alt={`${title} by ${artist}`}
                   className="h-48 w-48 rounded-3xl object-cover shadow-2xl"
                 />
-              </div>
-            ) : null}
+              ) : (
+                <MediaFallbackArtwork
+                  palette={palette}
+                  className="relative h-48 w-48 rounded-3xl shadow-2xl"
+                />
+              )}
+            </div>
 
             {/* Playback Controls */}
             <div className="flex items-center justify-center gap-6">
@@ -118,7 +126,7 @@ export function MediaDialog({
             <div>
               {isPlaying && (
                 <div className="mb-3 flex items-center justify-between">
-                  <span className={`text-sm ${surface.textSecondary}`}>{displayElapsed}</span>
+                  <span className={`text-sm ${surface.textSecondary}`}>{displayRemaining}</span>
                   <span className={`text-sm ${surface.textSecondary}`}>{displayDuration}</span>
                 </div>
               )}

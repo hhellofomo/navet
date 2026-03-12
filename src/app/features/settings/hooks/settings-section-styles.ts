@@ -1,0 +1,58 @@
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import type { PrimaryColor, ThemeType } from '@/app/hooks';
+import type { SettingsSectionStyles } from './use-settings-section-controller';
+
+export function getSettingsSectionStyles(
+  theme: ThemeType,
+  primaryColor: PrimaryColor
+): SettingsSectionStyles {
+  const surface = getThemeSurfaceTokens(theme);
+
+  return {
+    accentColor: getThemeColorValue(primaryColor),
+    borderColor: surface.borderStrong,
+    cardBg:
+      theme === 'light'
+        ? 'bg-white/92'
+        : theme === 'contrast'
+          ? 'bg-black'
+          : theme === 'glass'
+            ? 'bg-white/[0.10]'
+            : 'bg-gray-900/88',
+    chipBg: theme === 'contrast' ? 'bg-black' : surface.subtleBg,
+    chipHoverBg:
+      theme === 'light'
+        ? 'hover:bg-gray-200'
+        : theme === 'contrast'
+          ? 'hover:bg-black'
+          : theme === 'glass'
+            ? 'hover:bg-white/16'
+            : 'hover:bg-white/10',
+    chipTextColor: theme === 'light' ? 'text-gray-600' : surface.textSecondary,
+    dividerColor: surface.divider,
+    elevatedShadow:
+      theme === 'light' ? '0 10px 30px rgba(15, 23, 42, 0.06)' : '0 10px 30px rgba(0, 0, 0, 0.18)',
+    floatingButtonBg: theme === 'light' ? 'bg-gray-900' : 'bg-white',
+    floatingButtonText: theme === 'light' ? 'text-white' : 'text-gray-900',
+    hoverBg: theme === 'light' ? 'hover:bg-gray-100/90' : surface.hoverBg,
+    iconBg: surface.iconBg,
+    isLightTheme: theme === 'light',
+    insetBg: theme === 'light' ? 'bg-white' : theme === 'glass' ? 'bg-white/[0.06]' : 'bg-black',
+    lineColor: surface.borderStrong,
+    mixBlendMode: theme === 'light' ? 'multiply' : 'screen',
+    mutedColor: theme === 'light' ? 'text-gray-700' : surface.textSecondary,
+    ringClass: theme === 'light' ? 'ring-black/30' : 'ring-white/40',
+    ringOffsetClass: theme === 'light' ? 'ring-offset-white' : 'ring-offset-gray-900',
+    softBg:
+      theme === 'light'
+        ? 'bg-gray-50/90'
+        : theme === 'contrast'
+          ? 'bg-black'
+          : theme === 'glass'
+            ? 'bg-white/[0.06]'
+            : 'bg-white/[0.04]',
+    subtleColor: surface.textMuted,
+    textColor: surface.textPrimary,
+  };
+}

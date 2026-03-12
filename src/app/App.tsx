@@ -7,7 +7,7 @@ import { ConfigProvider, useConfig } from './contexts/config-context';
 import { ErrorProvider } from './contexts/error-context';
 import { LoadingProvider } from './contexts/loading-context';
 import { LoginPage } from './features/auth/login-page';
-import { DashboardPage } from './features/dashboard/dashboard-page';
+import { DashboardPage } from './features/dashboard';
 import { useHomeAssistant } from './hooks';
 import { useSettingsStore } from './stores';
 

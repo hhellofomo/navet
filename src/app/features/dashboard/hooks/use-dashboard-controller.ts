@@ -15,12 +15,9 @@ import {
 } from '@/app/hooks';
 import { useDevices, useRooms } from '@/app/hooks/use-devices';
 import type { Section } from '@/app/navigation/sections';
-import {
-  downloadDashboardConfig,
-  importDashboardConfigFromFile,
-} from '@/app/utils/dashboard-config';
-import type { AllViewGrouping } from '../all-view-grid.types';
-import type { CardType } from '../components/AddCardDialogContainer';
+import { importDashboardConfigFromFile } from '@/app/utils/dashboard-config';
+import type { AllViewGrouping } from '../all-view-grid';
+import type { CardType } from '../components/add-card-dialog';
 import { useDashboardEntitiesStore } from '../stores/dashboard-entities-store';
 import { useCardOrdering } from './use-card-ordering';
 import { useCustomCards } from './use-custom-cards';
@@ -72,7 +69,6 @@ export interface DashboardController {
   onToggleEditMode: () => void;
   orderedCardIds: string[];
   onDismissImportedDashboardReveal: () => void;
-  onExportDashboardConfig: () => void;
   onMoveRoom: (activeRoom: string, overRoom: string) => void;
   onSetAllViewGrouping: (grouping: AllViewGrouping) => void;
   roomOrder: string[];
@@ -285,7 +281,6 @@ export function useDashboardController(): DashboardController {
       setDashboardArrivalVariant(null);
       setShowImportedDashboardReveal(false);
     },
-    onExportDashboardConfig: downloadDashboardConfig,
     onMoveRoom: moveRoom,
     onSetAllViewGrouping: setAllViewGrouping,
     onOpenAddCardDialog: () => setShowAddCardDialog(true),

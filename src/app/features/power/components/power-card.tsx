@@ -1,6 +1,11 @@
 import { TrendingDown, Zap } from 'lucide-react';
 import { memo } from 'react';
-import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import {
+  type CardSize,
+  CardSizeSelector,
+  isCompactCardSize,
+} from '@/app/components/shared/card-size-selector';
+import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 
@@ -25,9 +30,10 @@ export const PowerCard = memo(function PowerCard({
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
+  const shell = getAccentCardShellTokens(theme, 'yellow');
 
   // Size-specific styling with intelligent layout adaptation
-  const isSmall = size === 'extra-small' || size === 'small';
+  const isSmall = isCompactCardSize(size);
   const isMedium = size === 'medium';
   const padding = isSmall ? 'p-4' : 'p-5';
 
@@ -40,16 +46,8 @@ export const PowerCard = memo(function PowerCard({
   const usageDiff = (lastMonthUsageFloat - usageFloat).toFixed(1);
 
   // Theme-aware colors
-  const cardGradient =
-    theme === 'light'
-      ? 'from-white to-yellow-50/80'
-      : isGlass
-        ? 'from-white/16 via-yellow-200/10 to-white/[0.03]'
-        : 'from-yellow-900/90 to-yellow-950/95';
-  const cardBorder =
-    theme === 'light' ? 'border-gray-200/80' : isGlass ? surface.border : 'border-yellow-700/30';
   const textPrimary = surface.textPrimary;
-  const textSecondary = theme === 'light' ? 'text-gray-500' : surface.textSecondary;
+  const textSecondary = surface.textSubtle;
   const iconBg =
     theme === 'light'
       ? 'bg-cyan-100'
@@ -60,12 +58,6 @@ export const PowerCard = memo(function PowerCard({
     theme === 'light' ? 'text-cyan-700' : isGlass ? 'text-cyan-100' : 'text-cyan-300';
   const accentColor =
     theme === 'light' ? 'text-cyan-700' : isGlass ? 'text-cyan-200' : 'text-cyan-400';
-  const glowGradient =
-    theme === 'light'
-      ? 'from-yellow-50/40'
-      : isGlass
-        ? 'from-white/10 via-cyan-300/10'
-        : 'from-blue-500/5';
   const progressBg = theme === 'light' ? 'bg-gray-200' : isGlass ? 'bg-white/12' : 'bg-white/10';
   const savingBg =
     theme === 'light' ? 'bg-green-100' : isGlass ? 'bg-green-300/16' : 'bg-green-500/20';
@@ -75,7 +67,7 @@ export const PowerCard = memo(function PowerCard({
 
   return (
     <div
-      className={`relative h-full bg-gradient-to-br ${cardGradient} backdrop-blur-xl rounded-3xl ${padding} border ${cardBorder} overflow-hidden ${theme === 'light' ? 'shadow-lg' : ''}`}
+      className={`relative h-full backdrop-blur-xl rounded-3xl ${padding} border overflow-hidden ${shell.containerClassName}`}
     >
       {isEditMode && (
         <CardSizeSelector
@@ -84,14 +76,9 @@ export const PowerCard = memo(function PowerCard({
         />
       )}
 
-      <div className={`absolute inset-0 bg-gradient-to-br ${glowGradient} to-transparent`}></div>
+      <div className={`absolute inset-0 ${shell.glowClassName}`}></div>
 
-      {/* Light theme frosted overlay */}
-      {(theme === 'light' || isGlass) && (
-        <div
-          className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`}
-        />
-      )}
+      {shell.overlayClassName && <div className={`absolute inset-0 ${shell.overlayClassName}`} />}
 
       <div className="relative h-full flex flex-col">
         <div className={`flex items-start justify-between ${isSmall ? 'mb-1' : 'mb-2'}`}>
