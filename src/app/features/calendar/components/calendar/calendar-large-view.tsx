@@ -11,6 +11,7 @@ interface CalendarLargeViewProps {
   dotColor: string;
   hoverBg: string;
   dividerColor: string;
+  onEventClick?: (event: CalendarEvent) => void;
 }
 
 export function CalendarLargeView({
@@ -22,10 +23,11 @@ export function CalendarLargeView({
   dotColor,
   hoverBg,
   dividerColor,
+  onEventClick,
 }: CalendarLargeViewProps) {
   return (
-    <div className="flex-1 overflow-hidden">
-      <div className="space-y-2">
+    <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+      <div className="space-y-2 pb-1">
         {largeEvents.map((event, index) => (
           <div key={event.id}>
             <CalendarEventItem
@@ -36,6 +38,7 @@ export function CalendarLargeView({
               hoverText={hoverText}
               dotColor={dotColor}
               hoverBg={hoverBg}
+              onItemClick={() => onEventClick?.(event)}
               showEndTime
             />
             {index < largeEvents.length - 1 && <div className={`h-px ${dividerColor} mt-2`} />}

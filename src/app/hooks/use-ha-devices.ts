@@ -1,6 +1,7 @@
 import type { Connection, HassEntity } from 'home-assistant-js-websocket';
 import { useEffect, useMemo, useState } from 'react';
 import type {
+  CalendarDevice,
   ClimateDevice,
   CoverDevice,
   DeviceCollection,
@@ -31,6 +32,21 @@ type WeatherForecastServiceEnvelope = WeatherForecastServicePayload & {
   result?: WeatherForecastServicePayload;
 };
 
+type CalendarServiceEvent = Record<string, unknown>;
+
+type CalendarEventsServicePayload = {
+  response?: Record<
+    string,
+    {
+      events?: CalendarServiceEvent[];
+    }
+  >;
+};
+
+type CalendarEventsServiceEnvelope = CalendarEventsServicePayload & {
+  result?: CalendarEventsServicePayload;
+};
+
 async function fetchWeatherForecast(
   connection: Connection,
   entityId: string
@@ -49,6 +65,26 @@ async function fetchWeatherForecast(
   return Array.isArray(forecast) ? forecast : [];
 }
 
+async function fetchCalendarEvents(
+  connection: Connection,
+  entityId: string
+): Promise<CalendarServiceEvent[]> {
+  const response = (await connection.sendMessagePromise({
+    type: 'call_service',
+    domain: 'calendar',
+    service: 'get_events',
+    target: { entity_id: entityId },
+    service_data: {
+      duration: { hours: 744 },
+    },
+    return_response: true,
+  })) as CalendarEventsServiceEnvelope;
+
+  const payload = response?.result?.response ? response.result : response;
+  const events = payload?.response?.[entityId]?.events;
+  return Array.isArray(events) ? events : [];
+}
+
 /**
  * Maps Home Assistant entities to Navet device structure
  */
@@ -61,9 +97,19 @@ export const useHADevices = (): DeviceCollection => {
 
     return Object.keys(entities).find((entityId) => entityId.startsWith('weather.')) ?? null;
   }, [entities]);
+  const calendarEntityIds = useMemo(() => {
+    if (!entities) {
+      return [];
+    }
+
+    return Object.keys(entities)
+      .filter((entityId) => entityId.startsWith('calendar.'))
+      .sort((left, right) => left.localeCompare(right));
+  }, [entities]);
   const [weatherForecasts, setWeatherForecasts] = useState<Record<string, WeatherForecastEntry[]>>(
     {}
   );
+  const [calendarEvents, setCalendarEvents] = useState<Record<string, CalendarServiceEvent[]>>({});
 
   useEffect(() => {
     if (!connection || !primaryWeatherEntityId) {
@@ -93,6 +139,32 @@ export const useHADevices = (): DeviceCollection => {
       cancelled = true;
     };
   }, [connection, primaryWeatherEntityId]);
+
+  useEffect(() => {
+    if (!connection || calendarEntityIds.length === 0) {
+      setCalendarEvents({});
+      return;
+    }
+
+    let cancelled = false;
+
+    void Promise.all(
+      calendarEntityIds.map(async (entityId) => {
+        const events = await fetchCalendarEvents(connection, entityId).catch(() => []);
+        return [entityId, events] as const;
+      })
+    ).then((entries) => {
+      if (cancelled) {
+        return;
+      }
+
+      setCalendarEvents(Object.fromEntries(entries));
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [calendarEntityIds, connection]);
 
   return useMemo(() => {
     const brightnessToPercent = (entityId: string, entity: HassEntity): number => {
@@ -245,6 +317,7 @@ export const useHADevices = (): DeviceCollection => {
     const locks: LockDevice[] = [];
     const vacuums: VacuumDevice[] = [];
     const weather: WeatherDevice[] = [];
+    const calendars: CalendarDevice[] = [];
     const areaMap = new Map(areas.map((area) => [area.area_id, area.name]));
     const entityRegistryMap = new Map(
       entityRegistry.map((registryEntry) => [registryEntry.entity_id, registryEntry])
@@ -311,6 +384,60 @@ export const useHADevices = (): DeviceCollection => {
       const hours = Math.floor(diffMs / 3_600_000);
       const minutes = Math.round((diffMs % 3_600_000) / 60_000);
       return `${hours} h ${minutes} m`;
+    };
+
+    const parseCalendarDate = (value: unknown): Date | null => {
+      if (typeof value === 'string' && value) {
+        const parsed = new Date(value);
+        return Number.isNaN(parsed.getTime()) ? null : parsed;
+      }
+
+      if (value && typeof value === 'object') {
+        const record = value as Record<string, unknown>;
+        const raw = record.dateTime ?? record.date;
+        if (typeof raw === 'string' && raw) {
+          const parsed = new Date(raw);
+          return Number.isNaN(parsed.getTime()) ? null : parsed;
+        }
+      }
+
+      return null;
+    };
+
+    const formatCalendarTime = (date: Date | null): string => {
+      if (!date) {
+        return '--';
+      }
+
+      return date.toLocaleTimeString([], {
+        hour: 'numeric',
+        minute: '2-digit',
+      });
+    };
+
+    const inferCalendarEventType = (title: string, location?: string) => {
+      const searchText = `${title} ${location ?? ''}`.toLowerCase();
+
+      if (
+        searchText.includes('zoom') ||
+        searchText.includes('meet') ||
+        searchText.includes('teams') ||
+        searchText.includes('call') ||
+        searchText.includes('video')
+      ) {
+        return 'call' as const;
+      }
+
+      if (
+        searchText.includes('meeting') ||
+        searchText.includes('standup') ||
+        searchText.includes('review') ||
+        searchText.includes('sync')
+      ) {
+        return 'meeting' as const;
+      }
+
+      return 'event' as const;
     };
 
     const inferMetricIcon = (
@@ -763,6 +890,102 @@ export const useHADevices = (): DeviceCollection => {
           break;
         }
 
+        case 'calendar': {
+          const rawEvents = calendarEvents[entityId] ?? [];
+          const fallbackTitle =
+            typeof entity.attributes?.message === 'string' ? entity.attributes.message : '';
+          const fallbackLocation =
+            typeof entity.attributes?.location === 'string'
+              ? entity.attributes.location
+              : undefined;
+          const fallbackEvents =
+            fallbackTitle.length > 0
+              ? [
+                  {
+                    id: `${entityId}-current`,
+                    title: fallbackTitle,
+                    start: entity.attributes?.start_time,
+                    end: entity.attributes?.end_time,
+                    location: fallbackLocation,
+                  },
+                ]
+              : [];
+
+          const colors = [
+            'bg-blue-500',
+            'bg-purple-500',
+            'bg-green-500',
+            'bg-orange-500',
+            'bg-indigo-500',
+          ] as const;
+
+          const events = (rawEvents.length > 0 ? rawEvents : fallbackEvents)
+            .map((rawEvent, index) => {
+              const eventRecord = rawEvent as Record<string, unknown>;
+              const title =
+                typeof eventRecord.title === 'string'
+                  ? eventRecord.title
+                  : typeof eventRecord.summary === 'string'
+                    ? eventRecord.summary
+                    : typeof eventRecord.message === 'string'
+                      ? eventRecord.message
+                      : `Event ${index + 1}`;
+              const location =
+                typeof eventRecord.location === 'string' ? eventRecord.location : undefined;
+              const description =
+                typeof eventRecord.description === 'string'
+                  ? eventRecord.description
+                  : typeof eventRecord.notes === 'string'
+                    ? eventRecord.notes
+                    : typeof eventRecord.message === 'string'
+                      ? eventRecord.message
+                      : undefined;
+              const startDate = parseCalendarDate(eventRecord.start ?? eventRecord.start_time);
+              const endDate = parseCalendarDate(eventRecord.end ?? eventRecord.end_time);
+              const attendees = Array.isArray(eventRecord.attendees)
+                ? eventRecord.attendees.length
+                : typeof eventRecord.attendees === 'number'
+                  ? eventRecord.attendees
+                  : undefined;
+
+              return {
+                id:
+                  (typeof eventRecord.uid === 'string' && eventRecord.uid) ||
+                  (typeof eventRecord.id === 'string' && eventRecord.id) ||
+                  `${entityId}-${index}`,
+                title,
+                startTime: formatCalendarTime(startDate),
+                endTime: formatCalendarTime(endDate),
+                timeDisplay: formatCalendarTime(startDate),
+                location,
+                description,
+                type: inferCalendarEventType(title, location),
+                color: colors[index % colors.length],
+                attendees,
+                sortKey: startDate?.toISOString(),
+                sourceId: entityId,
+                sourceName: name,
+                startDate,
+              };
+            })
+            .sort((left, right) => {
+              const leftTime = left.startDate?.getTime() ?? Number.MAX_SAFE_INTEGER;
+              const rightTime = right.startDate?.getTime() ?? Number.MAX_SAFE_INTEGER;
+              return leftTime - rightTime;
+            })
+            .slice(0, 5)
+            .map(({ startDate: _startDate, ...event }) => event);
+
+          calendars.push({
+            id: entityId,
+            name,
+            room,
+            size: 'medium',
+            events,
+          });
+          break;
+        }
+
         case 'weather': {
           if (entityId !== primaryWeatherEntityId) {
             break;
@@ -872,8 +1095,16 @@ export const useHADevices = (): DeviceCollection => {
       sensors: [],
       vacuums,
       rssFeeds: [],
-      calendars: [],
+      calendars,
       'grouped-sensors': [],
     };
-  }, [areas, deviceRegistry, entities, entityRegistry, primaryWeatherEntityId, weatherForecasts]);
+  }, [
+    areas,
+    calendarEvents,
+    deviceRegistry,
+    entities,
+    entityRegistry,
+    primaryWeatherEntityId,
+    weatherForecasts,
+  ]);
 };

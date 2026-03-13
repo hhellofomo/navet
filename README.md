@@ -49,14 +49,15 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **Search & Filter** - Real-time search filters dashboard view
 - **All View Modes** - Switch the `All` room between custom, room, type, or flat grouping
 - **Live Weather Entity Card** - Home Assistant weather entities now render as the dashboard weather card with forecast and solar data from Home Assistant
-- **Dashboard Menu** - The room-bar dashboard menu now groups add/view/edit actions plus config export in one dropdown
+- **Calendar Entities** - Home Assistant calendar entities now render through the live calendar card with per-card source selection, week/month views, and event details
+- **Home Assistant Notifications** - Navet notifications now show Home Assistant persistent notifications and update actions
+- **Card-Level Room Editing** - Supported entity cards can reassign their room directly from the settings dialog
 - **Notifications** - System notifications panel
 - **Settings** - Comprehensive theme and customization options
 - **User Management** - Login system with user profiles
 - **Data Persistence** - Automatic localStorage persistence of all settings:
   - ✅ Theme mode and primary color
   - ✅ Current room selection
-  - ✅ Search query
   - ✅ Custom widgets and layouts
   - ✅ User preferences
 - **Installable PWA Shell** - Manifest, service worker, offline app shell, update prompt, and install assets for mobile/desktop install surfaces
@@ -159,6 +160,7 @@ pnpm build
 - The top action row uses **Done Editing** plus **Add** and **View** dropdowns
 - **Add widgets** from the **Add** dropdown
 - Use **Add Entity** to bring entities onto the dashboard
+- Use supported card settings dialogs to move an entity directly into a different room
 - Use the card remove action to remove entities from the dashboard
 - **Drag cards** to reorder them
 - Use the top-right resize action to change card size (`extra-small`/small/medium/large, depending on card type)
@@ -190,6 +192,16 @@ pnpm build
 - In **All**, use the **View** dropdown to switch between **Custom**, **Room**, **Type**, and **No Grouping**
 - Device counts shown for each room
 - The selected dashboard section and room both persist across refresh
+
+#### Calendar Cards
+- Home Assistant `calendar.*` entities can be added directly to the dashboard
+- Each calendar card can choose which calendars it aggregates
+- Calendar cards support **This Week** and **This Month** views
+- Clicking an event opens a details dialog with time, notes, location, and an **Open Map** action when location is available
+
+#### Notifications
+- Home Assistant persistent notifications appear in Navet notifications
+- Home Assistant update entities can surface `Update`, install progress, and `Restart` actions directly in Navet
 
 #### Dashboard Content
 - On first launch, choose whether to start with all discovered entities or a blank dashboard

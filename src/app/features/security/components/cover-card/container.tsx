@@ -7,6 +7,7 @@ import type { CoverCardProps, CoverState, DeviceClass } from './types';
 import { CoverCardView } from './view';
 
 export const CoverCardContainer = memo(function CoverCardContainer({
+  id,
   name,
   room,
   initialPosition = 0,
@@ -90,6 +91,7 @@ export const CoverCardContainer = memo(function CoverCardContainer({
 
   return (
     <CoverCardView
+      entityId={id}
       name={name}
       room={room}
       position={position}

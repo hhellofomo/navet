@@ -82,7 +82,8 @@ export const useCardOrdering = (
         }
 
         const roomOrder = next[room] ?? [];
-        const preserved = order.filter((id) => allDeviceIds.has(id));
+        const validRoomIds = new Set(roomOrder);
+        const preserved = order.filter((id) => allDeviceIds.has(id) && validRoomIds.has(id));
         const additions = roomOrder.filter((id) => !preserved.includes(id));
         mergedOrders[room] = [...preserved, ...additions];
       });

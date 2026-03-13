@@ -7,6 +7,7 @@ interface CalendarSmallViewProps {
   textPrimary: string;
   textSecondary: string;
   moreEventsColor: string;
+  onEventClick?: (event: CalendarEvent) => void;
 }
 
 export function CalendarSmallView({
@@ -15,11 +16,16 @@ export function CalendarSmallView({
   textPrimary,
   textSecondary,
   moreEventsColor,
+  onEventClick,
 }: CalendarSmallViewProps) {
   return (
     <div className="flex-1 flex flex-col justify-between items-start text-left">
       <div className="w-full">
-        <div className="flex items-center gap-2 mb-2">
+        <button
+          type="button"
+          className="flex w-full items-center gap-2 rounded-xl text-left transition-colors hover:bg-white/5"
+          onClick={() => onEventClick?.(nextEvent)}
+        >
           <div className={`w-1 h-12 ${nextEvent.color} rounded-full`} />
           <div className="flex-1 text-left">
             <h3 className={`text-lg font-semibold ${textPrimary} leading-tight mb-1 text-left`}>
@@ -31,10 +37,12 @@ export function CalendarSmallView({
               {nextEvent.location && <span className="truncate">{nextEvent.location}</span>}
             </div>
           </div>
-        </div>
+        </button>
       </div>
 
-      <div className={`text-xs ${moreEventsColor}`}>{mockEvents.length - 1} more events today</div>
+      <div className={`text-xs ${moreEventsColor}`}>
+        {Math.max(0, mockEvents.length - 1)} more events today
+      </div>
     </div>
   );
 }

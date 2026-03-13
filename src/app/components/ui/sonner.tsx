@@ -5,7 +5,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
   const { theme } = useTheme();
 
   return (
-    <Sonner theme={theme === 'light' ? 'light' : 'dark'} className="toaster group" {...props} />
+    <Sonner
+      theme={theme === 'light' ? 'light' : 'dark'}
+      position="top-center"
+      className="toaster group"
+      {...props}
+    />
   );
 };
 

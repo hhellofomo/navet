@@ -15,6 +15,7 @@ export type DeviceClass =
   | 'door';
 
 export interface CoverCardProps {
+  id: string;
   name: string;
   room: string;
   initialPosition?: number;

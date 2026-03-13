@@ -11,6 +11,7 @@ import {
 } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import type { ThemeType } from '@/app/hooks';
@@ -18,6 +19,7 @@ import { getSecurityCardSurfaceTokens } from '../security-card-surface-tokens';
 import type { CoverIconButtonProps, DeviceClass, DeviceClassConfig } from './types';
 
 interface CoverCardViewProps {
+  entityId: string;
   name: string;
   room: string;
   position: number;
@@ -49,6 +51,7 @@ interface CoverCardViewProps {
 }
 
 export function CoverCardView({
+  entityId,
   name,
   room,
   position,
@@ -330,6 +333,10 @@ export function CoverCardView({
             <Dialog.Description className="text-sm text-gray-300 mb-6">
               Select the type of cover for {name}
             </Dialog.Description>
+
+            <div className="mb-6">
+              <EntityRoomSelector entityId={entityId} label="Room" />
+            </div>
 
             <div className="grid grid-cols-2 gap-3 mb-6">
               {(Object.keys(deviceClassConfig) as DeviceClass[]).map((type) => {

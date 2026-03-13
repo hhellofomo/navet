@@ -57,7 +57,7 @@ const mockEvents: CalendarEvent[] = [
   },
 ];
 
-export function useCalendarData() {
+export function useCalendarData(events?: CalendarEvent[]) {
   const currentDate = useMemo(() => new Date(), []);
   const monthName = useMemo(
     () => currentDate.toLocaleString('default', { month: 'long' }),
@@ -69,15 +69,17 @@ export function useCalendarData() {
     [currentDate]
   );
 
-  const nextEvent = useMemo(() => mockEvents[0], []);
-  const mediumEvents = useMemo(() => mockEvents.slice(0, 3), []);
-  const largeEvents = useMemo(() => mockEvents.slice(0, 5), []);
+  const sourceEvents = useMemo(() => events ?? mockEvents, [events]);
+  const nextEvent = useMemo(() => sourceEvents[0] ?? null, [sourceEvents]);
+  const mediumEvents = useMemo(() => sourceEvents.slice(0, 2), [sourceEvents]);
+  const largeEvents = useMemo(() => sourceEvents.slice(0, 5), [sourceEvents]);
 
   return {
     currentDate,
     monthName,
     dayNumber,
     dayName,
+    sourceEvents,
     nextEvent,
     mediumEvents,
     largeEvents,

@@ -167,6 +167,7 @@ export const renderCard = ({
     case 'covers':
       return (
         <CoverCard
+          id={device.id as string}
           name={device.name as string}
           room={device.room as string}
           initialPosition={device.position as number | undefined}
@@ -243,6 +244,22 @@ export const renderCard = ({
     case 'calendars':
       return (
         <CalendarCard
+          id={device.id as string}
+          name={device.name as string}
+          room={device.room as string}
+          events={
+            (device.events as Array<{
+              id: string;
+              title: string;
+              startTime: string;
+              endTime: string;
+              timeDisplay: string;
+              location?: string;
+              type: 'meeting' | 'call' | 'event';
+              color: string;
+              attendees?: number;
+            }>) ?? []
+          }
           inEditMode={isEditMode}
           size={size}
           onSizeChange={(newSize) => handleSizeChange(device.id, newSize)}

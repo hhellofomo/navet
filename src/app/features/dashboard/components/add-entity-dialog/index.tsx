@@ -1,5 +1,6 @@
 import { Search, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
@@ -156,14 +157,17 @@ export function AddEntityDialog({
                           {typeLabel} · {room}
                         </p>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => onAddEntity(device.id)}
-                        className="px-3 py-2 rounded-lg text-xs font-medium text-white"
-                        style={{ backgroundColor: getThemeColorValue(primaryColor) }}
-                      >
-                        {actionLabel}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <EntityRoomSelector entityId={device.id} label="Room" compact />
+                        <button
+                          type="button"
+                          onClick={() => onAddEntity(device.id)}
+                          className="px-3 py-2 rounded-lg text-xs font-medium text-white"
+                          style={{ backgroundColor: getThemeColorValue(primaryColor) }}
+                        >
+                          {actionLabel}
+                        </button>
+                      </div>
                     </div>
                   );
                 })}

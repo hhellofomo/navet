@@ -6,4 +6,6 @@ export const STORAGE_KEYS = {
   roomOrder: 'ha-dashboard-room-order',
   allViewGrouping: 'ha-dashboard-all-view-grouping',
   switchCardMetricPreferences: 'ha-dashboard-switch-card-metrics',
+  calendarCardSources: 'ha-dashboard-calendar-card-sources',
+  calendarCardViewModes: 'ha-dashboard-calendar-card-view-modes',
 } as const;

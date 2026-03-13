@@ -2,6 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Power, Settings2 } from 'lucide-react';
 import { memo } from 'react';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import type { SwitchCardProps } from './switch-card.types';
@@ -110,6 +111,18 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
             </Dialog.Description>
 
             <div className="mt-6 space-y-4">
+              <div
+                className={`rounded-2xl p-4 ${
+                  controller.theme === 'light'
+                    ? 'bg-gray-100'
+                    : controller.theme === 'glass'
+                      ? 'bg-white/8'
+                      : 'bg-white/5'
+                }`}
+              >
+                <EntityRoomSelector entityId={props.id} label="Room" />
+              </div>
+
               {controller.hasMetrics && (
                 <div
                   className={`rounded-2xl p-4 ${

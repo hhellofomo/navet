@@ -170,6 +170,7 @@ export const LightCard = memo(function LightCard({
       </div>
 
       <LightSettingsDialog
+        entityId={id}
         isOpen={controller.isOpen}
         onOpenChange={controller.onOpenChange}
         name={name}

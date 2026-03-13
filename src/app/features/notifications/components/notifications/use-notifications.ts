@@ -1,4 +1,10 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useHomeAssistant } from '@/app/hooks/use-home-assistant';
+import { homeAssistantService } from '@/app/services/home-assistant.service';
+
+const READ_NOTIFICATIONS_STORAGE_KEY = 'navet-read-notifications';
+const HIDDEN_NOTIFICATIONS_STORAGE_KEY = 'navet-hidden-notifications';
+const PENDING_UPDATE_INSTALLS_STORAGE_KEY = 'navet-pending-update-installs';
 
 export interface Notification {
   id: string;
@@ -7,78 +13,373 @@ export interface Notification {
   message: string;
   timestamp: Date;
   read: boolean;
+  notificationId: string;
+  source: 'persistent_notification' | 'update';
+  isBusy?: boolean;
+  progress?: number | null;
+  statusLabel?: string;
+  requiresRestart?: boolean;
 }
 
 interface UseNotificationsReturn {
   notifications: Notification[];
   unreadCount: number;
-  markAsRead: (id: string) => void;
+  runPrimaryAction: (id: string) => Promise<void>;
   markAllAsRead: () => void;
-  deleteNotification: (id: string) => void;
-  clearAll: () => void;
+  deleteNotification: (id: string) => Promise<void>;
+  clearAll: () => Promise<void>;
 }
 
-export function useNotifications(): UseNotificationsReturn {
-  // Mock notifications
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: '1',
-      type: 'warning',
-      title: 'Front Door Left Open',
-      message: 'The front door has been open for more than 5 minutes',
-      timestamp: new Date(Date.now() - 5 * 60 * 1000),
-      read: false,
-    },
-    {
-      id: '2',
-      type: 'success',
-      title: 'Automation Triggered',
-      message: 'Good Night routine completed successfully',
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-      read: false,
-    },
-    {
-      id: '3',
-      type: 'info',
-      title: 'Device Updated',
-      message: 'Living Room Thermostat firmware updated to v2.1.4',
-      timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
-      read: true,
-    },
-    {
-      id: '4',
-      type: 'error',
-      title: 'Connection Issue',
-      message: 'Bedroom Motion Sensor is offline',
-      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
-      read: true,
-    },
-  ]);
+const loadReadNotifications = (): string[] => {
+  return loadNotificationIds(READ_NOTIFICATIONS_STORAGE_KEY);
+};
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+const loadHiddenNotifications = (): string[] => {
+  return loadNotificationIds(HIDDEN_NOTIFICATIONS_STORAGE_KEY);
+};
 
-  const markAsRead = (id: string) => {
-    setNotifications(notifications.map((n) => (n.id === id ? { ...n, read: true } : n)));
-  };
+const loadPendingUpdateInstalls = (): string[] => {
+  return loadNotificationIds(PENDING_UPDATE_INSTALLS_STORAGE_KEY);
+};
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map((n) => ({ ...n, read: true })));
-  };
+const loadNotificationIds = (storageKey: string): string[] => {
+  if (typeof window === 'undefined') {
+    return [];
+  }
 
-  const deleteNotification = (id: string) => {
-    setNotifications(notifications.filter((n) => n.id !== id));
-  };
-
-  const clearAll = () => {
-    if (confirm('Are you sure you want to clear all notifications?')) {
-      setNotifications([]);
+  try {
+    const stored = window.localStorage.getItem(storageKey);
+    if (!stored) {
+      return [];
     }
-  };
+
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed)
+      ? parsed.filter((value): value is string => typeof value === 'string')
+      : [];
+  } catch {
+    return [];
+  }
+};
+
+const persistReadNotifications = (ids: string[]) => {
+  persistNotificationIds(READ_NOTIFICATIONS_STORAGE_KEY, ids);
+};
+
+const persistHiddenNotifications = (ids: string[]) => {
+  persistNotificationIds(HIDDEN_NOTIFICATIONS_STORAGE_KEY, ids);
+};
+
+const persistPendingUpdateInstalls = (ids: string[]) => {
+  persistNotificationIds(PENDING_UPDATE_INSTALLS_STORAGE_KEY, ids);
+};
+
+const persistNotificationIds = (storageKey: string, ids: string[]) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  window.localStorage.setItem(storageKey, JSON.stringify(ids));
+};
+
+const inferNotificationType = (
+  entityId: string,
+  attributes: Record<string, unknown>
+): Notification['type'] => {
+  const severity =
+    typeof attributes.severity === 'string'
+      ? attributes.severity.toLowerCase()
+      : typeof attributes.level === 'string'
+        ? attributes.level.toLowerCase()
+        : '';
+
+  if (severity.includes('error') || severity.includes('critical')) {
+    return 'error';
+  }
+
+  if (severity.includes('warn')) {
+    return 'warning';
+  }
+
+  if (severity.includes('success')) {
+    return 'success';
+  }
+
+  const searchText =
+    `${entityId} ${attributes.title ?? ''} ${attributes.message ?? ''}`.toLowerCase();
+  if (
+    searchText.includes('error') ||
+    searchText.includes('failed') ||
+    searchText.includes('offline')
+  ) {
+    return 'error';
+  }
+  if (
+    searchText.includes('warning') ||
+    searchText.includes('battery') ||
+    searchText.includes('open')
+  ) {
+    return 'warning';
+  }
+  if (searchText.includes('success') || searchText.includes('completed')) {
+    return 'success';
+  }
+
+  return 'info';
+};
+
+export function useNotifications(): UseNotificationsReturn {
+  const { entities } = useHomeAssistant();
+  const [readNotifications, setReadNotifications] = useState<string[]>(loadReadNotifications);
+  const [hiddenNotifications, setHiddenNotifications] = useState<string[]>(loadHiddenNotifications);
+  const [pendingUpdateInstalls, setPendingUpdateInstalls] =
+    useState<string[]>(loadPendingUpdateInstalls);
+
+  useEffect(() => {
+    persistReadNotifications(readNotifications);
+  }, [readNotifications]);
+
+  useEffect(() => {
+    persistHiddenNotifications(hiddenNotifications);
+  }, [hiddenNotifications]);
+
+  useEffect(() => {
+    persistPendingUpdateInstalls(pendingUpdateInstalls);
+  }, [pendingUpdateInstalls]);
+
+  useEffect(() => {
+    if (!entities) {
+      setPendingUpdateInstalls([]);
+      return;
+    }
+
+    setPendingUpdateInstalls((current) =>
+      current.filter((entityId) => Boolean(entities[entityId]) && entityId.startsWith('update.'))
+    );
+  }, [entities]);
+
+  const notifications = useMemo<Notification[]>(() => {
+    if (!entities) {
+      return [];
+    }
+
+    const persistentNotifications = Object.entries(entities)
+      .filter(([entityId]) => entityId.startsWith('persistent_notification.'))
+      .map(([entityId, entity]) => {
+        const notificationId =
+          (typeof entity.attributes?.notification_id === 'string' &&
+            entity.attributes.notification_id) ||
+          entityId.replace('persistent_notification.', '');
+        const title =
+          (typeof entity.attributes?.title === 'string' && entity.attributes.title) ||
+          (typeof entity.attributes?.friendly_name === 'string' &&
+            entity.attributes.friendly_name) ||
+          'Notification';
+        const message =
+          (typeof entity.attributes?.message === 'string' && entity.attributes.message) ||
+          entity.state ||
+          '';
+        const timestampSource =
+          typeof entity.last_changed === 'string'
+            ? entity.last_changed
+            : typeof entity.last_updated === 'string'
+              ? entity.last_updated
+              : '';
+        const timestamp = new Date(timestampSource || Date.now());
+
+        return {
+          id: entityId,
+          notificationId,
+          source: 'persistent_notification' as const,
+          type: inferNotificationType(entityId, entity.attributes ?? {}),
+          title,
+          message,
+          timestamp: Number.isNaN(timestamp.getTime()) ? new Date() : timestamp,
+          read: readNotifications.includes(entityId),
+        };
+      });
+
+    const updateNotifications = Object.entries(entities)
+      .filter(([entityId, entity]) => {
+        if (!entityId.startsWith('update.')) {
+          return false;
+        }
+
+        return (
+          entity.state === 'on' ||
+          Boolean(entity.attributes?.in_progress) ||
+          pendingUpdateInstalls.includes(entityId)
+        );
+      })
+      .map(([entityId, entity]) => {
+        const title =
+          (typeof entity.attributes?.friendly_name === 'string' &&
+            entity.attributes.friendly_name) ||
+          'Update available';
+        const installedVersion =
+          typeof entity.attributes?.installed_version === 'string'
+            ? entity.attributes.installed_version
+            : null;
+        const latestVersion =
+          typeof entity.attributes?.latest_version === 'string'
+            ? entity.attributes.latest_version
+            : null;
+        const releaseSummary =
+          typeof entity.attributes?.release_summary === 'string'
+            ? entity.attributes.release_summary
+            : null;
+        const rawProgress =
+          typeof entity.attributes?.update_percentage === 'number'
+            ? entity.attributes.update_percentage
+            : typeof entity.attributes?.update_progress === 'number'
+              ? entity.attributes.update_progress
+              : null;
+        const progress =
+          typeof rawProgress === 'number' && !Number.isNaN(rawProgress)
+            ? Math.max(0, Math.min(100, Math.round(rawProgress)))
+            : null;
+        const isBusy =
+          Boolean(entity.attributes?.in_progress) || pendingUpdateInstalls.includes(entityId);
+        const requiresRestart =
+          pendingUpdateInstalls.includes(entityId) &&
+          !entity.attributes?.in_progress &&
+          entity.state !== 'on';
+
+        const versionMessage =
+          installedVersion && latestVersion
+            ? `Update available: ${installedVersion} -> ${latestVersion}`
+            : latestVersion
+              ? `Update available to ${latestVersion}`
+              : 'Update available';
+        const message = releaseSummary?.trim() || versionMessage;
+        const statusLabel = requiresRestart
+          ? 'Restart Home Assistant to finish update'
+          : isBusy
+            ? progress !== null
+              ? `Installing ${progress}%`
+              : 'Installing update...'
+            : latestVersion
+              ? `Ready to install ${latestVersion}`
+              : 'Update available';
+        const timestampSource =
+          typeof entity.last_changed === 'string'
+            ? entity.last_changed
+            : typeof entity.last_updated === 'string'
+              ? entity.last_updated
+              : '';
+        const timestamp = new Date(timestampSource || Date.now());
+
+        return {
+          id: entityId,
+          notificationId: entityId,
+          source: 'update' as const,
+          type: 'warning' as const,
+          title,
+          message,
+          timestamp: Number.isNaN(timestamp.getTime()) ? new Date() : timestamp,
+          read: readNotifications.includes(entityId),
+          isBusy,
+          progress,
+          statusLabel,
+          requiresRestart,
+        };
+      });
+
+    return [...persistentNotifications, ...updateNotifications]
+      .filter((notification) => !hiddenNotifications.includes(notification.id))
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  }, [entities, hiddenNotifications, pendingUpdateInstalls, readNotifications]);
+
+  const unreadCount = notifications.filter((notification) => !notification.read).length;
+
+  const markAsRead = useCallback((id: string) => {
+    setReadNotifications((current) => (current.includes(id) ? current : [...current, id]));
+  }, []);
+
+  const runPrimaryAction = useCallback(
+    async (id: string) => {
+      const notification = notifications.find((entry) => entry.id === id);
+      if (!notification) {
+        return;
+      }
+
+      if (notification.source === 'update') {
+        if (notification.requiresRestart) {
+          await homeAssistantService.callService('homeassistant', 'restart');
+          setPendingUpdateInstalls((current) => current.filter((entityId) => entityId !== id));
+          markAsRead(id);
+          return;
+        }
+
+        setPendingUpdateInstalls((current) => (current.includes(id) ? current : [...current, id]));
+        await homeAssistantService.callService(
+          'update',
+          'install',
+          {},
+          { entity_id: notification.id }
+        );
+      }
+
+      markAsRead(id);
+    },
+    [markAsRead, notifications]
+  );
+
+  const markAllAsRead = useCallback(() => {
+    setReadNotifications(notifications.map((notification) => notification.id));
+  }, [notifications]);
+
+  const deleteNotification = useCallback(
+    async (id: string) => {
+      const notification = notifications.find((entry) => entry.id === id);
+      if (!notification) {
+        return;
+      }
+
+      if (notification.source === 'persistent_notification') {
+        await homeAssistantService.callService('persistent_notification', 'dismiss', {
+          notification_id: notification.notificationId,
+        });
+      } else {
+        setHiddenNotifications((current) => (current.includes(id) ? current : [...current, id]));
+      }
+
+      setReadNotifications((current) => current.filter((entry) => entry !== id));
+    },
+    [notifications]
+  );
+
+  const clearAll = useCallback(async () => {
+    if (!notifications.length || !confirm('Are you sure you want to clear all notifications?')) {
+      return;
+    }
+
+    await Promise.all(
+      notifications
+        .filter((notification) => notification.source === 'persistent_notification')
+        .map((notification) =>
+          homeAssistantService.callService('persistent_notification', 'dismiss', {
+            notification_id: notification.notificationId,
+          })
+        )
+    );
+
+    setHiddenNotifications((current) => [
+      ...new Set([
+        ...current,
+        ...notifications
+          .filter((notification) => notification.source === 'update')
+          .map((notification) => notification.id),
+      ]),
+    ]);
+
+    setReadNotifications([]);
+  }, [notifications]);
 
   return {
     notifications,
     unreadCount,
-    markAsRead,
+    runPrimaryAction,
     markAllAsRead,
     deleteNotification,
     clearAll,
