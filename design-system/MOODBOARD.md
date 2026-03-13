@@ -30,7 +30,7 @@
 #### HomeKit Design Patterns
 - **Adaptive Cards**: Different sizes for different device types
 - **Color-Coded States**: Lights show their actual color, thermostats show temp with gradient
-- **Quick Actions**: Tap to toggle, long-press for details
+- **Quick Actions**: Tap for the primary card action, with press-and-hold available for direct edit-mode entry on the dashboard
 - **Room Organization**: Spatial grouping by physical location
 - **Frosted Glass**: Backgrounds that let content shine through
 
@@ -438,7 +438,7 @@ If this dashboard were a person:
 ✅ Edit mode
 ✅ Authentication system
 ✅ User management with dropdown
-✅ Theme customization (3 modes)
+✅ Theme customization (4 modes)
 ✅ Primary color selection (8 colors)
 ✅ Section-based navigation
 ✅ Settings page

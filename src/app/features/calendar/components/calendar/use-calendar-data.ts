@@ -1,88 +1,117 @@
 import { useMemo } from 'react';
-import type { CalendarEvent } from './types';
+import type { CalendarEvent, CalendarEventGroup } from './types';
 
-// Mock calendar events
-const mockEvents: CalendarEvent[] = [
-  {
-    id: '1',
-    title: 'Team Standup',
-    startTime: '09:00',
-    endTime: '09:30',
-    timeDisplay: '9:00 AM',
-    type: 'call',
-    color: 'bg-blue-500',
-    attendees: 8,
-  },
-  {
-    id: '2',
-    title: 'Design Review',
-    startTime: '10:30',
-    endTime: '11:30',
-    timeDisplay: '10:30 AM',
-    location: 'Conference Room A',
-    type: 'meeting',
-    color: 'bg-purple-500',
-    attendees: 5,
-  },
-  {
-    id: '3',
-    title: 'Lunch with Client',
-    startTime: '12:00',
-    endTime: '13:00',
-    timeDisplay: '12:00 PM',
-    location: 'Downtown Bistro',
-    type: 'event',
-    color: 'bg-green-500',
-  },
-  {
-    id: '4',
-    title: 'Product Demo',
-    startTime: '14:00',
-    endTime: '15:00',
-    timeDisplay: '2:00 PM',
-    type: 'call',
-    color: 'bg-orange-500',
-    attendees: 12,
-  },
-  {
-    id: '5',
-    title: 'Code Review Session',
-    startTime: '15:30',
-    endTime: '16:30',
-    timeDisplay: '3:30 PM',
-    location: 'Dev Hub',
-    type: 'meeting',
-    color: 'bg-indigo-500',
-    attendees: 6,
-  },
-];
+function toIsoDate(baseDate: Date, dayOffset: number, hours: number, minutes = 0) {
+  const nextDate = new Date(baseDate);
+  nextDate.setDate(baseDate.getDate() + dayOffset);
+  nextDate.setHours(hours, minutes, 0, 0);
+  return nextDate.toISOString();
+}
+
+function groupEventsByDay(events: CalendarEvent[]): CalendarEventGroup[] {
+  const groups = new Map<string, CalendarEventGroup>();
+
+  for (const event of events) {
+    const eventDate = event.sortKey ? new Date(event.sortKey) : null;
+    const isValidDate = eventDate && !Number.isNaN(eventDate.getTime());
+    const key = isValidDate ? eventDate.toISOString().slice(0, 10) : `unknown-${event.id}`;
+
+    const existing = groups.get(key);
+    if (existing) {
+      existing.events.push(event);
+      continue;
+    }
+
+    groups.set(key, {
+      key,
+      date: isValidDate ? eventDate : null,
+      events: [event],
+    });
+  }
+
+  return Array.from(groups.values());
+}
 
 export function useCalendarData(events?: CalendarEvent[]) {
   const currentDate = useMemo(() => new Date(), []);
-  const monthName = useMemo(
-    () => currentDate.toLocaleString('default', { month: 'long' }),
-    [currentDate]
-  );
-  const dayNumber = useMemo(() => currentDate.getDate(), [currentDate]);
-  const dayName = useMemo(
-    () => currentDate.toLocaleString('default', { weekday: 'short' }),
+
+  const mockEvents = useMemo<CalendarEvent[]>(
+    () => [
+      {
+        id: '1',
+        title: 'Friday planning',
+        startTime: '9:00 AM',
+        endTime: '9:30 AM',
+        timeDisplay: '9:00 AM',
+        type: 'event',
+        color: 'bg-blue-500',
+        attendees: 8,
+        sortKey: toIsoDate(currentDate, 0, 9, 0),
+      },
+      {
+        id: '2',
+        title: 'Groceries pickup',
+        startTime: '1:00 PM',
+        endTime: '1:30 PM',
+        timeDisplay: '1:00 PM',
+        location: 'Market Hall',
+        type: 'event',
+        color: 'bg-purple-500',
+        sortKey: toIsoDate(currentDate, 0, 13, 0),
+      },
+      {
+        id: '3',
+        title: 'Food waste pickup tomorrow',
+        startTime: '--',
+        endTime: '--',
+        timeDisplay: '--',
+        isAllDay: true,
+        location: 'Home',
+        type: 'event',
+        color: 'bg-green-500',
+        sortKey: toIsoDate(currentDate, 1, 0, 0),
+      },
+      {
+        id: '4',
+        title: 'Appointment: Handledarkurs',
+        startTime: '5:00 PM',
+        endTime: '8:10 PM',
+        timeDisplay: '5:00 PM',
+        location: 'LBS Kreativa Gymnasiet Bredgatan 10, 222 21 Lund',
+        type: 'event',
+        color: 'bg-orange-500',
+        sortKey: toIsoDate(currentDate, 3, 17, 0),
+      },
+      {
+        id: '5',
+        title: 'Swimming lessons',
+        startTime: '3:30 PM',
+        endTime: '4:00 PM',
+        timeDisplay: '3:30 PM',
+        location: 'Tillfallig Simhall',
+        type: 'event',
+        color: 'bg-indigo-500',
+        sortKey: toIsoDate(currentDate, 3, 15, 30),
+      },
+    ],
     [currentDate]
   );
 
-  const sourceEvents = useMemo(() => events ?? mockEvents, [events]);
+  const sourceEvents = useMemo(() => events ?? mockEvents, [events, mockEvents]);
+  const groupedEvents = useMemo(() => groupEventsByDay(sourceEvents), [sourceEvents]);
   const nextEvent = useMemo(() => sourceEvents[0] ?? null, [sourceEvents]);
-  const mediumEvents = useMemo(() => sourceEvents.slice(0, 2), [sourceEvents]);
-  const largeEvents = useMemo(() => sourceEvents.slice(0, 5), [sourceEvents]);
+  const smallGroups = useMemo(() => groupedEvents, [groupedEvents]);
+  const mediumGroups = useMemo(() => groupedEvents, [groupedEvents]);
+  const largeGroups = useMemo(() => groupedEvents.slice(0, 4), [groupedEvents]);
 
   return {
     currentDate,
-    monthName,
-    dayNumber,
-    dayName,
     sourceEvents,
+    groupedEvents,
     nextEvent,
-    mediumEvents,
-    largeEvents,
+    smallGroups,
+    mediumGroups,
+    largeGroups,
     mockEvents,
   };
 }

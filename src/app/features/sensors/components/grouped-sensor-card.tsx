@@ -116,6 +116,7 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
       </button>
 
       <SensorGroupSettingsDialog
+        entityId={id}
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         groupName={name}

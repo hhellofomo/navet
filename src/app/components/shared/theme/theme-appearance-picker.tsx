@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+import { SettingsLivePreviewFrame } from '@/app/components/shared/settings-live-preview-frame';
 import type { PrimaryColorOption, ThemeOption } from '@/app/constants/theme-options';
 import type { PrimaryColor, ThemeType } from '@/app/hooks/use-theme';
 import { getThemeAppearancePickerTokens } from './theme-appearance-picker-tokens';
@@ -98,70 +99,57 @@ export function ThemeAppearancePicker({
         </div>
       </div>
 
-      <div className={`rounded-[28px] border p-5 ${pickerTokens.panelInsetClassName}`}>
-        <p
-          className={`text-xs font-semibold uppercase tracking-[0.24em] ${pickerTokens.mutedClassName}`}
-        >
-          Live Preview
-        </p>
-        <div
-          className="mt-4 overflow-hidden rounded-[24px] border p-4"
-          style={{
-            borderColor: `${accentColor}33`,
-            background: pickerTokens.previewBackground,
-          }}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={`text-sm font-semibold ${pickerTokens.textClassName}`}>Navet</p>
-              <p className={`text-xs ${pickerTokens.mutedClassName}`}>
-                {themeOptions.find((option) => option.value === selectedTheme)?.label} mode
-              </p>
-            </div>
+      <SettingsLivePreviewFrame
+        accentColor={accentColor}
+        theme={selectedTheme}
+        title="Navet"
+        subtitle={`${themeOptions.find((option) => option.value === selectedTheme)?.label} mode`}
+        background={pickerTokens.previewBackground}
+        topBar={
+          <div
+            className="h-3 w-16 rounded-full"
+            style={{
+              background: `linear-gradient(90deg, ${accentColor}, ${accentColor}88)`,
+            }}
+          />
+        }
+      >
+        <div className="grid gap-3">
+          {[0, 1, 2].map((index) => (
             <div
-              className="h-3 w-16 rounded-full"
+              key={index}
+              className="rounded-[18px] border p-3"
               style={{
-                background: `linear-gradient(90deg, ${accentColor}, ${accentColor}88)`,
+                borderColor: `${accentColor}${index === 0 ? '55' : '22'}`,
+                backgroundColor: pickerTokens.previewCardBackground(index),
               }}
-            />
-          </div>
-          <div className="mt-5 grid gap-3">
-            {[0, 1, 2].map((index) => (
-              <div
-                key={index}
-                className="rounded-[18px] border p-3"
-                style={{
-                  borderColor: `${accentColor}${index === 0 ? '55' : '22'}`,
-                  backgroundColor: pickerTokens.previewCardBackground(index),
-                }}
-              >
-                <div className="flex items-center gap-3">
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="h-9 w-9 rounded-2xl"
+                  style={{ backgroundColor: `${accentColor}26` }}
+                />
+                <div className="flex-1">
                   <div
-                    className="h-9 w-9 rounded-2xl"
-                    style={{ backgroundColor: `${accentColor}26` }}
+                    className="h-3 rounded-full"
+                    style={{
+                      width: index === 0 ? '58%' : index === 1 ? '44%' : '50%',
+                      backgroundColor: pickerTokens.previewPrimaryBarColor,
+                    }}
                   />
-                  <div className="flex-1">
-                    <div
-                      className="h-3 rounded-full"
-                      style={{
-                        width: index === 0 ? '58%' : index === 1 ? '44%' : '50%',
-                        backgroundColor: pickerTokens.previewPrimaryBarColor,
-                      }}
-                    />
-                    <div
-                      className="mt-2 h-2 rounded-full"
-                      style={{
-                        width: index === 0 ? '36%' : '28%',
-                        backgroundColor: pickerTokens.previewSecondaryBarColor,
-                      }}
-                    />
-                  </div>
+                  <div
+                    className="mt-2 h-2 rounded-full"
+                    style={{
+                      width: index === 0 ? '36%' : '28%',
+                      backgroundColor: pickerTokens.previewSecondaryBarColor,
+                    }}
+                  />
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
-      </div>
+      </SettingsLivePreviewFrame>
     </div>
   );
 }

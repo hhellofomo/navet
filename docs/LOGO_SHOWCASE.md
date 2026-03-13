@@ -183,8 +183,8 @@ Background: Orange gradient
 ### React/JSX Usage
 
 ```jsx
-import logo from '/public/logo.svg';
-import logoHorizontal from '/public/logo-horizontal.svg';
+import logo from '/logo.svg';
+import logoHorizontal from '/logo-horizontal.svg';
 
 // Square logo
 <img src={logo} alt="Navet" width="60" height="60" />
@@ -197,7 +197,7 @@ import logoHorizontal from '/public/logo-horizontal.svg';
 
 ```css
 .logo {
-  background-image: url('/public/logo.svg');
+  background-image: url('/logo.svg');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;

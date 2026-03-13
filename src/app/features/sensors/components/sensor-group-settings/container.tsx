@@ -10,6 +10,7 @@ import { useSensorGroupSettings } from './use-sensor-group-settings';
 import { SensorGroupSettingsView } from './view';
 
 export const SensorGroupSettingsContainer = memo(function SensorGroupSettingsContainer({
+  entityId,
   isOpen,
   onClose,
   groupName,
@@ -42,6 +43,7 @@ export const SensorGroupSettingsContainer = memo(function SensorGroupSettingsCon
           className={`fixed inset-0 z-50 animate-in fade-in ${surface.dialogBackdrop}`}
         />
         <SensorGroupSettingsView
+          entityId={entityId}
           groupName={groupName}
           selectedSensors={controller.selectedSensors}
           maxSensors={maxSensors}

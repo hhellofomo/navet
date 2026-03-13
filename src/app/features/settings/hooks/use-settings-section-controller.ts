@@ -51,6 +51,7 @@ export function useSettingsSectionController() {
   const { clearConfig } = useConfig();
   const disableAnimations = useSettingsStore((state) => state.disableAnimations);
   const entityInteractionMode = useSettingsStore((state) => state.entityInteractionMode);
+  const ambientLightBleed = useSettingsStore((state) => state.ambientLightBleed);
   const updateSettings = useSettingsStore((state) => state.updateSettings);
   const hiddenEntityIds = useDashboardEntitiesStore((state) => state.hiddenEntityIds);
   const showAllEntities = useDashboardEntitiesStore((state) => state.showAllEntities);
@@ -139,6 +140,7 @@ export function useSettingsSectionController() {
   const styles = getSettingsSectionStyles(theme, primaryColor);
 
   return {
+    ambientLightBleed,
     config,
     disableAnimations,
     entityInteractionMode,

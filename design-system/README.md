@@ -44,7 +44,7 @@ Design inspiration and visual direction:
 ### [Features Documentation](./FEATURES.md) ✨ NEW
 Complete feature implementation guide:
 - Authentication system and login flow
-- Theme customization (3 modes, 8 colors)
+- Theme customization (4 modes, 8 colors)
 - Navigation and section management
 - Settings page architecture
 - Empty states for sections
@@ -155,6 +155,8 @@ When creating a new card component:
 /src/app/features/climate/    → HVAC card, settings dialog, and climate-specific styles
 /src/app/features/auth/login-page.tsx → Login interface
 /src/app/contexts/auth-context.tsx → Authentication state management
+/src/app/components/layout/user-dropdown.tsx → User account menu in the header
+/src/app/components/layout/sidebar.tsx → Primary desktop sidebar
 /src/app/hooks/use-theme.ts   → Theme and color customization
 /src/app/hooks/use-navigation.ts → Section navigation state
 /src/styles/theme.css         → Design tokens and variables

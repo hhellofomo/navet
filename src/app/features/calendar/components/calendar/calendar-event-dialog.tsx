@@ -1,5 +1,5 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import { CalendarDays, ExternalLink, FileText, MapPin, Video } from 'lucide-react';
+import { Calendar, CalendarDays, ExternalLink, FileText, MapPin } from 'lucide-react';
 import { DialogHeader } from '@/app/components/shared/device-editor';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import type { ThemeType } from '@/app/hooks/use-theme';
@@ -48,8 +48,8 @@ export function CalendarEventDialog({
                 </div>
 
                 <div className={`flex items-center gap-2 ${surface.textPrimary}`}>
-                  <Video className="h-4 w-4" />
-                  <span className="capitalize">{event.type}</span>
+                  <Calendar className="h-4 w-4" />
+                  <span>Event</span>
                 </div>
 
                 {event.location && (

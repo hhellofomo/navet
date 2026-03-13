@@ -1,6 +1,7 @@
 import { Image as ImageIcon, Palette, Upload, X } from 'lucide-react';
 import { ThemeAppearancePicker } from '@/app/components/shared/theme/theme-appearance-picker';
 import type { SettingsSectionController } from '../hooks/use-settings-section-controller';
+import { AmbientLightPreviewCard } from './ambient-light-preview-card';
 import { SettingsItem, SettingsSectionShell } from './settings-section-shell';
 
 interface SettingsAppearanceSectionProps {
@@ -9,6 +10,7 @@ interface SettingsAppearanceSectionProps {
 
 export function SettingsAppearanceSection({ controller }: SettingsAppearanceSectionProps) {
   const {
+    ambientLightBleed,
     colorOptions,
     handleRemoveWallpaper,
     handleWallpaperUpload,
@@ -42,6 +44,54 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
           onAccentChange={setPrimaryColor}
           onThemeChange={setTheme}
         />
+      </SettingsItem>
+
+      <SettingsItem
+        title="Light card ambience"
+        description="Choose whether active light cards spill ambient color into the dashboard or stay contained inside the card."
+        styles={styles}
+      >
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
+          <div
+            className={`inline-flex w-fit rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
+          >
+            {[
+              { value: true, label: 'Ambient bleed' },
+              { value: false, label: 'Contained' },
+            ].map((option) => {
+              const isActive = ambientLightBleed === option.value;
+              return (
+                <button
+                  type="button"
+                  key={option.label}
+                  onClick={() => controller.updateSettings({ ambientLightBleed: option.value })}
+                  style={
+                    isActive
+                      ? {
+                          backgroundColor: styles.accentColor,
+                          color: '#ffffff',
+                        }
+                      : {
+                          color: undefined,
+                        }
+                  }
+                  className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
+                    isActive ? 'shadow-sm' : styles.chipTextColor
+                  }`}
+                  aria-pressed={isActive}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <AmbientLightPreviewCard
+            accentColor={styles.accentColor}
+            ambientLightBleed={ambientLightBleed}
+            theme={theme}
+          />
+        </div>
       </SettingsItem>
 
       <SettingsItem

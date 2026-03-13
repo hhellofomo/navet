@@ -130,42 +130,44 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
         description="Choose whether tapping the card should toggle the device right away or open its controls first."
         styles={styles}
       >
-        <div
-          className={`inline-flex rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
-        >
-          {INTERACTION_OPTIONS.map((option) => {
-            const isActive = entityInteractionMode === option.value;
-            return (
-              <button
-                type="button"
-                key={option.value}
-                onClick={() => updateSettings({ entityInteractionMode: option.value })}
-                style={
-                  isActive
-                    ? {
-                        backgroundColor: styles.accentColor,
-                        color: '#ffffff',
-                      }
-                    : {
-                        color: undefined,
-                      }
-                }
-                className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
-                  isActive ? 'shadow-sm' : styles.chipTextColor
-                }`}
-                aria-pressed={isActive}
-              >
-                {option.label}
-              </button>
-            );
-          })}
-        </div>
+        <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_20rem]">
+          <div
+            className={`inline-flex w-fit rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
+          >
+            {INTERACTION_OPTIONS.map((option) => {
+              const isActive = entityInteractionMode === option.value;
+              return (
+                <button
+                  type="button"
+                  key={option.value}
+                  onClick={() => updateSettings({ entityInteractionMode: option.value })}
+                  style={
+                    isActive
+                      ? {
+                          backgroundColor: styles.accentColor,
+                          color: '#ffffff',
+                        }
+                      : {
+                          color: undefined,
+                        }
+                  }
+                  className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
+                    isActive ? 'shadow-sm' : styles.chipTextColor
+                  }`}
+                  aria-pressed={isActive}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
 
-        <InteractionPreviewCard
-          mode={entityInteractionMode}
-          accentColor={styles.accentColor}
-          isLightTheme={styles.isLightTheme}
-        />
+          <InteractionPreviewCard
+            mode={entityInteractionMode}
+            accentColor={styles.accentColor}
+            theme={controller.theme}
+          />
+        </div>
       </SettingsItem>
 
       <SettingsItem

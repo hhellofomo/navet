@@ -4,6 +4,7 @@ export interface CalendarEvent {
   startTime: string;
   endTime: string;
   timeDisplay: string;
+  isAllDay?: boolean;
   location?: string;
   description?: string;
   type: 'meeting' | 'call' | 'event';
@@ -12,4 +13,10 @@ export interface CalendarEvent {
   sortKey?: string;
   sourceId?: string;
   sourceName?: string;
+}
+
+export interface CalendarEventGroup {
+  key: string;
+  date: Date | null;
+  events: CalendarEvent[];
 }

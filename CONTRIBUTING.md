@@ -80,7 +80,7 @@ This project adheres to a code of conduct. By participating, you are expected to
 3. **Commit your changes**
    ```bash
    git add .
-   git commit -m "feat: add amazing new feature"
+   git commit -m "feat(dashboard): add amazing new feature"
    ```
 
 4. **Keep your branch updated**
@@ -147,14 +147,19 @@ This project adheres to a code of conduct. By participating, you are expected to
 
 ```
 /src/app
-  ├── components/       # Reusable UI components
-  ├── features/        # Feature-specific components
-  ├── contexts/        # React contexts
-  ├── hooks/           # Custom hooks
-  ├── utils/           # Utility functions
-  ├── types/           # TypeScript types
-  └── data/            # Mock data
+  ├── components/shared/   # Cross-feature UI primitives
+  ├── components/layout/   # App shell layout pieces
+  ├── features/            # Feature-owned modules, hooks, and stores
+  ├── contexts/            # App-shell React contexts
+  ├── hooks/               # Truly shared hooks
+  ├── stores/              # Shared app stores/selectors
+  ├── navigation/          # Section definitions and shared nav metadata
+  └── utils/               # Shared utilities only
 ```
+
+- Prefer feature-owned modules over generic global folders when the code belongs to one feature
+- Put reusable cross-feature UI under `src/app/components/shared/`
+- Use `@/app/...` imports for shared app modules and cross-feature imports
 
 ### Naming Conventions
 
@@ -168,6 +173,7 @@ This project adheres to a code of conduct. By participating, you are expected to
 
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
+- Format: `type(scope): summary`
 - `feat:` - New feature
 - `fix:` - Bug fix
 - `docs:` - Documentation changes
@@ -178,11 +184,11 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 Examples:
 ```
-feat: add calendar widget support
-fix: correct theme toggle behavior
-docs: update installation instructions
-style: format code with prettier
-refactor: simplify card rendering logic
+feat(calendar): add source selection to card settings
+fix(search): match Home Assistant entity-id queries
+docs(readme): update appearance and search behavior
+style(settings): tighten preview card spacing
+refactor(lighting): share light card surface tokens
 ```
 
 ### Pre-commit Hooks

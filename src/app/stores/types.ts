@@ -46,6 +46,7 @@ interface UserSettings {
   compactMode: boolean;
   disableAnimations: boolean;
   entityInteractionMode: EntityInteractionMode;
+  ambientLightBleed: boolean;
 }
 
 export interface SettingsState extends UserSettings {

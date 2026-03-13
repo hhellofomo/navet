@@ -10,11 +10,10 @@ App Container
 ├── Main Content Area
     ├── Header
     │   ├── Greeting
-    │   ├── Date + 24h time
-    │   ├── Search Bar
+    │   ├── Search Devices
     │   └── User / notifications
     ├── Room Navigation Tabs
-    │   └── Customize / Add Entity / Add Card / Done Editing
+    │   └── Customize / Done Editing + Add / View dropdowns
     └── Device Grid (Main Content)
         └── Dynamic Card Grid / empty-state recovery actions
 ```
@@ -85,14 +84,14 @@ Vertical: py-6 (24px)
     {/* Left: Title */}
     <h1 className="text-2xl font-bold">Dashboard</h1>
     
-    {/* Center: Search Bar */}
+    {/* Center: Search Devices */}
     <div className="flex-1 max-w-md mx-8">
       <SearchInput />
     </div>
     
-    {/* Right: Actions */}
+    {/* Right: User and notifications */}
     <div className="flex items-center gap-4">
-      <button>Edit Mode</button>
+      <HeaderActions />
     </div>
   </div>
 </header>
@@ -110,9 +109,9 @@ Vertical: py-6 (24px)
     {/* Center: Title */}
     <h1 className="text-lg font-bold">Dashboard</h1>
     
-    {/* Right: Edit Toggle */}
+    {/* Right: User/actions */}
     <button className="w-10 h-10">
-      <EditIcon />
+      <HeaderActionsIcon />
     </button>
   </div>
   
@@ -161,6 +160,8 @@ Min Width: fit-content
 Height: 36px
 Gap: 8px between tabs
 ```
+
+In edit mode, the top action row uses **Done Editing** plus **Add** and **View** dropdowns instead of separate inline add buttons.
 
 ---
 

@@ -403,6 +403,19 @@ export const useHADevices = (): DeviceCollection => {
       return null;
     };
 
+    const isAllDayCalendarValue = (value: unknown): boolean => {
+      if (typeof value === 'string' && value) {
+        return /^\d{4}-\d{2}-\d{2}$/.test(value);
+      }
+
+      if (value && typeof value === 'object') {
+        const record = value as Record<string, unknown>;
+        return typeof record.date === 'string' && record.date.length > 0;
+      }
+
+      return false;
+    };
+
     const formatCalendarTime = (date: Date | null): string => {
       if (!date) {
         return '--';
@@ -941,6 +954,7 @@ export const useHADevices = (): DeviceCollection => {
                       : undefined;
               const startDate = parseCalendarDate(eventRecord.start ?? eventRecord.start_time);
               const endDate = parseCalendarDate(eventRecord.end ?? eventRecord.end_time);
+              const isAllDay = isAllDayCalendarValue(eventRecord.start ?? eventRecord.start_time);
               const attendees = Array.isArray(eventRecord.attendees)
                 ? eventRecord.attendees.length
                 : typeof eventRecord.attendees === 'number'
@@ -956,6 +970,7 @@ export const useHADevices = (): DeviceCollection => {
                 startTime: formatCalendarTime(startDate),
                 endTime: formatCalendarTime(endDate),
                 timeDisplay: formatCalendarTime(startDate),
+                isAllDay,
                 location,
                 description,
                 type: inferCalendarEventType(title, location),

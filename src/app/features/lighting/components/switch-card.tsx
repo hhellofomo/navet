@@ -17,9 +17,7 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
       <div
         {...controller.cardInteraction.cardProps}
         className={`relative h-full w-full bg-gradient-to-br ${controller.cardColors.gradient} backdrop-blur-xl rounded-3xl p-4 border ${controller.cardColors.border} overflow-hidden transition-all duration-500 ${
-          props.isEditMode
-            ? 'cursor-move active:cursor-grabbing'
-            : 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]'
+          props.isEditMode ? 'cursor-move active:cursor-grabbing' : 'cursor-pointer'
         } ${stateSurface.containerClassName} ${controller.theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
       >
         {controller.isOn && (

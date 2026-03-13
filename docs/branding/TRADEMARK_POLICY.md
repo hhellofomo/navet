@@ -4,7 +4,7 @@ This policy covers the **Navet** name, logo, wordmark, iconography, and other br
 
 ## Code vs Brand
 
-Navet source code is licensed separately under **AGPL-3.0**.
+Navet source code is licensed separately under **AGPL-3.0-only**.
 
 That code license does **not** grant permission to use the Navet Marks in a way that suggests:
 

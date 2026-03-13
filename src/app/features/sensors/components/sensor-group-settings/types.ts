@@ -10,6 +10,7 @@ export interface AvailableSensor {
 }
 
 export interface SensorGroupSettingsDialogProps {
+  entityId: string;
   isOpen: boolean;
   onClose: () => void;
   groupName: string;
