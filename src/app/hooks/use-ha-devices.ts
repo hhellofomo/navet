@@ -297,7 +297,6 @@ export const useHADevices = (): DeviceCollection => {
         persons: [],
         sensors: [],
         vacuums: [],
-        rssFeeds: [],
         calendars: [],
         'grouped-sensors': [],
       };
@@ -1094,7 +1093,6 @@ export const useHADevices = (): DeviceCollection => {
       persons,
       sensors: [],
       vacuums,
-      rssFeeds: [],
       calendars,
       'grouped-sensors': [],
     };

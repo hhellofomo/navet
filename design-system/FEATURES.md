@@ -191,11 +191,11 @@ Manages section navigation state across desktop and mobile layouts through a dir
 | Section  | Description                    | Icon      | Status    |
 |----------|--------------------------------|-----------|-----------|
 | Home     | Main dashboard with all cards  | Home      | Active    |
-| Security | Security cameras and monitoring | Video     | Empty     |
-| Tasks    | Automations and routines       | Clipboard | Empty     |
-| Locks    | Smart lock controls            | Lock      | Empty     |
+| Security | Security cameras and monitoring | Video     | Placeholder |
+| Tasks    | Automations and routines       | Clipboard | Placeholder |
+| Locks    | Smart lock controls            | Lock      | Active    |
 | Lights   | Lighting control center        | Lightbulb | Active    |
-| Media    | Media player management        | Tv        | Empty     |
+| Media    | Media player management        | Tv        | Active    |
 | Mock     | Flat staging area for mock entities | FlaskConical | Active |
 | Settings | App settings and preferences   | Settings  | Active    |
 

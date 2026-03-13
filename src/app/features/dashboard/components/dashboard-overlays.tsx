@@ -1,16 +1,7 @@
-import { lazy, Suspense } from 'react';
 import type { DashboardController } from '../hooks/use-dashboard-controller';
+import { AddCardDialogContainer } from './add-card-dialog';
 import { AddEntityDialog } from './add-entity-dialog';
-
-const AddCardDialog = lazy(async () => {
-  const module = await import('./add-card-dialog');
-  return { default: module.AddCardDialogContainer };
-});
-
-const DashboardOnboardingDialog = lazy(async () => {
-  const module = await import('./dashboard-onboarding-dialog');
-  return { default: module.DashboardOnboardingDialog };
-});
+import { DashboardOnboardingDialog } from './dashboard-onboarding-dialog';
 
 interface DashboardOverlaysProps {
   controller: DashboardController;
@@ -40,14 +31,12 @@ export function DashboardOverlays({ controller }: DashboardOverlaysProps) {
   return (
     <>
       {showAddCardDialog && (
-        <Suspense fallback={null}>
-          <AddCardDialog
-            open={showAddCardDialog}
-            onClose={onCloseAddCardDialog}
-            onAddCard={handleAddCard}
-            currentRoom={activeRoom}
-          />
-        </Suspense>
+        <AddCardDialogContainer
+          open={showAddCardDialog}
+          onClose={onCloseAddCardDialog}
+          onAddCard={handleAddCard}
+          currentRoom={activeRoom}
+        />
       )}
 
       {showAddEntityDialog && (
@@ -70,16 +59,14 @@ export function DashboardOverlays({ controller }: DashboardOverlaysProps) {
       )}
 
       {(!onboardingCompleted || isOnboardingClosing) && allEntityIds.length > 0 && (
-        <Suspense fallback={null}>
-          <DashboardOnboardingDialog
-            open
-            onChooseAll={handleChooseAllEntities}
-            onChooseBlank={handleChooseBlankDashboard}
-            onImportConfig={handleOnboardingImportDashboardConfig}
-            phase={isOnboardingClosing ? 'closing' : 'idle'}
-            onClosingAnimationComplete={onCompleteOnboardingClose}
-          />
-        </Suspense>
+        <DashboardOnboardingDialog
+          open
+          onChooseAll={handleChooseAllEntities}
+          onChooseBlank={handleChooseBlankDashboard}
+          onImportConfig={handleOnboardingImportDashboardConfig}
+          phase={isOnboardingClosing ? 'closing' : 'idle'}
+          onClosingAnimationComplete={onCompleteOnboardingClose}
+        />
       )}
     </>
   );

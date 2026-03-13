@@ -4,7 +4,7 @@ import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-si
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { DEVICES } from '@/app/data/mock-devices';
 import { renderCard } from '@/app/features/dashboard';
-import { useDeviceMap, useTheme } from '@/app/hooks';
+import { useDeviceMap, useDevices, useTheme } from '@/app/hooks';
 import type { DeviceWithType } from '@/app/types/device.types';
 import { EmptyState } from '../shared/empty-state';
 
@@ -29,11 +29,25 @@ export function TasksSection() {
 }
 
 export function LocksSection() {
+  const devices = useDevices();
+  const lockDevices = devices.locks;
+
+  if (lockDevices.length === 0) {
+    return (
+      <EmptyState
+        icon={Lock}
+        title="No Smart Locks"
+        description="You don't have any smart locks configured yet. Add locks to manage access to your home."
+      />
+    );
+  }
+
   return (
-    <EmptyState
-      icon={Lock}
-      title="No Smart Locks"
-      description="You don't have any smart locks configured yet. Add locks to manage access to your home."
+    <EntityGrid
+      devices={lockDevices.map((device) => ({ ...device, type: 'locks' as const }))}
+      title="Smart Locks"
+      singularLabel="lock"
+      pluralLabel="locks"
     />
   );
 }
@@ -49,16 +63,72 @@ export function LightsSection() {
 }
 
 export function MediaSection() {
+  const devices = useDevices();
+  const mediaDevices = devices.media;
+
+  if (mediaDevices.length === 0) {
+    return (
+      <EmptyState
+        icon={Tv}
+        title="No Media Players"
+        description="You don't have any media players configured yet. Add devices to control your entertainment."
+      />
+    );
+  }
+
   return (
-    <EmptyState
-      icon={Tv}
-      title="No Media Players"
-      description="You don't have any media players configured yet. Add devices to control your entertainment."
+    <EntityGrid
+      devices={mediaDevices.map((device) => ({ ...device, type: 'media' as const }))}
+      title="Media Players"
+      singularLabel="player"
+      pluralLabel="players"
     />
   );
 }
 
 const noopHandleSizeChange = () => {};
+
+const EntityGrid = memo(function EntityGrid({
+  devices,
+  title,
+  singularLabel,
+  pluralLabel,
+}: {
+  devices: DeviceWithType[];
+  title: string;
+  singularLabel: string;
+  pluralLabel: string;
+}) {
+  const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
+
+  return (
+    <section className="space-y-4">
+      <div className="flex items-center gap-3">
+        <h2 className={`text-lg font-semibold md:text-xl ${surface.textPrimary}`}>{title}</h2>
+        <span className={`text-xs md:text-sm ${surface.textSecondary}`}>
+          {devices.length} {devices.length === 1 ? singularLabel : pluralLabel}
+        </span>
+      </div>
+      <div className="grid w-full auto-rows-[87px] grid-flow-row-dense grid-cols-2 gap-2 md:grid-cols-4 md:gap-3 lg:gap-4 xl:grid-cols-6 2xl:grid-cols-8">
+        {devices.map((device) => {
+          const size = device.size as CardSize;
+
+          return (
+            <div key={device.id} className={getCardSpanClass(size)}>
+              {renderCard({
+                device,
+                size,
+                handleSizeChange: noopHandleSizeChange,
+                isEditMode: false,
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+});
 
 const MockEntityGrid = memo(function MockEntityGrid({ devices }: { devices: DeviceWithType[] }) {
   const { theme } = useTheme();

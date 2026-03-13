@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useAuth } from '@/app/contexts/auth-context';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
@@ -65,6 +65,8 @@ export function useMediaCardController({
   const [isOpen, setIsOpen] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(initialElapsedSeconds ?? 0);
   const [durationSeconds, setDurationSeconds] = useState(initialDurationSeconds ?? 0);
+  const [failedArtworkUrl, setFailedArtworkUrl] = useState<string | null>(null);
+  const previousEntityPictureRef = useRef(entityPicture);
 
   useEffect(() => {
     setState(initialState);
@@ -91,8 +93,20 @@ export function useMediaCardController({
       return null;
     }
 
-    return normalizeMediaArtworkUrl(entityPicture, authConfig?.url);
-  }, [authConfig, entityPicture]);
+    const normalizedArtworkUrl = normalizeMediaArtworkUrl(entityPicture, authConfig?.url);
+    if (!normalizedArtworkUrl || normalizedArtworkUrl === failedArtworkUrl) {
+      return null;
+    }
+
+    return normalizedArtworkUrl;
+  }, [authConfig, entityPicture, failedArtworkUrl]);
+
+  useEffect(() => {
+    if (previousEntityPictureRef.current !== entityPicture) {
+      previousEntityPictureRef.current = entityPicture;
+      setFailedArtworkUrl(null);
+    }
+  });
 
   const isPlaying = state === 'playing';
 
@@ -199,11 +213,20 @@ export function useMediaCardController({
     );
   }, [entityId, runAction]);
 
+  const handleArtworkError = useCallback((imageUrl?: string | null) => {
+    if (!imageUrl) {
+      return;
+    }
+
+    setFailedArtworkUrl((current) => current ?? imageUrl);
+  }, []);
+
   return {
     albumArt,
     closeDialog,
     durationSeconds,
     elapsedSeconds,
+    handleArtworkError,
     handleNext,
     handlePrevious,
     handleVolumeChange,

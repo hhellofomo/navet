@@ -19,7 +19,7 @@ export function EntityRoomSelector({
   className = '',
 }: EntityRoomSelectorProps) {
   const { theme } = useTheme();
-  const { areas, entityRegistry } = useHomeAssistant();
+  const { areas, deviceRegistry, entityRegistry } = useHomeAssistant();
   const surface = getThemeSurfaceTokens(theme);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -28,8 +28,21 @@ export function EntityRoomSelector({
     [areas]
   );
   const selectedAreaId = useMemo(() => {
-    return entityRegistry.find((entry) => entry.entity_id === entityId)?.area_id ?? '';
-  }, [entityId, entityRegistry]);
+    const entityEntry = entityRegistry.find((entry) => entry.entity_id === entityId);
+    if (!entityEntry) {
+      return '';
+    }
+
+    if (entityEntry.area_id) {
+      return entityEntry.area_id;
+    }
+
+    if (!entityEntry.device_id) {
+      return '';
+    }
+
+    return deviceRegistry.find((entry) => entry.id === entityEntry.device_id)?.area_id ?? '';
+  }, [deviceRegistry, entityId, entityRegistry]);
 
   const baseSelectClassName = compact
     ? `h-9 rounded-xl px-3 pr-8 text-xs ${surface.textPrimary}`

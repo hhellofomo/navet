@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react';
 import { MediaFallbackArtwork } from './media-fallback-artwork';
 import type { MediaArtworkPalette } from './use-media-artwork-colors';
 import { withAlpha } from './use-media-artwork-colors';
 
 interface MediaArtworkSurfaceProps {
   artwork?: string | null;
+  onArtworkError?: (imageUrl?: string | null) => void;
   palette: MediaArtworkPalette;
   layout?: 'full' | 'split' | 'stacked';
   imagePaddingClassName?: string;
@@ -14,6 +16,7 @@ interface MediaArtworkSurfaceProps {
 
 export function MediaArtworkSurface({
   artwork,
+  onArtworkError,
   palette,
   layout = 'full',
   imagePaddingClassName = 'p-6',
@@ -21,6 +24,24 @@ export function MediaArtworkSurface({
   artRegionClassName = 'w-[44%]',
   subduedFallback = false,
 }: MediaArtworkSurfaceProps) {
+  const [showDeferredBackdrop, setShowDeferredBackdrop] = useState(false);
+
+  useEffect(() => {
+    setShowDeferredBackdrop(false);
+
+    if (!artwork) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setShowDeferredBackdrop(true);
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [artwork]);
+
   const useSubduedFallback = subduedFallback && !artwork;
   const edgeFadeMask =
     layout === 'split'
@@ -61,21 +82,23 @@ export function MediaArtworkSurface({
                     : `linear-gradient(135deg, ${palette.dominant} 0%, ${palette.gradientEnd} 100%)`,
         }}
       />
-      {artwork ? (
+      {artwork && showDeferredBackdrop ? (
         <img
           src={artwork}
           alt=""
           aria-hidden="true"
+          onError={() => onArtworkError?.(artwork)}
           className="absolute inset-0 h-full w-full scale-[1.22] object-cover opacity-38 blur-[84px] saturate-[1.24]"
+          decoding="async"
         />
-      ) : (
+      ) : !artwork ? (
         <MediaFallbackArtwork
           palette={palette}
           className={`absolute inset-0 scale-[1.08] blur-[42px] ${
             useSubduedFallback ? 'opacity-24' : 'opacity-55'
           }`}
         />
-      )}
+      ) : null}
 
       {artwork ? (
         <div
@@ -92,7 +115,9 @@ export function MediaArtworkSurface({
               src={artwork}
               alt=""
               aria-hidden="true"
+              onError={() => onArtworkError?.(artwork)}
               className={`h-full w-full object-contain object-left ${imageClassName}`}
+              decoding="async"
               style={{
                 WebkitMaskImage: edgeFadeMask,
                 maskImage: edgeFadeMask,

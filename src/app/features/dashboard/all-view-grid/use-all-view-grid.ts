@@ -79,25 +79,25 @@ export function useAllViewGrid({
     [customCards]
   );
 
-  const orderedRoomEntries = useMemo(
-    () =>
-      rooms.map((room) => {
-        const roomDevices = devicesByRoom[room] || [];
-        const roomCustomCards = customCardsByRoom[room] || [];
-        const validIds = new Set([
-          ...roomDevices.map((device) => device.id),
-          ...roomCustomCards.map((card) => card.id),
-        ]);
-        const orderedIds = (cardOrders[room] || []).filter((id) => validIds.has(id));
+  const orderedRoomEntries = useMemo(() => {
+    const orderedRooms = Array.from(new Set([...rooms, ...customCards.map((card) => card.room)]));
 
-        return {
-          room,
-          orderedIds,
-          totalItems: validIds.size,
-        };
-      }),
-    [cardOrders, customCardsByRoom, devicesByRoom, rooms]
-  );
+    return orderedRooms.map((room) => {
+      const roomDevices = devicesByRoom[room] || [];
+      const roomCustomCards = customCardsByRoom[room] || [];
+      const validIds = new Set([
+        ...roomDevices.map((device) => device.id),
+        ...roomCustomCards.map((card) => card.id),
+      ]);
+      const orderedIds = (cardOrders[room] || []).filter((id) => validIds.has(id));
+
+      return {
+        room,
+        orderedIds,
+        totalItems: validIds.size,
+      };
+    });
+  }, [cardOrders, customCards, customCardsByRoom, devicesByRoom, rooms]);
 
   const allOrderedIds = useMemo(
     () => orderedRoomEntries.flatMap((entry) => entry.orderedIds),
@@ -155,12 +155,20 @@ export function useAllViewGrid({
     const visibleEntries = orderedRoomEntries.filter((entry) => entry.totalItems > 0);
     const orderedEntries =
       grouping === 'room'
-        ? [...visibleEntries].sort((left, right) => left.room.localeCompare(right.room))
+        ? [...visibleEntries].sort((left, right) => {
+            if (left.room === 'All') {
+              return -1;
+            }
+            if (right.room === 'All') {
+              return 1;
+            }
+            return left.room.localeCompare(right.room);
+          })
         : visibleEntries;
 
     return orderedEntries.map((entry) => ({
       key: `room:${entry.room}`,
-      title: entry.room,
+      title: entry.room === 'All' ? 'Widgets' : entry.room,
       orderedIds: entry.orderedIds,
       totalItems: entry.totalItems,
       mutedTitle: entry.room === UNKNOWN_ROOM_LABEL,

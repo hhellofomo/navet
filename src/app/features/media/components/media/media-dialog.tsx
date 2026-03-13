@@ -13,6 +13,7 @@ interface MediaDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   artwork?: string | null;
+  onArtworkError?: (imageUrl?: string | null) => void;
   title: string;
   artist: string;
   isPlaying: boolean;
@@ -30,6 +31,7 @@ export function MediaDialog({
   isOpen,
   onOpenChange,
   artwork,
+  onArtworkError,
   title,
   artist,
   isPlaying,
@@ -87,6 +89,7 @@ export function MediaDialog({
                 <img
                   src={artwork}
                   alt={`${title} by ${artist}`}
+                  onError={() => onArtworkError?.(artwork)}
                   className="h-48 w-48 rounded-3xl object-cover shadow-2xl"
                 />
               ) : (

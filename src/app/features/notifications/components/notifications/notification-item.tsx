@@ -1,4 +1,5 @@
 import { InteractivePill } from '@/app/components/shared/interactive-pill';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import type { PrimaryColor, ThemeType } from '@/app/hooks';
 import { getNotificationSurfaceTokens } from './notification-surface-tokens';
 import { getNotificationColor, getNotificationIcon } from './notification-utils';
@@ -10,7 +11,6 @@ interface NotificationItemProps {
   onDelete: (id: string) => Promise<void>;
   theme: ThemeType;
   primaryColor: PrimaryColor;
-  getColorValue: (color: PrimaryColor) => string;
   formatTimestamp: (date: Date) => string;
 }
 
@@ -20,7 +20,6 @@ export function NotificationItem({
   onDelete,
   theme,
   primaryColor,
-  getColorValue,
   formatTimestamp,
 }: NotificationItemProps) {
   const surface = getNotificationSurfaceTokens(theme);
@@ -33,6 +32,11 @@ export function NotificationItem({
       : 'Mark as read';
   const secondaryActionLabel = notification.source === 'update' ? 'Hide' : 'Delete';
   const accentColor = getNotificationColor(notification.type, primaryColor);
+  const unreadIndicatorColor = getThemeColorValue(primaryColor);
+  const iconColor =
+    notification.type === 'warning'
+      ? 'currentColor'
+      : getNotificationColor(notification.type, primaryColor);
   const iconShellClassName =
     theme === 'light'
       ? 'border border-gray-200 bg-white/90'
@@ -49,18 +53,30 @@ export function NotificationItem({
       <div className="flex gap-3">
         {/* Icon */}
         <div
-          className={`h-8 w-8 rounded-2xl flex items-center justify-center flex-shrink-0 ${iconShellClassName}`}
+          className={`h-8 w-8 rounded-2xl flex items-center justify-center flex-shrink-0 ${iconShellClassName} ${
+            notification.type === 'warning' ? surface.textSecondary : ''
+          }`}
         >
           <NotificationIcon
             className="w-4 h-4"
-            style={{ color: getNotificationColor(notification.type, primaryColor) }}
+            style={notification.type === 'warning' ? undefined : { color: iconColor }}
           />
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
-            <h4 className={`text-sm font-medium ${surface.textPrimary}`}>{notification.title}</h4>
+            <div className="flex min-w-0 items-center gap-2">
+              {!notification.read && (
+                <span
+                  className="h-1.5 w-1.5 flex-shrink-0 rounded-full"
+                  style={{ backgroundColor: unreadIndicatorColor }}
+                />
+              )}
+              <h4 className={`min-w-0 text-sm font-medium ${surface.textPrimary}`}>
+                {notification.title}
+              </h4>
+            </div>
             <span className={`shrink-0 text-xs ${surface.textMuted}`}>
               {formatTimestamp(notification.timestamp)}
             </span>
@@ -99,11 +115,6 @@ export function NotificationItem({
                   active={notification.source === 'update'}
                   intent="action"
                   className="h-7 rounded-full px-2.5 text-[11px] font-medium"
-                  style={
-                    notification.source === 'update'
-                      ? undefined
-                      : { color: getColorValue(primaryColor) }
-                  }
                 >
                   {primaryActionLabel}
                 </InteractivePill>
@@ -118,14 +129,6 @@ export function NotificationItem({
             </div>
           )}
         </div>
-
-        {/* Unread indicator */}
-        {!notification.read && (
-          <div
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full"
-            style={{ backgroundColor: getColorValue(primaryColor) }}
-          />
-        )}
       </div>
     </div>
   );

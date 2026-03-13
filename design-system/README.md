@@ -206,6 +206,10 @@ This design system evolves based on real-world usage and feedback. Document lear
 
 ---
 
+### Sidebar Section Status
+- **Media** and **Locks** now render live Home Assistant-backed cards in their dedicated section views
+- **Security** and **Tasks** still use placeholder section states until those domains are mapped into Navet card/device types
+
 **Design System Maintained By:** Development Team
-**Last Updated:** March 11, 2026
+**Last Updated:** March 13, 2026
 **Status:** Living Document

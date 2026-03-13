@@ -1,4 +1,4 @@
-import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { AlertCircle, CheckCircle, Info } from 'lucide-react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import type { PrimaryColor } from '@/app/hooks';
 import type { Notification } from './use-notifications';
@@ -23,7 +23,7 @@ export function getNotificationIcon(type: Notification['type']) {
     case 'success':
       return CheckCircle;
     case 'warning':
-      return AlertTriangle;
+      return AlertCircle;
     case 'error':
       return AlertCircle;
     default:

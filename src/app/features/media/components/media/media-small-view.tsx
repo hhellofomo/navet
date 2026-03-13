@@ -1,4 +1,5 @@
 import { Pause, Play, SkipBack, SkipForward } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { getCardActionControlSizes } from '@/app/components/shared/card-action-control-sizes';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
@@ -12,6 +13,7 @@ import { useMediaArtworkColors, withAlpha } from './use-media-artwork-colors';
 interface MediaSmallViewProps {
   entityId: string;
   artwork?: string | null;
+  onArtworkError?: (imageUrl?: string | null) => void;
   title: string;
   artist: string;
   isActive: boolean;
@@ -30,6 +32,7 @@ interface MediaSmallViewProps {
 export function MediaSmallView({
   entityId,
   artwork,
+  onArtworkError,
   title,
   artist,
   isActive,
@@ -44,6 +47,24 @@ export function MediaSmallView({
   onVolumeChange,
   onOpenDialog,
 }: MediaSmallViewProps) {
+  const [showDeferredBackdrop, setShowDeferredBackdrop] = useState(false);
+
+  useEffect(() => {
+    setShowDeferredBackdrop(false);
+
+    if (!artwork) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setShowDeferredBackdrop(true);
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [artwork]);
+
   const displayVolume = Math.max(0, Math.min(100, volume));
   const stateSurface = getCardStateSurfaceTokens(theme, isActive);
   const iconTone = stateSurface.primaryTextClassName;
@@ -101,20 +122,26 @@ export function MediaSmallView({
     <div className="relative -m-4 flex h-[calc(100%+2rem)] flex-col overflow-hidden rounded-[inherit]">
       <div className="pointer-events-none absolute inset-0" style={backgroundBaseStyle} />
       {artwork ? (
-        <>
-          <img
-            src={artwork}
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 h-full w-full scale-[1.04] object-cover opacity-18 saturate-[0.92] contrast-[0.88]"
-          />
-          <img
-            src={artwork}
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 h-full w-full scale-[1.12] object-cover opacity-10 blur-[26px] saturate-[1.02]"
-          />
-        </>
+        showDeferredBackdrop ? (
+          <>
+            <img
+              src={artwork}
+              alt=""
+              aria-hidden="true"
+              onError={() => onArtworkError?.(artwork)}
+              className="pointer-events-none absolute inset-0 h-full w-full scale-[1.04] object-cover opacity-18 saturate-[0.92] contrast-[0.88]"
+              decoding="async"
+            />
+            <img
+              src={artwork}
+              alt=""
+              aria-hidden="true"
+              onError={() => onArtworkError?.(artwork)}
+              className="pointer-events-none absolute inset-0 h-full w-full scale-[1.12] object-cover opacity-10 blur-[26px] saturate-[1.02]"
+              decoding="async"
+            />
+          </>
+        ) : null
       ) : (
         <MediaFallbackArtwork
           palette={palette}

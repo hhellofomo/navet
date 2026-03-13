@@ -44,13 +44,13 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 
 ### 🛠️ Functionality
 - **Edit Mode** - Drag-and-drop card reordering and resizing
-- **Custom Widgets** - Add Calendar, News, Photo Frame, and Quick Note widgets
+- **Custom Widgets** - Add RSS Feed, Photo Frame, and Quick Note widgets
 - **Entity Visibility Control** - Start with all entities, a blank board, or import a saved config, then add/remove entities as needed
 - **Search & Filter** - Real-time search filters dashboard view
 - **All View Modes** - Switch the `All` room between custom, room, type, or flat grouping
 - **Live Weather Entity Card** - Home Assistant weather entities now render as the dashboard weather card with forecast and solar data from Home Assistant
 - **Calendar Entities** - Home Assistant calendar entities now render through the live calendar card with per-card source selection, week/month views, and event details
-- **Home Assistant Notifications** - Navet notifications now show Home Assistant persistent notifications and update actions
+- **Home Assistant Notifications** - Navet notifications now show Home Assistant persistent notifications, repairs/issues, and update actions
 - **Card-Level Room Editing** - Supported entity cards can reassign their room directly from the settings dialog
 - **Notifications** - System notifications panel
 - **Settings** - Comprehensive theme and customization options
@@ -201,6 +201,7 @@ pnpm build
 
 #### Notifications
 - Home Assistant persistent notifications appear in Navet notifications
+- Home Assistant repairs/issues appear in Navet notifications
 - Home Assistant update entities can surface `Update`, install progress, and `Restart` actions directly in Navet
 
 #### Dashboard Content
@@ -225,16 +226,21 @@ pnpm build
 
 #### Custom Widgets
 - Click **Add Card** in edit mode to add custom widgets
-- Choose from **4 widget types**:
-  - **📅 Calendar** - View upcoming events and appointments
-  - **📰 News Feed** - Latest headlines and updates
+- Choose from **3 widget types**:
+  - **📰 RSS Feed** - Live articles from direct RSS URLs or Home Assistant Feedreader sources
   - **🖼️ Photo Frame** - Beautiful photo carousel with navigation
   - **📝 Quick Note** - Editable sticky notes for reminders
+- Calendar is now provided by live Home Assistant `calendar.*` entity cards instead of a custom widget
 - Available in **3 sizes**: Small, Medium, Large
 - Dashboard cards also support an **Extra-Small** `1 × 0.5` size for denser layouts
 - Widgets persist across browser sessions
 - Full drag-and-drop and delete support
 - See [WIDGETS.md](docs/WIDGETS.md) for detailed documentation
+
+#### Sidebar Sections
+- **Media** now renders live Home Assistant media players in its own section view
+- **Locks** now renders live Home Assistant lock entities in its own section view
+- **Tasks** and **Security** remain placeholders until those domains are mapped into Navet card/device types
 
 #### Navigation Sections
 - **Home** for the main dashboard
@@ -314,7 +320,7 @@ Found a bug or have an idea? [Open an issue](https://github.com/awesomestvi/nave
 
 ## 🗺️ Roadmap
 
-- [x] Custom widgets (Calendar, News, Photo Frame, Notes)
+- [x] Custom widgets (RSS Feed, Photo Frame, Notes)
 - [x] Data persistence with localStorage
 - [x] Configuration UI with setup wizard
 - [x] Loading states and error handling
@@ -327,8 +333,8 @@ Found a bug or have an idea? [Open an issue](https://github.com/awesomestvi/nave
 - [ ] Multi-language support
 - [ ] Voice control integration
 - [ ] Scene management
-- [ ] Real calendar integration (Google Calendar, etc.)
-- [ ] Real news API integration
+- [x] Home Assistant calendar entity integration
+- [x] RSS feed provider integration
 - [x] Home Assistant weather entity and forecast integration
 - [ ] Energy dashboard
 

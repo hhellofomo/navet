@@ -1,6 +1,8 @@
 import { ChevronRight, Rss } from 'lucide-react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
+import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import type { PrimaryColor, ThemeType } from '@/app/hooks';
 import { getRSSFeedCardSurfaceTokens } from './surface-tokens';
 import type { RSSItem } from './types';
@@ -20,10 +22,15 @@ interface RSSFeedCardViewProps {
   };
   isSmall: boolean;
   isMedium: boolean;
-  latestArticle: RSSItem;
+  latestArticle: RSSItem | null;
   mediumArticles: RSSItem[];
   largeArticles: RSSItem[];
   handleArticleClick: (url: string) => void;
+  isLoading: boolean;
+  error: string | null;
+  hasConfiguredProviders: boolean;
+  hasSelectedProviders: boolean;
+  onOpenSettings: () => void;
 }
 
 export function RSSFeedCardView({
@@ -39,8 +46,21 @@ export function RSSFeedCardView({
   mediumArticles,
   largeArticles,
   handleArticleClick,
+  isLoading,
+  error,
+  hasConfiguredProviders,
+  hasSelectedProviders,
+  onOpenSettings,
 }: RSSFeedCardViewProps) {
   const rssSurface = getRSSFeedCardSurfaceTokens(theme, primaryColor);
+  const isEmpty = !latestArticle && !isLoading;
+  const emptyMessage = !hasConfiguredProviders
+    ? 'Add RSS providers to start following feeds.'
+    : !hasSelectedProviders
+      ? 'Select one or more providers for this card.'
+      : error
+        ? error
+        : 'No articles available right now.';
 
   return (
     <div
@@ -63,26 +83,45 @@ export function RSSFeedCardView({
       {/* Content */}
       <div className="relative h-full flex flex-col p-4">
         {/* Header */}
-        <div className={`flex items-start justify-between ${isSmall ? 'mb-2' : 'mb-3'}`}>
-          <div className="min-w-0 flex-1 text-left">
-            <span className={`text-left text-sm font-semibold ${rssSurface.surface.textPrimary}`}>
-              News Feed
-            </span>
-          </div>
-
-          <div
-            className={`ml-2 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${rssSurface.iconWrapClassName}`}
-            style={{ backgroundColor: rssSurface.iconBackgroundColor }}
-          >
-            <Rss className="h-5 w-5" style={{ color: rssSurface.iconColor }} />
-          </div>
-        </div>
+        <EntityCardHeader
+          title="RSS Feed"
+          subtitle=""
+          size={size}
+          subtitleClassName="hidden"
+          leading={
+            <EntityCardHeaderIcon
+              IconComponent={Rss}
+              isActive={true}
+              size={size}
+              ariaLabel="Configure RSS providers"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => {
+                event.stopPropagation();
+                onOpenSettings();
+              }}
+            />
+          }
+        />
 
         {inEditMode && onSizeChange && (
           <CardSizeSelector currentSize={size} onSizeChange={onSizeChange} />
         )}
 
-        {isSmall ? (
+        {isEmpty ? (
+          <div className="flex flex-1 flex-col justify-center text-left">
+            <p className={`text-sm font-medium ${rssSurface.surface.textPrimary}`}>RSS Feed</p>
+            <p className={`mt-2 text-sm leading-relaxed ${rssSurface.textSecondaryClassName}`}>
+              {emptyMessage}
+            </p>
+          </div>
+        ) : isLoading && !latestArticle ? (
+          <div className="flex flex-1 flex-col justify-center text-left">
+            <p className={`text-sm font-medium ${rssSurface.surface.textPrimary}`}>Loading feeds</p>
+            <p className={`mt-2 text-sm leading-relaxed ${rssSurface.textSecondaryClassName}`}>
+              Fetching the latest articles from your selected providers.
+            </p>
+          </div>
+        ) : isSmall && latestArticle ? (
           // Small: Single latest article
           <div className="flex-1 flex flex-col justify-between items-start text-left">
             <div className="w-full">
@@ -115,6 +154,7 @@ export function RSSFeedCardView({
                   rel="noopener noreferrer"
                   className={`group/item -m-2 block cursor-pointer rounded-lg p-2 text-left no-underline transition-colors ${rssSurface.hoverClassName}`}
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     handleArticleClick(item.url);
                   }}
@@ -148,6 +188,7 @@ export function RSSFeedCardView({
                   rel="noopener noreferrer"
                   className={`group/item -m-2 block cursor-pointer rounded-xl p-2 text-left no-underline transition-colors ${rssSurface.hoverClassName}`}
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     handleArticleClick(item.url);
                   }}

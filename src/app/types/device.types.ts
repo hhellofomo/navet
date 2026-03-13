@@ -139,11 +139,6 @@ export interface VacuumDevice extends BaseDevice {
   cleaningTime?: string;
 }
 
-// RSS Feed device
-export interface RSSFeedDevice extends BaseDevice {
-  room: string;
-}
-
 // Calendar device
 export interface CalendarDevice extends BaseDevice {
   room: string;
@@ -191,7 +186,6 @@ export type Device =
   | PersonDevice
   | SensorDevice
   | VacuumDevice
-  | RSSFeedDevice
   | CalendarDevice
   | GroupedSensorDevice;
 
@@ -210,7 +204,6 @@ export interface DeviceCollection {
   persons: PersonDevice[];
   sensors: SensorDevice[];
   vacuums: VacuumDevice[];
-  rssFeeds: RSSFeedDevice[];
   calendars: CalendarDevice[];
   'grouped-sensors': GroupedSensorDevice[];
 }

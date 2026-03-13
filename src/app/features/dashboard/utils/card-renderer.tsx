@@ -6,7 +6,6 @@ import { LightCard, SwitchCard } from '@/app/features/lighting';
 import { MediaCard } from '@/app/features/media';
 import { PersonCard } from '@/app/features/person';
 import { PowerCard } from '@/app/features/power';
-import { RSSFeedCard } from '@/app/features/rss';
 import { CoverCard, LockCard } from '@/app/features/security';
 import { GroupedSensorCard, SensorCard, type SensorReading } from '@/app/features/sensors';
 import { VacuumCard } from '@/app/features/vacuum';
@@ -231,14 +230,6 @@ export const renderCard = ({
           size={size}
           onSizeChange={handleSizeChange}
           isEditMode={isEditMode}
-        />
-      );
-    case 'rssFeeds':
-      return (
-        <RSSFeedCard
-          inEditMode={isEditMode}
-          size={size}
-          onSizeChange={(newSize) => handleSizeChange(device.id, newSize)}
         />
       );
     case 'calendars':

@@ -11,6 +11,7 @@ import { useMediaArtworkColors, withAlpha } from './use-media-artwork-colors';
 interface MediaMediumViewProps {
   entityId: string;
   artwork?: string | null;
+  onArtworkError?: (imageUrl?: string | null) => void;
   title: string;
   artist: string;
   isActive: boolean;
@@ -31,6 +32,7 @@ interface MediaMediumViewProps {
 export function MediaMediumView({
   entityId,
   artwork,
+  onArtworkError,
   title,
   artist,
   isActive,
@@ -88,6 +90,7 @@ export function MediaMediumView({
     <div className="relative -m-5 flex flex-1 overflow-hidden">
       <MediaArtworkSurface
         artwork={artwork}
+        onArtworkError={onArtworkError}
         palette={palette}
         layout="split"
         artRegionClassName="w-[42%]"
