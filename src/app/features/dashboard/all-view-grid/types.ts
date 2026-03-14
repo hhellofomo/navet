@@ -9,6 +9,7 @@ export interface AllViewGridProps {
   rooms: string[];
   cardOrders: Record<string, string[]>;
   isEditMode: boolean;
+  isScrolling?: boolean;
   cardSizes: Record<string, CardSize>;
   updateCardSize: (id: string, size: CardSize) => void;
   grouping: AllViewGrouping;

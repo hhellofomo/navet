@@ -2,7 +2,6 @@ import { Flame, Snowflake, Wind } from 'lucide-react';
 import { memo } from 'react';
 import { CardActionRow } from '@/app/components/shared/card-action-row';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
-import { CardSizeSelector } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
@@ -25,7 +24,7 @@ export const HVACCard = memo(function HVACCard({
   initialAction,
   initialState = true,
   size,
-  onSizeChange,
+  onSizeChange: _onSizeChange,
   isEditMode,
 }: HVACCardProps) {
   const { t } = useI18n();
@@ -55,13 +54,6 @@ export const HVACCard = memo(function HVACCard({
         lightOverlayClassName={controller.lightOverlay}
         showShadow={controller.isOn}
       >
-        {isEditMode && (
-          <CardSizeSelector
-            currentSize={size}
-            onSizeChange={(newSize) => onSizeChange(id, newSize)}
-          />
-        )}
-
         {controller.isOn && (
           <div
             className={`absolute inset-0 bg-gradient-to-br ${controller.cardColors.glow} to-transparent transition-all duration-500`}
@@ -233,19 +225,21 @@ export const HVACCard = memo(function HVACCard({
         </div>
       </CardWrapper>
 
-      <HVACSettingsDialog
-        entityId={id}
-        isOpen={controller.isSettingsOpen}
-        onOpenChange={controller.setIsSettingsOpen}
-        name={name}
-        room={room}
-        isOn={controller.isOn}
-        mode={controller.mode}
-        targetTemp={controller.targetTemp}
-        currentTemp={controller.currentTemp}
-        onModeChange={controller.setMode}
-        onTogglePower={() => controller.setIsOn(!controller.isOn)}
-      />
+      {controller.isSettingsOpen ? (
+        <HVACSettingsDialog
+          entityId={id}
+          isOpen={controller.isSettingsOpen}
+          onOpenChange={controller.setIsSettingsOpen}
+          name={name}
+          room={room}
+          isOn={controller.isOn}
+          mode={controller.mode}
+          targetTemp={controller.targetTemp}
+          currentTemp={controller.currentTemp}
+          onModeChange={controller.setMode}
+          onTogglePower={() => controller.setIsOn(!controller.isOn)}
+        />
+      ) : null}
     </>
   );
 });

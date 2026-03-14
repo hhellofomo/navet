@@ -6,6 +6,8 @@ import { DraggableCard } from '@/app/components/shared/draggable-card';
 import type { DeviceWithType } from '@/app/types/device.types';
 import type { CustomCard } from '../stores/custom-cards-store';
 import { renderCard } from '../utils/card-renderer';
+import { DashboardCardSkeleton } from './dashboard-card-skeleton';
+import { DashboardResizeTrigger } from './dashboard-edit-actions';
 import { WidgetCard } from './widget-card';
 
 interface DashboardCardItemProps {
@@ -20,6 +22,7 @@ interface DashboardCardItemProps {
   onRemoveEntity?: (entityId: string) => void;
   allowEntityRemoval?: boolean;
   usesHideAction?: boolean;
+  renderLightweight?: boolean;
 }
 
 export const DashboardCardItem = memo(function DashboardCardItem({
@@ -34,41 +37,85 @@ export const DashboardCardItem = memo(function DashboardCardItem({
   onRemoveEntity,
   allowEntityRemoval = false,
   usesHideAction = false,
+  renderLightweight = false,
 }: DashboardCardItemProps) {
   const RemoveActionIcon = usesHideAction ? EyeOff : X;
   const removeAriaLabel = 'Remove entity from dashboard';
   const spanClass =
     device?.type === 'media' && size === 'large' ? 'col-span-1 row-span-4' : getCardSpanClass(size);
   const editControlSize = device?.type === 'media' && size === 'large' ? 'medium' : size;
+  const allowedSizes = getAllowedSizes(device, card);
 
   return (
     <DraggableCard id={id} isEditMode={isEditMode} className={spanClass}>
-      {device && isEditMode && allowEntityRemoval && onRemoveEntity && (
+      {isEditMode && device && allowEntityRemoval && onRemoveEntity && (
         <CardEditActionButton
           cardSize={editControlSize}
           Icon={RemoveActionIcon}
           placement="top-left"
           variant={usesHideAction ? 'neutral' : 'destructive'}
-          onClick={(event) => {
-            event.stopPropagation();
-            onRemoveEntity(id);
-          }}
+          data-dashboard-edit-action="remove-entity"
+          data-card-id={id}
           aria-label={removeAriaLabel}
         />
       )}
-      {device
-        ? renderCard({ device, size, handleSizeChange, isEditMode })
-        : card && (
-            <WidgetCard
-              card={{ ...card, size }}
-              isEditMode={isEditMode}
-              onDelete={onDeleteCard}
-              onUpdate={onUpdateCard}
-            />
-          )}
+      {isEditMode && !device && card && onDeleteCard && (
+        <CardEditActionButton
+          cardSize={editControlSize}
+          Icon={X}
+          placement="top-left"
+          variant="destructive"
+          data-dashboard-edit-action="delete-card"
+          data-card-id={id}
+          aria-label="Delete widget"
+        />
+      )}
+      {isEditMode && (
+        <DashboardResizeTrigger
+          cardId={id}
+          cardSize={editControlSize}
+          allowedSizes={allowedSizes}
+        />
+      )}
+      {renderLightweight ? (
+        <DashboardCardSkeleton size={size} />
+      ) : device ? (
+        renderCard({ device, size, handleSizeChange, isEditMode })
+      ) : (
+        card && (
+          <WidgetCard
+            card={{ ...card, size }}
+            isEditMode={isEditMode}
+            onDelete={onDeleteCard}
+            onUpdate={onUpdateCard}
+          />
+        )
+      )}
     </DraggableCard>
   );
 }, areDashboardCardItemPropsEqual);
+
+function getAllowedSizes(device?: DeviceWithType, card?: CustomCard): CardSize[] {
+  if (card) {
+    return ['small', 'medium', 'large'];
+  }
+
+  switch (device?.type) {
+    case 'media':
+      return ['small', 'medium', 'large'];
+    case 'grouped-sensors':
+      return ['small', 'medium'];
+    case 'calendars':
+      return ['small', 'medium', 'large'];
+    case 'weather':
+      return ['large'];
+    case 'switches':
+    case 'locks':
+      return [device.size as CardSize];
+    default:
+      return ['extra-small', 'small', 'medium', 'large'];
+  }
+}
 
 function areDashboardCardItemPropsEqual(
   previous: DashboardCardItemProps,
@@ -85,6 +132,7 @@ function areDashboardCardItemPropsEqual(
     previous.onUpdateCard === next.onUpdateCard &&
     previous.onRemoveEntity === next.onRemoveEntity &&
     previous.allowEntityRemoval === next.allowEntityRemoval &&
-    previous.usesHideAction === next.usesHideAction
+    previous.usesHideAction === next.usesHideAction &&
+    previous.renderLightweight === next.renderLightweight
   );
 }

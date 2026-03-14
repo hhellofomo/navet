@@ -1,10 +1,6 @@
 import { TrendingDown, Zap } from 'lucide-react';
 import { memo } from 'react';
-import {
-  type CardSize,
-  CardSizeSelector,
-  isCompactCardSize,
-} from '@/app/components/shared/card-size-selector';
+import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
@@ -23,10 +19,9 @@ export const PowerCard = memo(function PowerCard({
   usage,
   cost,
   size,
-  onSizeChange,
-  isEditMode,
+  onSizeChange: _onSizeChange,
+  isEditMode: _isEditMode,
 }: PowerCardProps) {
-  const cardId = 'power-1';
   const { theme } = useTheme();
   const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
@@ -70,13 +65,6 @@ export const PowerCard = memo(function PowerCard({
     <div
       className={`relative h-full backdrop-blur-xl rounded-3xl ${padding} border overflow-hidden ${shell.containerClassName}`}
     >
-      {isEditMode && (
-        <CardSizeSelector
-          currentSize={size}
-          onSizeChange={(newSize) => onSizeChange(cardId, newSize)}
-        />
-      )}
-
       <div className={`absolute inset-0 ${shell.glowClassName}`}></div>
 
       {shell.overlayClassName && <div className={`absolute inset-0 ${shell.overlayClassName}`} />}

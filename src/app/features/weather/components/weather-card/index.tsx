@@ -1,10 +1,6 @@
 import { Sunrise, Sunset } from 'lucide-react';
 import { memo } from 'react';
-import {
-  type CardSize,
-  CardSizeSelector,
-  isCompactCardSize,
-} from '@/app/components/shared/card-size-selector';
+import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { CaptionValue } from '@/app/components/ui/caption-value';
@@ -46,7 +42,7 @@ interface WeatherCardProps {
  * High-quality design inspired by modern weather apps
  */
 export const WeatherCard = memo(function WeatherCard({
-  id,
+  id: _id,
   location,
   temperature,
   condition,
@@ -61,8 +57,8 @@ export const WeatherCard = memo(function WeatherCard({
   highTemp,
   lowTemp,
   size,
-  onSizeChange,
-  isEditMode,
+  onSizeChange: _onSizeChange,
+  isEditMode: _isEditMode,
 }: WeatherCardProps) {
   const { theme } = useTheme();
   const { formatDate, formatTime, t } = useI18n();
@@ -96,13 +92,6 @@ export const WeatherCard = memo(function WeatherCard({
       className={`${shell.containerClassName} p-5`}
       lightOverlayClassName={shell.overlayClassName || undefined}
     >
-      {isEditMode && (
-        <CardSizeSelector
-          currentSize={size}
-          onSizeChange={(newSize) => onSizeChange(id, newSize)}
-        />
-      )}
-
       {/* Subtle gradient overlay */}
       <div className={`absolute inset-0 ${shell.glowClassName}`} />
 

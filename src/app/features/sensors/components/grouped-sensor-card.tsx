@@ -1,10 +1,6 @@
 import { Gauge } from 'lucide-react';
 import { memo } from 'react';
-import {
-  type CardSize,
-  CardSizeSelector,
-  isCompactCardSize,
-} from '@/app/components/shared/card-size-selector';
+import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
@@ -37,8 +33,8 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
   room: _room,
   sensors,
   size,
-  onSizeChange,
-  isEditMode,
+  onSizeChange: _onSizeChange,
+  isEditMode: _isEditMode,
   accentColor = 'teal',
 }: GroupedSensorCardProps) {
   const {
@@ -69,14 +65,6 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
 
   return (
     <div className="h-full w-full relative">
-      {isEditMode && (
-        <CardSizeSelector
-          currentSize={size}
-          onSizeChange={(newSize) => onSizeChange(id, newSize)}
-          allowedSizes={['small', 'medium']}
-        />
-      )}
-
       <button
         type="button"
         onClick={() => setIsSettingsOpen(true)}
@@ -116,16 +104,18 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
         </div>
       </button>
 
-      <SensorGroupSettingsDialog
-        entityId={id}
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        groupName={name}
-        currentSensors={selectedSensors}
-        maxSensors={MAX_SENSORS}
-        accentColor={accentColor}
-        onSensorsUpdate={handleSensorsUpdate}
-      />
+      {isSettingsOpen ? (
+        <SensorGroupSettingsDialog
+          entityId={id}
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          groupName={name}
+          currentSensors={selectedSensors}
+          maxSensors={MAX_SENSORS}
+          accentColor={accentColor}
+          onSensorsUpdate={handleSensorsUpdate}
+        />
+      ) : null}
     </div>
   );
 });

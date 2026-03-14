@@ -101,40 +101,42 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
         hasSelectedProviders={selectedProviderIds.length > 0}
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
-      <RSSFeedSettingsDialog
-        isOpen={isSettingsOpen}
-        onOpenChange={setIsSettingsOpen}
-        title={t('rss.title')}
-        theme={theme}
-        providers={providers}
-        selectedProviderIds={selectedProviderIds}
-        onSelectedProviderIdsChange={setSelectedProviderIds}
-        onAddProvider={(name, feedUrl) => {
-          try {
-            new URL(feedUrl);
-          } catch {
-            toast.error(t('rss.feedback.invalidUrl'));
-            return false;
-          }
+      {isSettingsOpen ? (
+        <RSSFeedSettingsDialog
+          isOpen={isSettingsOpen}
+          onOpenChange={setIsSettingsOpen}
+          title={t('rss.title')}
+          theme={theme}
+          providers={providers}
+          selectedProviderIds={selectedProviderIds}
+          onSelectedProviderIdsChange={setSelectedProviderIds}
+          onAddProvider={(name, feedUrl) => {
+            try {
+              new URL(feedUrl);
+            } catch {
+              toast.error(t('rss.feedback.invalidUrl'));
+              return false;
+            }
 
-          const nextProvider = addProvider(name, feedUrl);
-          if (!nextProvider) {
-            toast.error(t('rss.feedback.addNameAndUrl'));
-            return false;
-          }
+            const nextProvider = addProvider(name, feedUrl);
+            if (!nextProvider) {
+              toast.error(t('rss.feedback.addNameAndUrl'));
+              return false;
+            }
 
-          toast.success(t('rss.feedback.addedProvider', { name: nextProvider.name }));
-          return true;
-        }}
-        onRemoveProvider={(providerId) => {
-          const provider = providers.find((candidate) => candidate.id === providerId);
-          removeProvider(providerId);
-          if (provider) {
-            toast.success(t('rss.feedback.removedProvider', { name: provider.name }));
-          }
-        }}
-        onDeleteSelectedProviders={handleDeleteSelectedProviders}
-      />
+            toast.success(t('rss.feedback.addedProvider', { name: nextProvider.name }));
+            return true;
+          }}
+          onRemoveProvider={(providerId) => {
+            const provider = providers.find((candidate) => candidate.id === providerId);
+            removeProvider(providerId);
+            if (provider) {
+              toast.success(t('rss.feedback.removedProvider', { name: provider.name }));
+            }
+          }}
+          onDeleteSelectedProviders={handleDeleteSelectedProviders}
+        />
+      ) : null}
     </>
   );
 });

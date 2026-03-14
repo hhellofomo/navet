@@ -1,10 +1,6 @@
 import { Bot } from 'lucide-react';
 import { memo } from 'react';
-import {
-  type CardSize,
-  CardSizeSelector,
-  isCompactCardSize,
-} from '@/app/components/shared/card-size-selector';
+import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
@@ -40,8 +36,8 @@ export const VacuumCard = memo(function VacuumCard({
   cleaningTime = '0 min',
   room = 'Living Room',
   size,
-  onSizeChange,
-  isEditMode,
+  onSizeChange: _onSizeChange,
+  isEditMode: _isEditMode,
 }: VacuumCardProps) {
   const {
     currentStatus,
@@ -64,13 +60,6 @@ export const VacuumCard = memo(function VacuumCard({
 
   return (
     <div className="h-full w-full relative">
-      {isEditMode && (
-        <CardSizeSelector
-          currentSize={size}
-          onSizeChange={(newSize) => onSizeChange(id, newSize)}
-        />
-      )}
-
       <div
         className={`relative h-full bg-gradient-to-br ${cardColors.gradient} backdrop-blur-xl rounded-3xl ${padding} border ${cardColors.border} overflow-hidden ${surface.cardShadow} ${stateSurface.containerClassName}`}
       >
@@ -150,17 +139,19 @@ export const VacuumCard = memo(function VacuumCard({
         </div>
       </div>
 
-      <VacuumSettingsDialog
-        entityId={id}
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        onStartCleaning={handleStartCleaning}
-        onReturnHome={handleReturnHome}
-        name={name}
-        room={room}
-        theme={theme}
-        accentColorValue={cardColors.accent}
-      />
+      {isDialogOpen ? (
+        <VacuumSettingsDialog
+          entityId={id}
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          onStartCleaning={handleStartCleaning}
+          onReturnHome={handleReturnHome}
+          name={name}
+          room={room}
+          theme={theme}
+          accentColorValue={cardColors.accent}
+        />
+      ) : null}
     </div>
   );
 });

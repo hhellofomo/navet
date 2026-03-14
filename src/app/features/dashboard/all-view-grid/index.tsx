@@ -10,6 +10,7 @@ export const AllViewGrid = memo(function AllViewGrid({
   rooms,
   cardOrders,
   isEditMode,
+  isScrolling = false,
   cardSizes,
   updateCardSize,
   grouping,
@@ -47,6 +48,7 @@ export const AllViewGrid = memo(function AllViewGrid({
           textColor={textColor}
           textSecondary={textSecondary}
           isEditMode={isEditMode}
+          isScrolling={isScrolling}
           cardSizes={cardSizes}
           deviceMap={deviceMap}
           customCardMap={customCardMap}

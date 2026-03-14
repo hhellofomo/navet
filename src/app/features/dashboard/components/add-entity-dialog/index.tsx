@@ -1,13 +1,74 @@
 import { Search, X } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
+import { memo, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
 import { useI18n, useTheme } from '@/app/hooks';
+import type { DeviceWithType } from '@/app/types/device.types';
 import { getDeviceRoomLabel } from '@/app/utils/device-location';
 import { ENTITY_LIST_HEIGHT, ENTITY_LIST_OVERSCAN, ENTITY_ROW_HEIGHT } from './constants';
 import type { AddEntityDialogProps } from './types';
+
+interface PreparedDevice {
+  device: DeviceWithType;
+  id: string;
+  name: string;
+  room: string;
+  typeLabel: string;
+  searchText: string;
+}
+
+interface AddEntityRowProps {
+  actionLabel: string;
+  borderColor: string;
+  cardBg: string;
+  device: PreparedDevice;
+  mutedColor: string;
+  onAddEntity: (entityId: string) => void;
+  primaryColor: string;
+  textColor: string;
+}
+
+const AddEntityRow = memo(function AddEntityRow({
+  actionLabel,
+  borderColor,
+  cardBg,
+  device,
+  mutedColor,
+  onAddEntity,
+  primaryColor,
+  textColor,
+}: AddEntityRowProps) {
+  return (
+    <div
+      className={`flex h-[76px] items-center justify-between gap-4 rounded-xl border ${borderColor} ${cardBg} p-4`}
+    >
+      <div className="min-w-0">
+        <p className={`truncate text-sm font-medium ${textColor}`}>{device.name}</p>
+        <p className={`mt-1 truncate text-xs ${mutedColor}`}>
+          {device.typeLabel} · {device.room}
+        </p>
+      </div>
+      <div className="flex shrink-0 items-center gap-2">
+        <span
+          className={`max-w-28 truncate rounded-full px-3 py-2 text-xs ${mutedColor}`}
+          style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}
+          title={device.room}
+        >
+          {device.room}
+        </span>
+        <button
+          type="button"
+          onClick={() => onAddEntity(device.id)}
+          className="rounded-lg px-3 py-2 text-xs font-medium text-white"
+          style={{ backgroundColor: primaryColor }}
+        >
+          {actionLabel}
+        </button>
+      </div>
+    </div>
+  );
+});
 
 export function AddEntityDialog({
   open,
@@ -27,6 +88,8 @@ export function AddEntityDialog({
   const [query, setQuery] = useState('');
   const [scrollTop, setScrollTop] = useState(0);
   const listRef = useRef<HTMLDivElement | null>(null);
+  const scrollRafRef = useRef<number | null>(null);
+  const deferredQuery = useDeferredValue(query);
 
   const bgColor = theme === 'light' ? 'bg-white' : surface.panel;
   const textColor = surface.textPrimary;
@@ -35,40 +98,64 @@ export function AddEntityDialog({
   const cardBg = surface.panelMuted;
   const hoverBg = surface.hoverBg;
   const inputBg = surface.inputBg;
+  const accentColor = getThemeColorValue(primaryColor);
+
+  const visibleIdSet = useMemo(
+    () => (visibleEntityIds ? new Set(visibleEntityIds) : null),
+    [visibleEntityIds]
+  );
+  const addedEntityIdSet = useMemo(() => new Set(addedEntityIds), [addedEntityIds]);
+
+  const preparedDevices = useMemo(() => {
+    const devices: PreparedDevice[] = [];
+
+    for (const device of deviceMap.values()) {
+      if (visibleIdSet && !visibleIdSet.has(device.id)) {
+        continue;
+      }
+
+      if (addedEntityIdSet.has(device.id)) {
+        continue;
+      }
+
+      const room = getDeviceRoomLabel(device);
+      if (currentRoom !== 'All' && room !== currentRoom) {
+        continue;
+      }
+
+      const name = typeof device.name === 'string' ? device.name : device.id;
+      const typeLabel = getDeviceTypeLabel(device.type, t);
+
+      devices.push({
+        device,
+        id: device.id,
+        name,
+        room,
+        typeLabel,
+        searchText: `${name} ${room} ${typeLabel} ${device.id}`.toLowerCase(),
+      });
+    }
+
+    devices.sort((left, right) => {
+      const roomComparison = left.room.localeCompare(right.room);
+      if (roomComparison !== 0) {
+        return roomComparison;
+      }
+
+      return left.name.localeCompare(right.name);
+    });
+
+    return devices;
+  }, [addedEntityIdSet, currentRoom, deviceMap, t, visibleIdSet]);
 
   const availableDevices = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-    const visibleIdSet = visibleEntityIds ? new Set(visibleEntityIds) : null;
+    const normalizedQuery = deferredQuery.trim().toLowerCase();
+    if (!normalizedQuery) {
+      return preparedDevices;
+    }
 
-    return Array.from(deviceMap.values())
-      .filter((device) => (visibleIdSet ? visibleIdSet.has(device.id) : true))
-      .filter((device) => !addedEntityIds.includes(device.id))
-      .filter((device) => currentRoom === 'All' || getDeviceRoomLabel(device) === currentRoom)
-      .filter((device) => {
-        if (!normalizedQuery) {
-          return true;
-        }
-
-        const label = typeof device.name === 'string' ? device.name : device.id;
-        const room = getDeviceRoomLabel(device);
-        const type = getDeviceTypeLabel(device.type, t);
-
-        return `${label} ${room} ${type}`.toLowerCase().includes(normalizedQuery);
-      })
-      .sort((left, right) => {
-        const leftRoom = getDeviceRoomLabel(left);
-        const rightRoom = getDeviceRoomLabel(right);
-        const roomComparison = leftRoom.localeCompare(rightRoom);
-
-        if (roomComparison !== 0) {
-          return roomComparison;
-        }
-
-        const leftName = typeof left.name === 'string' ? left.name : left.id;
-        const rightName = typeof right.name === 'string' ? right.name : right.id;
-        return leftName.localeCompare(rightName);
-      });
-  }, [addedEntityIds, currentRoom, deviceMap, query, t, visibleEntityIds]);
+    return preparedDevices.filter((device) => device.searchText.includes(normalizedQuery));
+  }, [deferredQuery, preparedDevices]);
 
   const listResetKey = `${open}:${currentRoom}:${query}:${visibleEntityIds?.join(',') ?? ''}`;
 
@@ -77,6 +164,14 @@ export function AddEntityDialog({
     setScrollTop(0);
     listRef.current?.scrollTo({ top: 0 });
   }, [listResetKey]);
+
+  useEffect(() => {
+    return () => {
+      if (scrollRafRef.current !== null) {
+        window.cancelAnimationFrame(scrollRafRef.current);
+      }
+    };
+  }, []);
 
   const visibleCount = Math.ceil(ENTITY_LIST_HEIGHT / ENTITY_ROW_HEIGHT);
   const startIndex = Math.max(0, Math.floor(scrollTop / ENTITY_ROW_HEIGHT) - ENTITY_LIST_OVERSCAN);
@@ -126,7 +221,7 @@ export function AddEntityDialog({
               onChange={(event) => setQuery(event.target.value)}
               placeholder={t('dashboard.addEntity.searchPlaceholder')}
               className={`w-full rounded-xl border ${borderColor} ${inputBg} pl-10 pr-4 py-3 text-sm ${textColor} focus:outline-none`}
-              style={{ caretColor: getThemeColorValue(primaryColor) }}
+              style={{ caretColor: accentColor }}
             />
           </div>
         </div>
@@ -135,7 +230,17 @@ export function AddEntityDialog({
           ref={listRef}
           className="overflow-y-auto p-6 pt-4"
           style={{ maxHeight: `${ENTITY_LIST_HEIGHT}px` }}
-          onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
+          onScroll={(event) => {
+            const nextScrollTop = event.currentTarget.scrollTop;
+            if (scrollRafRef.current !== null) {
+              return;
+            }
+
+            scrollRafRef.current = window.requestAnimationFrame(() => {
+              scrollRafRef.current = null;
+              setScrollTop(nextScrollTop);
+            });
+          }}
         >
           {availableDevices.length > 0 ? (
             <div className="relative" style={{ height: totalHeight || ENTITY_LIST_HEIGHT }}>
@@ -143,40 +248,19 @@ export function AddEntityDialog({
                 className="absolute inset-x-0 top-0 space-y-3"
                 style={{ transform: `translateY(${topSpacerHeight}px)` }}
               >
-                {virtualDevices.map((device) => {
-                  const name = typeof device.name === 'string' ? device.name : device.id;
-                  const room = getDeviceRoomLabel(device);
-                  const typeLabel = getDeviceTypeLabel(device.type, t);
-
-                  return (
-                    <div
-                      key={device.id}
-                      className={`flex h-[76px] items-center justify-between gap-4 rounded-xl border ${borderColor} ${cardBg} p-4`}
-                    >
-                      <div className="min-w-0">
-                        <p className={`text-sm font-medium ${textColor} truncate`}>{name}</p>
-                        <p className={`text-xs ${mutedColor} truncate mt-1`}>
-                          {typeLabel} · {room}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <EntityRoomSelector
-                          entityId={device.id}
-                          label={t('dashboard.addEntity.roomLabel')}
-                          compact
-                        />
-                        <button
-                          type="button"
-                          onClick={() => onAddEntity(device.id)}
-                          className="px-3 py-2 rounded-lg text-xs font-medium text-white"
-                          style={{ backgroundColor: getThemeColorValue(primaryColor) }}
-                        >
-                          {actionLabel}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
+                {virtualDevices.map((device) => (
+                  <AddEntityRow
+                    key={device.id}
+                    actionLabel={actionLabel}
+                    borderColor={borderColor}
+                    cardBg={cardBg}
+                    device={device}
+                    mutedColor={mutedColor}
+                    onAddEntity={onAddEntity}
+                    primaryColor={accentColor}
+                    textColor={textColor}
+                  />
+                ))}
               </div>
             </div>
           ) : (

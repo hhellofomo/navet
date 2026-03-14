@@ -94,34 +94,19 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
         </div>
       </div>
 
-      <Dialog.Root
-        open={controller.hasControlsDialog ? controller.isDialogOpen : false}
-        onOpenChange={controller.setIsDialogOpen}
-      >
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
-          <Dialog.Content
-            className={`fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-[28px] border p-6 shadow-2xl ${controller.dialogSurface}`}
-          >
-            <Dialog.Title className="text-xl font-semibold">{props.name}</Dialog.Title>
-            <Dialog.Description className={`mt-1 text-sm ${controller.labelColor}`}>
-              {controller.entityType}
-            </Dialog.Description>
+      {controller.hasControlsDialog && controller.isDialogOpen ? (
+        <Dialog.Root open={controller.isDialogOpen} onOpenChange={controller.setIsDialogOpen}>
+          <Dialog.Portal>
+            <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
+            <Dialog.Content
+              className={`fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-[28px] border p-6 shadow-2xl ${controller.dialogSurface}`}
+            >
+              <Dialog.Title className="text-xl font-semibold">{props.name}</Dialog.Title>
+              <Dialog.Description className={`mt-1 text-sm ${controller.labelColor}`}>
+                {controller.entityType}
+              </Dialog.Description>
 
-            <div className="mt-6 space-y-4">
-              <div
-                className={`rounded-2xl p-4 ${
-                  controller.theme === 'light'
-                    ? 'bg-gray-100'
-                    : controller.theme === 'glass'
-                      ? 'bg-white/8'
-                      : 'bg-white/5'
-                }`}
-              >
-                <EntityRoomSelector entityId={props.id} label={controller.roomLabel} />
-              </div>
-
-              {controller.hasMetrics && (
+              <div className="mt-6 space-y-4">
                 <div
                   className={`rounded-2xl p-4 ${
                     controller.theme === 'light'
@@ -131,62 +116,76 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
                         : 'bg-white/5'
                   }`}
                 >
-                  <p className={`text-xs uppercase tracking-[0.16em] ${controller.labelColor}`}>
-                    {controller.metricSectionTitle}
-                  </p>
-                  <p className={`mt-1 text-xs ${controller.labelColor}`}>
-                    {controller.metricSectionDescription}
-                  </p>
-                  <div className="mt-3 space-y-2">
-                    {controller.availableMetrics.map((metric) => {
-                      const isSelected = controller.selectedMetricLabels.includes(metric.label);
-                      return (
-                        <button
-                          type="button"
-                          key={`dialog-${metric.label}`}
-                          onClick={() => controller.handleMetricToggle(metric.label)}
-                          className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-3 py-2 text-left transition-colors ${
-                            isSelected
-                              ? controller.theme === 'light'
-                                ? 'border-gray-900/20 bg-white'
-                                : 'border-white/20 bg-white/10'
-                              : controller.theme === 'light'
-                                ? 'border-transparent bg-white/60 hover:bg-white'
-                                : 'border-transparent bg-white/5 hover:bg-white/10'
-                          }`}
-                        >
-                          <span
-                            className={`min-w-0 flex items-center gap-2 ${controller.labelColor}`}
-                          >
-                            {controller.renderMetricIcon(metric, 'h-4 w-4 flex-shrink-0')}
-                            <span className="truncate">{controller.getMetricLabel(metric)}</span>
-                          </span>
-                          <div className="flex flex-shrink-0 items-center gap-3">
-                            <span className={`font-medium ${controller.textColor}`}>
-                              {controller.formatMetricValue(metric)}
-                            </span>
-                            <span
-                              className={`h-4 w-4 rounded border transition-colors ${
-                                isSelected
-                                  ? controller.theme === 'light'
-                                    ? 'border-gray-900 bg-gray-900'
-                                    : 'border-white bg-white'
-                                  : controller.theme === 'light'
-                                    ? 'border-gray-400 bg-transparent'
-                                    : 'border-white/40 bg-transparent'
-                              }`}
-                            />
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <EntityRoomSelector entityId={props.id} label={controller.roomLabel} />
                 </div>
-              )}
-            </div>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+
+                {controller.hasMetrics && (
+                  <div
+                    className={`rounded-2xl p-4 ${
+                      controller.theme === 'light'
+                        ? 'bg-gray-100'
+                        : controller.theme === 'glass'
+                          ? 'bg-white/8'
+                          : 'bg-white/5'
+                    }`}
+                  >
+                    <p className={`text-xs uppercase tracking-[0.16em] ${controller.labelColor}`}>
+                      {controller.metricSectionTitle}
+                    </p>
+                    <p className={`mt-1 text-xs ${controller.labelColor}`}>
+                      {controller.metricSectionDescription}
+                    </p>
+                    <div className="mt-3 space-y-2">
+                      {controller.availableMetrics.map((metric) => {
+                        const isSelected = controller.selectedMetricLabels.includes(metric.label);
+                        return (
+                          <button
+                            type="button"
+                            key={`dialog-${metric.label}`}
+                            onClick={() => controller.handleMetricToggle(metric.label)}
+                            className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-3 py-2 text-left transition-colors ${
+                              isSelected
+                                ? controller.theme === 'light'
+                                  ? 'border-gray-900/20 bg-white'
+                                  : 'border-white/20 bg-white/10'
+                                : controller.theme === 'light'
+                                  ? 'border-transparent bg-white/60 hover:bg-white'
+                                  : 'border-transparent bg-white/5 hover:bg-white/10'
+                            }`}
+                          >
+                            <span
+                              className={`min-w-0 flex items-center gap-2 ${controller.labelColor}`}
+                            >
+                              {controller.renderMetricIcon(metric, 'h-4 w-4 flex-shrink-0')}
+                              <span className="truncate">{controller.getMetricLabel(metric)}</span>
+                            </span>
+                            <div className="flex flex-shrink-0 items-center gap-3">
+                              <span className={`font-medium ${controller.textColor}`}>
+                                {controller.formatMetricValue(metric)}
+                              </span>
+                              <span
+                                className={`h-4 w-4 rounded border transition-colors ${
+                                  isSelected
+                                    ? controller.theme === 'light'
+                                      ? 'border-gray-900 bg-gray-900'
+                                      : 'border-white bg-white'
+                                    : controller.theme === 'light'
+                                      ? 'border-gray-400 bg-transparent'
+                                      : 'border-white/40 bg-transparent'
+                                }`}
+                              />
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      ) : null}
     </>
   );
 });

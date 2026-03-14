@@ -1,10 +1,6 @@
 import { Home, MapPin, User } from 'lucide-react';
 import { memo } from 'react';
-import {
-  type CardSize,
-  CardSizeSelector,
-  isCompactCardSize,
-} from '@/app/components/shared/card-size-selector';
+import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { useI18n, useTheme } from '@/app/hooks';
 import { getPersonCardSurfaceTokens } from './person-card-surface-tokens';
 
@@ -22,10 +18,9 @@ export const PersonCard = memo(function PersonCard({
   location,
   state,
   size,
-  onSizeChange,
-  isEditMode,
+  onSizeChange: _onSizeChange,
+  isEditMode: _isEditMode,
 }: PersonCardProps) {
-  const cardId = `person-${name.toLowerCase().replace(/ /g, '-')}`;
   const { t } = useI18n();
   const { theme, colors } = useTheme();
 
@@ -40,13 +35,6 @@ export const PersonCard = memo(function PersonCard({
     <div
       className={`relative h-full bg-gradient-to-br ${cardColors.gradient} backdrop-blur-xl rounded-3xl ${padding} border ${cardColors.border} overflow-hidden ${surface.containerShadowClassName}`}
     >
-      {isEditMode && (
-        <CardSizeSelector
-          currentSize={size}
-          onSizeChange={(newSize) => onSizeChange(cardId, newSize)}
-        />
-      )}
-
       <div className={`absolute inset-0 bg-gradient-to-br ${cardColors.glow} to-transparent`}></div>
 
       {/* Light theme frosted overlay */}

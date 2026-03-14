@@ -2,7 +2,6 @@ import { CalendarDays } from 'lucide-react';
 import { memo, useState } from 'react';
 import {
   type CardSize,
-  CardSizeSelector,
   getCompactCardSize,
   isCompactCardSize,
 } from '@/app/components/shared/card-size-selector';
@@ -35,7 +34,7 @@ export const CalendarCard = memo(function CalendarCard({
   events,
   inEditMode = false,
   size = 'medium',
-  onSizeChange,
+  onSizeChange: _onSizeChange,
 }: CalendarCardProps) {
   const { t } = useI18n();
   const { theme, colors } = useTheme();
@@ -121,16 +120,6 @@ export const CalendarCard = memo(function CalendarCard({
             />
           )}
 
-          {inEditMode && onSizeChange ? (
-            <div className={`${isSmall ? 'mb-2' : 'mb-3'}`}>
-              <CardSizeSelector
-                currentSize={effectiveSize}
-                onSizeChange={onSizeChange}
-                allowedSizes={['small', 'medium', 'large']}
-              />
-            </div>
-          ) : null}
-
           {!nextEvent ? (
             <div className={`flex flex-1 items-center justify-center text-sm ${textSecondary}`}>
               {t('calendar.noUpcomingEvents')}
@@ -168,34 +157,38 @@ export const CalendarCard = memo(function CalendarCard({
         </div>
       </div>
 
-      <CalendarSettingsDialog
-        entityId={id}
-        isOpen={isSettingsOpen}
-        onOpenChange={setIsSettingsOpen}
-        theme={theme}
-        title={displayName}
-        calendars={availableCalendars.map((calendar) => ({
-          id: calendar.id,
-          name: calendar.name,
-          room: calendar.room,
-          color: calendar.color,
-        }))}
-        selectedCalendarIds={selectedCalendarIds}
-        onSelectedCalendarIdsChange={setSelectedCalendarIds}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-      />
+      {isSettingsOpen ? (
+        <CalendarSettingsDialog
+          entityId={id}
+          isOpen={isSettingsOpen}
+          onOpenChange={setIsSettingsOpen}
+          theme={theme}
+          title={displayName}
+          calendars={availableCalendars.map((calendar) => ({
+            id: calendar.id,
+            name: calendar.name,
+            room: calendar.room,
+            color: calendar.color,
+          }))}
+          selectedCalendarIds={selectedCalendarIds}
+          onSelectedCalendarIdsChange={setSelectedCalendarIds}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
+      ) : null}
 
-      <CalendarEventDialog
-        event={selectedEvent}
-        isOpen={selectedEvent !== null}
-        onOpenChange={(open) => {
-          if (!open) {
-            setSelectedEvent(null);
-          }
-        }}
-        theme={theme}
-      />
+      {selectedEvent ? (
+        <CalendarEventDialog
+          event={selectedEvent}
+          isOpen={selectedEvent !== null}
+          onOpenChange={(open) => {
+            if (!open) {
+              setSelectedEvent(null);
+            }
+          }}
+          theme={theme}
+        />
+      ) : null}
     </>
   );
 });
