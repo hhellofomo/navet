@@ -6,6 +6,7 @@ import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import { iconMap } from '@/app/features/sensors';
 import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 import type { DeviceMetric } from '@/app/types/device.types';
 import { storage } from '@/app/utils/storage';
 import type { SwitchCardProps } from './switch-card.types';
@@ -38,7 +39,7 @@ export function useSwitchCardController({
 }: Omit<SwitchCardProps, 'room'>) {
   const [isOn, setIsOn] = useState(initialState);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { entities } = useHomeAssistant();
+  const entities = useHomeAssistant(homeAssistantSelectors.entities);
   const { colors, theme } = useTheme();
   const { t } = useI18n();
   const liveEntity = entities?.[id];

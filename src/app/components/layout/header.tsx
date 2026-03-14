@@ -7,6 +7,7 @@ import { useAuth } from '@/app/contexts/auth-context';
 import { NotificationPanel } from '@/app/features/notifications';
 import { useNotifications } from '@/app/features/notifications/components/notifications/use-notifications';
 import { useDevices, useHomeAssistant, useI18n, useSearch, useTheme } from '@/app/hooks';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { getWeekNumber } from '@/app/utils/format';
 import { UserDropdown } from './user-dropdown';
 
@@ -14,7 +15,8 @@ export const Header = memo(function Header() {
   const { theme, primaryColor } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const { config: authConfig } = useAuth();
-  const { entities, user } = useHomeAssistant();
+  const entities = useHomeAssistant(homeAssistantSelectors.entities);
+  const user = useHomeAssistant(homeAssistantSelectors.user);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [currentDateTime, setCurrentDateTime] = useState(() => new Date());

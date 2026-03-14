@@ -74,9 +74,8 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 - **Lazy-Loaded UI** - Settings, add-card flows, widgets, and media dialogs load on demand
 - **Deferred Room Rendering** - Offscreen room groups are deferred in the All view
 - **Batched Room Mounting** - Visible All-view room sections now hydrate cards in smaller batches instead of one large render burst
-- **Lightweight Scroll Shells** - During active dashboard scrolling, cards temporarily render lighter shells to reduce main-thread and layout pressure on lower-power devices
 - **Virtualized Entity Picker** - The Add Entity dialog window-renders large Home Assistant entity lists
-- **Smart Re-renders** - Zustand-backed search state and stable device maps reduce dashboard churn
+- **Smart Re-renders** - Selector-based Home Assistant subscriptions and stable device maps reduce dashboard churn during live entity updates
 - **No-Animation Mode** - Optional global animation disable for slower devices
 - **Local Config Backup** - Export and restore dashboard layout/preferences from a YAML file
 - **Tree-shakeable** - Only imports what's actually used

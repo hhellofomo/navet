@@ -3,6 +3,7 @@
  * Use these to prevent unnecessary re-renders
  */
 
+import type { HomeAssistantStore } from './home-assistant-store';
 import type {
   CustomCardsState,
   EditModeState,
@@ -115,6 +116,25 @@ export const settingsSelectors = {
     showNotifications: state.showNotifications,
     showWeatherInHeader: state.showWeatherInHeader,
   }),
+};
+
+/**
+ * Home Assistant Store Selectors
+ */
+export const homeAssistantSelectors = {
+  connected: (state: HomeAssistantStore) => state.connected,
+  connecting: (state: HomeAssistantStore) => state.connecting,
+  config: (state: HomeAssistantStore) => state.config,
+  entities: (state: HomeAssistantStore) => state.entities,
+  user: (state: HomeAssistantStore) => state.user,
+  areas: (state: HomeAssistantStore) => state.areas,
+  deviceRegistry: (state: HomeAssistantStore) => state.deviceRegistry,
+  entityRegistry: (state: HomeAssistantStore) => state.entityRegistry,
+  connection: (state: HomeAssistantStore) => state.connection,
+  error: (state: HomeAssistantStore) => state.error,
+  connect: (state: HomeAssistantStore) => state.connect,
+  disconnect: (state: HomeAssistantStore) => state.disconnect,
+  clearError: (state: HomeAssistantStore) => state.clearError,
 };
 
 /**

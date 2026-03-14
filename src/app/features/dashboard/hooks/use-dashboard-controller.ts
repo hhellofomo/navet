@@ -16,6 +16,7 @@ import {
 } from '@/app/hooks';
 import { useDevices, useRooms } from '@/app/hooks/use-devices';
 import type { Section } from '@/app/navigation/sections';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { importDashboardConfigFromFile } from '@/app/utils/dashboard-config';
 import type { AllViewGrouping } from '../all-view-grid';
 import type { CardType } from '../components/add-card-dialog';
@@ -87,7 +88,8 @@ export function useDashboardController(): DashboardController {
 
   const { activeSection, setActiveSection } = useNavigation();
   const { t } = useI18n();
-  const { connected, connecting } = useHomeAssistant();
+  const connected = useHomeAssistant(homeAssistantSelectors.connected);
+  const connecting = useHomeAssistant(homeAssistantSelectors.connecting);
   const [devicesLoaded, setDevicesLoaded] = useState(false);
   const [showAddCardDialog, setShowAddCardDialog] = useState(false);
   const [showAddEntityDialog, setShowAddEntityDialog] = useState(false);

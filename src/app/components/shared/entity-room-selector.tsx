@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 
 interface EntityRoomSelectorProps {
   entityId: string;
@@ -20,7 +21,9 @@ export function EntityRoomSelector({
 }: EntityRoomSelectorProps) {
   const { theme } = useTheme();
   const { t } = useI18n();
-  const { areas, deviceRegistry, entityRegistry } = useHomeAssistant();
+  const areas = useHomeAssistant(homeAssistantSelectors.areas);
+  const deviceRegistry = useHomeAssistant(homeAssistantSelectors.deviceRegistry);
+  const entityRegistry = useHomeAssistant(homeAssistantSelectors.entityRegistry);
   const surface = getThemeSurfaceTokens(theme);
   const [isSaving, setIsSaving] = useState(false);
   const resolvedLabel = label ?? t('common.room');

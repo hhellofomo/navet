@@ -6,6 +6,7 @@ import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surfa
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar';
 import { useAuth } from '@/app/contexts/auth-context';
 import { useClickOutside, useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 
 interface UserDropdownProps {
   avatarUrl?: string | null;
@@ -17,7 +18,7 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
   const { theme, primaryColor } = useTheme();
   const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
-  const { user } = useHomeAssistant();
+  const user = useHomeAssistant(homeAssistantSelectors.user);
   const { logout } = useAuth();
 
   const handleLogout = () => {

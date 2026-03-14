@@ -1,31 +1,9 @@
-import { useCallback } from 'react';
 import { useStore } from 'zustand';
-import type { HomeAssistantConfiguration } from '../services/home-assistant.service';
-import { homeAssistantStore } from '../stores/home-assistant-store';
+import { type HomeAssistantStore, homeAssistantStore } from '../stores/home-assistant-store';
 
 /**
  * Custom hook for Home Assistant connection management
- * Provides state and actions for connecting to Home Assistant
+ * Subscribe to the minimal Home Assistant store slice needed by a component.
  */
-export const useHomeAssistant = () => {
-  const state = useStore(homeAssistantStore);
-
-  const connect = useCallback(async (config: HomeAssistantConfiguration) => {
-    return await homeAssistantStore.getState().connect(config);
-  }, []);
-
-  const disconnect = useCallback(() => {
-    homeAssistantStore.getState().disconnect();
-  }, []);
-
-  const clearError = useCallback(() => {
-    homeAssistantStore.getState().clearError();
-  }, []);
-
-  return {
-    ...state,
-    connect,
-    disconnect,
-    clearError,
-  };
-};
+export const useHomeAssistant = <T>(selector: (state: HomeAssistantStore) => T): T =>
+  useStore(homeAssistantStore, selector);

@@ -2,6 +2,7 @@ import { memo, useState } from 'react';
 import { toast } from 'sonner';
 import { isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { RSSFeedSettingsDialog } from './settings-dialog';
 import type { RSSFeedCardProps } from './types';
 import { useRSSFeedItems } from './use-rss-feed-items';
@@ -14,7 +15,7 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
   size = 'medium',
   onSizeChange,
 }: RSSFeedCardProps) {
-  const { entities } = useHomeAssistant();
+  const entities = useHomeAssistant(homeAssistantSelectors.entities);
   const { theme, colors, primaryColor } = useTheme();
   const { t } = useI18n();
   const isSmall = isCompactCardSize(size);

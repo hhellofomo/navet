@@ -11,11 +11,14 @@ import { DashboardPage } from './features/dashboard';
 import { useHomeAssistant } from './hooks';
 import { I18nProvider } from './i18n';
 import { useSettingsStore } from './stores';
+import { homeAssistantSelectors } from './stores/selectors';
 
 function AppContent() {
   const { isAuthenticated, config: authConfig } = useAuth();
   const { config: haConfig } = useConfig();
-  const { connected, connecting, connect } = useHomeAssistant();
+  const connected = useHomeAssistant(homeAssistantSelectors.connected);
+  const connecting = useHomeAssistant(homeAssistantSelectors.connecting);
+  const connect = useHomeAssistant(homeAssistantSelectors.connect);
   const disableAnimations = useSettingsStore((state) => state.disableAnimations);
   const lowPowerMode = useSettingsStore((state) => state.lowPowerMode);
   const reducedEffectsEnabled = disableAnimations || lowPowerMode;
