@@ -1,6 +1,7 @@
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { memo, useEffect, useRef, useState } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { useI18n } from '@/app/hooks';
 import type { DeviceWithType } from '@/app/types/device.types';
 import { DashboardCardItem } from '../components/dashboard-card-item';
 import type { CustomCard } from '../stores/custom-cards-store';
@@ -44,6 +45,7 @@ export const RoomSection = memo(function RoomSection({
   allowEntityRemoval = false,
   usesHideAction = false,
 }: RoomSectionProps) {
+  const { t } = useI18n();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isVisible, setIsVisible] = useState(isEditMode);
 
@@ -99,7 +101,9 @@ export const RoomSection = memo(function RoomSection({
               {title}
             </h2>
             <span className={`text-xs md:text-sm ${textSecondary}`}>
-              {totalItems} {totalItems === 1 ? 'item' : 'items'}
+              {totalItems === 1
+                ? t('dashboard.sections.itemCount.one', { count: totalItems })
+                : t('dashboard.sections.itemCount.other', { count: totalItems })}
             </span>
           </>
         ) : null}

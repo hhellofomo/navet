@@ -2,7 +2,7 @@ import { AlertTriangle, RefreshCw, X } from 'lucide-react';
 import { memo } from 'react';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useError } from '@/app/contexts/error-context';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 
 interface ErrorDisplayProps {
   onRetry?: () => void;
@@ -14,6 +14,7 @@ export const ErrorDisplay = memo(function ErrorDisplay({
   showClose = true,
 }: ErrorDisplayProps) {
   const { theme } = useTheme();
+  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const { error, clearError } = useError();
 
@@ -43,7 +44,9 @@ export const ErrorDisplay = memo(function ErrorDisplay({
 
           {/* Error Message */}
           <div className="space-y-2">
-            <h3 className={`text-lg font-semibold ${surface.textPrimary}`}>Connection Error</h3>
+            <h3 className={`text-lg font-semibold ${surface.textPrimary}`}>
+              {t('errorDisplay.title')}
+            </h3>
             <p className={`text-sm ${surface.textPrimary}`}>{error.message}</p>
             {error.details && (
               <p
@@ -65,18 +68,18 @@ export const ErrorDisplay = memo(function ErrorDisplay({
               className="w-full px-4 py-3 rounded-xl bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors flex items-center justify-center gap-2"
             >
               <RefreshCw className="w-4 h-4" />
-              Retry Connection
+              {t('errorDisplay.retry')}
             </button>
           )}
 
           {/* Help Text */}
           <div className={`space-y-1 text-xs ${surface.textSecondary}`}>
-            <p className="font-medium">Common issues:</p>
+            <p className="font-medium">{t('errorDisplay.commonIssues')}</p>
             <ul className="list-disc list-inside space-y-0.5 ml-2">
-              <li>Smart home system is not running or unreachable</li>
-              <li>Incorrect URL or access token</li>
-              <li>Network connectivity issues</li>
-              <li>CORS or firewall blocking the connection</li>
+              <li>{t('errorDisplay.issue.1')}</li>
+              <li>{t('errorDisplay.issue.2')}</li>
+              <li>{t('errorDisplay.issue.3')}</li>
+              <li>{t('errorDisplay.issue.4')}</li>
             </ul>
           </div>
         </div>

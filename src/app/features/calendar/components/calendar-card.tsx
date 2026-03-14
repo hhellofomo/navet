@@ -8,7 +8,7 @@ import {
 } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { CalendarEventDialog } from './calendar/calendar-event-dialog';
 import { CalendarLargeView } from './calendar/calendar-large-view';
 import { CalendarMediumView } from './calendar/calendar-medium-view';
@@ -31,12 +31,13 @@ interface CalendarCardProps {
 
 export const CalendarCard = memo(function CalendarCard({
   id,
-  name = 'Family Calendar',
+  name,
   events,
   inEditMode = false,
   size = 'medium',
   onSizeChange,
 }: CalendarCardProps) {
+  const { t } = useI18n();
   const { theme, colors } = useTheme();
   const effectiveSize = getCompactCardSize(size);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -58,6 +59,7 @@ export const CalendarCard = memo(function CalendarCard({
   const isSmall = isCompactCardSize(effectiveSize);
   const isMedium = effectiveSize === 'medium';
   const canOpenSettings = !inEditMode;
+  const displayName = name ?? t('calendar.defaultTitle');
 
   return (
     <>
@@ -88,8 +90,8 @@ export const CalendarCard = memo(function CalendarCard({
               }}
             >
               <EntityCardHeader
-                title={selectedCalendarLabel || name}
-                subtitle="Upcoming agenda"
+                title={selectedCalendarLabel || displayName}
+                subtitle={t('calendar.upcomingAgenda')}
                 size={effectiveSize}
                 titleClassName={isSmall ? 'text-[11px]' : ''}
                 subtitleClassName={isSmall ? 'text-[9px]' : ''}
@@ -104,8 +106,8 @@ export const CalendarCard = memo(function CalendarCard({
             </button>
           ) : (
             <EntityCardHeader
-              title={selectedCalendarLabel || name}
-              subtitle="Upcoming agenda"
+              title={selectedCalendarLabel || displayName}
+              subtitle={t('calendar.upcomingAgenda')}
               size={effectiveSize}
               titleClassName={isSmall ? 'text-[11px]' : ''}
               subtitleClassName={isSmall ? 'text-[9px]' : ''}
@@ -131,7 +133,7 @@ export const CalendarCard = memo(function CalendarCard({
 
           {!nextEvent ? (
             <div className={`flex flex-1 items-center justify-center text-sm ${textSecondary}`}>
-              No upcoming events
+              {t('calendar.noUpcomingEvents')}
             </div>
           ) : isSmall ? (
             <CalendarSmallView
@@ -171,7 +173,7 @@ export const CalendarCard = memo(function CalendarCard({
         isOpen={isSettingsOpen}
         onOpenChange={setIsSettingsOpen}
         theme={theme}
-        title={name}
+        title={displayName}
         calendars={availableCalendars.map((calendar) => ({
           id: calendar.id,
           name: calendar.name,

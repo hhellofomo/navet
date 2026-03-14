@@ -3,7 +3,7 @@ import { memo, useState } from 'react';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { getSecurityCardSurfaceTokens } from './security-card-surface-tokens';
 
 interface LockCardProps {
@@ -17,6 +17,7 @@ export const LockCard = memo(function LockCard({
   initialState = true,
 }: Omit<LockCardProps, 'room'>) {
   const [isLocked, setIsLocked] = useState(initialState);
+  const { t } = useI18n();
   const { theme, colors } = useTheme();
   const securitySurface = getSecurityCardSurfaceTokens(theme);
 
@@ -38,7 +39,7 @@ export const LockCard = memo(function LockCard({
       <div className="relative h-full flex flex-col">
         <EntityCardHeader
           title={name}
-          subtitle="Lock"
+          subtitle={t('security.lock')}
           size="small"
           leading={
             <EntityCardHeaderIcon
@@ -84,7 +85,7 @@ export const LockCard = memo(function LockCard({
                       : 'text-red-400'
               } transition-colors duration-500`}
             >
-              {isLocked ? 'Locked' : 'Unlocked'}
+              {isLocked ? t('security.locked') : t('security.unlocked')}
             </div>
           </div>
         </div>

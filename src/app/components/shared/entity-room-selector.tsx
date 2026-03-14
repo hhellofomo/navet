@@ -2,7 +2,7 @@ import { Loader2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { useHomeAssistant, useTheme } from '@/app/hooks';
+import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 
 interface EntityRoomSelectorProps {
@@ -14,14 +14,16 @@ interface EntityRoomSelectorProps {
 
 export function EntityRoomSelector({
   entityId,
-  label = 'Room',
+  label,
   compact = false,
   className = '',
 }: EntityRoomSelectorProps) {
   const { theme } = useTheme();
+  const { t } = useI18n();
   const { areas, deviceRegistry, entityRegistry } = useHomeAssistant();
   const surface = getThemeSurfaceTokens(theme);
   const [isSaving, setIsSaving] = useState(false);
+  const resolvedLabel = label ?? t('common.room');
 
   const sortedAreas = useMemo(
     () => [...areas].sort((left, right) => left.name.localeCompare(right.name)),
@@ -51,31 +53,31 @@ export function EntityRoomSelector({
   return (
     <div className={`min-w-0 ${className}`}>
       {!compact && (
-        <div className={`mb-2 text-xs font-medium ${surface.textSecondary}`}>{label}</div>
+        <div className={`mb-2 text-xs font-medium ${surface.textSecondary}`}>{resolvedLabel}</div>
       )}
 
       <div className="relative">
         <select
-          aria-label={label}
+          aria-label={resolvedLabel}
           value={selectedAreaId}
           disabled={isSaving}
           onChange={async (event) => {
             const nextAreaId = event.target.value || null;
             const nextRoomName =
-              sortedAreas.find((area) => area.area_id === nextAreaId)?.name ?? 'No room';
+              sortedAreas.find((area) => area.area_id === nextAreaId)?.name ?? t('common.noRoom');
             setIsSaving(true);
             try {
               await homeAssistantService.updateEntityArea(entityId, nextAreaId);
-              toast.success(`Card moved to ${nextRoomName}`);
+              toast.success(t('entityRoomSelector.movedTo', { room: nextRoomName }));
             } catch {
-              toast.error('Unable to update room');
+              toast.error(t('entityRoomSelector.updateFailed'));
             } finally {
               setIsSaving(false);
             }
           }}
           className={`w-full appearance-none border ${surface.border} ${surface.inputBg} ${baseSelectClassName} disabled:cursor-not-allowed disabled:opacity-60`}
         >
-          <option value="">No room</option>
+          <option value="">{t('common.noRoom')}</option>
           {sortedAreas.map((area) => (
             <option key={area.area_id} value={area.area_id}>
               {area.name}

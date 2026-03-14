@@ -3,7 +3,7 @@ import type { LucideIcon } from 'lucide-react';
 import { MoreHorizontal } from 'lucide-react';
 import { memo } from 'react';
 import { isCompactCardSize } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { getCardActionControlSizes } from '../card-action-control-sizes';
 import type { CardSize } from '../card-size-selector';
 import { getRoundControlStyles } from '../theme/round-control-styles';
@@ -39,6 +39,7 @@ export const BrightnessPresetsInline = memo(function BrightnessPresetsInline({
   overflow = 'hide',
 }: BrightnessPresetsInlineProps) {
   const { theme, primaryColor } = useTheme();
+  const { t } = useI18n();
   const isCompact = isCompactCardSize(size);
   const controlSizes = getCardActionControlSizes(
     isCompact ? 'small' : size === 'large' ? 'large' : 'medium'
@@ -58,7 +59,7 @@ export const BrightnessPresetsInline = memo(function BrightnessPresetsInline({
     <fieldset
       data-card-interactive
       className={`shrink-0 flex items-center self-center ${gap}`}
-      aria-label="Brightness presets"
+      aria-label={t('deviceEditor.brightnessPresets')}
     >
       {visiblePresets.map((preset) => {
         const IconComponent = preset.icon;
@@ -69,7 +70,10 @@ export const BrightnessPresetsInline = memo(function BrightnessPresetsInline({
             type="button"
             key={preset.key ?? preset.brightness}
             disabled={!isOn}
-            aria-label={`${preset.label} brightness ${preset.brightness} percent`}
+            aria-label={t('deviceEditor.brightnessPresetAria', {
+              label: preset.label,
+              brightness: preset.brightness,
+            })}
             aria-pressed={isSelected}
             onClick={(e) => {
               e.stopPropagation();
@@ -124,6 +128,7 @@ const BrightnessOverflowMenu = memo(function BrightnessOverflowMenu({
   iconSize,
 }: BrightnessOverflowMenuProps) {
   const { theme, primaryColor } = useTheme();
+  const { t } = useI18n();
   const activeColor = getBrightnessPresetAccentColor(primaryColor);
   const roundControl = getRoundControlStyles(theme);
   const selectedClasses = `${roundControl.selectedText} ring-2 scale-105`;
@@ -134,7 +139,7 @@ const BrightnessOverflowMenu = memo(function BrightnessOverflowMenu({
         <button
           type="button"
           disabled={!isOn}
-          aria-label="More brightness presets"
+          aria-label={t('deviceEditor.moreBrightnessPresets')}
           className={`${buttonSize} rounded-full transition-all duration-300 flex items-center justify-center ${
             !isOn
               ? roundControl.disabledButton
@@ -152,7 +157,10 @@ const BrightnessOverflowMenu = memo(function BrightnessOverflowMenu({
           className="z-50 rounded-2xl border border-white/10 bg-[#1c1c1e]/95 p-3 backdrop-blur-xl shadow-2xl animate-in fade-in zoom-in duration-200"
           onClick={(e) => e.stopPropagation()}
         >
-          <fieldset className="flex items-center gap-2" aria-label="More brightness presets">
+          <fieldset
+            className="flex items-center gap-2"
+            aria-label={t('deviceEditor.moreBrightnessPresets')}
+          >
             {presets.map((preset) => {
               const IconComponent = preset.icon;
               const isSelected = Math.abs(currentBrightness - preset.brightness) <= 2;
@@ -161,7 +169,10 @@ const BrightnessOverflowMenu = memo(function BrightnessOverflowMenu({
                 <button
                   type="button"
                   key={preset.key ?? preset.brightness}
-                  aria-label={`${preset.label} brightness ${preset.brightness} percent`}
+                  aria-label={t('deviceEditor.brightnessPresetAria', {
+                    label: preset.label,
+                    brightness: preset.brightness,
+                  })}
                   aria-pressed={isSelected}
                   onClick={(e) => {
                     e.stopPropagation();

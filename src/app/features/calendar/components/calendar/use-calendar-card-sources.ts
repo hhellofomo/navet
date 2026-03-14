@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
-import { useDevices, usePersistedState } from '@/app/hooks';
+import { useDevices, useI18n, usePersistedState } from '@/app/hooks';
 import type { CalendarEvent } from './types';
 
 type PersistedCalendarSources = Record<string, string[]>;
@@ -16,6 +16,7 @@ const SOURCE_COLOR_CLASSES = [
 ] as const;
 
 export function useCalendarCardSources(cardId?: string, fallbackEvents: CalendarEvent[] = []) {
+  const { t } = useI18n();
   const devices = useDevices();
   const [calendarSources, setCalendarSources] = usePersistedState<PersistedCalendarSources>(
     STORAGE_KEYS.calendarCardSources,
@@ -109,11 +110,11 @@ export function useCalendarCardSources(cardId?: string, fallbackEvents: Calendar
     }
 
     if (matchedCalendars.length > 1) {
-      return `${matchedCalendars.length} Calendars`;
+      return t('calendar.selectedCalendars', { count: matchedCalendars.length });
     }
 
-    return 'Calendar';
-  }, [availableCalendars, selectedCalendarIds]);
+    return t('calendar.defaultSourceName');
+  }, [availableCalendars, selectedCalendarIds, t]);
 
   const setSelectedCalendarIds = (nextIds: string[]) => {
     if (!cardId) {

@@ -4,31 +4,34 @@ import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-si
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { DEVICES } from '@/app/data/mock-devices';
 import { renderCard } from '@/app/features/dashboard';
-import { useDeviceMap, useDevices, useTheme } from '@/app/hooks';
+import { useDeviceMap, useDevices, useI18n, useTheme } from '@/app/hooks';
 import type { DeviceWithType } from '@/app/types/device.types';
 import { EmptyState } from '../shared/empty-state';
 
 export function SecuritySection() {
+  const { t } = useI18n();
   return (
     <EmptyState
       icon={Video}
-      title="No Security Cameras"
-      description="You don't have any security cameras configured yet. Add cameras to monitor your home."
+      title={t('sections.security.emptyTitle')}
+      description={t('sections.security.emptyDescription')}
     />
   );
 }
 
 export function TasksSection() {
+  const { t } = useI18n();
   return (
     <EmptyState
       icon={Clipboard}
-      title="No Tasks"
-      description="You don't have any tasks or automations configured yet. Create tasks to manage your home routines."
+      title={t('sections.tasks.emptyTitle')}
+      description={t('sections.tasks.emptyDescription')}
     />
   );
 }
 
 export function LocksSection() {
+  const { t } = useI18n();
   const devices = useDevices();
   const lockDevices = devices.locks;
 
@@ -36,8 +39,8 @@ export function LocksSection() {
     return (
       <EmptyState
         icon={Lock}
-        title="No Smart Locks"
-        description="You don't have any smart locks configured yet. Add locks to manage access to your home."
+        title={t('sections.locks.emptyTitle')}
+        description={t('sections.locks.emptyDescription')}
       />
     );
   }
@@ -45,24 +48,26 @@ export function LocksSection() {
   return (
     <EntityGrid
       devices={lockDevices.map((device) => ({ ...device, type: 'locks' as const }))}
-      title="Smart Locks"
-      singularLabel="lock"
-      pluralLabel="locks"
+      title={t('sections.locks.title')}
+      singularLabel={t('sections.locks.singular')}
+      pluralLabel={t('sections.locks.plural')}
     />
   );
 }
 
 export function LightsSection() {
+  const { t } = useI18n();
   return (
     <EmptyState
       icon={Lightbulb}
-      title="No Lights"
-      description="You don't have any smart lights configured yet. Add lights to control your home lighting."
+      title={t('sections.lights.emptyTitle')}
+      description={t('sections.lights.emptyDescription')}
     />
   );
 }
 
 export function MediaSection() {
+  const { t } = useI18n();
   const devices = useDevices();
   const mediaDevices = devices.media;
 
@@ -70,8 +75,8 @@ export function MediaSection() {
     return (
       <EmptyState
         icon={Tv}
-        title="No Media Players"
-        description="You don't have any media players configured yet. Add devices to control your entertainment."
+        title={t('sections.media.emptyTitle')}
+        description={t('sections.media.emptyDescription')}
       />
     );
   }
@@ -79,9 +84,9 @@ export function MediaSection() {
   return (
     <EntityGrid
       devices={mediaDevices.map((device) => ({ ...device, type: 'media' as const }))}
-      title="Media Players"
-      singularLabel="player"
-      pluralLabel="players"
+      title={t('sections.media.title')}
+      singularLabel={t('sections.media.singular')}
+      pluralLabel={t('sections.media.plural')}
     />
   );
 }
@@ -131,6 +136,7 @@ const EntityGrid = memo(function EntityGrid({
 });
 
 const MockEntityGrid = memo(function MockEntityGrid({ devices }: { devices: DeviceWithType[] }) {
+  const { t } = useI18n();
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
 
@@ -141,7 +147,8 @@ const MockEntityGrid = memo(function MockEntityGrid({ devices }: { devices: Devi
           All Mock Entities
         </h2>
         <span className={`text-xs md:text-sm ${surface.textSecondary}`}>
-          {devices.length} {devices.length === 1 ? 'entity' : 'entities'}
+          {devices.length}{' '}
+          {devices.length === 1 ? t('sections.common.entity') : t('sections.common.entities')}
         </span>
       </div>
       <div className="grid w-full grid-flow-row-dense grid-cols-2 gap-2 auto-rows-[87px] md:grid-cols-4 md:gap-3 xl:grid-cols-6 lg:gap-4 2xl:grid-cols-8">
@@ -166,6 +173,7 @@ const MockEntityGrid = memo(function MockEntityGrid({ devices }: { devices: Devi
 
 export function MockEntitiesSection() {
   const { deviceMap } = useDeviceMap(DEVICES);
+  const { t } = useI18n();
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
@@ -184,11 +192,10 @@ export function MockEntitiesSection() {
             <h1
               className={`text-xl font-semibold tracking-tight md:text-2xl ${surface.textPrimary}`}
             >
-              Temporary Mock Entities
+              {t('sections.mock.title')}
             </h1>
             <p className={`mt-2 max-w-3xl text-sm leading-relaxed ${surface.textSecondary}`}>
-              This section holds your local mock entities so you can keep previewing cards that are
-              not fully integrated into the live Home Assistant dashboard yet.
+              {t('sections.mock.description')}
             </p>
           </div>
         </div>

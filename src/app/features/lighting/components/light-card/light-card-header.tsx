@@ -4,7 +4,7 @@ import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 
 interface LightCardHeaderProps {
   name: string;
@@ -26,12 +26,13 @@ export const LightCardHeader = memo(function LightCardHeader({
   iconAriaLabel,
 }: LightCardHeaderProps) {
   const { theme } = useTheme();
+  const { t } = useI18n();
   const stateSurface = getCardStateSurfaceTokens(theme, isOn);
 
   return (
     <EntityCardHeader
       title={name}
-      subtitle="Light"
+      subtitle={t('lighting.type.light')}
       size={size}
       titleClassName={stateSurface.primaryTextClassName}
       subtitleClassName={stateSurface.mutedTextClassName}

@@ -7,6 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/app/components/ui/dropdown-menu';
+import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 
 type CardActionRowSize = 'small' | 'medium' | 'large';
@@ -77,6 +78,7 @@ function CardActionOverflowMenu({
   size: CardActionRowSize;
   items: CardActionOverflowItem[];
 }) {
+  const { t } = useI18n();
   const actionSize = getActionButtonSize(size);
 
   return (
@@ -86,7 +88,7 @@ function CardActionOverflowMenu({
           theme={theme}
           size={size}
           variant="neutral"
-          aria-label="More actions"
+          aria-label={t('common.moreActions')}
           className="hover:scale-105 active:scale-95"
           onClick={(event) => event.stopPropagation()}
         >

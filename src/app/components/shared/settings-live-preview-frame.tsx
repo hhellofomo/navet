@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import { getThemeSurfaceTokens } from './theme/theme-surface-tokens';
 
@@ -22,6 +23,7 @@ export function SettingsLivePreviewFrame({
   background,
 }: SettingsLivePreviewFrameProps) {
   const surface = getThemeSurfaceTokens(theme);
+  const { t } = useI18n();
 
   return (
     <div
@@ -34,7 +36,7 @@ export function SettingsLivePreviewFrame({
       <div className="flex items-center justify-between">
         <div>
           <p className={`text-xs font-semibold uppercase tracking-[0.24em] ${surface.textMuted}`}>
-            Live Preview
+            {t('preview.livePreview')}
           </p>
           <p className="mt-2 text-sm font-semibold">{title}</p>
           <p className={`text-xs ${surface.textMuted}`}>{subtitle}</p>

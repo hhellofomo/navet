@@ -2,6 +2,7 @@ import { Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-rea
 import { getCardActionControlSizes } from '@/app/components/shared/card-action-control-sizes';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
+import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import { MediaArtworkSurface } from './media-artwork-surface';
 import { formatMediaTime } from './media-time';
@@ -49,6 +50,7 @@ export function MediaMediumView({
   onToggleMute,
   onVolumeChange,
 }: MediaMediumViewProps) {
+  const { t } = useI18n();
   const displayVolume = Math.max(0, Math.min(100, isMuted ? 0 : volume));
   const stateSurface = getCardStateSurfaceTokens(theme, isActive);
   const palette = useMediaArtworkColors(artwork, theme, entityId, `${title}::${artist}`);
@@ -132,7 +134,7 @@ export function MediaMediumView({
                 theme={theme}
                 size="medium"
                 variant="emphasis"
-                aria-label={isPlaying ? 'Pause playback' : 'Resume playback'}
+                aria-label={isPlaying ? t('media.pausePlayback') : t('media.resumePlayback')}
                 onClick={(event) => {
                   event.stopPropagation();
                   onTogglePlay();
@@ -155,7 +157,7 @@ export function MediaMediumView({
               theme={theme}
               size="small"
               variant="neutral"
-              aria-label="Previous track"
+              aria-label={t('media.previousTrack')}
               onClick={(event) => {
                 event.stopPropagation();
                 onPrevious();
@@ -194,7 +196,7 @@ export function MediaMediumView({
               theme={theme}
               size="small"
               variant="neutral"
-              aria-label="Next track"
+              aria-label={t('media.nextTrack')}
               onClick={(event) => {
                 event.stopPropagation();
                 onNext();
@@ -210,7 +212,7 @@ export function MediaMediumView({
               theme={theme}
               size="small"
               variant="neutral"
-              aria-label={isMuted ? 'Unmute volume' : 'Mute volume'}
+              aria-label={isMuted ? t('media.unmuteVolume') : t('media.muteVolume')}
               onClick={(event) => {
                 event.stopPropagation();
                 onToggleMute();

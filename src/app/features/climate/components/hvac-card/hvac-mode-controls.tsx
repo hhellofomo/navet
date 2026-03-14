@@ -3,7 +3,7 @@ import { memo } from 'react';
 import { getCardActionControlSizes } from '@/app/components/shared/card-action-control-sizes';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import { getHVACModeButtonColor } from '../../utils/hvac-styles';
 
@@ -21,6 +21,7 @@ export const HVACModeControls = memo(function HVACModeControls({
   size = 'medium',
 }: HVACModeControlsProps) {
   const { theme } = useTheme();
+  const { t } = useI18n();
   const primitiveSize = size === 'large' ? 'large' : 'medium';
   const controlSizes = getCardActionControlSizes(primitiveSize);
 
@@ -34,6 +35,7 @@ export const HVACModeControls = memo(function HVACModeControls({
           e.stopPropagation();
           onModeChange('cool');
         }}
+        aria-label={t('climate.mode.cool')}
         disabled={!isOn}
         className={`disabled:opacity-50 ${getHVACModeButtonColor('cool', mode, isOn, theme as ThemeType)}`}
       >
@@ -47,6 +49,7 @@ export const HVACModeControls = memo(function HVACModeControls({
           e.stopPropagation();
           onModeChange('heat');
         }}
+        aria-label={t('climate.mode.heat')}
         disabled={!isOn}
         className={`disabled:opacity-50 ${getHVACModeButtonColor('heat', mode, isOn, theme as ThemeType)}`}
       >
@@ -60,6 +63,7 @@ export const HVACModeControls = memo(function HVACModeControls({
           e.stopPropagation();
           onModeChange('fan');
         }}
+        aria-label={t('climate.mode.fan')}
         disabled={!isOn}
         className={`disabled:opacity-50 ${getHVACModeButtonColor('fan', mode, isOn, theme as ThemeType)}`}
       >

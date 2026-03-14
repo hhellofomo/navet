@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { getCardActionControlSizes } from '@/app/components/shared/card-action-control-sizes';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 
 interface CustomColorTriggerProps {
   isOn: boolean;
@@ -17,6 +17,7 @@ export const CustomColorTrigger = memo(function CustomColorTrigger({
   size,
 }: CustomColorTriggerProps) {
   const { theme } = useTheme();
+  const { t } = useI18n();
   const controlSizes = getCardActionControlSizes(size === 'large' ? 'large' : 'small');
   const inputColor =
     typeof currentColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(currentColor)
@@ -50,8 +51,8 @@ export const CustomColorTrigger = memo(function CustomColorTrigger({
     <label
       data-card-interactive
       className={`${triggerSize} shrink-0 rounded-full hover:scale-105 transition-all flex items-center justify-center cursor-pointer relative overflow-hidden`}
-      title="Custom color"
-      aria-label="Choose custom color"
+      title={t('lighting.customColor')}
+      aria-label={t('lighting.chooseCustomColor')}
       onClick={(e) => e.stopPropagation()}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -68,7 +69,7 @@ export const CustomColorTrigger = memo(function CustomColorTrigger({
       <input
         type="color"
         value={inputColor}
-        aria-label="Choose custom color"
+        aria-label={t('lighting.chooseCustomColor')}
         onChange={(e) => {
           e.stopPropagation();
           onColorChange(e.target.value);

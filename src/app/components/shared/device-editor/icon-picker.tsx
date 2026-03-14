@@ -28,9 +28,11 @@ import {
   Zap,
   ZapOff,
 } from 'lucide-react';
+import type React from 'react';
 import { memo, useState } from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
+import type { TranslationKey } from '@/app/i18n';
 import { getDeviceEditorSurfaceTokens } from './device-editor-surface-tokens';
 
 interface IconPickerProps {
@@ -39,49 +41,39 @@ interface IconPickerProps {
   isLightOn: boolean;
 }
 
-// Comprehensive light-related icons from Lucide React
 const lightIcons = [
-  // Primary light bulbs
-  { name: 'Lightbulb', component: Lightbulb, label: 'Light Bulb' },
-  { name: 'Lamp', component: Lamp, label: 'Table Lamp' },
-
-  // Lamps and fixtures
-  { name: 'LampDesk', component: LampDesk, label: 'Desk Lamp' },
-  { name: 'LampFloor', component: LampFloor, label: 'Floor Lamp' },
-  { name: 'LampCeiling', component: LampCeiling, label: 'Ceiling Light' },
-  { name: 'LampWallDown', component: LampWallDown, label: 'Wall Light Down' },
-  { name: 'LampWallUp', component: LampWallUp, label: 'Wall Light Up' },
-  { name: 'Flashlight', component: Flashlight, label: 'Flashlight' },
-
-  // Fire and flames
-  { name: 'Flame', component: Flame, label: 'Flame' },
-
-  // Natural light - Sun
-  { name: 'Sun', component: Sun, label: 'Sun' },
-  { name: 'SunMedium', component: SunMedium, label: 'Sun Medium' },
-  { name: 'SunDim', component: SunDim, label: 'Sun Dim' },
-  { name: 'Sunrise', component: Sunrise, label: 'Sunrise' },
-  { name: 'Sunset', component: Sunset, label: 'Sunset' },
-  { name: 'SunMoon', component: SunMoon, label: 'Sun & Moon' },
-
-  // Natural light - Moon & Stars
-  { name: 'Moon', component: Moon, label: 'Moon' },
-  { name: 'MoonStar', component: MoonStar, label: 'Moon & Star' },
-  { name: 'Star', component: Star, label: 'Star' },
-  { name: 'StarHalf', component: StarHalf, label: 'Half Star' },
-
-  // Electric/Energy
-  { name: 'Zap', component: Zap, label: 'Lightning' },
-  { name: 'ZapOff', component: ZapOff, label: 'Lightning Off' },
-  { name: 'Sparkles', component: Sparkles, label: 'Sparkles' },
-  { name: 'Sparkle', component: Sparkle, label: 'Sparkle' },
-
-  // Abstract/Shapes (for LED strips, ambient lights)
-  { name: 'Circle', component: Circle, label: 'Circle' },
-  { name: 'CircleDot', component: CircleDot, label: 'Circle Dot' },
-  { name: 'CircleDashed', component: CircleDashed, label: 'Dashed Circle' },
-  { name: 'Orbit', component: Orbit, label: 'Orbit' },
-];
+  { name: 'Lightbulb', component: Lightbulb, labelKey: 'iconPicker.lightbulb' },
+  { name: 'Lamp', component: Lamp, labelKey: 'iconPicker.lamp' },
+  { name: 'LampDesk', component: LampDesk, labelKey: 'iconPicker.lampDesk' },
+  { name: 'LampFloor', component: LampFloor, labelKey: 'iconPicker.lampFloor' },
+  { name: 'LampCeiling', component: LampCeiling, labelKey: 'iconPicker.lampCeiling' },
+  { name: 'LampWallDown', component: LampWallDown, labelKey: 'iconPicker.lampWallDown' },
+  { name: 'LampWallUp', component: LampWallUp, labelKey: 'iconPicker.lampWallUp' },
+  { name: 'Flashlight', component: Flashlight, labelKey: 'iconPicker.flashlight' },
+  { name: 'Flame', component: Flame, labelKey: 'iconPicker.flame' },
+  { name: 'Sun', component: Sun, labelKey: 'iconPicker.sun' },
+  { name: 'SunMedium', component: SunMedium, labelKey: 'iconPicker.sunMedium' },
+  { name: 'SunDim', component: SunDim, labelKey: 'iconPicker.sunDim' },
+  { name: 'Sunrise', component: Sunrise, labelKey: 'iconPicker.sunrise' },
+  { name: 'Sunset', component: Sunset, labelKey: 'iconPicker.sunset' },
+  { name: 'SunMoon', component: SunMoon, labelKey: 'iconPicker.sunMoon' },
+  { name: 'Moon', component: Moon, labelKey: 'iconPicker.moon' },
+  { name: 'MoonStar', component: MoonStar, labelKey: 'iconPicker.moonStar' },
+  { name: 'Star', component: Star, labelKey: 'iconPicker.star' },
+  { name: 'StarHalf', component: StarHalf, labelKey: 'iconPicker.starHalf' },
+  { name: 'Zap', component: Zap, labelKey: 'iconPicker.zap' },
+  { name: 'ZapOff', component: ZapOff, labelKey: 'iconPicker.zapOff' },
+  { name: 'Sparkles', component: Sparkles, labelKey: 'iconPicker.sparkles' },
+  { name: 'Sparkle', component: Sparkle, labelKey: 'iconPicker.sparkle' },
+  { name: 'Circle', component: Circle, labelKey: 'iconPicker.circle' },
+  { name: 'CircleDot', component: CircleDot, labelKey: 'iconPicker.circleDot' },
+  { name: 'CircleDashed', component: CircleDashed, labelKey: 'iconPicker.circleDashed' },
+  { name: 'Orbit', component: Orbit, labelKey: 'iconPicker.orbit' },
+] as const satisfies ReadonlyArray<{
+  name: string;
+  component: React.ComponentType<{ className?: string }>;
+  labelKey: TranslationKey;
+}>;
 
 export const IconPicker = memo(function IconPicker({
   selectedIcon,
@@ -89,6 +81,7 @@ export const IconPicker = memo(function IconPicker({
   isLightOn,
 }: IconPickerProps) {
   const { primaryColor } = useTheme();
+  const { t } = useI18n();
   const [searchQuery, setSearchQuery] = useState('');
   const activeColor = getThemeColorValue(primaryColor);
   const editorSurface = getDeviceEditorSurfaceTokens(isLightOn);
@@ -98,7 +91,7 @@ export const IconPicker = memo(function IconPicker({
     ? lightIcons.filter(
         (icon) =>
           icon.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          icon.label.toLowerCase().includes(searchQuery.toLowerCase())
+          t(icon.labelKey).toLowerCase().includes(searchQuery.toLowerCase())
       )
     : lightIcons;
 
@@ -108,7 +101,7 @@ export const IconPicker = memo(function IconPicker({
         <span
           className={`text-sm font-medium transition-colors duration-500 ${editorSurface.sectionLabelClassName}`}
         >
-          Light Icon
+          {t('lighting.lightIcon')}
         </span>
       </div>
 
@@ -121,7 +114,7 @@ export const IconPicker = memo(function IconPicker({
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search icons..."
+          placeholder={t('lighting.searchIcons')}
           className={`w-full rounded-xl border py-2 pl-10 pr-4 text-sm transition-all duration-500 focus:outline-none focus:ring-2 ${
             isLightOn
               ? 'border-white/10 bg-white/5 text-white placeholder:text-gray-500 focus:bg-white/10 focus:ring-transparent'
@@ -166,7 +159,7 @@ export const IconPicker = memo(function IconPicker({
                     }
                   : undefined
               }
-              title={icon.label}
+              title={t(icon.labelKey)}
             >
               <IconComponent
                 className={`w-5 h-5 transition-colors duration-500 ${
@@ -184,8 +177,8 @@ export const IconPicker = memo(function IconPicker({
         <div
           className={`py-8 text-center transition-colors duration-500 ${editorSurface.sectionLabelClassName}`}
         >
-          <p className="text-sm">No icons found</p>
-          <p className="text-xs mt-1">Try a different search term</p>
+          <p className="text-sm">{t('lighting.noIconsFound')}</p>
+          <p className="text-xs mt-1">{t('lighting.tryDifferentSearch')}</p>
         </div>
       )}
     </div>

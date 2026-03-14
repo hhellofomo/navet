@@ -1,6 +1,6 @@
-import { formatDistanceToNow } from 'date-fns';
 import type { HassEntities } from 'home-assistant-js-websocket';
 import { useEffect, useMemo, useState } from 'react';
+import { useI18n } from '@/app/hooks';
 import type { RSSItem, RSSProvider } from './types';
 
 const RSS_PROXY_PATH = '/__navet_rss_proxy__';
@@ -33,41 +33,81 @@ const toRSSItem = ({
   title,
   providerName,
   link,
+  fallbackRecentLabel,
   publishedAtRaw,
   excerpt,
   imageUrl,
+  formatRelativeTime,
 }: {
   id: string;
   title: string;
   providerName: string;
   link: string;
+  fallbackRecentLabel: string;
   publishedAtRaw?: string;
   excerpt?: string;
   imageUrl?: string;
+  formatRelativeTime: (value: number, unit: Intl.RelativeTimeFormatUnit) => string;
 }): RSSItem => {
   const publishedAt = publishedAtRaw ? new Date(publishedAtRaw) : null;
   const hasValidPublishedAt = publishedAt && !Number.isNaN(publishedAt.getTime());
+  const timeAgo = hasValidPublishedAt
+    ? formatRelativeFromNow(publishedAt, formatRelativeTime)
+    : fallbackRecentLabel;
 
   return {
     id,
     title,
     source: providerName,
-    timeAgo: hasValidPublishedAt
-      ? formatDistanceToNow(publishedAt, { addSuffix: true })
-      : 'Recently',
+    timeAgo,
     url: link,
     excerpt: excerpt ? stripHtml(excerpt) : undefined,
     imageUrl,
   };
 };
 
-const parseRSSDocument = (xml: string, providerName: string): RSSItem[] => {
+function formatRelativeFromNow(
+  publishedAt: Date,
+  formatRelativeTime: (value: number, unit: Intl.RelativeTimeFormatUnit) => string
+) {
+  const diffMs = publishedAt.getTime() - Date.now();
+  const diffMinutes = Math.round(diffMs / (1000 * 60));
+
+  if (Math.abs(diffMinutes) < 60) {
+    return formatRelativeTime(diffMinutes, 'minute');
+  }
+
+  const diffHours = Math.round(diffMinutes / 60);
+  if (Math.abs(diffHours) < 24) {
+    return formatRelativeTime(diffHours, 'hour');
+  }
+
+  const diffDays = Math.round(diffHours / 24);
+  if (Math.abs(diffDays) < 30) {
+    return formatRelativeTime(diffDays, 'day');
+  }
+
+  const diffMonths = Math.round(diffDays / 30);
+  if (Math.abs(diffMonths) < 12) {
+    return formatRelativeTime(diffMonths, 'month');
+  }
+
+  const diffYears = Math.round(diffMonths / 12);
+  return formatRelativeTime(diffYears, 'year');
+}
+
+const parseRSSDocument = (
+  xml: string,
+  providerName: string,
+  fallbackRecentLabel: string,
+  formatRelativeTime: (value: number, unit: Intl.RelativeTimeFormatUnit) => string
+): RSSItem[] => {
   const parser = new DOMParser();
   const document = parser.parseFromString(xml, 'application/xml');
   const parserError = document.querySelector('parsererror');
 
   if (parserError) {
-    throw new Error('Invalid feed format');
+    throw new Error('invalid-feed-format');
   }
 
   const rssItems = Array.from(document.querySelectorAll('rss > channel > item'));
@@ -89,6 +129,8 @@ const parseRSSDocument = (xml: string, providerName: string): RSSItem[] => {
           title,
           providerName,
           link,
+          fallbackRecentLabel,
+          formatRelativeTime,
           publishedAtRaw: readFirstText(item, ['pubDate', 'dc\\:date']),
           excerpt: readFirstText(item, ['description', 'content\\:encoded']),
           imageUrl:
@@ -116,6 +158,8 @@ const parseRSSDocument = (xml: string, providerName: string): RSSItem[] => {
         title,
         providerName,
         link,
+        fallbackRecentLabel,
+        formatRelativeTime,
         publishedAtRaw: readFirstText(entry, ['published', 'updated']),
         excerpt: readFirstText(entry, ['summary', 'content']),
       });
@@ -123,7 +167,11 @@ const parseRSSDocument = (xml: string, providerName: string): RSSItem[] => {
     .filter((item): item is RSSItem => item !== null);
 };
 
-async function fetchUrlProviderItems(provider: RSSProvider): Promise<RSSItem[]> {
+async function fetchUrlProviderItems(
+  provider: RSSProvider,
+  fallbackRecentLabel: string,
+  formatRelativeTime: (value: number, unit: Intl.RelativeTimeFormatUnit) => string
+): Promise<RSSItem[]> {
   if (!provider.feedUrl) {
     return [];
   }
@@ -132,16 +180,18 @@ async function fetchUrlProviderItems(provider: RSSProvider): Promise<RSSItem[]> 
   const response = await fetch(requestUrl);
 
   if (!response.ok) {
-    throw new Error(`Unable to load ${provider.name}`);
+    throw new Error(`unable-to-load:${provider.name}`);
   }
 
   const xml = await response.text();
-  return parseRSSDocument(xml, provider.name).slice(0, 8);
+  return parseRSSDocument(xml, provider.name, fallbackRecentLabel, formatRelativeTime).slice(0, 8);
 }
 
 function getHomeAssistantProviderItems(
   provider: RSSProvider,
-  entities: HassEntities | null
+  entities: HassEntities | null,
+  fallbackRecentLabel: string,
+  formatRelativeTime: (value: number, unit: Intl.RelativeTimeFormatUnit) => string
 ): RSSItem[] {
   if (provider.type !== 'home-assistant-feedreader' || !provider.entityId || !entities) {
     return [];
@@ -169,6 +219,8 @@ function getHomeAssistantProviderItems(
       title,
       providerName: provider.name,
       link,
+      fallbackRecentLabel,
+      formatRelativeTime,
       publishedAtRaw:
         (typeof attributes?.published === 'string' && attributes.published) ||
         (typeof attributes?.pubDate === 'string' && attributes.pubDate) ||
@@ -193,6 +245,7 @@ const dedupeItems = (items: RSSItem[]): RSSItem[] =>
   );
 
 export function useRSSFeedItems(providers: RSSProvider[], entities: HassEntities | null) {
+  const { formatRelativeTime, t } = useI18n();
   const [items, setItems] = useState<RSSItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -215,8 +268,15 @@ export function useRSSFeedItems(providers: RSSProvider[], entities: HassEntities
         const results = await Promise.allSettled(
           providers.map((provider) =>
             provider.type === 'home-assistant-feedreader'
-              ? Promise.resolve(getHomeAssistantProviderItems(provider, entities))
-              : fetchUrlProviderItems(provider)
+              ? Promise.resolve(
+                  getHomeAssistantProviderItems(
+                    provider,
+                    entities,
+                    t('rss.recently'),
+                    formatRelativeTime
+                  )
+                )
+              : fetchUrlProviderItems(provider, t('rss.recently'), formatRelativeTime)
           )
         );
 
@@ -232,7 +292,7 @@ export function useRSSFeedItems(providers: RSSProvider[], entities: HassEntities
 
         setItems(nextItems);
         setError(
-          nextItems.length === 0 && failedResults.length > 0 ? 'Unable to load feeds' : null
+          nextItems.length === 0 && failedResults.length > 0 ? t('rss.error.unableToLoad') : null
         );
       } finally {
         if (!cancelled) {
@@ -246,7 +306,7 @@ export function useRSSFeedItems(providers: RSSProvider[], entities: HassEntities
     return () => {
       cancelled = true;
     };
-  }, [entities, providers]);
+  }, [entities, formatRelativeTime, providers, t]);
 
   const latestArticle = items[0] ?? null;
   const mediumArticles = useMemo(() => items.slice(0, 3), [items]);

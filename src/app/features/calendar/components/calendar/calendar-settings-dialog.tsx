@@ -4,6 +4,7 @@ import { DialogHeader } from '@/app/components/shared/device-editor';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { useI18n } from '@/app/hooks';
 import { type ThemeType, useTheme } from '@/app/hooks/use-theme';
 
 interface CalendarSourceOption {
@@ -38,6 +39,7 @@ export function CalendarSettingsDialog({
   viewMode,
   onViewModeChange,
 }: CalendarSettingsDialogProps) {
+  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const { primaryColor } = useTheme();
   const isOn = theme !== 'light';
@@ -51,18 +53,25 @@ export function CalendarSettingsDialog({
           className={`fixed top-1/2 left-1/2 z-50 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl border p-6 shadow-2xl backdrop-blur-xl ${surface.panel} ${surface.border}`}
         >
           <DialogHeader
-            title="Calendar Sources"
-            description={`Choose which calendars ${title} should show`}
+            title={t('calendar.settings.title')}
+            description={t('calendar.settings.description', { title })}
             isOn={isOn}
             trailing={
               entityId ? (
-                <EntityRoomSelector entityId={entityId} label="Room" compact className="w-32" />
+                <EntityRoomSelector
+                  entityId={entityId}
+                  label={t('calendar.settings.room')}
+                  compact
+                  className="w-32"
+                />
               ) : undefined
             }
           />
 
           <div className="mb-4">
-            <div className={`mb-2 text-xs font-medium ${surface.textSecondary}`}>View</div>
+            <div className={`mb-2 text-xs font-medium ${surface.textSecondary}`}>
+              {t('calendar.settings.view')}
+            </div>
             <div className="grid grid-cols-2 gap-2">
               {(['week', 'month'] as const).map((option) => {
                 const isSelected = viewMode === option;
@@ -87,7 +96,9 @@ export function CalendarSettingsDialog({
                         : undefined
                     }
                   >
-                    {option === 'week' ? 'This Week' : 'This Month'}
+                    {option === 'week'
+                      ? t('calendar.settings.thisWeek')
+                      : t('calendar.settings.thisMonth')}
                   </button>
                 );
               })}
@@ -162,7 +173,7 @@ export function CalendarSettingsDialog({
                 type="button"
                 className={`rounded-xl px-4 py-2 text-sm font-medium ${surface.textPrimary} ${surface.subtleBg} ${surface.hoverBg}`}
               >
-                Done
+                {t('common.done')}
               </button>
             </Dialog.Close>
           </div>

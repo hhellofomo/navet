@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useAuth } from '@/app/contexts/auth-context';
+import { useI18n } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 
 interface UseMediaCardControllerParams {
@@ -59,6 +60,7 @@ export function useMediaCardController({
   initialPositionUpdatedAt,
 }: UseMediaCardControllerParams) {
   const { config: authConfig } = useAuth();
+  const { t } = useI18n();
   const [state, setState] = useState(initialState);
   const [volume, setVolume] = useState(initialVolume);
   const [isMuted, setIsMuted] = useState(initialMuted);
@@ -158,18 +160,18 @@ export function useMediaCardController({
     setState(nextState);
     void runAction(
       () => homeAssistantService.updateMediaPlayerPlayback(entityId, isPlaying ? 'pause' : 'play'),
-      'Failed to update media playback'
+      t('media.feedback.updatePlaybackFailed')
     );
-  }, [entityId, isPlaying, runAction]);
+  }, [entityId, isPlaying, runAction, t]);
 
   const toggleMute = useCallback(() => {
     const nextMuted = !isMuted;
     setIsMuted(nextMuted);
     void runAction(
       () => homeAssistantService.setMediaPlayerMute(entityId, nextMuted),
-      'Failed to update media volume'
+      t('media.feedback.updateVolumeFailed')
     );
-  }, [entityId, isMuted, runAction]);
+  }, [entityId, isMuted, runAction, t]);
 
   const handleVolumeChange = useCallback(
     (nextVolume: number) => {
@@ -179,16 +181,16 @@ export function useMediaCardController({
         void runAction(async () => {
           await homeAssistantService.setMediaPlayerMute(entityId, false);
           await homeAssistantService.setMediaPlayerVolume(entityId, nextVolume);
-        }, 'Failed to update media volume');
+        }, t('media.feedback.updateVolumeFailed'));
         return;
       }
 
       void runAction(
         () => homeAssistantService.setMediaPlayerVolume(entityId, nextVolume),
-        'Failed to update media volume'
+        t('media.feedback.updateVolumeFailed')
       );
     },
-    [entityId, isMuted, runAction]
+    [entityId, isMuted, runAction, t]
   );
 
   const openDialog = useCallback(() => {
@@ -202,16 +204,16 @@ export function useMediaCardController({
   const handlePrevious = useCallback(() => {
     void runAction(
       () => homeAssistantService.updateMediaPlayerPlayback(entityId, 'previous'),
-      'Failed to skip to previous track'
+      t('media.feedback.previousTrackFailed')
     );
-  }, [entityId, runAction]);
+  }, [entityId, runAction, t]);
 
   const handleNext = useCallback(() => {
     void runAction(
       () => homeAssistantService.updateMediaPlayerPlayback(entityId, 'next'),
-      'Failed to skip to next track'
+      t('media.feedback.nextTrackFailed')
     );
-  }, [entityId, runAction]);
+  }, [entityId, runAction, t]);
 
   const handleArtworkError = useCallback((imageUrl?: string | null) => {
     if (!imageUrl) {

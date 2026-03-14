@@ -1,9 +1,10 @@
 import type { PrimaryColor, ThemeType } from '../hooks/use-theme';
+import type { TranslationKey } from '../i18n';
 
 export type ThemeOption = {
   value: ThemeType;
-  label: string;
-  description: string;
+  labelKey: TranslationKey;
+  descriptionKey: TranslationKey;
 };
 
 export type PrimaryColorOption = {
@@ -15,23 +16,23 @@ export type PrimaryColorOption = {
 export const THEME_OPTIONS: ThemeOption[] = [
   {
     value: 'glass',
-    label: 'Liquid Glass',
-    description: 'Frosted translucent panels with luminous accents',
+    labelKey: 'themeOption.glass.label',
+    descriptionKey: 'themeOption.glass.description',
   },
   {
     value: 'dark',
-    label: 'Dark',
-    description: 'Subtle gradients with muted colors',
+    labelKey: 'themeOption.dark.label',
+    descriptionKey: 'themeOption.dark.description',
   },
   {
     value: 'light',
-    label: 'Light',
-    description: 'Bright pastels with soft accents',
+    labelKey: 'themeOption.light.label',
+    descriptionKey: 'themeOption.light.description',
   },
   {
     value: 'contrast',
-    label: 'High Contrast',
-    description: 'Vibrant colors for better visibility',
+    labelKey: 'themeOption.contrast.label',
+    descriptionKey: 'themeOption.contrast.description',
   },
 ];
 

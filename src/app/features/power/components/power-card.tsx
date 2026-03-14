@@ -7,7 +7,7 @@ import {
 } from '@/app/components/shared/card-size-selector';
 import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 
 interface PowerCardProps {
   percentage: number;
@@ -28,6 +28,7 @@ export const PowerCard = memo(function PowerCard({
 }: PowerCardProps) {
   const cardId = 'power-1';
   const { theme } = useTheme();
+  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
   const shell = getAccentCardShellTokens(theme, 'yellow');
@@ -86,9 +87,11 @@ export const PowerCard = memo(function PowerCard({
             <h3
               className={`font-semibold ${textPrimary} truncate ${isSmall ? 'text-xs' : 'text-sm'}`}
             >
-              Energy Usage
+              {t('power.title')}
             </h3>
-            <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5`}>Power</p>
+            <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5`}>
+              {t('power.subtitle')}
+            </p>
           </div>
           <div
             className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${iconBg} flex items-center justify-center flex-shrink-0`}
@@ -111,7 +114,7 @@ export const PowerCard = memo(function PowerCard({
                 <div className={`flex items-center gap-1 px-2 py-0.5 ${savingBg} rounded-full`}>
                   <TrendingDown className={`w-3 h-3 ${savingText}`} />
                   <span className={`text-[10px] ${savingText} font-medium`}>
-                    Saving ${savedAmount}
+                    {t('power.savingAmount', { amount: savedAmount })}
                   </span>
                 </div>
               </div>
@@ -135,11 +138,13 @@ export const PowerCard = memo(function PowerCard({
                 <div className={`text-3xl font-bold ${textPrimary}`}>${cost}</div>
                 <div className={`flex items-center gap-1 px-2 py-1 ${savingBg} rounded-full`}>
                   <TrendingDown className={`w-3 h-3 ${savingText}`} />
-                  <span className={`text-xs ${savingText} font-medium`}>Saving ${savedAmount}</span>
+                  <span className={`text-xs ${savingText} font-medium`}>
+                    {t('power.savingAmount', { amount: savedAmount })}
+                  </span>
                 </div>
               </div>
               <div className={`text-xs ${textSecondary}`}>
-                Using {usageDiff} kW less than same period last month
+                {t('power.usingLess', { amount: usageDiff })}
               </div>
             </div>
 
@@ -152,11 +157,11 @@ export const PowerCard = memo(function PowerCard({
 
             <div className={`grid grid-cols-2 gap-2 p-2 ${infoBg} rounded-lg`}>
               <div>
-                <div className={`text-[10px] ${textSecondary}`}>Current usage</div>
+                <div className={`text-[10px] ${textSecondary}`}>{t('power.currentUsage')}</div>
                 <div className={`text-xs font-semibold ${textPrimary}`}>{usage}</div>
               </div>
               <div>
-                <div className={`text-[10px] ${textSecondary}`}>Last month</div>
+                <div className={`text-[10px] ${textSecondary}`}>{t('power.lastMonth')}</div>
                 <div className={`text-xs font-semibold ${textSecondary}`}>${lastMonthCost}</div>
               </div>
             </div>

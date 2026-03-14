@@ -1,8 +1,8 @@
 import type { CalendarEvent } from './types';
 
-export function formatCalendarEventTimeLabel(event: CalendarEvent) {
+export function formatCalendarEventTimeLabel(event: CalendarEvent, allDayLabel = 'All day') {
   if (event.isAllDay) {
-    return 'All day';
+    return allDayLabel;
   }
 
   if (event.startTime !== '--' && event.endTime !== '--') {
@@ -12,7 +12,7 @@ export function formatCalendarEventTimeLabel(event: CalendarEvent) {
   return event.timeDisplay;
 }
 
-export function getCalendarDateParts(date: Date | null) {
+export function getCalendarDateParts(date: Date | null, locale?: string) {
   if (!date) {
     return {
       weekdayShort: '--',
@@ -22,13 +22,13 @@ export function getCalendarDateParts(date: Date | null) {
   }
 
   return {
-    weekdayShort: date.toLocaleDateString([], { weekday: 'short' }),
+    weekdayShort: date.toLocaleDateString(locale ? [locale] : undefined, { weekday: 'short' }),
     dayNumber: date.getDate().toString(),
-    monthShort: date.toLocaleDateString([], { month: 'short' }),
+    monthShort: date.toLocaleDateString(locale ? [locale] : undefined, { month: 'short' }),
   };
 }
 
-export function formatCalendarGroupLabel(date: Date | null) {
-  const { weekdayShort, dayNumber, monthShort } = getCalendarDateParts(date);
+export function formatCalendarGroupLabel(date: Date | null, locale?: string) {
+  const { weekdayShort, dayNumber, monthShort } = getCalendarDateParts(date, locale);
   return `${weekdayShort}, ${dayNumber} ${monthShort}`;
 }

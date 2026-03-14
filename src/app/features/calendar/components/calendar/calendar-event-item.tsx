@@ -1,4 +1,5 @@
 import { Clock3, MapPin } from 'lucide-react';
+import { useI18n } from '@/app/hooks';
 import { formatCalendarEventTimeLabel } from './calendar-formatters';
 import type { CalendarEvent } from './types';
 
@@ -21,8 +22,9 @@ export function CalendarEventItem({
   onItemClick,
   variant = 'default',
 }: CalendarEventItemProps) {
+  const { t } = useI18n();
   const isCompact = variant === 'compact';
-  const timeLabel = formatCalendarEventTimeLabel(event);
+  const timeLabel = formatCalendarEventTimeLabel(event, t('calendar.allDay'));
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {

@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
+import { useI18n } from '@/app/hooks';
 import { applyPwaUpdate, dismissPwaUpdate, usePwaUpdateState } from '@/app/pwa/pwa-update-store';
 
 export function PwaUpdatePrompt() {
   const { updateAvailable } = usePwaUpdateState();
+  const { t } = useI18n();
   const toastIdRef = useRef<string | number | null>(null);
 
   useEffect(() => {
@@ -15,17 +17,17 @@ export function PwaUpdatePrompt() {
       return;
     }
 
-    toastIdRef.current = toast('Navet update available', {
-      description: 'A new version has been installed in the background.',
+    toastIdRef.current = toast(t('pwa.updateAvailableTitle'), {
+      description: t('pwa.updateAvailableDescription'),
       duration: Infinity,
       action: {
-        label: 'Reload',
+        label: t('pwa.reload'),
         onClick: () => {
           void applyPwaUpdate();
         },
       },
       cancel: {
-        label: 'Later',
+        label: t('pwa.later'),
         onClick: () => {
           dismissPwaUpdate();
         },
@@ -38,7 +40,7 @@ export function PwaUpdatePrompt() {
         toastIdRef.current = null;
       }
     };
-  }, [updateAvailable]);
+  }, [t, updateAvailable]);
 
   return null;
 }

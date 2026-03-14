@@ -10,22 +10,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/app/components/ui/alert-dialog';
+import { useI18n } from '@/app/hooks';
 import type {
   SettingsInteractionOption,
   SettingsSectionController,
 } from '../hooks/use-settings-section-controller';
 import { SettingsItem, SettingsSectionShell } from './settings-section-shell';
 
-const INTERACTION_OPTIONS: SettingsInteractionOption[] = [
-  { value: 'toggle-first', label: 'Tap toggles' },
-  { value: 'control-first', label: 'Tap opens controls' },
-];
-
 interface SettingsDashboardSectionProps {
   controller: SettingsSectionController;
 }
 
 export function SettingsDashboardSection({ controller }: SettingsDashboardSectionProps) {
+  const { t } = useI18n();
   const {
     entityInteractionMode,
     handleExportDashboardConfig,
@@ -41,18 +38,22 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
     styles,
     updateSettings,
   } = controller;
+  const interactionOptions: SettingsInteractionOption[] = [
+    { value: 'toggle-first', label: t('settings.dashboard.interaction.toggleFirst') },
+    { value: 'control-first', label: t('settings.dashboard.interaction.controlFirst') },
+  ];
 
   return (
     <SettingsSectionShell
       id="dashboard"
       icon={LayoutGrid}
-      title="Dashboard"
-      description="Decide what shows up on the board and how this local setup is backed up."
+      title={t('settings.dashboard.sectionTitle')}
+      description={t('settings.dashboard.sectionDescription')}
       styles={styles}
     >
       <SettingsItem
-        title="Entity visibility"
-        description="Navet now uses one visibility model. Remove entities from edit mode, then add them back later from Add Entity."
+        title={t('settings.dashboard.entityVisibility.title')}
+        description={t('settings.dashboard.entityVisibility.description')}
         styles={styles}
       >
         <div className="flex flex-wrap gap-3">
@@ -67,7 +68,7 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
             }`}
           >
             <LayoutGrid className="h-4 w-4" />
-            <span>Add all removed entities</span>
+            <span>{t('settings.dashboard.entityVisibility.revealAll')}</span>
           </button>
           <button
             type="button"
@@ -75,31 +76,32 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
             className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
           >
             <Scale className="h-4 w-4" />
-            <span>Restart onboarding</span>
+            <span>{t('settings.dashboard.entityVisibility.restartOnboarding')}</span>
           </button>
         </div>
         <p className={`mt-3 text-xs leading-relaxed ${styles.subtleColor}`}>
-          Hidden right now: {hiddenEntityIds.length}. Restart onboarding if you want to choose
-          between starting full or blank again.
+          {t('settings.dashboard.entityVisibility.hiddenSummary', {
+            count: hiddenEntityIds.length,
+          })}
         </p>
 
         <AlertDialog open={showRevealAllConfirm} onOpenChange={setShowRevealAllConfirm}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Add all removed entities back?</AlertDialogTitle>
+              <AlertDialogTitle>{t('settings.dashboard.confirmReveal.title')}</AlertDialogTitle>
               <AlertDialogDescription>
-                This will put every currently removed entity back onto the dashboard at once.
+                {t('settings.dashboard.confirmReveal.description')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
               <AlertDialogAction
                 onClick={() => {
                   showAllEntities();
                   setShowRevealAllConfirm(false);
                 }}
               >
-                Add All
+                {t('settings.dashboard.confirmReveal.action')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -111,30 +113,31 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
         >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Restart onboarding?</AlertDialogTitle>
+              <AlertDialogTitle>{t('settings.dashboard.confirmRestart.title')}</AlertDialogTitle>
               <AlertDialogDescription>
-                This will reopen the startup wizard so you can choose whether to begin with all
-                entities, a blank dashboard, or import a config file.
+                {t('settings.dashboard.confirmRestart.description')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleRestartOnboarding}>Restart</AlertDialogAction>
+              <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+              <AlertDialogAction onClick={handleRestartOnboarding}>
+                {t('common.restart')}
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       </SettingsItem>
 
       <SettingsItem
-        title="Card interaction style"
-        description="Choose whether tapping the card should toggle the device right away or open its controls first."
+        title={t('settings.dashboard.interaction.title')}
+        description={t('settings.dashboard.interaction.description')}
         styles={styles}
       >
         <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_20rem]">
           <div
             className={`inline-flex w-fit rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
           >
-            {INTERACTION_OPTIONS.map((option) => {
+            {interactionOptions.map((option) => {
               const isActive = entityInteractionMode === option.value;
               return (
                 <button
@@ -171,14 +174,12 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
       </SettingsItem>
 
       <SettingsItem
-        title="Local config backup"
-        description="Export a reusable snapshot of your dashboard layout and restore it on another device later."
+        title={t('settings.dashboard.backup.title')}
+        description={t('settings.dashboard.backup.description')}
         styles={styles}
       >
         <p className={`max-w-2xl text-sm leading-relaxed ${styles.subtleColor}`}>
-          Includes theme, layout, room order, card order, hidden entity state, custom widgets, and
-          light preset settings. Export and import both use YAML. Connection URL and token are
-          intentionally left out.
+          {t('settings.dashboard.backup.body')}
         </p>
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
@@ -188,7 +189,7 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
             className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
           >
             <Download className="h-4 w-4" />
-            <span>Export config</span>
+            <span>{t('settings.dashboard.backup.export')}</span>
           </button>
           <button
             type="button"
@@ -196,7 +197,7 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
             className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
           >
             <Upload className="h-4 w-4" />
-            <span>Import config</span>
+            <span>{t('settings.dashboard.backup.import')}</span>
           </button>
           <input
             ref={importInputRef}

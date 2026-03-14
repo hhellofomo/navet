@@ -1,3 +1,4 @@
+import { useI18n } from '@/app/hooks';
 import type { DashboardController } from '../hooks/use-dashboard-controller';
 import { AddCardDialogContainer } from './add-card-dialog';
 import { AddEntityDialog } from './add-entity-dialog';
@@ -8,6 +9,7 @@ interface DashboardOverlaysProps {
 }
 
 export function DashboardOverlays({ controller }: DashboardOverlaysProps) {
+  const { t } = useI18n();
   const {
     activeRoom,
     addableEntityIds,
@@ -48,13 +50,13 @@ export function DashboardOverlays({ controller }: DashboardOverlaysProps) {
           deviceMap={availableDeviceMap}
           addedEntityIds={[]}
           visibleEntityIds={addableEntityIds}
-          title="Add Entity"
+          title={t('dashboard.addEntity.title')}
           description={
             hiddenEntityIds.length > 0
-              ? 'Add Home Assistant entities back to the dashboard.'
-              : 'Choose Home Assistant entities to add to the dashboard.'
+              ? t('dashboard.addEntity.descriptionWithHidden')
+              : t('dashboard.addEntity.descriptionDefault')
           }
-          actionLabel="Add"
+          actionLabel={t('dashboard.addEntity.action')}
         />
       )}
 

@@ -1,3 +1,5 @@
+import { useI18n } from '@/app/hooks';
+
 interface MediaVisualizerButtonProps {
   isPlaying: boolean;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -11,11 +13,12 @@ export function MediaVisualizerButton({
   onClick,
   className = '',
 }: MediaVisualizerButtonProps) {
+  const { t } = useI18n();
   return (
     <>
       <button
         type="button"
-        aria-label="Open media details"
+        aria-label={t('media.openDetails')}
         onClick={onClick}
         className={`flex h-7 w-7 items-center justify-center ${className}`}
       >

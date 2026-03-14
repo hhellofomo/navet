@@ -2,9 +2,9 @@ import { Hand, Lightbulb, MoreHorizontal, Settings2, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import type { EntityInteractionMode } from '@/app/stores';
-import { getInteractionPreview } from './entity-card-interaction-controller';
 
 interface InteractionPreviewCardProps {
   mode: EntityInteractionMode;
@@ -15,12 +15,22 @@ interface InteractionPreviewCardProps {
 const PRESET_LABELS = ['25%', '60%', '100%'];
 
 export function InteractionPreviewCard({ mode, accentColor, theme }: InteractionPreviewCardProps) {
+  const { t } = useI18n();
   const [isOn, setIsOn] = useState(true);
   const [brightness, setBrightness] = useState(60);
   const surface = getThemeSurfaceTokens(theme);
   const isLightTheme = theme === 'light';
   const isContrastTheme = theme === 'contrast';
-  const preview = getInteractionPreview(mode);
+  const preview =
+    mode === 'toggle-first'
+      ? {
+          cardTap: t('interactionPreview.cardTap.toggle'),
+          iconTap: t('interactionPreview.iconTap.toggle'),
+        }
+      : {
+          cardTap: t('interactionPreview.cardTap.controls'),
+          iconTap: t('interactionPreview.iconTap.toggle'),
+        };
   const showsTrailingButton = mode === 'toggle-first';
 
   const cardClass = isLightTheme
@@ -83,8 +93,8 @@ export function InteractionPreviewCard({ mode, accentColor, theme }: Interaction
     : `focus-visible:ring-white/35 ${surface.ringOffset}`;
 
   const showControlsOpenedToast = () => {
-    toast.success('Controls opened', {
-      description: 'This is where the full light controls would open.',
+    toast.success(t('interactionPreview.preview.controlsOpenedTitle'), {
+      description: t('interactionPreview.preview.controlsOpenedDescription'),
     });
   };
 
@@ -134,15 +144,21 @@ export function InteractionPreviewCard({ mode, accentColor, theme }: Interaction
               />
             </button>
             <div className="min-w-0">
-              <p className={`truncate text-sm font-semibold ${textClass}`}>Living Room Light</p>
-              <p className={`mt-0.5 truncate text-[10px] ${labelClass}`}>Light</p>
+              <p className={`truncate text-sm font-semibold ${textClass}`}>
+                {t('interactionPreview.preview.deviceName')}
+              </p>
+              <p className={`mt-0.5 truncate text-[10px] ${labelClass}`}>
+                {t('interactionPreview.preview.deviceType')}
+              </p>
             </div>
           </div>
         </div>
 
         <div className="mt-4">
           <div className="mb-1.5 flex items-center justify-between">
-            <span className={`text-xs ${labelClass}`}>Brightness</span>
+            <span className={`text-xs ${labelClass}`}>
+              {t('interactionPreview.preview.brightness')}
+            </span>
             <span className={`text-sm font-bold ${textClass}`}>{brightness}%</span>
           </div>
           <div className="flex h-5 items-center">
@@ -217,7 +233,7 @@ export function InteractionPreviewCard({ mode, accentColor, theme }: Interaction
             className={`flex items-center gap-1.5 text-[11px] font-semibold ${sectionLabelClass}`}
           >
             <Hand className="h-3 w-3" />
-            <span>Tap card</span>
+            <span>{t('interactionPreview.cardTitle')}</span>
           </div>
           <p className={`mt-1 text-sm ${textClass}`}>{preview.cardTap}</p>
         </div>
@@ -228,7 +244,7 @@ export function InteractionPreviewCard({ mode, accentColor, theme }: Interaction
               className={`flex items-center gap-1.5 text-[11px] font-semibold ${sectionLabelClass}`}
             >
               <Lightbulb className="h-3 w-3" />
-              <span>Icon</span>
+              <span>{t('interactionPreview.iconTitle')}</span>
             </div>
             <p className={`mt-1 text-sm ${textClass}`}>{preview.iconTap}</p>
           </div>
@@ -238,9 +254,11 @@ export function InteractionPreviewCard({ mode, accentColor, theme }: Interaction
                 className={`flex items-center gap-1.5 text-[11px] font-semibold ${sectionLabelClass}`}
               >
                 <Settings2 className="h-3 w-3" />
-                <span>Trailing button</span>
+                <span>{t('interactionPreview.trailingButtonTitle')}</span>
               </div>
-              <p className={`mt-1 text-sm ${textClass}`}>Open controls</p>
+              <p className={`mt-1 text-sm ${textClass}`}>
+                {t('interactionPreview.trailingButtonAction')}
+              </p>
             </div>
           )}
         </div>

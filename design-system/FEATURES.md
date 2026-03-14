@@ -237,8 +237,10 @@ Full-page settings interface with card-based organization.
 **1. Appearance**
 - **Theme Mode Selection**: 2 × 2 grid with live card previews
 - **Primary Color Picker**: 8 color circles in a row
+- **Language selection**: persisted app language for interface and locale-aware formatting
+- **Localized theme picker copy**: theme names and descriptions resolve through the shared i18n dictionaries
 - **Light card ambience**: global visual toggle between ambient bleed and contained light-card rendering
-- **Theme-aware live previews**: theme/accent and ambience previews share the same preview-frame primitive
+- **Theme-aware live previews**: theme/accent and ambience previews share the same preview-frame primitive, and the shared `Live Preview` header localizes with the active language
 - **Visual feedback**: Selected items show primary color indicator
 - **Layout**: Left-aligned text, right-aligned selection indicator
 

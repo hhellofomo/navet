@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 
 interface DashboardArrivalRevealProps {
   open: boolean;
@@ -8,39 +8,8 @@ interface DashboardArrivalRevealProps {
   variant: 'all' | 'blank' | 'import';
 }
 
-const ARRIVAL_COPY = {
-  all: {
-    bakingKicker: 'Waking Up Your Home',
-    bakingHeading: 'Bringing every room and entity into view.',
-    bakingBody:
-      'Navet is assembling your full dashboard so you can begin with everything ready and visible.',
-    revealKicker: 'Welcome Home',
-    revealHeading: 'Everything is in place.',
-    revealBody:
-      'Your full dashboard is ready. Start exploring and shape it further from a complete first view.',
-  },
-  blank: {
-    bakingKicker: 'Preparing Your Canvas',
-    bakingHeading: 'Clearing the board for a fresh start.',
-    bakingBody:
-      'Navet is setting up a clean dashboard so you can build every room, card, and widget your way.',
-    revealKicker: 'Start Fresh',
-    revealHeading: 'Your blank dashboard is ready.',
-    revealBody:
-      'You are starting with an empty board. Add back exactly what matters and build the experience from scratch.',
-  },
-  import: {
-    bakingKicker: 'Restoring Your Dashboard',
-    bakingHeading: 'Putting every saved room, card, and detail back in place.',
-    bakingBody:
-      'Navet is restoring your saved setup and preparing the reveal so you can step right back in.',
-    revealKicker: 'Welcome Back',
-    revealHeading: 'Your dashboard has been restored.',
-    revealBody: 'Everything from your backup is in place and ready for you to return to.',
-  },
-} as const;
-
 export function DashboardArrivalReveal({ open, onComplete, variant }: DashboardArrivalRevealProps) {
+  const { t } = useI18n();
   const { theme, primaryColor } = useTheme();
   const [phase, setPhase] = useState<'baking' | 'revealed' | 'exiting'>('baking');
 
@@ -65,7 +34,14 @@ export function DashboardArrivalReveal({ open, onComplete, variant }: DashboardA
 
   if (!open) return null;
 
-  const copy = ARRIVAL_COPY[variant];
+  const copy = {
+    bakingKicker: t(`dashboard.arrival.${variant}.bakingKicker` as const),
+    bakingHeading: t(`dashboard.arrival.${variant}.bakingHeading` as const),
+    bakingBody: t(`dashboard.arrival.${variant}.bakingBody` as const),
+    revealKicker: t(`dashboard.arrival.${variant}.revealKicker` as const),
+    revealHeading: t(`dashboard.arrival.${variant}.revealHeading` as const),
+    revealBody: t(`dashboard.arrival.${variant}.revealBody` as const),
+  };
   const accentColor = getThemeColorValue(primaryColor);
   const panelBackground =
     theme === 'light' ? 'rgba(255, 255, 255, 0.72)' : 'rgba(10, 10, 10, 0.55)';

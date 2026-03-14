@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/app/components/ui/dropdown-menu';
 import type { AllViewGrouping } from '@/app/features/dashboard/all-view-grid';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 
 interface RoomNavProps {
   rooms?: string[];
@@ -33,6 +33,7 @@ interface RoomNavProps {
 interface RoomNavItemProps {
   room: string;
   activeRoom: string;
+  allLabel: string;
   isEditMode: boolean;
   textSecondary: string;
   hoverBg: string;
@@ -45,13 +46,6 @@ interface RoomNavMenuButtonProps {
   textSecondary: string;
   className: string;
 }
-
-const ALL_VIEW_GROUPING_OPTIONS: Array<{ label: string; value: AllViewGrouping }> = [
-  { label: 'Custom', value: 'custom' },
-  { label: 'Room', value: 'room' },
-  { label: 'Type', value: 'type' },
-  { label: 'No Grouping', value: 'none' },
-];
 
 function useStickyActivation() {
   const stickyRef = useRef<HTMLDivElement | null>(null);
@@ -94,6 +88,7 @@ export const RoomNav = memo(function RoomNav({
   onAddEntity,
   addEntityLabel = 'Add Entity',
 }: RoomNavProps) {
+  const { t } = useI18n();
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const { stickyRef, isStickyActive } = useStickyActivation();
@@ -116,6 +111,12 @@ export const RoomNav = memo(function RoomNav({
   const showAllViewGrouping = activeRoom === 'All' && onAllViewGroupingChange;
   const actionPillClassName = `flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs md:gap-2 md:px-3 md:py-2 md:text-sm transition-colors ${inactiveBg} ${hoverBg}`;
   const dropdownItemClassName = `rounded-xl px-3 py-2 ${surface.textPrimary} ${hoverBg}`;
+  const allViewGroupingOptions: Array<{ label: string; value: AllViewGrouping }> = [
+    { label: t('dashboard.roomNav.grouping.custom'), value: 'custom' },
+    { label: t('dashboard.roomNav.grouping.room'), value: 'room' },
+    { label: t('dashboard.roomNav.grouping.type'), value: 'type' },
+    { label: t('dashboard.roomNav.grouping.none'), value: 'none' },
+  ];
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -143,6 +144,7 @@ export const RoomNav = memo(function RoomNav({
                       key={room}
                       room={room}
                       activeRoom={activeRoom}
+                      allLabel={t('dashboard.roomNav.all')}
                       isEditMode={isEditMode}
                       textSecondary={textSecondary}
                       hoverBg={hoverBg}
@@ -160,16 +162,16 @@ export const RoomNav = memo(function RoomNav({
                 <DropdownMenuTrigger asChild>
                   <RoomNavMenuButton
                     icon={LayoutGrid}
-                    label="View"
+                    label={t('dashboard.roomNav.view')}
                     textSecondary={textSecondary}
                     className={actionPillClassName}
                   />
                 </DropdownMenuTrigger>
                 <ThemeDropdownContent theme={theme} align="end">
                   <DropdownMenuLabel className={`px-3 py-2 text-xs font-medium ${textSecondary}`}>
-                    Group By
+                    {t('dashboard.roomNav.groupBy')}
                   </DropdownMenuLabel>
-                  {ALL_VIEW_GROUPING_OPTIONS.map((option) => (
+                  {allViewGroupingOptions.map((option) => (
                     <DropdownMenuItem
                       key={option.value}
                       className={dropdownItemClassName}
@@ -190,7 +192,7 @@ export const RoomNav = memo(function RoomNav({
                 <DropdownMenuTrigger asChild>
                   <RoomNavMenuButton
                     icon={Lightbulb}
-                    label="Add"
+                    label={t('dashboard.roomNav.add')}
                     textSecondary={textSecondary}
                     className={actionPillClassName}
                   />
@@ -205,7 +207,7 @@ export const RoomNav = memo(function RoomNav({
                   {onAddCard ? (
                     <DropdownMenuItem className={dropdownItemClassName} onClick={onAddCard}>
                       <LayoutGrid className="h-4 w-4" />
-                      Add Card
+                      {t('dashboard.roomNav.addCard')}
                     </DropdownMenuItem>
                   ) : null}
                 </ThemeDropdownContent>
@@ -231,14 +233,14 @@ export const RoomNav = memo(function RoomNav({
                 <>
                   <Check className="h-4 w-4 text-white" />
                   <span className="hidden text-xs font-medium text-white md:inline">
-                    Done Editing
+                    {t('dashboard.roomNav.doneEditing')}
                   </span>
                 </>
               ) : (
                 <>
                   <Edit3 className={`h-4 w-4 ${textSecondary}`} />
                   <span className={`hidden text-xs font-medium md:inline ${textSecondary}`}>
-                    Customize
+                    {t('dashboard.roomNav.customize')}
                   </span>
                 </>
               )}
@@ -267,6 +269,7 @@ const RoomNavMenuButton = memo(
 const RoomNavItem = memo(function RoomNavItem({
   room,
   activeRoom,
+  allLabel,
   isEditMode,
   textSecondary,
   hoverBg,
@@ -294,7 +297,7 @@ const RoomNavItem = memo(function RoomNavItem({
       {...(isEditMode && room !== 'All' ? attributes : {})}
       {...(isEditMode && room !== 'All' ? listeners : {})}
     >
-      {room}
+      {room === 'All' ? allLabel : room}
     </InteractivePill>
   );
 });

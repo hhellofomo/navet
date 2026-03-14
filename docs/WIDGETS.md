@@ -53,10 +53,10 @@ Shows live articles from your selected RSS providers.
 
 ### 2. Photo Frame Widget
 
-Beautiful photo carousel with navigation.
+Decorative ambient frame with built-in rotating artwork panels.
 
 **Features:**
-- Multiple photos
+- Multiple built-in artwork panels
 - Next/previous navigation
 - Dot indicators
 - Smooth transitions

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import type { HVACCardProps } from './hvac-card.types';
 
 export function useHVACCardController({
@@ -24,6 +24,7 @@ export function useHVACCardController({
   | 'isEditMode'
   | 'size'
 >) {
+  const { t } = useI18n();
   const [targetTemp, setTargetTemp] = useState(initialTemp);
   const [currentTemp, setCurrentTemp] = useState(initialCurrentTemp);
   const [mode, setMode] = useState(initialMode);
@@ -118,7 +119,7 @@ export function useHVACCardController({
   const secondaryTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
 
   const cardInteraction = useEntityCardInteractionController({
-    ariaLabel: `${name} hvac`,
+    ariaLabel: `${name} ${t('climate.subtitle').toLowerCase()}`,
     ariaPressed: isOn,
     isEditMode,
     onToggle: () => setIsOn((current) => !current),

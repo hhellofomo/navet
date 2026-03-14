@@ -9,6 +9,7 @@ import {
   useDeviceMap,
   useEditMode,
   useHomeAssistant,
+  useI18n,
   useNavigation,
   usePersistedState,
   useRoomNavigation,
@@ -85,6 +86,7 @@ export function useDashboardController(): DashboardController {
   type OnboardingTransition = 'all' | 'blank' | 'import' | null;
 
   const { activeSection, setActiveSection } = useNavigation();
+  const { t } = useI18n();
   const { connected, connecting } = useHomeAssistant();
   const [devicesLoaded, setDevicesLoaded] = useState(false);
   const [showAddCardDialog, setShowAddCardDialog] = useState(false);
@@ -149,46 +151,49 @@ export function useDashboardController(): DashboardController {
   const handleAddCard = useCallback(
     (type: CardType, size: CardSize) => {
       addCard(type, size, activeRoom);
-      toast.success(`Added ${type} widget to ${activeRoom}!`);
+      toast.success(t('dashboard.feedback.widgetAdded', { type, room: activeRoom }));
     },
-    [activeRoom, addCard]
+    [activeRoom, addCard, t]
   );
 
   const handleDeleteCard = useCallback(
     (cardId: string) => {
       removeCard(cardId);
-      toast.success('Widget deleted');
+      toast.success(t('dashboard.feedback.widgetDeleted'));
     },
-    [removeCard]
+    [removeCard, t]
   );
 
   const handleAddEntity = useCallback(
     (entityId: string) => {
       showAutoEntity(entityId);
-      toast.success('Entity added to dashboard');
+      toast.success(t('dashboard.feedback.entityAdded'));
     },
-    [showAutoEntity]
+    [showAutoEntity, t]
   );
 
   const handleRemoveEntity = useCallback(
     (entityId: string) => {
       hideAutoEntity(entityId);
-      toast.success('Entity removed from dashboard');
+      toast.success(t('dashboard.feedback.entityRemoved'));
     },
-    [hideAutoEntity]
+    [hideAutoEntity, t]
   );
 
-  const handleImportDashboardConfig = useCallback(async (file: File) => {
-    try {
-      await importDashboardConfigFromFile(file);
-      toast.success('Dashboard config imported. Reloading...');
-      window.setTimeout(() => {
-        window.location.reload();
-      }, 600);
-    } catch {
-      toast.error('Failed to import dashboard config');
-    }
-  }, []);
+  const handleImportDashboardConfig = useCallback(
+    async (file: File) => {
+      try {
+        await importDashboardConfigFromFile(file);
+        toast.success(t('dashboard.feedback.configImported'));
+        window.setTimeout(() => {
+          window.location.reload();
+        }, 600);
+      } catch {
+        toast.error(t('dashboard.feedback.configImportFailed'));
+      }
+    },
+    [t]
+  );
 
   const handleOnboardingImportDashboardConfig = useCallback(
     async (file: File) => {
@@ -197,12 +202,12 @@ export function useDashboardController(): DashboardController {
         setActiveSection('home');
         changeRoom('All');
         setOnboardingTransition('import');
-        toast.success('Dashboard config restored');
+        toast.success(t('dashboard.feedback.configRestored'));
       } catch {
-        toast.error('Failed to import dashboard config');
+        toast.error(t('dashboard.feedback.configImportFailed'));
       }
     },
-    [changeRoom, setActiveSection]
+    [changeRoom, setActiveSection, t]
   );
 
   const handleCompleteOnboardingClose = useCallback(() => {

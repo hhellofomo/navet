@@ -4,7 +4,7 @@ import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { getDeviceRoomLabel } from '@/app/utils/device-location';
 import { ENTITY_LIST_HEIGHT, ENTITY_LIST_OVERSCAN, ENTITY_ROW_HEIGHT } from './constants';
 import type { AddEntityDialogProps } from './types';
@@ -21,6 +21,7 @@ export function AddEntityDialog({
   description,
   actionLabel = 'Add',
 }: AddEntityDialogProps) {
+  const { t } = useI18n();
   const { theme, primaryColor } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const [query, setQuery] = useState('');
@@ -50,7 +51,7 @@ export function AddEntityDialog({
 
         const label = typeof device.name === 'string' ? device.name : device.id;
         const room = getDeviceRoomLabel(device);
-        const type = getDeviceTypeLabel(device.type);
+        const type = getDeviceTypeLabel(device.type, t);
 
         return `${label} ${room} ${type}`.toLowerCase().includes(normalizedQuery);
       })
@@ -67,7 +68,7 @@ export function AddEntityDialog({
         const rightName = typeof right.name === 'string' ? right.name : right.id;
         return leftName.localeCompare(rightName);
       });
-  }, [addedEntityIds, currentRoom, deviceMap, query, visibleEntityIds]);
+  }, [addedEntityIds, currentRoom, deviceMap, query, t, visibleEntityIds]);
 
   const listResetKey = `${open}:${currentRoom}:${query}:${visibleEntityIds?.join(',') ?? ''}`;
 
@@ -103,8 +104,8 @@ export function AddEntityDialog({
             <p className={`text-sm ${mutedColor} mt-1`}>
               {description ??
                 (currentRoom === 'All'
-                  ? 'Choose which Home Assistant entities should appear on the dashboard'
-                  : `Choose entities for ${currentRoom}`)}
+                  ? t('dashboard.addEntity.defaultDescriptionAll')
+                  : t('dashboard.addEntity.defaultDescriptionRoom', { room: currentRoom }))}
             </p>
           </div>
           <button
@@ -123,7 +124,7 @@ export function AddEntityDialog({
               type="text"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search entities"
+              placeholder={t('dashboard.addEntity.searchPlaceholder')}
               className={`w-full rounded-xl border ${borderColor} ${inputBg} pl-10 pr-4 py-3 text-sm ${textColor} focus:outline-none`}
               style={{ caretColor: getThemeColorValue(primaryColor) }}
             />
@@ -145,7 +146,7 @@ export function AddEntityDialog({
                 {virtualDevices.map((device) => {
                   const name = typeof device.name === 'string' ? device.name : device.id;
                   const room = getDeviceRoomLabel(device);
-                  const typeLabel = getDeviceTypeLabel(device.type);
+                  const typeLabel = getDeviceTypeLabel(device.type, t);
 
                   return (
                     <div
@@ -159,7 +160,11 @@ export function AddEntityDialog({
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <EntityRoomSelector entityId={device.id} label="Room" compact />
+                        <EntityRoomSelector
+                          entityId={device.id}
+                          label={t('dashboard.addEntity.roomLabel')}
+                          compact
+                        />
                         <button
                           type="button"
                           onClick={() => onAddEntity(device.id)}
@@ -176,11 +181,13 @@ export function AddEntityDialog({
             </div>
           ) : (
             <div className={`rounded-xl border ${borderColor} ${cardBg} p-8 text-center`}>
-              <p className={`text-sm font-medium ${textColor}`}>No entities available</p>
+              <p className={`text-sm font-medium ${textColor}`}>
+                {t('dashboard.addEntity.emptyTitle')}
+              </p>
               <p className={`text-xs ${mutedColor} mt-2`}>
                 {visibleEntityIds
-                  ? 'There are no removed entities matching this room or search.'
-                  : 'Try another search or switch to a different room.'}
+                  ? t('dashboard.addEntity.emptyHidden')
+                  : t('dashboard.addEntity.emptyDefault')}
               </p>
             </div>
           )}

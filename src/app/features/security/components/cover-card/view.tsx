@@ -14,7 +14,7 @@ import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import type { ThemeType } from '@/app/hooks';
+import { type ThemeType, useI18n } from '@/app/hooks';
 import { getSecurityCardSurfaceTokens } from '../security-card-surface-tokens';
 import type { CoverIconButtonProps, DeviceClass, DeviceClassConfig } from './types';
 
@@ -75,6 +75,7 @@ export function CoverCardView({
   handleStop,
   setDeviceClass,
 }: CoverCardViewProps) {
+  const { t } = useI18n();
   // Size-specific styling with intelligent layout adaptation
   const isSmall = isCompactCardSize(size);
   const isMedium = size === 'medium';
@@ -105,7 +106,7 @@ export function CoverCardView({
       <div className="relative h-full flex flex-col">
         <EntityCardHeader
           title={name}
-          subtitle={deviceClassConfig[deviceClass].label}
+          subtitle={t(deviceClassConfig[deviceClass].labelKey)}
           size={size}
           leading={
             <EntityCardHeaderIcon
@@ -151,7 +152,7 @@ export function CoverCardView({
                       handleOpen();
                     }}
                     className={`hover:scale-105 ${securitySurface.subtleButtonClassName}`}
-                    title="Open"
+                    title={t('cover.open')}
                   >
                     <ChevronUp className="h-3 w-3" />
                   </RoundControlButton>
@@ -164,7 +165,7 @@ export function CoverCardView({
                       handleStop();
                     }}
                     className={`hover:scale-105 ${securitySurface.subtleButtonClassName}`}
-                    title="Stop"
+                    title={t('cover.stop')}
                   >
                     <Square className="h-3 w-3" />
                   </RoundControlButton>
@@ -173,7 +174,7 @@ export function CoverCardView({
               overflowItems={[
                 {
                   key: 'close',
-                  label: 'Close',
+                  label: t('cover.close'),
                   icon: ChevronDown,
                   onSelect: handleClose,
                 },
@@ -220,7 +221,7 @@ export function CoverCardView({
                       }}
                       className={`flex flex-1 items-center justify-center gap-0.5 rounded-lg py-1.5 text-[10px] font-medium transition-colors ${securitySurface.actionButtonClassName}`}
                     >
-                      <ChevronUp className="h-3 w-3" /> Open
+                      <ChevronUp className="h-3 w-3" /> {t('cover.open')}
                     </button>
                     <button
                       type="button"
@@ -230,7 +231,7 @@ export function CoverCardView({
                       }}
                       className={`flex flex-1 items-center justify-center gap-0.5 rounded-lg py-1.5 text-[10px] font-medium transition-colors ${securitySurface.actionButtonClassName}`}
                     >
-                      <Square className="h-3 w-3" /> Stop
+                      <Square className="h-3 w-3" /> {t('cover.stop')}
                     </button>
                     <button
                       type="button"
@@ -240,7 +241,7 @@ export function CoverCardView({
                       }}
                       className={`flex flex-1 items-center justify-center gap-0.5 rounded-lg py-1.5 text-[10px] font-medium transition-colors ${securitySurface.actionButtonClassName}`}
                     >
-                      <ChevronDown className="h-3 w-3" /> Close
+                      <ChevronDown className="h-3 w-3" /> {t('cover.close')}
                     </button>
                   </>
                 }
@@ -285,7 +286,7 @@ export function CoverCardView({
                       }}
                       className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-2 text-xs font-medium transition-colors ${securitySurface.actionButtonClassName}`}
                     >
-                      <ChevronUp className="h-3.5 w-3.5" /> Open
+                      <ChevronUp className="h-3.5 w-3.5" /> {t('cover.open')}
                     </button>
                     <button
                       type="button"
@@ -295,7 +296,7 @@ export function CoverCardView({
                       }}
                       className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-2 text-xs font-medium transition-colors ${securitySurface.actionButtonClassName}`}
                     >
-                      <Square className="h-3.5 w-3.5" /> Stop
+                      <Square className="h-3.5 w-3.5" /> {t('cover.stop')}
                     </button>
                     <button
                       type="button"
@@ -305,7 +306,7 @@ export function CoverCardView({
                       }}
                       className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-2 text-xs font-medium transition-colors ${securitySurface.actionButtonClassName}`}
                     >
-                      <ChevronDown className="h-3.5 w-3.5" /> Close
+                      <ChevronDown className="h-3.5 w-3.5" /> {t('cover.close')}
                     </button>
                   </>
                 }
@@ -328,14 +329,14 @@ export function CoverCardView({
             className={`fixed top-1/2 left-1/2 z-50 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl border p-6 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in duration-200 ${securitySurface.dialogContentClassName}`}
           >
             <Dialog.Title className="text-xl font-semibold text-white mb-2">
-              Device Type
+              {t('cover.settings.deviceType')}
             </Dialog.Title>
             <Dialog.Description className="text-sm text-gray-300 mb-6">
-              Select the type of cover for {name}
+              {t('cover.settings.description', { name })}
             </Dialog.Description>
 
             <div className="mb-6">
-              <EntityRoomSelector entityId={entityId} label="Room" />
+              <EntityRoomSelector entityId={entityId} label={t('common.room')} />
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-6">
@@ -362,7 +363,7 @@ export function CoverCardView({
                       <span
                         className={`text-center text-xs font-medium ${securitySurface.dialogOptionTextClassName(isSelected)}`}
                       >
-                        {config.label}
+                        {t(config.labelKey)}
                       </span>
                     </div>
                   </button>
@@ -376,7 +377,7 @@ export function CoverCardView({
                   type="button"
                   className={`flex-1 rounded-xl py-2.5 text-sm font-medium text-white transition-colors ${securitySurface.dialogCancelButtonClassName}`}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
               </Dialog.Close>
               <Dialog.Close asChild>
@@ -384,7 +385,7 @@ export function CoverCardView({
                   type="button"
                   className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 rounded-xl text-white text-sm font-medium transition-colors"
                 >
-                  Done
+                  {t('common.done')}
                 </button>
               </Dialog.Close>
             </div>

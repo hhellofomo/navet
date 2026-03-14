@@ -3,7 +3,7 @@ import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { CardSizeSelector } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
-import type { PrimaryColor, ThemeType } from '@/app/hooks';
+import { type PrimaryColor, type ThemeType, useI18n } from '@/app/hooks';
 import { getRSSFeedCardSurfaceTokens } from './surface-tokens';
 import type { RSSItem } from './types';
 
@@ -52,15 +52,16 @@ export function RSSFeedCardView({
   hasSelectedProviders,
   onOpenSettings,
 }: RSSFeedCardViewProps) {
+  const { t } = useI18n();
   const rssSurface = getRSSFeedCardSurfaceTokens(theme, primaryColor);
   const isEmpty = !latestArticle && !isLoading;
   const emptyMessage = !hasConfiguredProviders
-    ? 'Add RSS providers to start following feeds.'
+    ? t('rss.empty.noProviders')
     : !hasSelectedProviders
-      ? 'Select one or more providers for this card.'
+      ? t('rss.empty.noSelection')
       : error
         ? error
-        : 'No articles available right now.';
+        : t('rss.empty.noArticles');
 
   return (
     <div
@@ -84,7 +85,7 @@ export function RSSFeedCardView({
       <div className="relative h-full flex flex-col p-4">
         {/* Header */}
         <EntityCardHeader
-          title="RSS Feed"
+          title={t('rss.title')}
           subtitle=""
           size={size}
           subtitleClassName="hidden"
@@ -93,7 +94,7 @@ export function RSSFeedCardView({
               IconComponent={Rss}
               isActive={true}
               size={size}
-              ariaLabel="Configure RSS providers"
+              ariaLabel={t('rss.configureProviders')}
               onPointerDown={(event) => event.stopPropagation()}
               onClick={(event) => {
                 event.stopPropagation();
@@ -109,16 +110,20 @@ export function RSSFeedCardView({
 
         {isEmpty ? (
           <div className="flex flex-1 flex-col justify-center text-left">
-            <p className={`text-sm font-medium ${rssSurface.surface.textPrimary}`}>RSS Feed</p>
+            <p className={`text-sm font-medium ${rssSurface.surface.textPrimary}`}>
+              {t('rss.title')}
+            </p>
             <p className={`mt-2 text-sm leading-relaxed ${rssSurface.textSecondaryClassName}`}>
               {emptyMessage}
             </p>
           </div>
         ) : isLoading && !latestArticle ? (
           <div className="flex flex-1 flex-col justify-center text-left">
-            <p className={`text-sm font-medium ${rssSurface.surface.textPrimary}`}>Loading feeds</p>
+            <p className={`text-sm font-medium ${rssSurface.surface.textPrimary}`}>
+              {t('rss.loading.title')}
+            </p>
             <p className={`mt-2 text-sm leading-relaxed ${rssSurface.textSecondaryClassName}`}>
-              Fetching the latest articles from your selected providers.
+              {t('rss.loading.description')}
             </p>
           </div>
         ) : isSmall && latestArticle ? (
@@ -138,7 +143,7 @@ export function RSSFeedCardView({
             </div>
 
             <div className={`flex items-center gap-1 text-xs ${rssSurface.readMoreClassName}`}>
-              <span>Read more</span>
+              <span>{t('rss.readMore')}</span>
               <ChevronRight className="w-3 h-3" />
             </div>
           </div>

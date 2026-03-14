@@ -84,6 +84,7 @@ export const settingsSelectors = {
   // Individual settings
   username: (state: SettingsState) => state.username,
   email: (state: SettingsState) => state.email,
+  language: (state: SettingsState) => state.language,
   showNotifications: (state: SettingsState) => state.showNotifications,
   showWeatherInHeader: (state: SettingsState) => state.showWeatherInHeader,
   use24HourTime: (state: SettingsState) => state.use24HourTime,
@@ -100,6 +101,7 @@ export const settingsSelectors = {
 
   // Combined selectors
   displaySettings: (state: SettingsState) => ({
+    language: state.language,
     use24HourTime: state.use24HourTime,
     temperatureUnit: state.temperatureUnit,
     compactMode: state.compactMode,

@@ -1,4 +1,7 @@
 import { ExternalLink, FileText, Github, Info, LogOut, Scale } from 'lucide-react';
+import { AppReleaseBadge } from '@/app/components/shared/app-release-badge';
+import { APP_VERSION } from '@/app/constants/app-version';
+import { useI18n } from '@/app/hooks';
 import type { SettingsSectionController } from '../hooks/use-settings-section-controller';
 import { SettingsItem, SettingsSectionShell } from './settings-section-shell';
 
@@ -7,34 +10,44 @@ interface SettingsProjectSectionProps {
 }
 
 export function SettingsProjectSection({ controller }: SettingsProjectSectionProps) {
+  const { t } = useI18n();
   const { handleLogout, setShowLicense, setShowTerms, showLicense, showTerms, styles } = controller;
 
   return (
     <SettingsSectionShell
       id="project"
       icon={Info}
-      title="Project"
-      description="Version details, maintainer links, and the legal basics for using Navet."
+      title={t('settings.project.sectionTitle')}
+      description={t('settings.project.sectionDescription')}
       styles={styles}
     >
-      <SettingsItem title="About" description="Quick project information." styles={styles}>
+      <SettingsItem
+        title={t('settings.project.about.title')}
+        description={t('settings.project.about.description')}
+        styles={styles}
+      >
         <div className="grid gap-3 sm:grid-cols-2">
           <div className={`rounded-[24px] border px-5 py-4 ${styles.borderColor} ${styles.softBg}`}>
             <p className={`text-[11px] uppercase tracking-[0.18em] ${styles.subtleColor}`}>
-              Version
+              {t('settings.project.about.version')}
             </p>
-            <p className={`mt-2 text-lg font-semibold ${styles.textColor}`}>1.0.0</p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <p className={`text-lg font-semibold ${styles.textColor}`}>{APP_VERSION}</p>
+              <AppReleaseBadge />
+            </div>
           </div>
           <div className={`rounded-[24px] border px-5 py-4 ${styles.borderColor} ${styles.softBg}`}>
-            <p className={`text-[11px] uppercase tracking-[0.18em] ${styles.subtleColor}`}>Build</p>
+            <p className={`text-[11px] uppercase tracking-[0.18em] ${styles.subtleColor}`}>
+              {t('settings.project.about.build')}
+            </p>
             <p className={`mt-2 text-lg font-semibold ${styles.textColor}`}>March 2026</p>
           </div>
         </div>
       </SettingsItem>
 
       <SettingsItem
-        title="Credits"
-        description="Project maintainer and the stack behind the app."
+        title={t('settings.project.credits.title')}
+        description={t('settings.project.credits.description')}
         styles={styles}
       >
         <a
@@ -52,13 +65,13 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
           <p>React & TypeScript</p>
           <p>Tailwind CSS v4</p>
           <p>Radix UI</p>
-          <p>Home Assistant community feedback</p>
+          <p>{t('settings.project.credits.community')}</p>
         </div>
       </SettingsItem>
 
       <SettingsItem
-        title="License"
-        description="CC BY-NC-SA 4.0. Free for personal, educational, and non-profit use."
+        title={t('settings.project.license.title')}
+        description={t('settings.project.license.description')}
         styles={styles}
       >
         <button
@@ -67,34 +80,24 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
           className={`inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
         >
           <Scale className="h-4 w-4" />
-          <span>{showLicense ? 'Hide full license' : 'View full license'}</span>
+          <span>
+            {showLicense ? t('settings.project.license.hide') : t('settings.project.license.show')}
+          </span>
         </button>
 
         {showLicense ? (
           <div className={`mt-4 rounded-[24px] border p-5 ${styles.borderColor} ${styles.softBg}`}>
             <div className={`space-y-3 text-sm leading-relaxed ${styles.textColor}`}>
-              <div>
-                <p className="font-semibold">You are free to:</p>
-                <ul className="mt-2 ml-4 list-disc space-y-1">
-                  <li>Share and redistribute the material.</li>
-                  <li>Adapt, remix, transform, and build upon it.</li>
-                </ul>
-              </div>
-              <div>
-                <p className="font-semibold">Under these terms:</p>
-                <ul className="mt-2 ml-4 list-disc space-y-1">
-                  <li>Attribution is required.</li>
-                  <li>Commercial use is not allowed.</li>
-                  <li>Derivative work must keep the same license.</li>
-                </ul>
-              </div>
+              <p>{t('settings.project.license.summary')}</p>
+              <p>{t('settings.project.license.networkUse')}</p>
+              <p>{t('settings.project.license.trademark')}</p>
               <a
-                href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
+                href="https://www.gnu.org/licenses/agpl-3.0-standalone.html"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-blue-500 hover:underline"
               >
-                <span>Read the full legal code</span>
+                <span>{t('settings.project.license.readFull')}</span>
                 <ExternalLink className="h-3.5 w-3.5" />
               </a>
             </div>
@@ -103,8 +106,8 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
       </SettingsItem>
 
       <SettingsItem
-        title="Terms of use"
-        description="Permitted and prohibited use, plus the standard warranty disclaimer."
+        title={t('settings.project.terms.title')}
+        description={t('settings.project.terms.description')}
         styles={styles}
       >
         <button
@@ -113,34 +116,31 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
           className={`inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
         >
           <FileText className="h-4 w-4" />
-          <span>{showTerms ? 'Hide terms of use' : 'View terms of use'}</span>
+          <span>
+            {showTerms ? t('settings.project.terms.hide') : t('settings.project.terms.show')}
+          </span>
         </button>
 
         {showTerms ? (
           <div className={`mt-4 rounded-[24px] border p-5 ${styles.borderColor} ${styles.softBg}`}>
             <div className={`space-y-3 text-sm leading-relaxed ${styles.textColor}`}>
               <div>
-                <p className="font-semibold">Permitted use</p>
+                <p className="font-semibold">{t('settings.project.terms.allowedTitle')}</p>
                 <ul className="mt-2 ml-4 list-disc space-y-1">
-                  <li>Personal use on your home devices.</li>
-                  <li>Educational and learning purposes.</li>
-                  <li>Non-profit organizations.</li>
-                  <li>Open-source contributions to the project.</li>
+                  <li>{t('settings.project.terms.allowed.1')}</li>
+                  <li>{t('settings.project.terms.allowed.2')}</li>
+                  <li>{t('settings.project.terms.allowed.3')}</li>
                 </ul>
               </div>
               <div>
-                <p className="font-semibold">Prohibited use</p>
+                <p className="font-semibold">{t('settings.project.terms.prohibitedTitle')}</p>
                 <ul className="mt-2 ml-4 list-disc space-y-1">
-                  <li>Commercial use or revenue generation.</li>
-                  <li>Corporate deployment for business purposes.</li>
-                  <li>Offering the software as a paid service.</li>
-                  <li>White-labeling or reselling it.</li>
+                  <li>{t('settings.project.terms.prohibited.1')}</li>
+                  <li>{t('settings.project.terms.prohibited.2')}</li>
+                  <li>{t('settings.project.terms.prohibited.3')}</li>
                 </ul>
               </div>
-              <p className={styles.subtleColor}>
-                THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. The author is not
-                responsible for security breaches or damages resulting from use of this software.
-              </p>
+              <p className={styles.subtleColor}>{t('settings.project.terms.disclaimer')}</p>
             </div>
           </div>
         ) : null}
@@ -153,7 +153,7 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
           className="inline-flex items-center gap-2 rounded-full bg-red-500/10 px-5 py-3 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/15"
         >
           <LogOut className="h-4 w-4" />
-          <span>Logout</span>
+          <span>{t('settings.project.logout')}</span>
         </button>
       </div>
     </SettingsSectionShell>

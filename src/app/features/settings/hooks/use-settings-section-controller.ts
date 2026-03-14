@@ -4,7 +4,7 @@ import { PRIMARY_COLOR_OPTIONS, THEME_OPTIONS } from '@/app/constants/theme-opti
 import { useAuth } from '@/app/contexts/auth-context';
 import { useConfig } from '@/app/contexts/config-context';
 import { useDashboardEntitiesStore } from '@/app/features/dashboard';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { type EntityInteractionMode, useSettingsStore } from '@/app/stores';
 import { useNavigationStore } from '@/app/stores/navigation-store';
 import {
@@ -47,9 +47,11 @@ export type SettingsSectionStyles = {
 
 export function useSettingsSectionController() {
   const { theme, setTheme, primaryColor, setPrimaryColor, wallpaper, setWallpaper } = useTheme();
+  const { languageOptions, t } = useI18n();
   const { logout, config } = useAuth();
   const { clearConfig } = useConfig();
   const disableAnimations = useSettingsStore((state) => state.disableAnimations);
+  const language = useSettingsStore((state) => state.language);
   const entityInteractionMode = useSettingsStore((state) => state.entityInteractionMode);
   const ambientLightBleed = useSettingsStore((state) => state.ambientLightBleed);
   const updateSettings = useSettingsStore((state) => state.updateSettings);
@@ -65,21 +67,17 @@ export function useSettingsSectionController() {
   const importInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleLogout = () => {
-    if (confirm('Are you sure you want to logout?')) {
+    if (confirm(t('settings.feedback.logoutConfirm'))) {
       logout();
-      toast.success('Logged out successfully');
+      toast.success(t('settings.feedback.logoutSuccess'));
     }
   };
 
   const handleResetConnection = () => {
-    if (
-      confirm(
-        'Are you sure you want to reset your smart home connection? You will need to reconnect.'
-      )
-    ) {
+    if (confirm(t('settings.feedback.resetConnectionConfirm'))) {
       clearConfig();
       logout();
-      toast.info('Connection reset. Please reconnect to your system.');
+      toast.info(t('settings.feedback.resetConnectionSuccess'));
     }
   };
 
@@ -98,7 +96,7 @@ export function useSettingsSectionController() {
     try {
       setWallpaper(await readFileAsDataUrl(file));
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to read image file');
+      alert(error instanceof Error ? error.message : t('settings.feedback.wallpaperReadFailed'));
     }
   };
 
@@ -108,7 +106,7 @@ export function useSettingsSectionController() {
 
   const handleExportDashboardConfig = () => {
     downloadDashboardConfig();
-    toast.success('Dashboard config exported');
+    toast.success(t('settings.feedback.configExported'));
   };
 
   const handleImportDashboardConfig = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -119,12 +117,12 @@ export function useSettingsSectionController() {
 
     try {
       await importDashboardConfigFromFile(file);
-      toast.success('Dashboard config imported. Reloading...');
+      toast.success(t('settings.feedback.configImported'));
       window.setTimeout(() => {
         window.location.reload();
       }, 600);
     } catch {
-      toast.error('Failed to import dashboard config');
+      toast.error(t('settings.feedback.configImportFailed'));
     } finally {
       event.target.value = '';
     }
@@ -153,6 +151,8 @@ export function useSettingsSectionController() {
     handleWallpaperUpload,
     hiddenEntityIds,
     importInputRef,
+    language,
+    languageOptions,
     primaryColor,
     reopenOnboarding,
     setPrimaryColor,

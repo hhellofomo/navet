@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import { iconMap } from '@/app/features/sensors';
-import { useHomeAssistant, useTheme } from '@/app/hooks';
+import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 import type { DeviceMetric } from '@/app/types/device.types';
 import { storage } from '@/app/utils/storage';
@@ -29,7 +29,7 @@ export function useSwitchCardController({
   name,
   size,
   initialState = false,
-  entityType = 'Switch',
+  entityType,
   power,
   voltage,
   energy,
@@ -40,7 +40,9 @@ export function useSwitchCardController({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { entities } = useHomeAssistant();
   const { colors, theme } = useTheme();
+  const { t } = useI18n();
   const liveEntity = entities?.[id];
+  const resolvedEntityType = entityType || t('lighting.type.switch');
 
   useEffect(() => {
     if (liveEntity) {
@@ -177,7 +179,7 @@ export function useSwitchCardController({
       : 'bg-gray-950/95 border-white/10 text-white';
 
   const cardInteraction = useEntityCardInteractionController({
-    ariaLabel: `${name} switch`,
+    ariaLabel: `${name} ${t('lighting.type.switch').toLowerCase()}`,
     ariaPressed: isOn,
     isEditMode,
     onToggle: () => {
@@ -185,7 +187,9 @@ export function useSwitchCardController({
       setIsOn(nextIsOn);
       void homeAssistantService.updateSwitch(id, nextIsOn ? 'on' : 'off').catch((error) => {
         setIsOn(!nextIsOn);
-        toast.error(error instanceof Error ? error.message : 'Failed to update switch');
+        toast.error(
+          error instanceof Error ? error.message : t('lighting.feedback.updateSwitchFailed')
+        );
       });
     },
     onOpenControls: () => {
@@ -216,6 +220,19 @@ export function useSwitchCardController({
         : `${metric.value.toFixed(metric.unit === 'kWh' ? 2 : 0)}${metric.unit ? ` ${metric.unit}` : ''}`
       : metric.value;
 
+  const getMetricLabel = (metric: DeviceMetric) => {
+    switch (metric.label) {
+      case 'Power':
+        return t('lighting.metrics.power');
+      case 'Voltage':
+        return t('lighting.metrics.voltage');
+      case 'Energy':
+        return t('lighting.metrics.energy');
+      default:
+        return metric.label;
+    }
+  };
+
   const renderMetricIcon = (metric: DeviceMetric, className: string) => {
     const Icon = iconMap[metric.icon] ?? Power;
     return <Icon className={className} />;
@@ -241,8 +258,9 @@ export function useSwitchCardController({
     cardColors,
     cardInteraction,
     dialogSurface,
-    entityType,
+    entityType: resolvedEntityType,
     formatMetricValue,
+    getMetricLabel,
     handleMetricToggle,
     hasControlsDialog,
     hasMetrics,
@@ -250,6 +268,12 @@ export function useSwitchCardController({
     isOn,
     labelColor,
     metricLimit,
+    metricSectionDescription:
+      metricLimit === 1
+        ? t('lighting.switch.metricLimit.one', { count: metricLimit })
+        : t('lighting.switch.metricLimit.other', { count: metricLimit }),
+    metricSectionTitle: t('lighting.switch.cardMetric'),
+    roomLabel: t('lighting.settings.room'),
     renderMetricIcon,
     selectedMetricLabels,
     selectedMetrics,

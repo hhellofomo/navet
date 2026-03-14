@@ -4,7 +4,7 @@ import {
   isCompactCardSize,
   isExtraSmallCardSize,
 } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import type { CardSize } from '../card-size-selector';
 import { getDeviceEditorSurfaceTokens } from './device-editor-surface-tokens';
 
@@ -41,6 +41,7 @@ export const BrightnessSlider = memo(function BrightnessSlider({
   onClick,
 }: BrightnessSliderProps) {
   const { theme, primaryColor } = useTheme();
+  const { t } = useI18n();
   const isExtraSmall = isExtraSmallCardSize(size);
   const isCompact = isCompactCardSize(size);
   const editorSurface = getDeviceEditorSurfaceTokens(isOn);
@@ -75,7 +76,9 @@ export const BrightnessSlider = memo(function BrightnessSlider({
     <div>
       {showLabel && (
         <div className="flex items-center justify-between mb-1.5">
-          <span className={`text-xs ${editorSurface.sectionLabelClassName}`}>Brightness</span>
+          <span className={`text-xs ${editorSurface.sectionLabelClassName}`}>
+            {t('lighting.brightness')}
+          </span>
           <span className={`text-sm font-bold ${editorSurface.sectionValueClassName}`}>
             {value}%
           </span>

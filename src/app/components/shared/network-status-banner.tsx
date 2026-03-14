@@ -1,6 +1,6 @@
 import { AlertTriangle, WifiOff } from 'lucide-react';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 
 interface NetworkStatusBannerProps {
   connected: boolean;
@@ -10,6 +10,7 @@ interface NetworkStatusBannerProps {
 
 export function NetworkStatusBanner({ connected, connecting, isOnline }: NetworkStatusBannerProps) {
   const { theme } = useTheme();
+  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
 
   if (isOnline && (connected || connecting)) {
@@ -18,10 +19,10 @@ export function NetworkStatusBanner({ connected, connecting, isOnline }: Network
 
   const isOffline = !isOnline;
   const Icon = isOffline ? WifiOff : AlertTriangle;
-  const title = isOffline ? 'You are offline' : 'Home Assistant disconnected';
+  const title = isOffline ? t('network.offlineTitle') : t('network.disconnectedTitle');
   const description = isOffline
-    ? 'The app shell is available, but live smart-home data and actions need a network connection.'
-    : 'Navet cannot reach Home Assistant right now. Cached UI is still available while it reconnects.';
+    ? t('network.offlineDescription')
+    : t('network.disconnectedDescription');
 
   return (
     <div className="fixed inset-x-0 top-0 z-[70] px-3 pt-3 md:px-6">

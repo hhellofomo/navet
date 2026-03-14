@@ -1,7 +1,7 @@
 import { X } from 'lucide-react';
 import { type CardSize, isExtraSmallCardSize } from '@/app/components/shared/card-size-selector';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import type { ThemeType } from '@/app/hooks';
+import { type ThemeType, useI18n } from '@/app/hooks';
 import type { CardTemplate, CardType } from './types';
 
 interface AddCardDialogViewProps {
@@ -35,6 +35,7 @@ export function AddCardDialogView({
   getColorValue,
   handleAdd,
 }: AddCardDialogViewProps) {
+  const { t } = useI18n();
   if (!open) return null;
 
   const surface = getThemeSurfaceTokens(theme);
@@ -58,9 +59,11 @@ export function AddCardDialogView({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/10 sticky top-0 bg-inherit z-10">
           <div>
-            <h2 className={`text-xl font-semibold ${textColor}`}>Add Card</h2>
+            <h2 className={`text-xl font-semibold ${textColor}`}>{t('dashboard.addCard.title')}</h2>
             <p className={`text-sm ${mutedColor} mt-1`}>
-              Add a new widget to {currentRoom === 'All' ? 'all rooms' : currentRoom}
+              {t('dashboard.addCard.description', {
+                room: currentRoom === 'All' ? t('dashboard.addCard.allRooms') : currentRoom,
+              })}
             </p>
           </div>
           <button
@@ -75,7 +78,9 @@ export function AddCardDialogView({
         {/* Card Templates Grid */}
         <div className="p-6 space-y-6">
           <div>
-            <h3 className={`text-sm font-medium ${textColor} mb-3`}>Choose a widget type</h3>
+            <h3 className={`text-sm font-medium ${textColor} mb-3`}>
+              {t('dashboard.addCard.chooseType')}
+            </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {cardTemplates.map((template) => (
                 <button
@@ -112,8 +117,10 @@ export function AddCardDialogView({
                       {template.icon}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className={`text-sm font-medium ${textColor} mb-0.5`}>{template.name}</h4>
-                      <p className={`text-xs ${mutedColor}`}>{template.description}</p>
+                      <h4 className={`text-sm font-medium ${textColor} mb-0.5`}>
+                        {t(template.nameKey)}
+                      </h4>
+                      <p className={`text-xs ${mutedColor}`}>{t(template.descriptionKey)}</p>
                     </div>
                   </div>
                 </button>
@@ -124,7 +131,9 @@ export function AddCardDialogView({
           {/* Size Selection */}
           {selectedType && (
             <div>
-              <h3 className={`text-sm font-medium ${textColor} mb-3`}>Choose a size</h3>
+              <h3 className={`text-sm font-medium ${textColor} mb-3`}>
+                {t('dashboard.addCard.chooseSize')}
+              </h3>
               <div className="flex gap-3">
                 {(['extra-small', 'small', 'medium', 'large'] as const).map((size) => (
                   <button
@@ -166,7 +175,9 @@ export function AddCardDialogView({
                                 : 'rgba(255, 255, 255, 0.2)',
                         }}
                       />
-                      <p className={`text-xs font-medium ${textColor} capitalize`}>{size}</p>
+                      <p className={`text-xs font-medium ${textColor} capitalize`}>
+                        {t(`dashboard.addCard.size.${size}` as const)}
+                      </p>
                     </div>
                   </button>
                 ))}
@@ -177,7 +188,9 @@ export function AddCardDialogView({
           {/* Preview */}
           {selectedTemplate && (
             <div className={`p-4 rounded-xl ${cardBg} border ${borderColor}`}>
-              <p className={`text-xs font-medium ${mutedColor} mb-2`}>PREVIEW</p>
+              <p className={`text-xs font-medium ${mutedColor} mb-2`}>
+                {t('dashboard.addCard.previewLabel')}
+              </p>
               <div className="flex items-center gap-3">
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center"
@@ -189,9 +202,13 @@ export function AddCardDialogView({
                   {selectedTemplate.icon}
                 </div>
                 <div>
-                  <h4 className={`text-sm font-medium ${textColor}`}>{selectedTemplate.name}</h4>
+                  <h4 className={`text-sm font-medium ${textColor}`}>
+                    {t(selectedTemplate.nameKey)}
+                  </h4>
                   <p className={`text-xs ${mutedColor}`}>
-                    {selectedSize.charAt(0).toUpperCase() + selectedSize.slice(1)} card
+                    {t('dashboard.addCard.previewSize', {
+                      size: t(`dashboard.addCard.size.${selectedSize}` as const),
+                    })}
                   </p>
                 </div>
               </div>
@@ -206,7 +223,7 @@ export function AddCardDialogView({
             onClick={onClose}
             className={`flex-1 px-4 py-3 rounded-xl border ${borderColor} ${textColor} text-sm font-medium ${hoverBg} transition-all`}
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             type="button"
@@ -219,7 +236,7 @@ export function AddCardDialogView({
               cursor: selectedType ? 'pointer' : 'not-allowed',
             }}
           >
-            Add Widget
+            {t('dashboard.addCard.action')}
           </button>
         </div>
       </div>

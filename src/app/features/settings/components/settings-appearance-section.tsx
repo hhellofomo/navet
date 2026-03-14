@@ -1,5 +1,6 @@
 import { Image as ImageIcon, Palette, Upload, X } from 'lucide-react';
 import { ThemeAppearancePicker } from '@/app/components/shared/theme/theme-appearance-picker';
+import { useI18n } from '@/app/hooks';
 import type { SettingsSectionController } from '../hooks/use-settings-section-controller';
 import { AmbientLightPreviewCard } from './ambient-light-preview-card';
 import { SettingsItem, SettingsSectionShell } from './settings-section-shell';
@@ -9,11 +10,14 @@ interface SettingsAppearanceSectionProps {
 }
 
 export function SettingsAppearanceSection({ controller }: SettingsAppearanceSectionProps) {
+  const { t } = useI18n();
   const {
     ambientLightBleed,
     colorOptions,
     handleRemoveWallpaper,
     handleWallpaperUpload,
+    language,
+    languageOptions,
     primaryColor,
     setPrimaryColor,
     setTheme,
@@ -27,13 +31,13 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
     <SettingsSectionShell
       id="appearance"
       icon={Palette}
-      title="Appearance"
-      description="Visual decisions that define the overall feel of the dashboard."
+      title={t('settings.appearance.sectionTitle')}
+      description={t('settings.appearance.sectionDescription')}
       styles={styles}
     >
       <SettingsItem
-        title="Theme and accent"
-        description="Choose the overall visual tone and key accent using the same picker shown during onboarding."
+        title={t('settings.appearance.themeAccent.title')}
+        description={t('settings.appearance.themeAccent.description')}
         styles={styles}
       >
         <ThemeAppearancePicker
@@ -47,8 +51,43 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
       </SettingsItem>
 
       <SettingsItem
-        title="Light card ambience"
-        description="Choose whether active light cards spill ambient color into the dashboard or stay contained inside the card."
+        title={t('settings.appearance.language.title')}
+        description={t('settings.appearance.language.description')}
+        styles={styles}
+      >
+        <div className="flex flex-wrap gap-3">
+          {languageOptions.map((option) => {
+            const isActive = language === option.value;
+            return (
+              <button
+                type="button"
+                key={option.value}
+                onClick={() => controller.updateSettings({ language: option.value })}
+                style={
+                  isActive
+                    ? {
+                        backgroundColor: styles.accentColor,
+                        color: '#ffffff',
+                      }
+                    : undefined
+                }
+                className={`rounded-full border px-5 py-3 text-sm font-medium transition-all ${styles.borderColor} ${
+                  isActive
+                    ? 'shadow-sm'
+                    : `${styles.softBg} ${styles.chipTextColor} ${styles.hoverBg}`
+                }`}
+                aria-pressed={isActive}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+      </SettingsItem>
+
+      <SettingsItem
+        title={t('settings.appearance.ambience.title')}
+        description={t('settings.appearance.ambience.description')}
         styles={styles}
       >
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
@@ -56,8 +95,8 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
             className={`inline-flex w-fit rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
           >
             {[
-              { value: true, label: 'Ambient bleed' },
-              { value: false, label: 'Contained' },
+              { value: true, label: t('settings.appearance.ambience.ambientBleed') },
+              { value: false, label: t('settings.appearance.ambience.contained') },
             ].map((option) => {
               const isActive = ambientLightBleed === option.value;
               return (
@@ -95,8 +134,8 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
       </SettingsItem>
 
       <SettingsItem
-        title="Wallpaper"
-        description="Add a background image that blends with the active accent and theme."
+        title={t('settings.appearance.wallpaper.title')}
+        description={t('settings.appearance.wallpaper.description')}
         styles={styles}
       >
         {wallpaper ? (
@@ -105,7 +144,11 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
               className="relative h-36 overflow-hidden rounded-[24px] border"
               style={{ borderColor: `${styles.accentColor}40` }}
             >
-              <img src={wallpaper} alt="Wallpaper preview" className="h-full w-full object-cover" />
+              <img
+                src={wallpaper}
+                alt={t('settings.appearance.wallpaper.previewAlt')}
+                className="h-full w-full object-cover"
+              />
               <div
                 className="absolute inset-0"
                 style={{
@@ -128,8 +171,12 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
             >
               <Upload className={`h-4 w-4 ${styles.mutedColor}`} />
               <div className="text-center">
-                <p className={`text-sm font-medium ${styles.textColor}`}>Replace wallpaper</p>
-                <p className={`text-[11px] ${styles.subtleColor}`}>PNG, JPG up to 5MB</p>
+                <p className={`text-sm font-medium ${styles.textColor}`}>
+                  {t('settings.appearance.wallpaper.replace')}
+                </p>
+                <p className={`text-[11px] ${styles.subtleColor}`}>
+                  {t('settings.appearance.wallpaper.fileHint')}
+                </p>
               </div>
               <input
                 type="file"
@@ -144,8 +191,12 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
             className={`flex h-36 max-w-2xl cursor-pointer flex-col items-center justify-center rounded-[24px] border-2 border-dashed ${styles.lineColor} text-center transition-colors ${styles.hoverBg}`}
           >
             <ImageIcon className={`mb-3 h-9 w-9 ${styles.mutedColor}`} />
-            <span className={`text-sm font-medium ${styles.textColor}`}>Upload wallpaper</span>
-            <span className={`mt-1 text-[11px] ${styles.subtleColor}`}>PNG, JPG up to 5MB</span>
+            <span className={`text-sm font-medium ${styles.textColor}`}>
+              {t('settings.appearance.wallpaper.upload')}
+            </span>
+            <span className={`mt-1 text-[11px] ${styles.subtleColor}`}>
+              {t('settings.appearance.wallpaper.fileHint')}
+            </span>
             <input
               type="file"
               accept="image/*"

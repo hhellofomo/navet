@@ -1,12 +1,14 @@
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from 'lucide-react';
 import type * as React from 'react';
+import { useI18n } from '@/app/hooks';
 import { type Button, buttonVariants } from './button';
 import { cn } from './utils';
 
 function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
+  const { t } = useI18n();
   return (
     <nav
-      aria-label="pagination"
+      aria-label={t('pagination.label')}
       data-slot="pagination"
       className={cn('mx-auto flex w-full justify-center', className)}
       {...props}
@@ -52,34 +54,37 @@ function PaginationLink({ className, isActive, size = 'icon', ...props }: Pagina
 }
 
 function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
+  const { t } = useI18n();
   return (
     <PaginationLink
-      aria-label="Go to previous page"
+      aria-label={t('pagination.previousPage')}
       size="default"
       className={cn('gap-1 px-2.5 sm:pl-2.5', className)}
       {...props}
     >
       <ChevronLeftIcon />
-      <span className="hidden sm:block">Previous</span>
+      <span className="hidden sm:block">{t('pagination.previous')}</span>
     </PaginationLink>
   );
 }
 
 function PaginationNext({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
+  const { t } = useI18n();
   return (
     <PaginationLink
-      aria-label="Go to next page"
+      aria-label={t('pagination.nextPage')}
       size="default"
       className={cn('gap-1 px-2.5 sm:pr-2.5', className)}
       {...props}
     >
-      <span className="hidden sm:block">Next</span>
+      <span className="hidden sm:block">{t('pagination.next')}</span>
       <ChevronRightIcon />
     </PaginationLink>
   );
 }
 
 function PaginationEllipsis({ className, ...props }: React.ComponentProps<'span'>) {
+  const { t } = useI18n();
   return (
     <span
       aria-hidden
@@ -88,7 +93,7 @@ function PaginationEllipsis({ className, ...props }: React.ComponentProps<'span'
       {...props}
     >
       <MoreHorizontalIcon className="size-4" />
-      <span className="sr-only">More pages</span>
+      <span className="sr-only">{t('pagination.morePages')}</span>
     </span>
   );
 }

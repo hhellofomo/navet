@@ -1,8 +1,9 @@
 import { MapPin } from 'lucide-react';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import { BatteryIndicator } from './battery-indicator';
-import { getVacuumStatusColorClass, getVacuumStatusText, type VacuumStatus } from './vacuum-utils';
+import { getVacuumStatusColorClass, type VacuumStatus } from './vacuum-utils';
 
 interface VacuumStatusDisplayProps {
   currentStatus: VacuumStatus;
@@ -25,13 +26,24 @@ export function VacuumStatusDisplay({
   isSmall,
   isMedium = false,
 }: VacuumStatusDisplayProps) {
+  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const textPrimary = surface.textPrimary;
   const textSecondary = surface.textSubtle;
+  const statusText =
+    currentStatus === 'cleaning'
+      ? t('vacuum.status.cleaning')
+      : currentStatus === 'returning'
+        ? t('vacuum.status.returning')
+        : currentStatus === 'docked'
+          ? t('vacuum.status.docked')
+          : currentStatus === 'paused'
+            ? t('vacuum.status.paused')
+            : t('vacuum.status.idle');
   const statusRow = (
     <div className="flex items-end justify-between">
       <div className={`font-medium leading-none ${getVacuumStatusColorClass(currentStatus)}`}>
-        {getVacuumStatusText(currentStatus)}
+        {statusText}
       </div>
       <div className={`flex items-center gap-1 text-xs ${textSecondary}`}>
         <MapPin className="w-3 h-3" />
@@ -57,11 +69,11 @@ export function VacuumStatusDisplay({
           {statusRow}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <div className={`text-xs ${textSecondary}`}>Cleaned Area</div>
+              <div className={`text-xs ${textSecondary}`}>{t('vacuum.cleanedArea')}</div>
               <div className={`font-medium ${textPrimary}`}>{cleanedArea}</div>
             </div>
             <div>
-              <div className={`text-xs ${textSecondary}`}>Cleaning Time</div>
+              <div className={`text-xs ${textSecondary}`}>{t('vacuum.cleaningTime')}</div>
               <div className={`font-medium ${textPrimary}`}>{cleaningTime}</div>
             </div>
           </div>

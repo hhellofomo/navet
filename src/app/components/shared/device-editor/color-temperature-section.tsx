@@ -1,7 +1,7 @@
 import * as Slider from '@radix-ui/react-slider';
 import { memo } from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { getDeviceEditorSurfaceTokens } from './device-editor-surface-tokens';
 
 interface ColorTemperature {
@@ -30,6 +30,7 @@ export const ColorTemperatureSection = memo(function ColorTemperatureSection({
   onTempCommit,
 }: ColorTemperatureSectionProps) {
   const { primaryColor } = useTheme();
+  const { t } = useI18n();
   const activeColor = getThemeColorValue(primaryColor);
   const editorSurface = getDeviceEditorSurfaceTokens(isOn);
 
@@ -39,7 +40,7 @@ export const ColorTemperatureSection = memo(function ColorTemperatureSection({
         <span
           className={`text-sm font-medium transition-colors duration-500 ${editorSurface.sectionLabelClassName}`}
         >
-          Color Temperature
+          {t('lighting.colorTemperature')}
         </span>
         <span
           className={`text-sm font-semibold transition-colors duration-500 ${editorSurface.sectionValueClassName}`}

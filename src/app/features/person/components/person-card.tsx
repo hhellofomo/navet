@@ -5,7 +5,7 @@ import {
   CardSizeSelector,
   isCompactCardSize,
 } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { getPersonCardSurfaceTokens } from './person-card-surface-tokens';
 
 interface PersonCardProps {
@@ -26,6 +26,7 @@ export const PersonCard = memo(function PersonCard({
   isEditMode,
 }: PersonCardProps) {
   const cardId = `person-${name.toLowerCase().replace(/ /g, '-')}`;
+  const { t } = useI18n();
   const { theme, colors } = useTheme();
 
   // Size-specific styling
@@ -61,7 +62,9 @@ export const PersonCard = memo(function PersonCard({
             >
               {name}
             </h3>
-            <p className={`mt-0.5 truncate text-[10px] ${surface.typeLabelClassName}`}>Person</p>
+            <p className={`mt-0.5 truncate text-[10px] ${surface.typeLabelClassName}`}>
+              {t('deviceType.person')}
+            </p>
             {!isSmall && <p className={`text-xs ${surface.locationClassName}`}>{location}</p>}
           </div>
         </div>
@@ -85,13 +88,15 @@ export const PersonCard = memo(function PersonCard({
                 <>
                   <Home className={`h-3 w-3 ${surface.homeIconClassName}`} />
                   <span className={`text-xs font-medium ${surface.statusLabelClassName}`}>
-                    Home
+                    {t('person.home')}
                   </span>
                 </>
               ) : (
                 <>
                   <MapPin className={`h-3 w-3 ${surface.awayIconClassName}`} />
-                  <span className={`text-xs ${surface.statusLabelClassName}`}>Away</span>
+                  <span className={`text-xs ${surface.statusLabelClassName}`}>
+                    {t('person.away')}
+                  </span>
                 </>
               )}
             </div>

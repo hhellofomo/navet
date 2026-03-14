@@ -1,0 +1,15 @@
+import { deMessages } from './de';
+import { enMessages } from './en';
+import { esMessages } from './es';
+import { frMessages } from './fr';
+import { svMessages } from './sv';
+
+export type TranslationKey = keyof typeof enMessages;
+
+export const MESSAGES = {
+  en: enMessages,
+  sv: svMessages,
+  de: deMessages,
+  fr: frMessages,
+  es: esMessages,
+} as const satisfies Record<string, Record<TranslationKey, string>>;

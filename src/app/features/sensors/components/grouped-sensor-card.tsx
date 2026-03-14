@@ -8,7 +8,7 @@ import {
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { SensorGroupSettingsDialog } from './sensor-group-settings';
 import {
   darkColorMap,
@@ -49,6 +49,7 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
     visibleSensors,
   } = useSensorGroup({ initialSensors: sensors });
   const { theme } = useTheme();
+  const { t } = useI18n();
 
   // Size-specific styling with intelligent layout adaptation
   const isSmall = isCompactCardSize(size);
@@ -87,7 +88,7 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
         <div className="relative h-full flex flex-col">
           <EntityCardHeader
             title={name}
-            subtitle="Sensor Group"
+            subtitle={t('sensors.group')}
             size={size}
             leading={
               <EntityCardHeaderIcon IconComponent={PrimaryIcon} isActive={true} size={size} />

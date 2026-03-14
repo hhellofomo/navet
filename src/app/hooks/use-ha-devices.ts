@@ -1,5 +1,6 @@
 import type { Connection, HassEntity } from 'home-assistant-js-websocket';
 import { useEffect, useMemo, useState } from 'react';
+import { useI18n } from '../i18n';
 import type {
   CalendarDevice,
   ClimateDevice,
@@ -90,6 +91,7 @@ async function fetchCalendarEvents(
  */
 export const useHADevices = (): DeviceCollection => {
   const { areas, connection, deviceRegistry, entities, entityRegistry } = useHomeAssistant();
+  const { locale, t } = useI18n();
   const primaryWeatherEntityId = useMemo(() => {
     if (!entities) {
       return null;
@@ -362,10 +364,10 @@ export const useHADevices = (): DeviceCollection => {
         return value;
       }
 
-      return date.toLocaleTimeString([], {
+      return new Intl.DateTimeFormat(locale, {
         hour: 'numeric',
         minute: '2-digit',
-      });
+      }).format(date);
     };
 
     const formatDaylight = (sunrise: unknown, sunset: unknown): string => {
@@ -421,10 +423,10 @@ export const useHADevices = (): DeviceCollection => {
         return '--';
       }
 
-      return date.toLocaleTimeString([], {
+      return new Intl.DateTimeFormat(locale, {
         hour: 'numeric',
         minute: '2-digit',
-      });
+      }).format(date);
     };
 
     const inferCalendarEventType = (title: string, location?: string) => {
@@ -549,6 +551,16 @@ export const useHADevices = (): DeviceCollection => {
 
     const formatEntityType = (deviceClass: unknown, fallback: string): string => {
       if (typeof deviceClass === 'string' && deviceClass.trim()) {
+        const normalized = deviceClass.trim().toLowerCase();
+
+        if (normalized === 'outlet') {
+          return t('lighting.type.outlet');
+        }
+
+        if (normalized === 'switch') {
+          return t('lighting.type.switch');
+        }
+
         return deviceClass
           .trim()
           .replace(/_/g, ' ')
@@ -728,7 +740,10 @@ export const useHADevices = (): DeviceCollection => {
             room,
             size: 'small',
             state: entity.state === 'on',
-            entityType: formatEntityType(entity.attributes?.device_class, 'Switch'),
+            entityType: formatEntityType(
+              entity.attributes?.device_class,
+              t('lighting.type.switch')
+            ),
             power:
               parseNumberish(entity.attributes?.power) ??
               parseNumberish(entity.attributes?.current_power_w) ??
@@ -786,7 +801,7 @@ export const useHADevices = (): DeviceCollection => {
             (typeof entity.attributes?.source === 'string' && entity.attributes.source) ||
             (typeof entity.attributes?.media_album_name === 'string' &&
               entity.attributes.media_album_name) ||
-            'Ready to play';
+            t('media.readyToPlay');
           const volumeLevel = parseNumberish(entity.attributes?.volume_level);
           const mediaPosition = parseNumberish(entity.attributes?.media_position);
           const mediaDuration = parseNumberish(entity.attributes?.media_duration);
@@ -941,7 +956,7 @@ export const useHADevices = (): DeviceCollection => {
                     ? eventRecord.summary
                     : typeof eventRecord.message === 'string'
                       ? eventRecord.message
-                      : `Event ${index + 1}`;
+                      : t('calendar.fallbackEvent', { count: index + 1 });
               const location =
                 typeof eventRecord.location === 'string' ? eventRecord.location : undefined;
               const description =
@@ -1023,11 +1038,11 @@ export const useHADevices = (): DeviceCollection => {
               const dayLabel =
                 forecastDate && !Number.isNaN(forecastDate.getTime())
                   ? index === 0
-                    ? 'Today'
-                    : forecastDate.toLocaleDateString([], { weekday: 'short' })
+                    ? t('weather.today')
+                    : new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(forecastDate)
                   : index === 0
-                    ? 'Today'
-                    : `Day ${index + 1}`;
+                    ? t('weather.today')
+                    : t('weather.dayFallback', { day: index + 1 });
 
               return {
                 day: dayLabel,
@@ -1079,11 +1094,13 @@ export const useHADevices = (): DeviceCollection => {
               parseNumberish(
                 (forecastSource[1] as Record<string, unknown>).precipitation_probability
               ) !== null
-                ? `${Math.round(
-                    parseNumberish(
-                      (forecastSource[1] as Record<string, unknown>).precipitation_probability
-                    ) ?? 0
-                  )}% chance of rain tomorrow`
+                ? t('weather.rainTomorrow', {
+                    chance: Math.round(
+                      parseNumberish(
+                        (forecastSource[1] as Record<string, unknown>).precipitation_probability
+                      ) ?? 0
+                    ),
+                  })
                 : '',
             highTemp,
             lowTemp,
@@ -1117,7 +1134,9 @@ export const useHADevices = (): DeviceCollection => {
     deviceRegistry,
     entities,
     entityRegistry,
+    locale,
     primaryWeatherEntityId,
+    t,
     weatherForecasts,
   ]);
 };

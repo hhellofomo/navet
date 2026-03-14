@@ -7,6 +7,7 @@ import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { CardWrapper } from '@/app/components/ui/card-wrapper';
+import { useI18n } from '@/app/hooks';
 import { HVACSettingsDialog } from '../hvac-settings-dialog';
 import type { HVACCardProps } from './hvac-card.types';
 import { HVACGauge } from './hvac-gauge';
@@ -27,6 +28,7 @@ export const HVACCard = memo(function HVACCard({
   onSizeChange,
   isEditMode,
 }: HVACCardProps) {
+  const { t } = useI18n();
   const controller = useHVACCardController({
     name,
     initialTemp,
@@ -40,8 +42,8 @@ export const HVACCard = memo(function HVACCard({
   const stateSurface = getCardStateSurfaceTokens(controller.theme, controller.isOn);
   const targetTemperatureLabel =
     controller.targetTemp < controller.currentTemp
-      ? `Cooling down to ${controller.targetTemp}°C`
-      : `Heat to ${controller.targetTemp}°C`;
+      ? t('climate.coolingDownTo', { temp: controller.targetTemp })
+      : t('climate.heatingTo', { temp: controller.targetTemp });
   const HeaderIcon =
     controller.visualMode === 'heat' ? Flame : controller.visualMode === 'cool' ? Snowflake : Wind;
 
@@ -77,7 +79,7 @@ export const HVACCard = memo(function HVACCard({
         <div className="relative z-[2] h-full flex flex-col">
           <EntityCardHeader
             title={name}
-            subtitle="HVAC"
+            subtitle={t('climate.subtitle')}
             size={size}
             titleClassName={stateSurface.primaryTextClassName}
             subtitleClassName={stateSurface.mutedTextClassName}
@@ -204,7 +206,9 @@ export const HVACCard = memo(function HVACCard({
                     size="large"
                     leftContent={
                       <div className="flex items-center gap-3">
-                        <div className={`text-xs ${stateSurface.secondaryTextClassName}`}>Mode</div>
+                        <div className={`text-xs ${stateSurface.secondaryTextClassName}`}>
+                          {t('climate.mode')}
+                        </div>
                         <HVACModeControls
                           mode={controller.visualMode}
                           isOn={controller.isOn}
