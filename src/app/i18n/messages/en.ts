@@ -32,6 +32,8 @@ export const enMessages = {
     'Choose whether active light cards spill ambient color into the dashboard or stay contained inside the card.',
   'settings.appearance.ambience.ambientBleed': 'Ambient bleed',
   'settings.appearance.ambience.contained': 'Contained',
+  'settings.appearance.ambience.disabledInLowPower':
+    'Unavailable while Low-power mode is on. Light cards use Contained mode instead.',
   'settings.appearance.wallpaper.title': 'Wallpaper',
   'settings.appearance.wallpaper.description':
     'Add a background image that blends with the active accent and theme.',
@@ -74,6 +76,9 @@ export const enMessages = {
   'settings.system.animations.title': 'Disable animations',
   'settings.system.animations.description':
     'Useful for slower devices like Raspberry Pis. Turns off transitions and animated effects across the app.',
+  'settings.system.lowPowerMode.title': 'Low-power mode',
+  'settings.system.lowPowerMode.description':
+    'Disables animations and reduces blur, heavy shadows, wallpaper processing, and ambient glow for smoother rendering on slower hardware.',
   'settings.system.connection.title': 'Connection',
   'settings.system.connection.description':
     'Review the current server target, open Home Assistant, or reset the saved connection.',

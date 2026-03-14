@@ -1,5 +1,4 @@
-import { useEffect, useRef } from 'react';
-import { useTheme } from '@/app/hooks';
+import { useClickOutside, useTheme } from '@/app/hooks';
 import { NotificationEmptyState } from './notification-empty-state';
 import { NotificationHeader } from './notification-header';
 import { NotificationItem } from './notification-item';
@@ -13,7 +12,7 @@ interface NotificationPanelProps {
 }
 
 export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
-  const panelRef = useRef<HTMLDivElement>(null);
+  const panelRef = useClickOutside<HTMLDivElement>(onClose, isOpen);
   const { theme, primaryColor } = useTheme();
   const surface = getNotificationSurfaceTokens(theme);
   const {
@@ -24,19 +23,6 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
     deleteNotification,
     clearAll,
   } = useNotifications();
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
-        onClose();
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

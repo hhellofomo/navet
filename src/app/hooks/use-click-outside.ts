@@ -11,22 +11,27 @@ import { useEffect, useRef } from 'react';
  * return <div ref={ref}>...</div>
  */
 export function useClickOutside<T extends HTMLElement = HTMLElement>(
-  callback: () => void
+  callback: () => void,
+  enabled = true
 ): React.RefObject<T | null> {
   const ref = useRef<T>(null);
 
   useEffect(() => {
-    const handleClick = (event: MouseEvent) => {
+    if (!enabled) {
+      return;
+    }
+
+    const handleClick = (event: PointerEvent) => {
       if (ref.current && !ref.current.contains(event.target as Node)) {
         callback();
       }
     };
 
-    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('pointerdown', handleClick);
     return () => {
-      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('pointerdown', handleClick);
     };
-  }, [callback]);
+  }, [callback, enabled]);
 
   return ref;
 }

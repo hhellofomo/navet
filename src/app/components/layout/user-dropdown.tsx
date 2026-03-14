@@ -1,11 +1,11 @@
 import { LogOut, Shield } from 'lucide-react';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { getThemeDropdownSurfaceClasses } from '@/app/components/shared/theme/dropdown-surface-tokens';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar';
 import { useAuth } from '@/app/contexts/auth-context';
-import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
+import { useClickOutside, useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 
 interface UserDropdownProps {
   avatarUrl?: string | null;
@@ -13,26 +13,12 @@ interface UserDropdownProps {
 
 export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useClickOutside<HTMLDivElement>(() => setIsOpen(false), isOpen);
   const { theme, primaryColor } = useTheme();
   const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const { user } = useHomeAssistant();
   const { logout } = useAuth();
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [isOpen]);
 
   const handleLogout = () => {
     if (confirm(t('settings.feedback.logoutConfirm'))) {

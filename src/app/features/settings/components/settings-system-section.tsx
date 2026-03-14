@@ -9,7 +9,9 @@ interface SettingsSystemSectionProps {
 
 export function SettingsSystemSection({ controller }: SettingsSystemSectionProps) {
   const { t } = useI18n();
-  const { config, disableAnimations, handleResetConnection, styles, updateSettings } = controller;
+  const { config, disableAnimations, handleResetConnection, lowPowerMode, styles, updateSettings } =
+    controller;
+  const reducedEffectsEnabled = disableAnimations || lowPowerMode;
 
   return (
     <SettingsSectionShell
@@ -20,8 +22,8 @@ export function SettingsSystemSection({ controller }: SettingsSystemSectionProps
       styles={styles}
     >
       <SettingsItem
-        title={t('settings.system.animations.title')}
-        description={t('settings.system.animations.description')}
+        title={t('settings.system.lowPowerMode.title')}
+        description={t('settings.system.lowPowerMode.description')}
         styles={styles}
       >
         <div
@@ -31,12 +33,17 @@ export function SettingsSystemSection({ controller }: SettingsSystemSectionProps
             { value: false, label: t('common.off') },
             { value: true, label: t('common.on') },
           ].map((option) => {
-            const isActive = disableAnimations === option.value;
+            const isActive = reducedEffectsEnabled === option.value;
             return (
               <button
                 type="button"
                 key={option.label}
-                onClick={() => updateSettings({ disableAnimations: option.value })}
+                onClick={() =>
+                  updateSettings({
+                    disableAnimations: option.value,
+                    lowPowerMode: option.value,
+                  })
+                }
                 style={
                   isActive
                     ? {

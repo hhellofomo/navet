@@ -47,6 +47,7 @@ interface UserSettings {
   defaultView: 'all' | string;
   compactMode: boolean;
   disableAnimations: boolean;
+  lowPowerMode: boolean;
   entityInteractionMode: EntityInteractionMode;
   ambientLightBleed: boolean;
 }

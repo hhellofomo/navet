@@ -2,7 +2,7 @@ import { Clipboard, FlaskConical, Home, Lightbulb, Lock, Settings, Tv, Video } f
 import { memo, useEffect, useRef, useState } from 'react';
 import { InteractivePill } from '@/app/components/shared/interactive-pill';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { type Section, useI18n, useNavigation, useTheme } from '@/app/hooks';
+import { type Section, useI18n, useMediaQuery, useNavigation, useTheme } from '@/app/hooks';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 
 export const Sidebar = memo(function Sidebar() {
@@ -14,8 +14,14 @@ export const Sidebar = memo(function Sidebar() {
   const inactiveColor = `${surface.textMuted} ${surface.hoverBg}`;
   const [isMobileNavHidden, setIsMobileNavHidden] = useState(false);
   const lastScrollYRef = useRef(0);
+  const isMobile = useMediaQuery('(max-width: 767px)');
 
   useEffect(() => {
+    if (!isMobile) {
+      setIsMobileNavHidden(false);
+      return;
+    }
+
     const showThreshold = 96;
     const hideThreshold = 120;
 
@@ -36,7 +42,7 @@ export const Sidebar = memo(function Sidebar() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isMobile]);
 
   const menuItems = [
     {
@@ -153,7 +159,7 @@ export const Sidebar = memo(function Sidebar() {
           ) : null}
 
           <div
-            className={`relative flex justify-around items-center px-2 py-2 ${isGlass ? 'bg-slate-950/18' : surface.shellPanel}`}
+            className={`relative flex items-center justify-around px-1.5 py-1.5 ${isGlass ? 'bg-slate-950/18' : surface.shellPanel}`}
           >
             {[
               menuItems[0],
@@ -166,13 +172,13 @@ export const Sidebar = memo(function Sidebar() {
               <InteractivePill
                 key={index}
                 onClick={item.onClick}
+                aria-label={item.label}
                 active={activeSection === item.section}
-                className={`flex min-w-0 flex-1 basis-0 flex-col items-center gap-1 rounded-[20px] px-2 py-2 transition-colors ${
+                className={`flex h-11 min-w-0 flex-1 basis-0 items-center justify-center rounded-[28px] px-1.5 py-1.5 transition-colors ${
                   activeSection === item.section ? '' : inactiveColor
                 }`}
               >
                 <item.icon className="h-5 w-5 shrink-0" />
-                <span className="truncate text-[10px] font-medium">{item.label}</span>
               </InteractivePill>
             ))}
           </div>

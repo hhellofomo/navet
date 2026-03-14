@@ -15,6 +15,7 @@ export interface UserSettings {
   defaultView: 'all' | string;
   compactMode: boolean;
   disableAnimations: boolean;
+  lowPowerMode: boolean;
   entityInteractionMode: EntityInteractionMode;
   ambientLightBleed: boolean;
 }
@@ -35,6 +36,7 @@ export const defaultSettings: UserSettings = {
   defaultView: 'all',
   compactMode: false,
   disableAnimations: false,
+  lowPowerMode: false,
   entityInteractionMode: 'toggle-first',
   ambientLightBleed: true,
 };
