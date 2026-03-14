@@ -358,6 +358,8 @@ Beautiful placeholder screens for sections without data.
 - Compact icon-only bottom navigation bar with 6 sections including Mock and Settings
 - Grid: 2 columns
 - Settings: Full width with mobile padding
+- Dashboard header compacts greeting, search, notifications, and avatar into one top row
+- Room navigation spacing is reduced so content starts higher on the screen
 
 ---
 
@@ -369,7 +371,7 @@ Beautiful placeholder screens for sections without data.
 3. **Dashboard** → See current entities and rooms
 4. **Explore Sections** → Navigate to different sections via sidebar/bottom nav
 5. **Customize Appearance** → Go to Settings → adjust theme, accent color, visual quality, and light-card ambience
-6. **Edit Cards** → Enter edit mode from Customize or a dashboard long-press to add/remove entities, reorder cards, and resize cards
+6. **Edit Cards** → Enter edit mode from Customize to add/remove entities, reorder cards, and resize cards
 
 ### Settings Customization Flow
 1. Navigate to Settings section

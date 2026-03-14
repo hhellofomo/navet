@@ -46,10 +46,10 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 - **Configurable Card Interactions** - Choose whether card tap toggles devices or opens controls
 
 ### 🛠️ Functionality
-- **Edit Mode** - Drag-and-drop card reordering and resizing, entered from **Customize** or by pressing and holding on the dashboard
+- **Edit Mode** - Drag-and-drop card reordering and resizing, entered from **Customize**
 - **Custom Widgets** - Add RSS Feed, Photo Frame, and Quick Note widgets
 - **Entity Visibility Control** - Start with all entities, a blank board, or import a saved config, then add/remove entities as needed
-- **Search & Filter** - Real-time search filters dashboard view, including Home Assistant-style entity id queries such as `light.`, `sensor.`, and full ids
+- **Search & Filter** - Real-time search filters dashboard view, including Home Assistant-style entity id queries such as `light.`, `sensor.`, and full ids, with compact mobile search access from the header
 - **All View Modes** - Switch the `All` room between custom, room, type, or flat grouping
 - **Live Weather Entity Card** - Home Assistant weather entities now render as the dashboard weather card with forecast and solar data from Home Assistant
 - **Calendar Entities** - Home Assistant calendar entities now render through the live calendar card with per-card source selection, week/month views, and event details
@@ -160,7 +160,7 @@ pnpm build
 
 1. **Provide Home Assistant credentials** via `.env`, Docker runtime config, or the in-app login screen
 2. **Connect System** - Ensure your Home Assistant instance is accessible
-3. **Customize Layout** - Enter Edit Mode from **Customize** or by pressing and holding on the dashboard to arrange rooms and cards
+3. **Customize Layout** - Enter Edit Mode from **Customize** to arrange rooms and cards
 4. **Choose Theme** - Select your preferred color scheme and theme mode
 5. **Optional for slower hardware** - Lower visual quality in Settings -> Appearance
 
@@ -168,7 +168,6 @@ pnpm build
 
 #### Edit Mode
 - Click **Customize**
-- Or press and hold on the dashboard background or a card to enter edit mode directly
 - The top action row uses **Done Editing** plus **Add** and **View** dropdowns
 - **Add widgets** from the **Add** dropdown
 - Use **Add Entity** to bring entities onto the dashboard
@@ -180,7 +179,8 @@ pnpm build
 - **Save changes** when done
 
 #### Search
-- Type in the **search bar** to filter devices
+- On desktop, type in the **search bar** to filter devices
+- On mobile, tap the **search icon** in the header to open the compact search field
 - Search supports Home Assistant-style entity ids and domains
 - Type `light.` to show light entities, `sensor.` to show sensor entities, or a full id such as `light.dining_table_lamp` to target one entity directly
 - View filters to show only matching entities
@@ -212,6 +212,7 @@ pnpm build
 - In **All**, use the **View** dropdown to switch between **Custom**, **Room**, **Type**, and **No Grouping**
 - Device counts shown for each room
 - The selected dashboard section and room both persist across refresh
+- On mobile, the header and room navigation are intentionally compacted so the first card rows appear sooner
 
 #### Calendar Cards
 - Home Assistant `calendar.*` entities can be added directly to the dashboard

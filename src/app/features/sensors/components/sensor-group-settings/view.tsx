@@ -231,7 +231,7 @@ export function SensorGroupSettingsView({
                       }
                     }}
                     placeholder={t('sensors.groupSettings.searchPlaceholder')}
-                    className={`w-full ${surface.inputBg} border ${surface.border} rounded-2xl pl-11 pr-4 py-3 text-sm ${surface.textPrimary} ${surface.placeholder} focus:outline-none focus:ring-2 focus:ring-white/20 transition-all`}
+                    className={`w-full ${surface.inputBg} border ${surface.border} rounded-[22px] pl-11 pr-4 py-3 text-sm ${surface.textPrimary} ${surface.placeholder} focus:outline-none focus:ring-2 focus:ring-white/20 transition-all`}
                     disabled={selectedSensors.length >= maxSensors}
                     autoComplete="off"
                   />

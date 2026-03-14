@@ -36,7 +36,7 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
   const textColor = surface.textPrimary;
 
   return (
-    <div className={`min-h-screen ${bgColor} ${textColor} relative`}>
+    <div className={`relative min-h-screen overflow-x-clip ${bgColor} ${textColor}`}>
       {/* Background Wallpaper with Color Blend */}
       {wallpaper && !isContrast && (
         <div className="fixed inset-0 z-0">
@@ -109,10 +109,10 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
       )}
 
       {/* Content */}
-      <div className="relative z-10">
+      <div className="relative z-10 overflow-x-clip">
         <Sidebar />
 
-        <div className="safe-area-pt-8 md:ml-16 flex flex-col gap-6 md:gap-8 p-3 pb-20 md:p-6 md:pb-6 lg:p-8 lg:pb-8">
+        <div className="safe-area-pt-5 flex flex-col gap-4 overflow-x-clip p-3 pb-20 md:ml-16 md:gap-8 md:p-6 md:pb-6 lg:p-8 lg:pb-8">
           <Header />
           {children}
         </div>

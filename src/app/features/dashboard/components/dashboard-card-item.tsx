@@ -69,8 +69,10 @@ export const DashboardCardItem = memo(function DashboardCardItem({
       {isEditMode ? (
         <DashboardResizeTrigger
           cardId={id}
-          cardSize={editControlSize}
+          cardSize={size}
+          triggerSize={editControlSize}
           allowedSizes={allowedSizes}
+          cardType={device?.type ?? (card ? 'widget' : undefined)}
         />
       ) : null}
       {device

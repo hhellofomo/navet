@@ -220,7 +220,7 @@ export function AddEntityDialog({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={t('dashboard.addEntity.searchPlaceholder')}
-              className={`w-full rounded-xl border ${borderColor} ${inputBg} pl-10 pr-4 py-3 text-sm ${textColor} focus:outline-none`}
+              className={`w-full rounded-[22px] border ${borderColor} ${inputBg} pl-10 pr-4 py-3 text-sm ${textColor} focus:outline-none`}
               style={{ caretColor: accentColor }}
             />
           </div>

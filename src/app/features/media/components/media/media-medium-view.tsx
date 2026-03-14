@@ -59,6 +59,7 @@ export function MediaMediumView({
   const displayRemaining = formatMediaTime(Math.max(0, durationSeconds - elapsedSeconds));
   const controlSizes = getCardActionControlSizes('small');
   const primaryControlSizes = getCardActionControlSizes('medium');
+  const subduedFallback = !artwork;
   const neutralButtonStyle = {
     backgroundColor: withAlpha(palette.darkMuted, 0.18),
     borderColor: withAlpha(palette.highlight, 0.14),
@@ -126,10 +127,12 @@ export function MediaMediumView({
             </div>
 
             <div className="relative">
-              <div
-                className="pointer-events-none absolute inset-[-26%] rounded-full blur-2xl"
-                style={playGlowStyle}
-              />
+              {!subduedFallback && (
+                <div
+                  className="pointer-events-none absolute inset-[-26%] rounded-full blur-2xl"
+                  style={playGlowStyle}
+                />
+              )}
               <RoundControlButton
                 theme={theme}
                 size="medium"
@@ -139,9 +142,11 @@ export function MediaMediumView({
                   event.stopPropagation();
                   onTogglePlay();
                 }}
-                className="h-13 w-13 border backdrop-blur-xl hover:scale-[1.03] active:scale-95"
-                iconClassName="!text-white"
-                style={playButtonStyle}
+                className={`h-13 w-13 hover:scale-[1.03] active:scale-95 ${
+                  subduedFallback ? '' : 'border backdrop-blur-xl'
+                }`}
+                iconClassName={subduedFallback ? undefined : '!text-white'}
+                style={subduedFallback ? undefined : playButtonStyle}
               >
                 {isPlaying ? (
                   <Pause className={primaryControlSizes.icon} fill="currentColor" />
@@ -157,16 +162,20 @@ export function MediaMediumView({
               theme={theme}
               size="small"
               variant="neutral"
-              aria-label={t('media.previousTrack')}
+              aria-label={isMuted ? t('media.unmuteVolume') : t('media.muteVolume')}
               onClick={(event) => {
                 event.stopPropagation();
-                onPrevious();
+                onToggleMute();
               }}
               className="border backdrop-blur-xl transition-colors"
               iconClassName="!text-white/90"
               style={neutralButtonStyle}
             >
-              <SkipBack className={controlSizes.icon} />
+              {isMuted ? (
+                <VolumeX className={controlSizes.icon} />
+              ) : (
+                <Volume2 className={controlSizes.icon} />
+              )}
             </RoundControlButton>
 
             <div className="relative flex-1">
@@ -196,6 +205,22 @@ export function MediaMediumView({
               theme={theme}
               size="small"
               variant="neutral"
+              aria-label={t('media.previousTrack')}
+              onClick={(event) => {
+                event.stopPropagation();
+                onPrevious();
+              }}
+              className="border backdrop-blur-xl transition-colors"
+              iconClassName="!text-white/90"
+              style={neutralButtonStyle}
+            >
+              <SkipBack className={controlSizes.icon} />
+            </RoundControlButton>
+
+            <RoundControlButton
+              theme={theme}
+              size="small"
+              variant="neutral"
               aria-label={t('media.nextTrack')}
               onClick={(event) => {
                 event.stopPropagation();
@@ -206,26 +231,6 @@ export function MediaMediumView({
               style={neutralButtonStyle}
             >
               <SkipForward className={controlSizes.icon} />
-            </RoundControlButton>
-
-            <RoundControlButton
-              theme={theme}
-              size="small"
-              variant="neutral"
-              aria-label={isMuted ? t('media.unmuteVolume') : t('media.muteVolume')}
-              onClick={(event) => {
-                event.stopPropagation();
-                onToggleMute();
-              }}
-              className="border backdrop-blur-xl transition-colors"
-              iconClassName="!text-white/90"
-              style={neutralButtonStyle}
-            >
-              {isMuted ? (
-                <VolumeX className={controlSizes.icon} />
-              ) : (
-                <Volume2 className={controlSizes.icon} />
-              )}
             </RoundControlButton>
           </div>
         </div>

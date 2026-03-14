@@ -109,6 +109,9 @@ export function useLightCardController({
   const lastColorTempRef = useRef(rememberedLightState?.colorTemp ?? roundKelvin(initialTemp));
   const pendingBrightnessRef = useRef<number | null>(null);
   const brightnessSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const brightnessSendTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const queuedBrightnessRef = useRef<number | null>(null);
+  const brightnessRequestInFlightRef = useRef(false);
   const pendingStateRef = useRef<boolean | null>(null);
   const stateSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingTempRef = useRef<number | null>(null);
@@ -212,6 +215,9 @@ export function useLightCardController({
     return () => {
       if (brightnessSyncTimeoutRef.current) {
         clearTimeout(brightnessSyncTimeoutRef.current);
+      }
+      if (brightnessSendTimeoutRef.current) {
+        clearTimeout(brightnessSendTimeoutRef.current);
       }
       if (stateSyncTimeoutRef.current) {
         clearTimeout(stateSyncTimeoutRef.current);
@@ -328,6 +334,45 @@ export function useLightCardController({
     }, delayMs);
   }, []);
 
+  const flushQueuedBrightnessSync = useCallback(() => {
+    if (brightnessRequestInFlightRef.current || queuedBrightnessRef.current === null) {
+      return;
+    }
+
+    const nextBrightness = queuedBrightnessRef.current;
+    queuedBrightnessRef.current = null;
+    brightnessRequestInFlightRef.current = true;
+
+    void syncLightWithHomeAssistant({ state: 'on', brightnessPct: nextBrightness }).finally(() => {
+      brightnessRequestInFlightRef.current = false;
+      if (queuedBrightnessRef.current !== null) {
+        flushQueuedBrightnessSync();
+      }
+    });
+  }, [syncLightWithHomeAssistant]);
+
+  const queueBrightnessSync = useCallback(
+    (nextBrightness: number, immediate = false) => {
+      queuedBrightnessRef.current = nextBrightness;
+
+      if (brightnessSendTimeoutRef.current) {
+        clearTimeout(brightnessSendTimeoutRef.current);
+        brightnessSendTimeoutRef.current = null;
+      }
+
+      if (immediate) {
+        flushQueuedBrightnessSync();
+        return;
+      }
+
+      brightnessSendTimeoutRef.current = setTimeout(() => {
+        brightnessSendTimeoutRef.current = null;
+        flushQueuedBrightnessSync();
+      }, 75);
+    },
+    [flushQueuedBrightnessSync]
+  );
+
   const hexToRgb = useCallback((hex: string): [number, number, number] | null => {
     const normalized = hex.replace('#', '');
     if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
@@ -364,9 +409,16 @@ export function useLightCardController({
         return;
       }
 
-      void syncLightWithHomeAssistant({ state: 'on', brightnessPct: nextBrightness });
+      queueBrightnessSync(nextBrightness);
     },
-    [id, isOn, rememberLightState, schedulePendingStateReset, syncLightWithHomeAssistant]
+    [
+      id,
+      isOn,
+      queueBrightnessSync,
+      rememberLightState,
+      schedulePendingStateReset,
+      syncLightWithHomeAssistant,
+    ]
   );
 
   const onBrightnessCommit = useCallback(
@@ -387,9 +439,9 @@ export function useLightCardController({
       if (!isOn) {
         setIsOn(true);
       }
-      void syncLightWithHomeAssistant({ state: 'on', brightnessPct: nextBrightness });
+      queueBrightnessSync(nextBrightness, true);
     },
-    [id, isOn, rememberLightState, syncLightWithHomeAssistant]
+    [id, isOn, queueBrightnessSync, rememberLightState]
   );
 
   const onTempChange = useCallback(

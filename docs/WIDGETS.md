@@ -92,7 +92,7 @@ Editable sticky note for quick reminders.
 
 ### Step 1: Enter Edit Mode
 
-Click **Customize** in the dashboard action row, or press and hold on the dashboard to enter edit mode directly.
+Click **Customize** in the dashboard action row to enter edit mode.
 
 ### Step 2: Open Add Dialog
 

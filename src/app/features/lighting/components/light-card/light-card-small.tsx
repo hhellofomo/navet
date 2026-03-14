@@ -74,7 +74,6 @@ export const LightCardSmall = memo(function LightCardSmall({
                 isOn={isOn}
                 size="extra-small"
                 showLabel={false}
-                onClick={(e) => e.stopPropagation()}
               />
             </div>
 
@@ -95,7 +94,6 @@ export const LightCardSmall = memo(function LightCardSmall({
             isOn={isOn}
             size="small"
             showLabel
-            onClick={(e) => e.stopPropagation()}
           />
         )}
 

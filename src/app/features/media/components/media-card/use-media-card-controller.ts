@@ -20,8 +20,8 @@ function normalizeMediaArtworkUrl(entityPicture: string, hassUrl?: string) {
     return null;
   }
 
-  if (entityPicture.startsWith('/api/')) {
-    return entityPicture;
+  if (entityPicture.startsWith('/api/') || entityPicture.startsWith('/media/')) {
+    return hassUrl ? `${hassUrl}${entityPicture}` : entityPicture;
   }
 
   if (!entityPicture.startsWith('http://') && !entityPicture.startsWith('https://')) {
@@ -49,6 +49,21 @@ function normalizeMediaArtworkUrl(entityPicture: string, hassUrl?: string) {
   return entityPicture;
 }
 
+function shouldFetchArtworkWithToken(artworkUrl: string, hassUrl?: string) {
+  if (!hassUrl) {
+    return artworkUrl.startsWith('/api/') || artworkUrl.startsWith('/media/');
+  }
+
+  try {
+    const resolvedArtworkUrl = new URL(artworkUrl, hassUrl);
+    const resolvedHassUrl = new URL(hassUrl);
+
+    return resolvedArtworkUrl.origin === resolvedHassUrl.origin;
+  } catch {
+    return artworkUrl.startsWith('/api/') || artworkUrl.startsWith('/media/');
+  }
+}
+
 export function useMediaCardController({
   entityId,
   entityPicture,
@@ -68,7 +83,9 @@ export function useMediaCardController({
   const [elapsedSeconds, setElapsedSeconds] = useState(initialElapsedSeconds ?? 0);
   const [durationSeconds, setDurationSeconds] = useState(initialDurationSeconds ?? 0);
   const [failedArtworkUrl, setFailedArtworkUrl] = useState<string | null>(null);
+  const [resolvedAlbumArt, setResolvedAlbumArt] = useState<string | null>(null);
   const previousEntityPictureRef = useRef(entityPicture);
+  const objectUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     setState(initialState);
@@ -104,11 +121,85 @@ export function useMediaCardController({
   }, [authConfig, entityPicture, failedArtworkUrl]);
 
   useEffect(() => {
+    if (!albumArt) {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+      setResolvedAlbumArt(null);
+      return;
+    }
+
+    if (
+      albumArt.startsWith('blob:') ||
+      albumArt.startsWith('data:') ||
+      !shouldFetchArtworkWithToken(albumArt, authConfig?.url)
+    ) {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+      setResolvedAlbumArt(albumArt);
+      return;
+    }
+
+    const controller = new AbortController();
+    let cancelled = false;
+
+    void fetch(albumArt, {
+      headers: authConfig?.token ? { Authorization: `Bearer ${authConfig.token}` } : undefined,
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to load artwork: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        if (!blob.type.startsWith('image/')) {
+          throw new Error('Artwork response is not an image');
+        }
+
+        const nextObjectUrl = URL.createObjectURL(blob);
+        if (cancelled) {
+          URL.revokeObjectURL(nextObjectUrl);
+          return;
+        }
+
+        if (objectUrlRef.current) {
+          URL.revokeObjectURL(objectUrlRef.current);
+        }
+
+        objectUrlRef.current = nextObjectUrl;
+        setResolvedAlbumArt(nextObjectUrl);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setResolvedAlbumArt(null);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [albumArt, authConfig?.token, authConfig?.url]);
+
+  useEffect(() => {
     if (previousEntityPictureRef.current !== entityPicture) {
       previousEntityPictureRef.current = entityPicture;
       setFailedArtworkUrl(null);
     }
   });
+
+  useEffect(() => {
+    return () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+    };
+  }, []);
 
   const isPlaying = state === 'playing';
 
@@ -224,7 +315,7 @@ export function useMediaCardController({
   }, []);
 
   return {
-    albumArt,
+    albumArt: resolvedAlbumArt,
     closeDialog,
     durationSeconds,
     elapsedSeconds,

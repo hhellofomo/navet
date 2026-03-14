@@ -66,7 +66,6 @@ export interface DashboardController {
   onCompleteOnboardingClose: () => void;
   onCloseAddCardDialog: () => void;
   onCloseAddEntityDialog: () => void;
-  onEnterEditMode: () => void;
   onOpenAddCardDialog: () => void;
   onOpenAddEntityDialog: () => void;
   onToggleEditMode: () => void;
@@ -120,7 +119,7 @@ export function useDashboardController(): DashboardController {
   const { activeRoom, changeRoom } = useRoomNavigation('All');
   const { addCard, removeCard, updateCard, getCardsForRoom } = useCustomCards();
   const allCustomCards = getCardsForRoom('All');
-  const { isEditMode, setEditMode, toggleEditMode } = useEditMode();
+  const { isEditMode, toggleEditMode } = useEditMode();
   const { cardSizes, updateCardSize } = useCardState(devices);
   const { cardOrders, moveCard } = useCardOrdering(devices, rooms, allCustomCards);
   const { roomOrder, moveRoom } = useRoomOrdering(rooms);
@@ -289,7 +288,6 @@ export function useDashboardController(): DashboardController {
       setDashboardArrivalVariant(null);
       setShowImportedDashboardReveal(false);
     },
-    onEnterEditMode: () => setEditMode(true),
     onMoveRoom: moveRoom,
     onSetAllViewGrouping: setAllViewGrouping,
     onOpenAddCardDialog: () => setShowAddCardDialog(true),

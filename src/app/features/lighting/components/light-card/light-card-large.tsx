@@ -80,7 +80,6 @@ export const LightCardLarge = memo(function LightCardLarge({
             isOn={isOn}
             showLabel={false}
             size="large"
-            onClick={(e) => e.stopPropagation()}
           />
           <div className="mt-3">
             <BrightnessPresetsInline

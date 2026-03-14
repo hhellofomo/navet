@@ -1,5 +1,5 @@
 import { Bell, CalendarDays, Clock3, Search, X } from 'lucide-react';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { AppReleaseBadge } from '@/app/components/shared/app-release-badge';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
@@ -19,7 +19,9 @@ export const Header = memo(function Header() {
   const user = useHomeAssistant(homeAssistantSelectors.user);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [currentDateTime, setCurrentDateTime] = useState(() => new Date());
+  const mobileSearchInputRef = useRef<HTMLInputElement | null>(null);
   const { searchQuery, setSearchQuery, setFilteredDeviceIds, clearSearch, isSearchActive } =
     useSearch();
   const devices = useDevices();
@@ -116,6 +118,17 @@ export const Header = memo(function Header() {
 
   const handleClearSearch = () => {
     clearSearch();
+    setIsMobileSearchOpen(false);
+  };
+
+  const handleToggleMobileSearch = () => {
+    setIsMobileSearchOpen((current) => {
+      const next = !current;
+      if (next) {
+        window.setTimeout(() => mobileSearchInputRef.current?.focus(), 0);
+      }
+      return next;
+    });
   };
 
   const firstName = useMemo(() => {
@@ -164,43 +177,169 @@ export const Header = memo(function Header() {
   const weekNumber = useMemo(() => getWeekNumber(currentDateTime), [currentDateTime]);
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <div className="flex items-center gap-4 md:gap-6 flex-1">
-        <div>
-          <div className="mb-1 flex flex-wrap items-center gap-2">
-            <h1 className={`text-2xl md:text-4xl font-bold ${textPrimary}`}>
-              {t('header.greeting', { name: firstName })}
-            </h1>
-            <AppReleaseBadge className="translate-y-[1px]" />
-          </div>
-          <div className={`${textSecondary} flex flex-wrap items-center gap-3 text-xs md:text-sm`}>
-            <div className="flex items-center gap-1.5">
-              <Clock3 className="h-3.5 w-3.5" />
-              <span>{formattedDate}</span>
-              <span aria-hidden="true" className={dividerColor}>
-                |
-              </span>
-              <span>{formattedTime}</span>
+    <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-4">
+      <div className="flex min-w-0 flex-col gap-2 md:flex-1 md:flex-row md:items-center md:justify-between md:gap-4">
+        <div className="min-w-0">
+          <div className="flex items-start justify-between gap-2 md:block">
+            <div className="min-w-0">
+              <div className="mb-0.5 flex items-center gap-1.5 md:mb-1 md:flex-wrap md:gap-2">
+                <h1
+                  className={`min-w-0 text-[1.55rem] leading-none md:text-4xl font-bold ${textPrimary}`}
+                >
+                  {t('header.greeting', { name: firstName })}
+                </h1>
+                <AppReleaseBadge className="shrink-0 translate-y-[1px] scale-90 md:scale-100" />
+              </div>
+              <div
+                className={`${textSecondary} flex items-center gap-1.5 text-[0.82rem] md:hidden`}
+              >
+                <span>{formattedDate}</span>
+                <span aria-hidden="true" className={dividerColor}>
+                  |
+                </span>
+                <span>{formattedTime}</span>
+                <span aria-hidden="true" className={dividerColor}>
+                  |
+                </span>
+                <span>{t('header.weekLabel', { week: weekNumber })}</span>
+              </div>
+              <div
+                className={`${textSecondary} hidden flex-wrap items-center gap-x-3 gap-y-1 text-sm md:flex`}
+              >
+                <div className="flex items-center gap-1.5">
+                  <Clock3 className={`h-3.5 w-3.5 ${textSecondary}`} />
+                  <span>{formattedDate}</span>
+                  <span aria-hidden="true" className={dividerColor}>
+                    |
+                  </span>
+                  <span>{formattedTime}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <CalendarDays className={`h-3.5 w-3.5 ${textSecondary}`} />
+                  <span>{t('header.weekLabel', { week: weekNumber })}</span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <CalendarDays className="h-3.5 w-3.5" />
-              <span>{t('header.weekLabel', { week: weekNumber })}</span>
+
+            <div className="flex items-center gap-1 md:hidden">
+              <button
+                type="button"
+                onClick={handleToggleMobileSearch}
+                className={`relative p-2 rounded-[22px] ${hoverBg} transition-colors`}
+                aria-label={t('header.searchPlaceholder')}
+                aria-expanded={isMobileSearchOpen}
+              >
+                {isMobileSearchOpen ? (
+                  <X className={`h-5 w-5 ${textSecondary}`} />
+                ) : (
+                  <Search className={`h-5 w-5 ${textSecondary}`} />
+                )}
+              </button>
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                  className={`relative p-2 rounded-[22px] ${hoverBg} transition-colors`}
+                >
+                  <Bell className={`w-5 h-5 ${textSecondary}`} />
+                  {unreadCount > 0 && (
+                    <span
+                      className="absolute top-1 right-1 w-2 h-2 rounded-full"
+                      style={{ backgroundColor: activeColorValue }}
+                    ></span>
+                  )}
+                </button>
+
+                <NotificationPanel
+                  isOpen={isNotificationOpen}
+                  onClose={() => setIsNotificationOpen(false)}
+                />
+              </div>
+
+              <UserDropdown avatarUrl={avatarUrl} />
             </div>
           </div>
         </div>
+
+        <div className="hidden items-center gap-2 md:flex md:gap-4">
+          <div className="relative flex-1 md:flex-none">
+            <Search
+              className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textSecondary}`}
+            />
+            <input
+              type="text"
+              placeholder={t('header.searchPlaceholder')}
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
+              className={`${inputBg} border rounded-[22px] pl-10 pr-10 py-2 text-sm ${textPrimary} ${placeholder} focus:outline-none w-full md:w-64`}
+              style={{
+                borderColor: isSearchFocused ? activeColorValue : undefined,
+                boxShadow: isSearchFocused ? `0 0 0 2px ${activeColorValue}22` : undefined,
+                caretColor: activeColorValue,
+              }}
+            />
+            {isSearchActive && (
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                className={`absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded ${hoverBg} transition-colors`}
+              >
+                <X className={`w-4 h-4 ${textSecondary}`} />
+              </button>
+            )}
+          </div>
+
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+              className={`relative p-2 rounded-[22px] ${hoverBg} transition-colors`}
+            >
+              <Bell className={`w-5 h-5 ${textSecondary}`} />
+              {unreadCount > 0 && (
+                <span
+                  className="absolute top-1 right-1 w-2 h-2 rounded-full"
+                  style={{ backgroundColor: activeColorValue }}
+                ></span>
+              )}
+            </button>
+
+            <NotificationPanel
+              isOpen={isNotificationOpen}
+              onClose={() => setIsNotificationOpen(false)}
+            />
+          </div>
+
+          <UserDropdown avatarUrl={avatarUrl} />
+        </div>
       </div>
 
-      <div className="flex items-center gap-2 md:gap-4">
-        <div className="relative flex-1 md:flex-none">
+      <div
+        className={`relative overflow-hidden transition-[max-height,opacity,margin] duration-200 md:hidden ${
+          isMobileSearchOpen || isSearchActive
+            ? 'mt-0 max-h-16 opacity-100'
+            : '-mt-1 max-h-0 opacity-0'
+        }`}
+      >
+        <div className="relative">
           <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textSecondary}`} />
           <input
+            ref={mobileSearchInputRef}
             type="text"
             placeholder={t('header.searchPlaceholder')}
             value={searchQuery}
             onChange={handleSearchChange}
             onFocus={() => setIsSearchFocused(true)}
-            onBlur={() => setIsSearchFocused(false)}
-            className={`${inputBg} border rounded-lg pl-10 pr-10 py-2 text-sm ${textPrimary} ${placeholder} focus:outline-none w-full md:w-64`}
+            onBlur={() => {
+              setIsSearchFocused(false);
+              if (!searchQuery) {
+                setIsMobileSearchOpen(false);
+              }
+            }}
+            className={`${inputBg} border rounded-[22px] pl-10 pr-10 py-2 text-sm ${textPrimary} ${placeholder} focus:outline-none w-full`}
             style={{
               borderColor: isSearchFocused ? activeColorValue : undefined,
               boxShadow: isSearchFocused ? `0 0 0 2px ${activeColorValue}22` : undefined,
@@ -217,29 +356,6 @@ export const Header = memo(function Header() {
             </button>
           )}
         </div>
-
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-            className={`relative p-2 rounded-lg ${hoverBg} transition-colors`}
-          >
-            <Bell className={`w-5 h-5 ${textSecondary}`} />
-            {unreadCount > 0 && (
-              <span
-                className="absolute top-1 right-1 w-2 h-2 rounded-full"
-                style={{ backgroundColor: activeColorValue }}
-              ></span>
-            )}
-          </button>
-
-          <NotificationPanel
-            isOpen={isNotificationOpen}
-            onClose={() => setIsNotificationOpen(false)}
-          />
-        </div>
-
-        <UserDropdown avatarUrl={avatarUrl} />
       </div>
     </div>
   );
