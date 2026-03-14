@@ -12,6 +12,7 @@ import { useHomeAssistant } from './hooks';
 import { I18nProvider } from './i18n';
 import { useSettingsStore } from './stores';
 import { homeAssistantSelectors } from './stores/selectors';
+import { resolveEffectsQuality } from './utils/effects-quality';
 
 function AppContent() {
   const { isAuthenticated, config: authConfig } = useAuth();
@@ -21,7 +22,12 @@ function AppContent() {
   const connect = useHomeAssistant(homeAssistantSelectors.connect);
   const disableAnimations = useSettingsStore((state) => state.disableAnimations);
   const lowPowerMode = useSettingsStore((state) => state.lowPowerMode);
-  const reducedEffectsEnabled = disableAnimations || lowPowerMode;
+  const effectsQuality = useSettingsStore((state) => state.effectsQuality);
+  const resolvedEffectsQuality = resolveEffectsQuality(
+    effectsQuality,
+    disableAnimations || lowPowerMode
+  );
+  const reducedEffectsEnabled = resolvedEffectsQuality === 'low';
   const [isOnline, setIsOnline] = useState(() =>
     typeof navigator === 'undefined' ? true : navigator.onLine
   );
@@ -40,12 +46,14 @@ function AppContent() {
   useEffect(() => {
     document.documentElement.dataset.noAnimation = reducedEffectsEnabled ? 'true' : 'false';
     document.documentElement.dataset.lowPower = reducedEffectsEnabled ? 'true' : 'false';
+    document.documentElement.dataset.effectsQuality = resolvedEffectsQuality;
 
     return () => {
       delete document.documentElement.dataset.noAnimation;
       delete document.documentElement.dataset.lowPower;
+      delete document.documentElement.dataset.effectsQuality;
     };
-  }, [reducedEffectsEnabled]);
+  }, [reducedEffectsEnabled, resolvedEffectsQuality]);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);

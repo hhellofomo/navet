@@ -12,15 +12,16 @@ export const esMessages = {
   'header.weekLabel': 'Semana {week}',
   'settings.hero.eyebrow': 'Ajustes',
   'settings.hero.title': 'Un lugar más sereno para ajustar Navet.',
-  'settings.hero.description':
-    'Tipografía más amplia, menos cajas y una ruta clara por ajuste. La página sigue siendo escalable, pero ahora debería sentirse más como una experiencia de ajustes de producto que como un panel de control denso.',
+  'settings.hero.description': 'Ajusta cómo se ve, responde y se conecta Navet en un solo lugar.',
   'settings.nav.appearance': 'Apariencia',
+  'settings.nav.localization': 'Localización',
+  'settings.nav.interaction': 'Interacción',
   'settings.nav.dashboard': 'Panel',
   'settings.nav.system': 'Sistema',
   'settings.nav.project': 'Proyecto',
   'settings.appearance.sectionTitle': 'Apariencia',
   'settings.appearance.sectionDescription':
-    'Decisiones visuales que definen la sensación general del panel.',
+    'Tema, fondo, intensidad del cristal y ambiente de luz que definen la identidad visual de Navet.',
   'settings.appearance.themeAccent.title': 'Tema y acento',
   'settings.appearance.themeAccent.description':
     'Elige el tono visual general y el color de acento con el mismo selector que aparece durante el onboarding.',
@@ -33,7 +34,7 @@ export const esMessages = {
   'settings.appearance.ambience.ambientBleed': 'Brillo ambiental',
   'settings.appearance.ambience.contained': 'Contenido',
   'settings.appearance.ambience.disabledInLowPower':
-    'No disponible mientras el modo de bajo consumo está activo. Las tarjetas de luz usan el modo contenido en su lugar.',
+    'Disponible solo con calidad visual Alta. Las tarjetas de luz usan el modo contenido en Media y Baja.',
   'settings.appearance.wallpaper.title': 'Fondo',
   'settings.appearance.wallpaper.description':
     'Agrega una imagen de fondo que combine con el acento y el tema activos.',
@@ -43,7 +44,7 @@ export const esMessages = {
   'settings.appearance.wallpaper.fileHint': 'PNG, JPG hasta 5 MB',
   'settings.dashboard.sectionTitle': 'Panel',
   'settings.dashboard.sectionDescription':
-    'Decide qué aparece en el panel y cómo se respalda esta configuración local.',
+    'Gestiona qué aparece en el panel y cómo se respalda esta configuración local.',
   'settings.dashboard.entityVisibility.title': 'Visibilidad de entidades',
   'settings.dashboard.entityVisibility.description':
     'Navet ahora usa un solo modelo de visibilidad. Quita entidades desde el modo de edición y vuélvelas a agregar después desde Add Entity.',
@@ -63,6 +64,28 @@ export const esMessages = {
     'Elige si tocar la tarjeta debe alternar el dispositivo de inmediato o abrir primero sus controles.',
   'settings.dashboard.interaction.toggleFirst': 'Tocar alterna',
   'settings.dashboard.interaction.controlFirst': 'Tocar abre controles',
+  'settings.localization.sectionTitle': 'Localización',
+  'settings.localization.sectionDescription':
+    'Preferencias de idioma y formato para nombres, fechas, horas y unidades.',
+  'settings.localization.language.title': 'Idioma',
+  'settings.localization.language.description':
+    'Define el idioma de la interfaz y la configuración regional para fechas, hora y números.',
+  'settings.localization.timeFormat.title': 'Formato de hora',
+  'settings.localization.timeFormat.description':
+    'Elige si Navet debe mostrar la hora en formato de 12 o 24 horas.',
+  'settings.localization.timeFormat.twelveHour': '12 horas',
+  'settings.localization.timeFormat.twentyFourHour': '24 horas',
+  'settings.localization.temperatureUnit.title': 'Unidad de temperatura',
+  'settings.localization.temperatureUnit.description':
+    'Elige qué unidad de temperatura deben usar las tarjetas y las vistas del tiempo.',
+  'settings.localization.temperatureUnit.celsius': 'Celsius',
+  'settings.localization.temperatureUnit.fahrenheit': 'Fahrenheit',
+  'settings.interaction.sectionTitle': 'Interacción',
+  'settings.interaction.sectionDescription':
+    'Define cómo responden las tarjetas al toque y qué acción prioriza Navet primero.',
+  'settings.interaction.cardBehavior.title': 'Comportamiento de la tarjeta',
+  'settings.interaction.cardBehavior.description':
+    'Elige si tocar una tarjeta debe actuar de inmediato o abrir primero los controles detallados.',
   'settings.dashboard.backup.title': 'Respaldo local de configuración',
   'settings.dashboard.backup.description':
     'Exporta una captura reutilizable del diseño del panel y restáurala después en otro dispositivo.',
@@ -72,13 +95,19 @@ export const esMessages = {
   'settings.dashboard.backup.import': 'Importar configuración',
   'settings.system.sectionTitle': 'Sistema',
   'settings.system.sectionDescription':
-    'Controles de rendimiento y detalles de conexión para el destino actual de Home Assistant.',
+    'Detalles de conexión y acciones de recuperación para el destino actual de Home Assistant.',
   'settings.system.animations.title': 'Desactivar animaciones',
   'settings.system.animations.description':
     'Útil para dispositivos más lentos como Raspberry Pi. Desactiva transiciones y efectos animados en toda la app.',
   'settings.system.lowPowerMode.title': 'Modo de bajo consumo',
   'settings.system.lowPowerMode.description':
     'Desactiva las animaciones y reduce desenfoques, sombras pesadas, procesamiento del fondo y brillo ambiental para un renderizado más fluido en hardware más lento.',
+  'settings.system.effectsQuality.title': 'Calidad visual',
+  'settings.system.effectsQuality.description':
+    'Elige cuántos efectos de vidrio en vivo debe usar Navet. Alta mantiene el acabado completo, Media usa vidrio simulado y Baja reduce los efectos para el hardware más limitado.',
+  'settings.system.effectsQuality.high': 'Alta',
+  'settings.system.effectsQuality.medium': 'Media',
+  'settings.system.effectsQuality.low': 'Baja',
   'settings.system.connection.title': 'Conexión',
   'settings.system.connection.description':
     'Revisa el servidor actual, abre Home Assistant o restablece la conexión guardada.',
@@ -334,6 +363,8 @@ export const esMessages = {
   'login.errors.unexpected': 'Ocurrió un error inesperado',
   'themePicker.themeMode': 'Modo de tema',
   'themePicker.accentColor': 'Color de acento',
+  'themePicker.customAccent': 'Color de acento personalizado',
+  'themePicker.customAccentBadge': 'Elegir',
   'themePicker.previewSubtitle': 'Modo {mode}',
   'themeOption.glass.label': 'Cristal líquido',
   'themeOption.glass.description': 'Paneles translúcidos esmerilados con acentos luminosos',

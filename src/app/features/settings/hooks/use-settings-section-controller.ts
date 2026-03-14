@@ -46,13 +46,25 @@ export type SettingsSectionStyles = {
 };
 
 export function useSettingsSectionController() {
-  const { theme, setTheme, primaryColor, setPrimaryColor, wallpaper, setWallpaper } = useTheme();
+  const {
+    customPrimaryColor,
+    theme,
+    setTheme,
+    primaryColor,
+    setPrimaryColor,
+    setCustomPrimaryColor,
+    wallpaper,
+    setWallpaper,
+  } = useTheme();
   const { languageOptions, t } = useI18n();
   const { logout, config } = useAuth();
   const { clearConfig } = useConfig();
   const disableAnimations = useSettingsStore((state) => state.disableAnimations);
+  const effectsQuality = useSettingsStore((state) => state.effectsQuality);
   const lowPowerMode = useSettingsStore((state) => state.lowPowerMode);
   const language = useSettingsStore((state) => state.language);
+  const temperatureUnit = useSettingsStore((state) => state.temperatureUnit);
+  const use24HourTime = useSettingsStore((state) => state.use24HourTime);
   const entityInteractionMode = useSettingsStore((state) => state.entityInteractionMode);
   const ambientLightBleed = useSettingsStore((state) => state.ambientLightBleed);
   const updateSettings = useSettingsStore((state) => state.updateSettings);
@@ -141,7 +153,9 @@ export function useSettingsSectionController() {
   return {
     ambientLightBleed,
     config,
+    customPrimaryColor,
     disableAnimations,
+    effectsQuality,
     entityInteractionMode,
     handleExportDashboardConfig,
     handleImportDashboardConfig,
@@ -158,6 +172,7 @@ export function useSettingsSectionController() {
     primaryColor,
     reopenOnboarding,
     setPrimaryColor,
+    setCustomPrimaryColor,
     setShowLicense,
     setShowRestartOnboardingConfirm,
     setShowRevealAllConfirm,
@@ -171,8 +186,10 @@ export function useSettingsSectionController() {
     styles,
     theme,
     themeOptions: THEME_OPTIONS,
+    temperatureUnit,
     colorOptions: PRIMARY_COLOR_OPTIONS,
     updateSettings,
+    use24HourTime,
     wallpaper,
   };
 }

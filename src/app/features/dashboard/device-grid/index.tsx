@@ -75,6 +75,51 @@ export const DeviceGrid = memo(function DeviceGrid({
     () => allCards.map((item) => (item.type === 'device' ? item.id : item.card.id)),
     [allCards]
   );
+  const gridContent = (
+    <div className="grid w-full grid-flow-row-dense grid-cols-2 gap-2 auto-rows-[87px] md:grid-cols-4 md:gap-3 xl:grid-cols-6 lg:gap-4 2xl:grid-cols-8">
+      {allCards.map((item) => {
+        if (item.type === 'device') {
+          const device = deviceMap.get(item.id);
+          if (!device) return null;
+
+          const size = cardSizes[device.id] || (device.size as CardSize);
+
+          return (
+            <DashboardCardItem
+              key={device.id}
+              id={device.id}
+              device={device}
+              size={size}
+              isEditMode={isEditMode}
+              handleSizeChange={handleSizeChange}
+              onRemoveEntity={onRemoveEntity}
+              allowEntityRemoval={allowEntityRemoval}
+              usesHideAction={usesHideAction}
+            />
+          );
+        }
+
+        const { card } = item;
+        const size = cardSizes[card.id] || card.size;
+
+        return (
+          <DashboardCardItem
+            key={card.id}
+            id={card.id}
+            card={card}
+            size={size}
+            isEditMode={isEditMode}
+            handleSizeChange={handleSizeChange}
+            onDeleteCard={onDeleteCard}
+            onUpdateCard={onUpdateCard}
+            onRemoveEntity={onRemoveEntity}
+            allowEntityRemoval={allowEntityRemoval}
+            usesHideAction={usesHideAction}
+          />
+        );
+      })}
+    </div>
+  );
   return (
     <DashboardEditActions
       isEditMode={isEditMode}
@@ -82,51 +127,13 @@ export const DeviceGrid = memo(function DeviceGrid({
       onRemoveEntity={onRemoveEntity}
       onSizeChange={handleSizeChange}
     >
-      <SortableContext items={allCardIds} strategy={rectSortingStrategy}>
-        <div className="grid w-full grid-flow-row-dense grid-cols-2 gap-2 auto-rows-[87px] md:grid-cols-4 md:gap-3 xl:grid-cols-6 lg:gap-4 2xl:grid-cols-8">
-          {allCards.map((item) => {
-            if (item.type === 'device') {
-              const device = deviceMap.get(item.id);
-              if (!device) return null;
-
-              const size = cardSizes[device.id] || (device.size as CardSize);
-
-              return (
-                <DashboardCardItem
-                  key={device.id}
-                  id={device.id}
-                  device={device}
-                  size={size}
-                  isEditMode={isEditMode}
-                  handleSizeChange={handleSizeChange}
-                  onRemoveEntity={onRemoveEntity}
-                  allowEntityRemoval={allowEntityRemoval}
-                  usesHideAction={usesHideAction}
-                />
-              );
-            }
-
-            const { card } = item;
-            const size = cardSizes[card.id] || card.size;
-
-            return (
-              <DashboardCardItem
-                key={card.id}
-                id={card.id}
-                card={card}
-                size={size}
-                isEditMode={isEditMode}
-                handleSizeChange={handleSizeChange}
-                onDeleteCard={onDeleteCard}
-                onUpdateCard={onUpdateCard}
-                onRemoveEntity={onRemoveEntity}
-                allowEntityRemoval={allowEntityRemoval}
-                usesHideAction={usesHideAction}
-              />
-            );
-          })}
-        </div>
-      </SortableContext>
+      {isEditMode ? (
+        <SortableContext items={allCardIds} strategy={rectSortingStrategy}>
+          {gridContent}
+        </SortableContext>
+      ) : (
+        gridContent
+      )}
     </DashboardEditActions>
   );
 });

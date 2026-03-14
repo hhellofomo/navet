@@ -13,14 +13,16 @@ export const deMessages = {
   'settings.hero.eyebrow': 'Einstellungen',
   'settings.hero.title': 'Ein ruhigerer Ort, um Navet anzupassen.',
   'settings.hero.description':
-    'Größere Typografie, weniger Kästen und ein klarer Weg pro Einstellung. Die Seite bleibt skalierbar, soll sich jetzt aber eher wie echte Produkteinstellungen als wie ein dichtes Kontrollpanel anfühlen.',
+    'Passe an, wie Navet aussieht, reagiert und sich verbindet, an einem Ort.',
   'settings.nav.appearance': 'Darstellung',
+  'settings.nav.localization': 'Lokalisierung',
+  'settings.nav.interaction': 'Interaktion',
   'settings.nav.dashboard': 'Dashboard',
   'settings.nav.system': 'System',
   'settings.nav.project': 'Projekt',
   'settings.appearance.sectionTitle': 'Darstellung',
   'settings.appearance.sectionDescription':
-    'Visuelle Entscheidungen, die das Gesamtgefühl des Dashboards bestimmen.',
+    'Thema, Hintergrundbild, Glasintensität und Lichtambiente, die Navets visuelle Identität prägen.',
   'settings.appearance.themeAccent.title': 'Thema und Akzent',
   'settings.appearance.themeAccent.description':
     'Wähle den visuellen Grundton und die Akzentfarbe mit demselben Picker wie im Onboarding.',
@@ -33,7 +35,7 @@ export const deMessages = {
   'settings.appearance.ambience.ambientBleed': 'Ambienter Schein',
   'settings.appearance.ambience.contained': 'Begrenzt',
   'settings.appearance.ambience.disabledInLowPower':
-    'Nicht verfügbar, solange der Low-Power-Modus aktiv ist. Lichtkarten verwenden stattdessen den begrenzten Modus.',
+    'Nur bei hoher visueller Qualität verfügbar. Lichtkarten verwenden bei Mittel und Niedrig den begrenzten Modus.',
   'settings.appearance.wallpaper.title': 'Hintergrundbild',
   'settings.appearance.wallpaper.description':
     'Füge ein Hintergrundbild hinzu, das mit aktivem Akzent und Thema zusammenarbeitet.',
@@ -43,7 +45,7 @@ export const deMessages = {
   'settings.appearance.wallpaper.fileHint': 'PNG, JPG bis 5 MB',
   'settings.dashboard.sectionTitle': 'Dashboard',
   'settings.dashboard.sectionDescription':
-    'Bestimme, was auf der Fläche erscheint und wie dieses lokale Setup gesichert wird.',
+    'Lege fest, was auf der Fläche erscheint und wie dieses lokale Setup gesichert wird.',
   'settings.dashboard.entityVisibility.title': 'Gerätesichtbarkeit',
   'settings.dashboard.entityVisibility.description':
     'Navet verwendet jetzt ein gemeinsames Sichtbarkeitsmodell. Entferne Geräte im Bearbeitungsmodus und füge sie später über Add Entity wieder hinzu.',
@@ -63,6 +65,28 @@ export const deMessages = {
     'Wähle, ob ein Tippen auf die Karte das Gerät sofort schaltet oder zuerst die Steuerung öffnet.',
   'settings.dashboard.interaction.toggleFirst': 'Tippen schaltet',
   'settings.dashboard.interaction.controlFirst': 'Tippen öffnet Steuerung',
+  'settings.localization.sectionTitle': 'Lokalisierung',
+  'settings.localization.sectionDescription':
+    'Sprach- und Formatvorgaben für Namen, Datum, Uhrzeit und Einheiten.',
+  'settings.localization.language.title': 'Sprache',
+  'settings.localization.language.description':
+    'Lege die Sprache und Locale für Oberfläche sowie Datums-, Zeit- und Zahlenformatierung fest.',
+  'settings.localization.timeFormat.title': 'Zeitformat',
+  'settings.localization.timeFormat.description':
+    'Wähle, ob Navet Zeiten im 12- oder 24-Stunden-Format anzeigen soll.',
+  'settings.localization.timeFormat.twelveHour': '12-Stunden',
+  'settings.localization.timeFormat.twentyFourHour': '24-Stunden',
+  'settings.localization.temperatureUnit.title': 'Temperatureinheit',
+  'settings.localization.temperatureUnit.description':
+    'Wähle, welche Temperatureinheit Karten und Wetteransichten verwenden sollen.',
+  'settings.localization.temperatureUnit.celsius': 'Celsius',
+  'settings.localization.temperatureUnit.fahrenheit': 'Fahrenheit',
+  'settings.interaction.sectionTitle': 'Interaktion',
+  'settings.interaction.sectionDescription':
+    'Wie Karten auf Tippen reagieren und welche Aktion Navet zuerst priorisiert.',
+  'settings.interaction.cardBehavior.title': 'Kartenverhalten',
+  'settings.interaction.cardBehavior.description':
+    'Wähle, ob ein Kartentipp sofort handeln oder zuerst die Detailsteuerung öffnen soll.',
   'settings.dashboard.backup.title': 'Lokales Konfigurationsbackup',
   'settings.dashboard.backup.description':
     'Exportiere eine wiederverwendbare Momentaufnahme deines Dashboard-Layouts und stelle sie später auf einem anderen Gerät wieder her.',
@@ -72,13 +96,19 @@ export const deMessages = {
   'settings.dashboard.backup.import': 'Konfiguration importieren',
   'settings.system.sectionTitle': 'System',
   'settings.system.sectionDescription':
-    'Leistungsoptionen und Verbindungsdetails für das aktuelle Home-Assistant-Ziel.',
+    'Verbindungsdetails und Wiederherstellungsaktionen für das aktuelle Home-Assistant-Ziel.',
   'settings.system.animations.title': 'Animationen deaktivieren',
   'settings.system.animations.description':
     'Nützlich für langsamere Geräte wie Raspberry Pis. Schaltet Übergänge und animierte Effekte in der gesamten App aus.',
   'settings.system.lowPowerMode.title': 'Low-Power-Modus',
   'settings.system.lowPowerMode.description':
     'Deaktiviert Animationen und reduziert Unschärfe, starke Schatten, Hintergrundverarbeitung und Umgebungsleuchten für flüssigeres Rendern auf schwächeren Geräten.',
+  'settings.system.effectsQuality.title': 'Visuelle Qualität',
+  'settings.system.effectsQuality.description':
+    'Lege fest, wie viel lebendigen Glaseffekt Navet verwenden soll. Hoch behält die volle Optik, Mittel nutzt simuliertes Glas und Niedrig reduziert Effekte für die schwächsten Geräte.',
+  'settings.system.effectsQuality.high': 'Hoch',
+  'settings.system.effectsQuality.medium': 'Mittel',
+  'settings.system.effectsQuality.low': 'Niedrig',
   'settings.system.connection.title': 'Verbindung',
   'settings.system.connection.description':
     'Prüfe das aktuelle Serverziel, öffne Home Assistant oder setze die gespeicherte Verbindung zurück.',
@@ -333,6 +363,8 @@ export const deMessages = {
   'login.errors.unexpected': 'Ein unerwarteter Fehler ist aufgetreten',
   'themePicker.themeMode': 'Themenmodus',
   'themePicker.accentColor': 'Akzentfarbe',
+  'themePicker.customAccent': 'Benutzerdefinierte Akzentfarbe',
+  'themePicker.customAccentBadge': 'Wählen',
   'themePicker.previewSubtitle': '{mode}-Modus',
   'themeOption.glass.label': 'Flüssiges Glas',
   'themeOption.glass.description': 'Mattierte transparente Flächen mit leuchtenden Akzenten',

@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { ColorInputSwatch } from '@/app/components/shared/color-input-swatch';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useI18n, useTheme } from '@/app/hooks';
 import { getDeviceEditorSurfaceTokens } from './device-editor-surface-tokens';
@@ -51,35 +52,20 @@ export const ColorSelectorSection = memo(function ColorSelectorSection({
         ))}
 
         {/* Custom Color Button */}
-        <label
-          className={`w-full aspect-square rounded-full transition-all duration-300 flex items-center justify-center cursor-pointer relative overflow-hidden ${
-            isOn ? 'hover:scale-110' : editorSurface.disabledCircleClassName
-          }`}
+        <ColorInputSwatch
+          value={customColor}
+          ariaLabel={t('lighting.customColorPicker')}
           title={t('lighting.customColorPicker')}
-          style={{
-            background: `linear-gradient(135deg, ${customColor} 0%, ${customColor}cc 45%, rgba(255, 255, 255, 0.9) 100%)`,
-            boxShadow: selectedColor === customColor ? `0 0 0 4px ${activeColor}` : undefined,
+          size="large"
+          disabled={!isOn}
+          selected={selectedColor === customColor}
+          ringColor={activeColor}
+          className={`h-auto w-full aspect-square ${!isOn ? editorSurface.disabledCircleClassName : ''}`}
+          onChange={(value) => {
+            onCustomColorChange(value);
+            onColorChange(value);
           }}
-        >
-          <input
-            type="color"
-            value={customColor}
-            onChange={(e) => {
-              onCustomColorChange(e.target.value);
-              onColorChange(e.target.value);
-            }}
-            disabled={!isOn}
-            className="absolute inset-0 opacity-0 cursor-pointer"
-          />
-          <div className="pointer-events-none flex h-6 w-6 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-            <div
-              className="h-3 w-3 rounded-full border border-white/80"
-              style={{
-                background: `linear-gradient(135deg, ${customColor} 0%, rgba(255, 255, 255, 0.9) 100%)`,
-              }}
-            />
-          </div>
-        </label>
+        />
       </div>
     </div>
   );

@@ -26,8 +26,10 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
         description={t('settings.project.about.description')}
         styles={styles}
       >
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className={`rounded-[24px] border px-5 py-4 ${styles.borderColor} ${styles.softBg}`}>
+        <div className="grid gap-2.5 sm:grid-cols-2 md:gap-3">
+          <div
+            className={`rounded-[20px] border px-4 py-3.5 md:rounded-[24px] md:px-5 md:py-4 ${styles.borderColor} ${styles.softBg}`}
+          >
             <p className={`text-[11px] uppercase tracking-[0.18em] ${styles.subtleColor}`}>
               {t('settings.project.about.version')}
             </p>
@@ -36,7 +38,9 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
               <AppReleaseBadge />
             </div>
           </div>
-          <div className={`rounded-[24px] border px-5 py-4 ${styles.borderColor} ${styles.softBg}`}>
+          <div
+            className={`rounded-[20px] border px-4 py-3.5 md:rounded-[24px] md:px-5 md:py-4 ${styles.borderColor} ${styles.softBg}`}
+          >
             <p className={`text-[11px] uppercase tracking-[0.18em] ${styles.subtleColor}`}>
               {t('settings.project.about.build')}
             </p>
@@ -54,7 +58,7 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
           href="https://github.com/awesomestvi/"
           target="_blank"
           rel="noopener noreferrer"
-          className={`inline-flex items-center gap-3 rounded-full border px-4 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
+          className={`inline-flex items-center gap-3 rounded-full border px-4 py-2.5 text-sm font-medium transition-colors md:py-3 ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
         >
           <Github className="h-4 w-4" />
           <span>awesomestvi</span>
@@ -77,7 +81,7 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
         <button
           type="button"
           onClick={() => setShowLicense(!showLicense)}
-          className={`inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
+          className={`inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition-colors md:px-5 md:py-3 ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
         >
           <Scale className="h-4 w-4" />
           <span>
@@ -86,7 +90,9 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
         </button>
 
         {showLicense ? (
-          <div className={`mt-4 rounded-[24px] border p-5 ${styles.borderColor} ${styles.softBg}`}>
+          <div
+            className={`mt-4 rounded-[20px] border p-4 md:rounded-[24px] md:p-5 ${styles.borderColor} ${styles.softBg}`}
+          >
             <div className={`space-y-3 text-sm leading-relaxed ${styles.textColor}`}>
               <p>{t('settings.project.license.summary')}</p>
               <p>{t('settings.project.license.networkUse')}</p>
@@ -113,7 +119,7 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
         <button
           type="button"
           onClick={() => setShowTerms(!showTerms)}
-          className={`inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
+          className={`inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition-colors md:px-5 md:py-3 ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
         >
           <FileText className="h-4 w-4" />
           <span>
@@ -122,7 +128,9 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
         </button>
 
         {showTerms ? (
-          <div className={`mt-4 rounded-[24px] border p-5 ${styles.borderColor} ${styles.softBg}`}>
+          <div
+            className={`mt-4 rounded-[20px] border p-4 md:rounded-[24px] md:p-5 ${styles.borderColor} ${styles.softBg}`}
+          >
             <div className={`space-y-3 text-sm leading-relaxed ${styles.textColor}`}>
               <div>
                 <p className="font-semibold">{t('settings.project.terms.allowedTitle')}</p>
@@ -146,11 +154,11 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
         ) : null}
       </SettingsItem>
 
-      <div className="pt-6">
+      <div className="pt-4 md:pt-6">
         <button
           type="button"
           onClick={handleLogout}
-          className="inline-flex items-center gap-2 rounded-full bg-red-500/10 px-5 py-3 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/15"
+          className="inline-flex items-center gap-2 rounded-full bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/15 md:px-5 md:py-3"
         >
           <LogOut className="h-4 w-4" />
           <span>{t('settings.project.logout')}</span>

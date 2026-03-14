@@ -4,6 +4,7 @@ import {
   isCompactCardSize,
   isExtraSmallCardSize,
 } from '@/app/components/shared/card-size-selector';
+import { resolvePrimaryColorToken } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import type { PrimaryColor, ThemeType } from '@/app/hooks/use-theme';
 
@@ -14,7 +15,7 @@ type EntityIconPillStyles = {
   iconStyle?: CSSProperties;
 };
 
-const accentColorMap: Record<PrimaryColor, { bg: string; text: string }> = {
+const accentColorMap = {
   orange: { bg: 'rgba(249, 115, 22, 0.24)', text: '#c2410c' },
   blue: { bg: 'rgba(59, 130, 246, 0.24)', text: '#1d4ed8' },
   green: { bg: 'rgba(34, 197, 94, 0.24)', text: '#15803d' },
@@ -23,7 +24,7 @@ const accentColorMap: Record<PrimaryColor, { bg: string; text: string }> = {
   red: { bg: 'rgba(239, 68, 68, 0.24)', text: '#b91c1c' },
   yellow: { bg: 'rgba(234, 179, 8, 0.24)', text: '#a16207' },
   teal: { bg: 'rgba(20, 184, 166, 0.24)', text: '#0f766e' },
-};
+} as const;
 
 function getBadgeSizeClass(size: CardSize) {
   if (isExtraSmallCardSize(size)) {
@@ -63,7 +64,7 @@ export function getEntityIconPillStyles({
   theme: ThemeType;
 }): EntityIconPillStyles {
   const surface = getThemeSurfaceTokens(theme);
-  const accent = accentColorMap[primaryColor];
+  const accent = accentColorMap[resolvePrimaryColorToken(primaryColor)];
   const badgeSizeClass = getBadgeSizeClass(size);
   const iconSizeClass = getIconSizeClass(size);
   const interactiveClass = isInteractive

@@ -7,6 +7,21 @@ import { DashboardCardItem } from '../components/dashboard-card-item';
 import { DashboardEditActions } from '../components/dashboard-edit-actions';
 import type { CustomCard } from '../stores/custom-cards-store';
 
+type IdleCallbackHandle = number;
+
+type IdleDeadlineLike = {
+  didTimeout: boolean;
+  timeRemaining: () => number;
+};
+
+type WindowWithIdleCallback = Window & {
+  requestIdleCallback?: (
+    callback: (deadline: IdleDeadlineLike) => void,
+    options?: { timeout: number }
+  ) => IdleCallbackHandle;
+  cancelIdleCallback?: (handle: IdleCallbackHandle) => void;
+};
+
 interface RoomSectionProps {
   title: string;
   orderedIds: string[];
@@ -64,14 +79,11 @@ export const RoomSection = memo(function RoomSection({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry?.isIntersecting) {
-          startTransition(() => {
-            setIsVisible(true);
-          });
-          observer.disconnect();
-        }
+        startTransition(() => {
+          setIsVisible(Boolean(entry?.isIntersecting));
+        });
       },
-      { rootMargin: '200px 0px' }
+      { rootMargin: '320px 0px' }
     );
 
     observer.observe(node);
@@ -92,9 +104,9 @@ export const RoomSection = memo(function RoomSection({
       return;
     }
 
-    const INITIAL_BATCH = 12;
-    const BATCH_SIZE = 12;
-    const BATCH_DELAY_MS = 48;
+    const INITIAL_BATCH = 8;
+    const BATCH_SIZE = 8;
+    const idleWindow = window as WindowWithIdleCallback;
 
     setVisibleCount((current) =>
       current > 0
@@ -106,11 +118,12 @@ export const RoomSection = memo(function RoomSection({
       return;
     }
 
-    let timeoutId: number | null = null;
     let cancelled = false;
+    let timeoutId: number | null = null;
+    let idleId: IdleCallbackHandle | null = null;
 
     const scheduleNextBatch = () => {
-      timeoutId = window.setTimeout(() => {
+      const runBatch = () => {
         if (cancelled) {
           return;
         }
@@ -128,7 +141,24 @@ export const RoomSection = memo(function RoomSection({
             return next;
           });
         });
-      }, BATCH_DELAY_MS);
+      };
+
+      if (typeof idleWindow.requestIdleCallback === 'function') {
+        idleId = idleWindow.requestIdleCallback(
+          (deadline) => {
+            if (deadline.didTimeout || deadline.timeRemaining() > 4) {
+              runBatch();
+              return;
+            }
+
+            scheduleNextBatch();
+          },
+          { timeout: 160 }
+        );
+        return;
+      }
+
+      timeoutId = window.setTimeout(runBatch, 96);
     };
 
     scheduleNextBatch();
@@ -138,12 +168,62 @@ export const RoomSection = memo(function RoomSection({
       if (timeoutId !== null) {
         window.clearTimeout(timeoutId);
       }
+      if (idleId !== null && typeof idleWindow.cancelIdleCallback === 'function') {
+        idleWindow.cancelIdleCallback(idleId);
+      }
     };
   }, [isEditMode, isVisible, orderedIds.length]);
 
   const estimatedRows = Math.max(1, Math.ceil(totalItems / 4));
   const placeholderHeight = estimatedRows * 120;
   const visibleOrderedIds = isEditMode ? orderedIds : orderedIds.slice(0, visibleCount);
+  const gridContent = (
+    <div className="grid w-full grid-flow-row-dense grid-cols-2 gap-2 auto-rows-[87px] md:grid-cols-4 md:gap-3 xl:grid-cols-6 lg:gap-4 2xl:grid-cols-8">
+      {visibleOrderedIds.map((id) => {
+        const device = deviceMap.get(id);
+        if (device) {
+          const size = cardSizes[device.id] || (device.size as CardSize);
+
+          return (
+            <DashboardCardItem
+              key={device.id}
+              id={device.id}
+              device={device}
+              size={size}
+              isEditMode={isEditMode}
+              handleSizeChange={handleSizeChange}
+              onRemoveEntity={onRemoveEntity}
+              allowEntityRemoval={allowEntityRemoval}
+              usesHideAction={usesHideAction}
+            />
+          );
+        }
+
+        const card = customCardMap.get(id);
+        if (!card) {
+          return null;
+        }
+
+        const size = cardSizes[card.id] || card.size;
+
+        return (
+          <DashboardCardItem
+            key={card.id}
+            id={card.id}
+            card={card}
+            size={size}
+            isEditMode={isEditMode}
+            handleSizeChange={handleSizeChange}
+            onDeleteCard={onDeleteCard}
+            onUpdateCard={onUpdateCard}
+            onRemoveEntity={onRemoveEntity}
+            allowEntityRemoval={allowEntityRemoval}
+            usesHideAction={usesHideAction}
+          />
+        );
+      })}
+    </div>
+  );
 
   return (
     <div
@@ -181,53 +261,13 @@ export const RoomSection = memo(function RoomSection({
           onRemoveEntity={onRemoveEntity}
           onSizeChange={handleSizeChange}
         >
-          <SortableContext items={visibleOrderedIds} strategy={rectSortingStrategy}>
-            <div className="grid w-full grid-flow-row-dense grid-cols-2 gap-2 auto-rows-[87px] md:grid-cols-4 md:gap-3 xl:grid-cols-6 lg:gap-4 2xl:grid-cols-8">
-              {visibleOrderedIds.map((id) => {
-                const device = deviceMap.get(id);
-                if (device) {
-                  const size = cardSizes[device.id] || (device.size as CardSize);
-
-                  return (
-                    <DashboardCardItem
-                      key={device.id}
-                      id={device.id}
-                      device={device}
-                      size={size}
-                      isEditMode={isEditMode}
-                      handleSizeChange={handleSizeChange}
-                      onRemoveEntity={onRemoveEntity}
-                      allowEntityRemoval={allowEntityRemoval}
-                      usesHideAction={usesHideAction}
-                    />
-                  );
-                }
-
-                const card = customCardMap.get(id);
-                if (!card) {
-                  return null;
-                }
-
-                const size = cardSizes[card.id] || card.size;
-
-                return (
-                  <DashboardCardItem
-                    key={card.id}
-                    id={card.id}
-                    card={card}
-                    size={size}
-                    isEditMode={isEditMode}
-                    handleSizeChange={handleSizeChange}
-                    onDeleteCard={onDeleteCard}
-                    onUpdateCard={onUpdateCard}
-                    onRemoveEntity={onRemoveEntity}
-                    allowEntityRemoval={allowEntityRemoval}
-                    usesHideAction={usesHideAction}
-                  />
-                );
-              })}
-            </div>
-          </SortableContext>
+          {isEditMode ? (
+            <SortableContext items={visibleOrderedIds} strategy={rectSortingStrategy}>
+              {gridContent}
+            </SortableContext>
+          ) : (
+            gridContent
+          )}
         </DashboardEditActions>
       ) : (
         <div className="w-full" style={{ minHeight: `${placeholderHeight}px` }} />

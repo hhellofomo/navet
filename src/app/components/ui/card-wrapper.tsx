@@ -58,7 +58,7 @@ export const CardWrapper = memo(function CardWrapper({
           onClick(e);
         }
       }}
-      className={`relative h-full backdrop-blur-xl rounded-3xl border overflow-hidden transition-all duration-500 ${onClick && !isDisabled ? 'cursor-pointer' : ''} ${showShadow ? surface.cardShadow : ''} ${interactionClassName || ''} ${className}`}
+      className={`relative h-full rounded-3xl border overflow-hidden transition-all duration-500 ${onClick && !isDisabled ? 'cursor-pointer' : ''} ${showShadow ? surface.cardShadow : ''} ${interactionClassName || ''} ${className}`}
       {...restInteractionProps}
     >
       {children}

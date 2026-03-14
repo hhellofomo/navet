@@ -1,14 +1,8 @@
+import { resolvePrimaryColorToken } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import type { PrimaryColor, ThemeType } from '@/app/hooks';
 
-const RSS_ACCENT_COLORS: Record<
-  PrimaryColor,
-  {
-    strong: string;
-    base: string;
-    soft: string;
-  }
-> = {
+const RSS_ACCENT_COLORS = {
   orange: { strong: '#c2410c', base: '#f97316', soft: '#fed7aa' },
   blue: { strong: '#1d4ed8', base: '#3b82f6', soft: '#bfdbfe' },
   green: { strong: '#15803d', base: '#22c55e', soft: '#bbf7d0' },
@@ -17,11 +11,11 @@ const RSS_ACCENT_COLORS: Record<
   red: { strong: '#b91c1c', base: '#ef4444', soft: '#fecaca' },
   yellow: { strong: '#a16207', base: '#eab308', soft: '#fef08a' },
   teal: { strong: '#0f766e', base: '#14b8a6', soft: '#99f6e4' },
-};
+} as const;
 
 export function getRSSFeedCardSurfaceTokens(theme: ThemeType, primaryColor: PrimaryColor) {
   const surface = getThemeSurfaceTokens(theme);
-  const accentColor = RSS_ACCENT_COLORS[primaryColor];
+  const accentColor = RSS_ACCENT_COLORS[resolvePrimaryColorToken(primaryColor)];
 
   return {
     surface,

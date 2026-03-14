@@ -2,22 +2,14 @@
 
 import * as SwitchPrimitive from '@radix-ui/react-switch';
 import type * as React from 'react';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useTheme } from '@/app/hooks';
 
 import { cn } from './utils';
 
 function Switch({ className, ...props }: React.ComponentProps<typeof SwitchPrimitive.Root>) {
   const { primaryColor } = useTheme();
-  const colorMap = {
-    blue: '#3b82f6',
-    purple: '#a855f7',
-    pink: '#ec4899',
-    red: '#ef4444',
-    orange: '#f97316',
-    yellow: '#eab308',
-    green: '#22c55e',
-    teal: '#14b8a6',
-  } as const;
+  const accentColor = getThemeColorValue(primaryColor);
 
   return (
     <SwitchPrimitive.Root
@@ -27,8 +19,8 @@ function Switch({ className, ...props }: React.ComponentProps<typeof SwitchPrimi
         className
       )}
       style={{
-        ['--switch-checked-bg' as string]: colorMap[primaryColor],
-        ['--switch-focus-ring' as string]: `${colorMap[primaryColor]}33`,
+        ['--switch-checked-bg' as string]: accentColor,
+        ['--switch-focus-ring' as string]: `${accentColor}33`,
       }}
       {...props}
     >

@@ -1,7 +1,7 @@
 import type { CardSize } from '../components/shared/card-size-selector';
 import type { AppLanguage } from '../i18n';
 import type { Section } from '../navigation/sections';
-import type { EntityInteractionMode } from './settings-store';
+import type { EffectsQuality, EntityInteractionMode } from './settings-store';
 import type { PrimaryColor, ThemeMode } from './theme-store';
 
 export type ThemeType = ThemeMode;
@@ -9,9 +9,11 @@ export type ThemeType = ThemeMode;
 export interface ThemeState {
   theme: ThemeMode;
   primaryColor: PrimaryColor;
+  customPrimaryColor: string | null;
   wallpaper: string | null;
   setTheme: (theme: ThemeMode) => void;
   setPrimaryColor: (color: PrimaryColor) => void;
+  setCustomPrimaryColor: (color: string | null) => void;
   setWallpaper: (wallpaper: string | null) => void;
 }
 
@@ -48,6 +50,7 @@ interface UserSettings {
   compactMode: boolean;
   disableAnimations: boolean;
   lowPowerMode: boolean;
+  effectsQuality: EffectsQuality;
   entityInteractionMode: EntityInteractionMode;
   ambientLightBleed: boolean;
 }

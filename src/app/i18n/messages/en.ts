@@ -12,28 +12,26 @@ export const enMessages = {
   'header.weekLabel': 'Week {week}',
   'settings.hero.eyebrow': 'Settings',
   'settings.hero.title': 'A calmer place to tune Navet.',
-  'settings.hero.description':
-    'Large type, fewer boxes, and one clear action path per setting. The page stays scalable, but it should now read more like a product settings experience than a dense control panel.',
+  'settings.hero.description': 'Adjust how Navet looks, behaves, and connects in one place.',
   'settings.nav.appearance': 'Appearance',
+  'settings.nav.localization': 'Localization',
+  'settings.nav.interaction': 'Interaction',
   'settings.nav.dashboard': 'Dashboard',
   'settings.nav.system': 'System',
   'settings.nav.project': 'Project',
   'settings.appearance.sectionTitle': 'Appearance',
   'settings.appearance.sectionDescription':
-    'Visual decisions that define the overall feel of the dashboard.',
+    'Theme, wallpaper, glass intensity, and lighting ambience that shape Navet’s visual identity.',
   'settings.appearance.themeAccent.title': 'Theme and accent',
   'settings.appearance.themeAccent.description':
     'Choose the overall visual tone and key accent using the same picker shown during onboarding.',
-  'settings.appearance.language.title': 'Language',
-  'settings.appearance.language.description':
-    'Set the interface language and locale used for dates, time, and number formatting.',
   'settings.appearance.ambience.title': 'Light card ambience',
   'settings.appearance.ambience.description':
     'Choose whether active light cards spill ambient color into the dashboard or stay contained inside the card.',
   'settings.appearance.ambience.ambientBleed': 'Ambient bleed',
   'settings.appearance.ambience.contained': 'Contained',
   'settings.appearance.ambience.disabledInLowPower':
-    'Unavailable while Low-power mode is on. Light cards use Contained mode instead.',
+    'Available only on High visual quality. Light cards use Contained mode on Medium and Low.',
   'settings.appearance.wallpaper.title': 'Wallpaper',
   'settings.appearance.wallpaper.description':
     'Add a background image that blends with the active accent and theme.',
@@ -43,7 +41,7 @@ export const enMessages = {
   'settings.appearance.wallpaper.fileHint': 'PNG, JPG up to 5MB',
   'settings.dashboard.sectionTitle': 'Dashboard',
   'settings.dashboard.sectionDescription':
-    'Decide what shows up on the board and how this local setup is backed up.',
+    'Manage what appears on the board and how this local setup is backed up.',
   'settings.dashboard.entityVisibility.title': 'Entity visibility',
   'settings.dashboard.entityVisibility.description':
     'Navet now uses one visibility model. Remove entities from edit mode, then add them back later from Add Entity.',
@@ -63,6 +61,28 @@ export const enMessages = {
     'Choose whether tapping the card should toggle the device right away or open its controls first.',
   'settings.dashboard.interaction.toggleFirst': 'Tap toggles',
   'settings.dashboard.interaction.controlFirst': 'Tap opens controls',
+  'settings.localization.sectionTitle': 'Localization',
+  'settings.localization.sectionDescription':
+    'Language and formatting preferences for names, dates, times, and units.',
+  'settings.localization.language.title': 'Language',
+  'settings.localization.language.description':
+    'Set the interface language and locale used for dates, time, and number formatting.',
+  'settings.localization.timeFormat.title': 'Time format',
+  'settings.localization.timeFormat.description':
+    'Choose whether Navet shows times in 12-hour or 24-hour format.',
+  'settings.localization.timeFormat.twelveHour': '12-hour',
+  'settings.localization.timeFormat.twentyFourHour': '24-hour',
+  'settings.localization.temperatureUnit.title': 'Temperature unit',
+  'settings.localization.temperatureUnit.description':
+    'Choose which temperature unit cards and weather views should use.',
+  'settings.localization.temperatureUnit.celsius': 'Celsius',
+  'settings.localization.temperatureUnit.fahrenheit': 'Fahrenheit',
+  'settings.interaction.sectionTitle': 'Interaction',
+  'settings.interaction.sectionDescription':
+    'How cards respond when you tap them and what action Navet prioritizes first.',
+  'settings.interaction.cardBehavior.title': 'Card behavior',
+  'settings.interaction.cardBehavior.description':
+    'Choose whether a card tap should act immediately or open detailed controls first.',
   'settings.dashboard.backup.title': 'Local config backup',
   'settings.dashboard.backup.description':
     'Export a reusable snapshot of your dashboard layout and restore it on another device later.',
@@ -72,13 +92,19 @@ export const enMessages = {
   'settings.dashboard.backup.import': 'Import config',
   'settings.system.sectionTitle': 'System',
   'settings.system.sectionDescription':
-    'Performance controls and connection details for the current Home Assistant target.',
+    'Connection details and recovery actions for the current Home Assistant target.',
   'settings.system.animations.title': 'Disable animations',
   'settings.system.animations.description':
     'Useful for slower devices like Raspberry Pis. Turns off transitions and animated effects across the app.',
   'settings.system.lowPowerMode.title': 'Low-power mode',
   'settings.system.lowPowerMode.description':
     'Disables animations and reduces blur, heavy shadows, wallpaper processing, and ambient glow for smoother rendering on slower hardware.',
+  'settings.system.effectsQuality.title': 'Visual quality',
+  'settings.system.effectsQuality.description':
+    'Choose how much live glass rendering Navet should use. High keeps the full look, Medium uses simulated glass, and Low strips effects down for the slowest devices.',
+  'settings.system.effectsQuality.high': 'High',
+  'settings.system.effectsQuality.medium': 'Medium',
+  'settings.system.effectsQuality.low': 'Low',
   'settings.system.connection.title': 'Connection',
   'settings.system.connection.description':
     'Review the current server target, open Home Assistant, or reset the saved connection.',
@@ -327,6 +353,8 @@ export const enMessages = {
   'login.errors.unexpected': 'An unexpected error occurred',
   'themePicker.themeMode': 'Theme mode',
   'themePicker.accentColor': 'Accent color',
+  'themePicker.customAccent': 'Custom accent color',
+  'themePicker.customAccentBadge': 'Pick',
   'themePicker.previewSubtitle': '{mode} mode',
   'themeOption.glass.label': 'Liquid Glass',
   'themeOption.glass.description': 'Frosted translucent panels with luminous accents',

@@ -22,8 +22,8 @@ Complete documentation for the Navet smart home dashboard.
 - **[Main README](../README.md#-features)** - Current product features, including the unified HVAC-based climate card path, live calendar cards, Home Assistant notifications/repairs, and card-level room reassignment
 - **[Main README](../README.md#room-navigation)** - Dashboard room navigation, All-view grouping modes, and dashboard dropdown behavior
 - **[Main README](../README.md#search)** - Dashboard search behavior, including Home Assistant entity-id and domain queries
-- **[Main README](../README.md#themes)** - Theme modes, shared appearance primitives, and the light card ambience setting
-- **[Main README](../README.md#themes)** - Appearance settings also cover app language, translated theme picker copy, shared localized live previews, and locale-aware formatting
+- **[Main README](../README.md#themes)** - Theme modes, adaptive glass visual quality tiers, shared appearance primitives, custom accents, and the light card ambience setting
+- **[Main README](../README.md#themes)** - Settings are organized into Appearance, Localization, Interaction, Dashboard, System, and Project sections
 - **[Design System](../design-system/README.md#core-design-principles)** - Shared primitives, including icon pills, nav/action pills, and card off-state surface tokens
 - **[Docker and Home Assistant Add-on](DOCKER_HOME_ASSISTANT_ADDON.md)** - Packaging and deployment guide
   - Standalone Docker image
@@ -97,6 +97,9 @@ Complete documentation for the Navet smart home dashboard.
 
 **Understand card tap behavior and interaction styles:**
 → See [Main README -> Card Interaction Style](../README.md#card-interaction-style)
+
+**Understand custom accent colors and shared color pickers:**
+→ See [Main README -> Themes](../README.md#themes)
 
 **Understand dashboard search with entity ids and domains:**
 → See [Main README -> Search](../README.md#search)

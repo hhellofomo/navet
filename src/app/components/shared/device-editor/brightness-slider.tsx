@@ -4,6 +4,7 @@ import {
   isCompactCardSize,
   isExtraSmallCardSize,
 } from '@/app/components/shared/card-size-selector';
+import { resolvePrimaryColorToken } from '@/app/components/shared/theme/theme-colors';
 import { useI18n, useTheme } from '@/app/hooks';
 import type { CardSize } from '../card-size-selector';
 import { getDeviceEditorSurfaceTokens } from './device-editor-surface-tokens';
@@ -49,7 +50,7 @@ export const BrightnessSlider = memo(function BrightnessSlider({
   const trackHeightClass = isExtraSmall ? 'h-[3px]' : 'h-1';
   const thumbSizeClass = isExtraSmall ? 'w-3.5 h-3.5' : isCompact ? 'w-4 h-4' : 'w-5 h-5';
   const trackBg = theme === 'light' ? 'bg-gray-200' : 'bg-white/10';
-  const activeColor = BRIGHTNESS_ACCENT_COLORS[primaryColor];
+  const activeColor = BRIGHTNESS_ACCENT_COLORS[resolvePrimaryColorToken(primaryColor)];
   const rangeBg = isOn
     ? theme === 'glass'
       ? `linear-gradient(to right, rgba(255,255,255,0.52), ${activeColor.to}88)`

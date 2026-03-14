@@ -1,6 +1,8 @@
 import { Image as ImageIcon, Palette, Upload, X } from 'lucide-react';
 import { ThemeAppearancePicker } from '@/app/components/shared/theme/theme-appearance-picker';
 import { useI18n } from '@/app/hooks';
+import type { EffectsQuality } from '@/app/stores/settings-store';
+import { getLegacyReducedEffectsFlags } from '@/app/utils/effects-quality';
 import type { SettingsSectionController } from '../hooks/use-settings-section-controller';
 import { AmbientLightPreviewCard } from './ambient-light-preview-card';
 import { SettingsItem, SettingsSectionShell } from './settings-section-shell';
@@ -14,20 +16,27 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
   const {
     ambientLightBleed,
     colorOptions,
+    customPrimaryColor,
+    effectsQuality,
     handleRemoveWallpaper,
     handleWallpaperUpload,
-    language,
-    languageOptions,
-    lowPowerMode,
     primaryColor,
     setPrimaryColor,
+    setCustomPrimaryColor,
     setTheme,
     styles,
     theme,
     themeOptions,
+    updateSettings,
     wallpaper,
   } = controller;
-  const effectiveAmbientLightBleed = ambientLightBleed && !lowPowerMode;
+  const ambienceDisabled = effectsQuality !== 'high';
+  const effectiveAmbientLightBleed = ambientLightBleed && !ambienceDisabled;
+  const qualityOptions: Array<{ value: EffectsQuality; label: string }> = [
+    { value: 'high', label: t('settings.system.effectsQuality.high') },
+    { value: 'medium', label: t('settings.system.effectsQuality.medium') },
+    { value: 'low', label: t('settings.system.effectsQuality.low') },
+  ];
 
   return (
     <SettingsSectionShell
@@ -44,27 +53,36 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
       >
         <ThemeAppearancePicker
           colorOptions={colorOptions}
+          customAccent={customPrimaryColor}
           selectedAccent={primaryColor}
           selectedTheme={theme}
           themeOptions={themeOptions}
           onAccentChange={setPrimaryColor}
+          onCustomAccentChange={setCustomPrimaryColor}
           onThemeChange={setTheme}
         />
       </SettingsItem>
 
       <SettingsItem
-        title={t('settings.appearance.language.title')}
-        description={t('settings.appearance.language.description')}
+        title={t('settings.system.effectsQuality.title')}
+        description={t('settings.system.effectsQuality.description')}
         styles={styles}
       >
-        <div className="flex flex-wrap gap-3">
-          {languageOptions.map((option) => {
-            const isActive = language === option.value;
+        <div
+          className={`inline-flex flex-wrap rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
+        >
+          {qualityOptions.map((option) => {
+            const isActive = effectsQuality === option.value;
             return (
               <button
                 type="button"
-                key={option.value}
-                onClick={() => controller.updateSettings({ language: option.value })}
+                key={option.label}
+                onClick={() =>
+                  updateSettings({
+                    effectsQuality: option.value,
+                    ...getLegacyReducedEffectsFlags(option.value),
+                  })
+                }
                 style={
                   isActive
                     ? {
@@ -73,10 +91,8 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
                       }
                     : undefined
                 }
-                className={`rounded-full border px-5 py-3 text-sm font-medium transition-all ${styles.borderColor} ${
-                  isActive
-                    ? 'shadow-sm'
-                    : `${styles.softBg} ${styles.chipTextColor} ${styles.hoverBg}`
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-all md:px-5 ${
+                  isActive ? 'shadow-sm' : styles.chipTextColor
                 }`}
                 aria-pressed={isActive}
               >
@@ -92,10 +108,10 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
         description={t('settings.appearance.ambience.description')}
         styles={styles}
       >
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
+        <div className="grid gap-4 md:gap-5 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
           <div className="space-y-3">
             <div
-              className={`inline-flex w-fit rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
+              className={`inline-flex w-fit flex-wrap rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
             >
               {[
                 { value: true, label: t('settings.appearance.ambience.ambientBleed') },
@@ -107,7 +123,7 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
                     type="button"
                     key={option.label}
                     onClick={() => controller.updateSettings({ ambientLightBleed: option.value })}
-                    disabled={lowPowerMode}
+                    disabled={ambienceDisabled}
                     style={
                       isActive
                         ? {
@@ -118,9 +134,9 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
                             color: undefined,
                           }
                     }
-                    className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all md:px-5 ${
                       isActive ? 'shadow-sm' : styles.chipTextColor
-                    } ${lowPowerMode ? 'cursor-not-allowed opacity-50' : ''}`}
+                    } ${ambienceDisabled ? 'cursor-not-allowed opacity-50' : ''}`}
                     aria-pressed={isActive}
                   >
                     {option.label}
@@ -129,18 +145,20 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
               })}
             </div>
 
-            {lowPowerMode ? (
+            {ambienceDisabled ? (
               <p className={`text-sm ${styles.subtleColor}`}>
                 {t('settings.appearance.ambience.disabledInLowPower')}
               </p>
             ) : null}
           </div>
 
-          <AmbientLightPreviewCard
-            accentColor={styles.accentColor}
-            ambientLightBleed={effectiveAmbientLightBleed}
-            theme={theme}
-          />
+          <div className="hidden md:block">
+            <AmbientLightPreviewCard
+              accentColor={styles.accentColor}
+              ambientLightBleed={effectiveAmbientLightBleed}
+              theme={theme}
+            />
+          </div>
         </div>
       </SettingsItem>
 
@@ -152,7 +170,7 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
         {wallpaper ? (
           <div className="relative max-w-2xl">
             <div
-              className="relative h-36 overflow-hidden rounded-[24px] border"
+              className="relative h-28 overflow-hidden rounded-[20px] border md:h-36 md:rounded-[24px]"
               style={{ borderColor: `${styles.accentColor}40` }}
             >
               <img
@@ -178,7 +196,7 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
             </button>
 
             <label
-              className={`mt-4 flex h-16 cursor-pointer items-center justify-center gap-3 rounded-[20px] border-2 border-dashed ${styles.lineColor} transition-colors ${styles.hoverBg}`}
+              className={`mt-3 flex h-14 cursor-pointer items-center justify-center gap-3 rounded-[18px] border-2 border-dashed md:mt-4 md:h-16 md:rounded-[20px] ${styles.lineColor} transition-colors ${styles.hoverBg}`}
             >
               <Upload className={`h-4 w-4 ${styles.mutedColor}`} />
               <div className="text-center">
@@ -199,9 +217,9 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
           </div>
         ) : (
           <label
-            className={`flex h-36 max-w-2xl cursor-pointer flex-col items-center justify-center rounded-[24px] border-2 border-dashed ${styles.lineColor} text-center transition-colors ${styles.hoverBg}`}
+            className={`flex h-28 max-w-2xl cursor-pointer flex-col items-center justify-center rounded-[20px] border-2 border-dashed text-center transition-colors md:h-36 md:rounded-[24px] ${styles.lineColor} ${styles.hoverBg}`}
           >
-            <ImageIcon className={`mb-3 h-9 w-9 ${styles.mutedColor}`} />
+            <ImageIcon className={`mb-2 h-8 w-8 md:mb-3 md:h-9 md:w-9 ${styles.mutedColor}`} />
             <span className={`text-sm font-medium ${styles.textColor}`}>
               {t('settings.appearance.wallpaper.upload')}
             </span>

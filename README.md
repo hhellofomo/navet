@@ -12,7 +12,7 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.0-38bdf8)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178c6)
 
-**A beautiful, iOS-inspired smart home dashboard with frosted glass aesthetics**
+**A beautiful, iOS-inspired smart home dashboard with adaptive glass aesthetics**
 
 [Features](#features) • [Installation](#installation) • [Usage](#usage) • [Widgets](docs/WIDGETS.md) • [License](#license) • [Contributing](CONTRIBUTING.md)
 
@@ -22,16 +22,16 @@
 
 ## 📱 Overview
 
-Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built with React and Tailwind CSS v4. Features a stunning frosted glass design inspired by iOS widgets, with comprehensive smart home control capabilities and an intuitive editing system.
+Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built with React and Tailwind CSS v4. It keeps a premium glass-inspired design language while scaling visual effects across powerful and low-power devices, with comprehensive smart home control capabilities and an intuitive editing system.
 
 Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONING.md) for the beta versioning policy.
 
 ## ✨ Features
 
 ### 🎨 Design
-- **iOS-Inspired Interface** - Frosted glass cards with blur effects and smooth animations
+- **Adaptive Glass Interface** - Premium glass-inspired surfaces with visual quality tiers for high, medium, and low-power devices
 - **4 Theme Modes** - Liquid Glass, Dark, Light, and High Contrast
-- **8 Primary Colors** - Customizable accent colors
+- **Custom Accent Colors** - 8 built-in accents plus a custom accent color picker
 - **Multi-Language UI** - English, Swedish, German, French, and Spanish interface support with locale-aware date, time, and number formatting
 - **Responsive Grid** - 2 columns (mobile) → 4 (tablet) → 6 (desktop)
 - **Adaptive Cards** - Extra-Small, Small, Medium, and Large card sizes
@@ -76,7 +76,7 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 - **Batched Room Mounting** - Visible All-view room sections now hydrate cards in smaller batches instead of one large render burst
 - **Virtualized Entity Picker** - The Add Entity dialog window-renders large Home Assistant entity lists
 - **Smart Re-renders** - Selector-based Home Assistant subscriptions and stable device maps reduce dashboard churn during live entity updates
-- **No-Animation Mode** - Optional global animation disable for slower devices
+- **Low-Power Mode** - Optional reduced-effects mode for slower devices, with cheaper glass rendering and contained light cards
 - **Local Config Backup** - Export and restore dashboard layout/preferences from a YAML file
 - **Tree-shakeable** - Only imports what's actually used
 
@@ -155,7 +155,7 @@ pnpm build
 2. **Connect System** - Ensure your Home Assistant instance is accessible
 3. **Customize Layout** - Enter Edit Mode from **Customize** or by pressing and holding on the dashboard to arrange rooms and cards
 4. **Choose Theme** - Select your preferred color scheme and theme mode
-5. **Optional for slower hardware** - Enable Low-power mode in Settings -> System
+5. **Optional for slower hardware** - Lower visual quality in Settings -> Appearance
 
 ### Features Guide
 
@@ -182,15 +182,17 @@ pnpm build
 #### Themes
 - Access **Settings** from the user menu
 - Choose from **4 modes**: Liquid Glass, Dark, Light, Contrast
-- Select from **8 colors**: Blue, Purple, Green, Orange, Pink, Red, Teal, Yellow
-- Choose the app **Language** in **Settings -> Appearance** to switch locale-aware interface formatting
+- Select from **8 built-in accents** or choose a **custom accent color**
+- Choose **Visual Quality** in **Settings -> Appearance**: **High**, **Medium**, or **Low**
+- Choose the app **Language** in **Settings -> Localization** to switch locale-aware interface formatting
 - Theme mode names, descriptions, and shared **Live Preview** labels follow the selected app language
 - In **Settings -> Appearance**, choose whether active light cards use **Ambient bleed** or stay **Contained** inside the card
+- Custom accent colors, preset accent colors, light colors, and Kelvin swatches now share the same color-picker primitive and sizing language
 - Shared theme-sensitive pieces such as entity icon pills and nav/action pills now resolve through reusable shared primitives rather than per-feature inline styling
 - Inactive/off card shells and text treatment now also resolve through a shared card-state primitive instead of per-card opacity tweaks
 
 #### Card Interaction Style
-- In **Settings -> Dashboard**, choose how entity cards respond to taps
+- In **Settings -> Interaction**, choose how entity cards respond to taps
 - **Tap toggles**: tapping the card toggles the device directly
 - **Tap opens controls**: tapping the card opens the device controls instead
 - The settings screen includes a live practice card preview so you can test the interaction before leaving Settings
@@ -224,7 +226,7 @@ pnpm build
 - Restarting onboarding from Settings sends you back to the Home dashboard and reopens the onboarding dialog
 
 #### Dashboard Config
-- In **Settings -> Dashboard Config**, export your local dashboard setup to a YAML file
+- In **Settings -> Dashboard**, export your local dashboard setup to a YAML file
 - Navet imports that YAML file later from Settings or directly from first-run onboarding
 - Import that file later on the same machine or another device to restore:
   - theme and wallpaper

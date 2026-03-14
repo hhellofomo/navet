@@ -3,6 +3,7 @@ import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-s
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import { useSettingsStore } from '@/app/stores';
+import { resolveEffectsQuality } from '@/app/utils/effects-quality';
 import { LightCardLarge } from './light-card-large';
 import { LightCardMedium } from './light-card-medium';
 import { LightCardSmall } from './light-card-small';
@@ -35,6 +36,7 @@ export const LightCard = memo(function LightCard({
   const { theme } = useTheme();
   const ambientLightBleed = useSettingsStore((state) => state.ambientLightBleed);
   const lowPowerMode = useSettingsStore((state) => state.lowPowerMode);
+  const effectsQuality = useSettingsStore((state) => state.effectsQuality);
   const controller = useLightCardController({
     id,
     name,
@@ -46,7 +48,8 @@ export const LightCard = memo(function LightCard({
     isEditMode,
   });
   const stateSurface = getCardStateSurfaceTokens(theme, controller.isOn);
-  const showAmbientLightBleed = ambientLightBleed && !lowPowerMode;
+  const resolvedEffectsQuality = resolveEffectsQuality(effectsQuality, lowPowerMode);
+  const showAmbientLightBleed = ambientLightBleed && resolvedEffectsQuality === 'high';
 
   const isSmall = isCompactCardSize(size);
 
@@ -68,11 +71,11 @@ export const LightCard = memo(function LightCard({
 
         <div
           {...controller.cardInteraction.cardProps}
-          className={`relative z-10 h-full w-full overflow-hidden rounded-3xl border backdrop-blur-xl ${controller.padding} transition-all duration-500 ${controller.gradientColors.border} ${stateSurface.containerClassName} ${!isEditMode ? 'cursor-pointer' : ''} ${
+          className={`relative z-10 h-full w-full overflow-hidden rounded-3xl border ${controller.padding} transition-all duration-500 ${controller.gradientColors.border} ${stateSurface.containerClassName} ${!isEditMode ? 'cursor-pointer' : ''} ${
             controller.gradientColors.customGradient
               ? ''
               : `bg-gradient-to-br ${controller.gradientColors.from} ${controller.gradientColors.to}`
-          } ${theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
+          } ${theme === 'light' && controller.isOn && resolvedEffectsQuality === 'high' ? 'shadow-md' : ''}`}
           style={
             controller.gradientColors.customGradient
               ? {
@@ -100,7 +103,7 @@ export const LightCard = memo(function LightCard({
           )}
 
           {theme !== 'light' && (
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.015)_38%,transparent_68%)]" />
           )}
 
           {stateSurface.overlayClassName && (

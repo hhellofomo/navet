@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { ColorInputSwatch } from '@/app/components/shared/color-input-swatch';
 import { type CardSize, isCompactCardSize } from '../card-size-selector';
 
 interface ColorTemperature {
@@ -27,39 +28,25 @@ export const ColorTemperaturePresets = memo(function ColorTemperaturePresets({
   size = 'medium',
 }: ColorTemperaturePresetsProps) {
   const isCompact = isCompactCardSize(size);
-  const buttonSize = isCompact ? 'w-8 h-8' : size === 'medium' ? 'w-10 h-10' : 'w-12 h-12';
-  const scaleSelected = isCompact ? 'scale-110' : size === 'medium' ? 'scale-110' : 'scale-[1.15]';
-  const glowSize = isCompact
-    ? { blur: '12px', spread: '24px', opacity: '80', opacity2: '40' }
-    : size === 'medium'
-      ? { blur: '16px', spread: '32px', opacity: '90', opacity2: '50' }
-      : { blur: '20px', spread: '40px', opacity: '95', opacity2: '60' };
+  const swatchSize = isCompact ? 'small' : size === 'medium' ? 'medium' : 'large';
 
   return (
     <>
       {options.map((option) => (
-        <button
-          type="button"
+        <ColorInputSwatch
           key={option.value}
+          mode="swatch"
+          value={option.color}
+          ariaLabel={`${option.label} (${option.value}K)`}
+          title={size === 'large' ? `${option.label} (${option.value}K)` : option.label}
+          size={swatchSize}
+          selected={currentTemp === option.value && !selectedColor && isOn}
           onClick={(e) => {
             e.stopPropagation();
             onTempChange(option.value);
             onClearColor();
           }}
           disabled={!isOn}
-          className={`${buttonSize} rounded-full transition-all duration-500 ${
-            currentTemp === option.value && !selectedColor && isOn
-              ? scaleSelected
-              : 'hover:scale-105'
-          } ${!isOn ? 'opacity-50 cursor-not-allowed' : ''}`}
-          style={{
-            backgroundColor: option.color,
-            boxShadow:
-              currentTemp === option.value && !selectedColor && isOn
-                ? `0 0 ${glowSize.blur} ${option.color}${glowSize.opacity}, 0 0 ${glowSize.spread} ${option.color}${glowSize.opacity2}`
-                : 'none',
-          }}
-          title={size === 'large' ? `${option.label} (${option.value}K)` : option.label}
         />
       ))}
     </>

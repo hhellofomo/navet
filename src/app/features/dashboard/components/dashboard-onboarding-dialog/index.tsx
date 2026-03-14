@@ -1,7 +1,10 @@
 import { ArrowLeft, Check, Download, Layers3, Palette, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ThemeAppearancePicker } from '@/app/components/shared/theme/theme-appearance-picker';
-import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import {
+  getThemeColorValue,
+  sanitizeCustomPrimaryColor,
+} from '@/app/components/shared/theme/theme-colors';
 import { PRIMARY_COLOR_OPTIONS, THEME_OPTIONS } from '@/app/constants/theme-options';
 import { useI18n, useTheme } from '@/app/hooks';
 import type { PrimaryColor, ThemeType } from '@/app/hooks/use-theme';
@@ -16,12 +19,22 @@ export function DashboardOnboardingDialog({
   onClosingAnimationComplete,
 }: DashboardOnboardingDialogProps) {
   const { t } = useI18n();
-  const { theme, primaryColor, setPrimaryColor, setTheme } = useTheme();
+  const {
+    customPrimaryColor,
+    theme,
+    primaryColor,
+    setCustomPrimaryColor,
+    setPrimaryColor,
+    setTheme,
+  } = useTheme();
   const [isImporting, setIsImporting] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState<WizardRoute>(null);
   const [step, setStep] = useState<WizardStep>('route');
   const [selectedTheme, setSelectedTheme] = useState<ThemeType>(theme);
   const [selectedAccent, setSelectedAccent] = useState<PrimaryColor>(primaryColor);
+  const [selectedCustomAccent, setSelectedCustomAccent] = useState<string | null>(
+    customPrimaryColor
+  );
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -33,7 +46,8 @@ export function DashboardOnboardingDialog({
     setSelectedRoute(null);
     setSelectedTheme(theme);
     setSelectedAccent(primaryColor);
-  }, [open, primaryColor, theme]);
+    setSelectedCustomAccent(customPrimaryColor);
+  }, [customPrimaryColor, open, primaryColor, theme]);
 
   useEffect(() => {
     if (phase !== 'closing' || !onClosingAnimationComplete) {
@@ -61,7 +75,10 @@ export function DashboardOnboardingDialog({
 
   const previewTheme = step === 'theme' ? selectedTheme : theme;
   const previewAccent = step === 'theme' ? selectedAccent : primaryColor;
-  const accentColor = getThemeColorValue(previewAccent);
+  const accentColor =
+    previewAccent === 'custom' && selectedCustomAccent
+      ? selectedCustomAccent
+      : getThemeColorValue(previewAccent);
   const isContrast = previewTheme === 'contrast';
   const bgColor =
     previewTheme === 'light'
@@ -126,12 +143,14 @@ export function DashboardOnboardingDialog({
     setSelectedRoute(route);
     setSelectedTheme(theme);
     setSelectedAccent(primaryColor);
+    setSelectedCustomAccent(customPrimaryColor);
     setStep('theme');
   };
 
   const handleFinishThemeSetup = () => {
     setTheme(selectedTheme);
     setPrimaryColor(selectedAccent);
+    setCustomPrimaryColor(sanitizeCustomPrimaryColor(selectedCustomAccent));
 
     if (selectedRoute === 'all') {
       onChooseAll();
@@ -287,10 +306,12 @@ export function DashboardOnboardingDialog({
           <div className="mt-8">
             <ThemeAppearancePicker
               colorOptions={PRIMARY_COLOR_OPTIONS}
+              customAccent={selectedCustomAccent}
               selectedAccent={selectedAccent}
               selectedTheme={selectedTheme}
               themeOptions={THEME_OPTIONS}
               onAccentChange={setSelectedAccent}
+              onCustomAccentChange={setSelectedCustomAccent}
               onThemeChange={setSelectedTheme}
               lead={
                 <div className="flex items-center gap-3">
