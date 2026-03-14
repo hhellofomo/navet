@@ -122,8 +122,9 @@ At `lg` and above, that resolves to the familiar desktop card dimensions:
 
 ### Responsive Breakpoints
 - **Mobile**: `< 768px` - 2 column grid, hidden sidebar
-- **Tablet**: `768px - 1023px` - 3-4 column grid, slide-in sidebar
-- **Desktop**: `≥ 1024px` - 4-6 column grid, fixed sidebar
+- **Tablet**: `768px - 1279px` - 4 column grid
+- **Desktop**: `1280px - 1535px` - 6 column grid, fixed sidebar
+- **Large Desktop**: `≥ 1536px` - 8 column grid, fixed sidebar
 
 ## 🛠 For Developers
 

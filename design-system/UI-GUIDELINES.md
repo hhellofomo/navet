@@ -389,12 +389,13 @@ Focus visible on keyboard navigation
 ### Responsive Breakpoints
 ```css
 Mobile: < 768px
-Tablet: 768px - 1024px
-Desktop: > 1024px
+Tablet: 768px - 1279px
+Desktop: 1280px - 1535px
+Large Desktop: ≥ 1536px
 ```
 
 ### Mobile Optimizations
-- Sidebar hidden, accessible via menu
+- Sidebar hidden; mobile navigation uses the bottom bar
 - Dashboard uses a 2-column grid by default
 - Touch-friendly 44px minimum hit targets
 - Reduced card padding for space efficiency

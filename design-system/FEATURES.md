@@ -167,17 +167,17 @@ Navet now uses a single HVAC-based card path for Home Assistant climate entities
 
 **Location**: `/src/app/features/media/components/media-card/`
 
-Navet now uses a live Home Assistant-backed media card flow instead of a mock-only media stub.
+Navet now uses a live Home Assistant-backed media card flow.
 
 #### Current Behavior
-- **Home Assistant media player wiring** - media cards map real `media_player` entities into playback state, volume, mute, metadata, artwork, and elapsed-time UI
+- **Home Assistant media player wiring** - media cards map real `media_player` entities into playback state, volume, mute, metadata, artwork, and remaining-time UI
 - **Artwork-led layouts** - small, medium, and medium-vertical media cards use artwork-led surfaces rather than a separate album-art tile pattern
 - **Shared transport controls** - previous, play/pause, next, volume, and details actions use the shared round control button primitive
 - **Theme-aware inactive treatment** - media off state now follows the same shared card-state surface token system used by other cards
-- **Top-left playback indicator** - the visualizer animates while media is playing, and elapsed time appears beside it only during active playback
+- **Top-left playback indicator** - the visualizer animates while media is playing, and remaining time appears beside it only during active playback
 
 #### Notes
-- Elapsed time is shown only when Home Assistant playback is active
+- Remaining time is shown only when Home Assistant playback is active
 - Artwork is rendered only when the entity exposes artwork; Navet no longer injects a default placeholder image
 - The media dialog and card views share the same transport/action visual language
 
@@ -342,16 +342,16 @@ Beautiful placeholder screens for sections without data.
 
 ## Responsive Behavior
 
-### Desktop (≥ 1024px)
+### Desktop (≥ 1280px)
 - Sidebar always visible on left
 - Settings: Maximum width 896px (max-w-2xl), centered
 - Grid: 6 columns at `xl`, growing to 8 columns at `2xl`
 - Navigation: Sidebar icons only
 
-### Tablet (768px - 1023px)
-- Sidebar hidden, accessible via menu
+### Tablet (768px - 1279px)
+- Sidebar visible on left
 - Grid: 4 columns
-- Navigation: Bottom bar on mobile breakpoint
+- Navigation: Sidebar remains primary
 
 ### Mobile (< 768px)
 - No sidebar
