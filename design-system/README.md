@@ -150,20 +150,23 @@ When creating a new card component:
 
 ### Key Files
 ```
-/src/app/components/shared/   → Shared UI building blocks
-/src/app/components/layout/sections.tsx → Dedicated non-home section views
-/src/app/features/dashboard/  → Dashboard layout, routing, and card registry
-/src/app/features/settings/   → Settings page and section implementations
-/src/app/features/lighting/   → Light cards, presets, and feature-owned stores
-/src/app/features/climate/    → HVAC card, settings dialog, and climate-specific styles
-/src/app/features/auth/login-page.tsx → Login interface
-/src/app/contexts/auth-context.tsx → Authentication state management
+/src/app/components/shared/             → Shared UI building blocks
+/src/app/components/layout/             → Header, sidebar, bottom nav
+/src/app/features/dashboard/            → Dashboard layout, routing, and card registry
+/src/app/features/settings/             → Settings page and section implementations
+/src/app/features/lighting/             → Light cards, presets, and feature-owned stores
+/src/app/features/climate/              → HVAC card, settings dialog, and climate-specific styles
+/src/app/features/auth/login-page.tsx   → Login interface
+/src/app/stores/auth-store.ts           → Authentication state (Zustand)
+/src/app/stores/config-store.ts         → HA connection config (Zustand)
+/src/app/stores/theme-store.ts          → Theme mode and primary color (Zustand)
+/src/app/stores/navigation-store.ts     → Section and room navigation (Zustand)
 /src/app/components/layout/user-dropdown.tsx → User account menu in the header
-/src/app/components/layout/sidebar.tsx → Primary desktop sidebar
-/src/app/hooks/use-theme.ts   → Theme and color customization
-/src/app/hooks/use-navigation.ts → Section navigation state
-/src/styles/theme.css         → Design tokens and variables
-/src/styles/tailwind.css      → Tailwind configuration
+/src/app/components/layout/sidebar.tsx  → Primary desktop sidebar (icon-only, 64px wide)
+/src/app/hooks/use-theme.ts             → Theme hook (wraps theme store)
+/src/app/hooks/use-navigation.ts        → Navigation hook (wraps navigation store)
+/src/app/stores/selectors.ts            → Optimized per-field selectors for all stores
+/src/styles/theme.css                   → Design tokens and variables
 ```
 
 ## 🎨 For Designers
@@ -188,6 +191,7 @@ Use these values in your design tools (Figma, Sketch, etc.):
 - **v1.2** - Added adaptive layout guidelines and best practices
 - **v1.3** - Added authentication system, theme customization, and navigation system
 - **v1.4** - Implemented settings section and empty states for all sections
+- **v1.5** - Auth/config moved to Zustand stores; sidebar updated to 64px icon-only layout; drag & drop card/room reordering shipped; typed HA service events; navigation store migrated to Zustand persist
 
 ## 📖 How to Use This Documentation
 

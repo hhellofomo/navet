@@ -51,6 +51,9 @@ interface CallServiceTarget {
   device_id?: string | string[];
 }
 
+export type HAServiceEventType = 'entities' | 'config' | 'registries' | 'connection';
+type HAServiceListener = (event: HAServiceEventType) => void;
+
 class HomeAssistantService {
   private connection: Connection | null = null;
   private config: HassConfig | null = null;
@@ -60,7 +63,9 @@ class HomeAssistantService {
   private deviceRegistry: HomeAssistantDeviceRegistryEntry[] = [];
   private entityRegistry: HomeAssistantEntityRegistryEntry[] = [];
   private connected: boolean = false;
-  private listeners: Array<() => void> = [];
+  private listeners: HAServiceListener[] = [];
+  private registryLoadInProgress = false;
+  private pendingRegistryLoad = false;
 
   /**
    * Authenticate and establish connection to Home Assistant
@@ -92,29 +97,29 @@ class HomeAssistantService {
       // Subscribe to entities
       subscribeEntities(this.connection, (entities) => {
         this.entities = entities;
-        this.notifyListeners();
+        this.notifyListeners('entities');
       });
 
       // Subscribe to config
       subscribeConfig(this.connection, (config) => {
         this.config = config;
-        this.notifyListeners();
+        this.notifyListeners('config');
       });
 
       // Connection events
       this.connection.addEventListener('ready', () => {
         this.connected = true;
-        this.notifyListeners();
+        this.notifyListeners('connection');
       });
 
       this.connection.addEventListener('disconnected', () => {
         this.connected = false;
-        this.notifyListeners();
+        this.notifyListeners('connection');
       });
 
       this.connection.addEventListener('reconnect-error', () => {
         this.connected = false;
-        this.notifyListeners();
+        this.notifyListeners('connection');
       });
 
       // Clear auth query string if present
@@ -130,6 +135,14 @@ class HomeAssistantService {
     if (!this.connection) {
       return;
     }
+
+    if (this.registryLoadInProgress) {
+      this.pendingRegistryLoad = true;
+      return;
+    }
+
+    this.registryLoadInProgress = true;
+    this.pendingRegistryLoad = false;
 
     try {
       const [areas, devices, entities] = await Promise.all([
@@ -147,51 +160,55 @@ class HomeAssistantService {
       this.areas = areas;
       this.deviceRegistry = devices;
       this.entityRegistry = entities;
-      this.notifyListeners();
+      this.notifyListeners('registries');
     } catch {
       this.areas = [];
       this.deviceRegistry = [];
       this.entityRegistry = [];
+    } finally {
+      this.registryLoadInProgress = false;
+      if (this.pendingRegistryLoad) {
+        void this.loadRegistries();
+      }
     }
   }
 
   /**
-   * Handle connection errors
+   * Handle connection errors, translating numeric error codes to messages
    */
   private handleError(error: unknown): never {
-    switch (error) {
-      case ERR_INVALID_AUTH:
-        break;
-      case ERR_CANNOT_CONNECT:
-        break;
-      case ERR_CONNECTION_LOST:
-        break;
-      case ERR_HASS_HOST_REQUIRED:
-        break;
-      case ERR_INVALID_HTTPS_TO_HTTP:
-        break;
-      default:
-        break;
+    const errorMessages: Record<number, string> = {
+      [ERR_INVALID_AUTH]:
+        'Invalid authentication token. Please check your long-lived access token.',
+      [ERR_CANNOT_CONNECT]:
+        'Cannot connect to Home Assistant. Check the URL and ensure it is reachable.',
+      [ERR_CONNECTION_LOST]: 'Connection to Home Assistant was lost.',
+      [ERR_HASS_HOST_REQUIRED]: 'Home Assistant host URL is required.',
+      [ERR_INVALID_HTTPS_TO_HTTP]: 'Cannot connect to an HTTP server from an HTTPS page.',
+    };
+
+    if (typeof error === 'number' && error in errorMessages) {
+      throw new Error(errorMessages[error]);
     }
+
     throw error;
   }
 
   /**
-   * Notify all listeners of state changes
+   * Notify all listeners of a specific state change
    */
-  private notifyListeners(): void {
-    this.listeners.forEach((listener) => {
-      listener();
-    });
+  private notifyListeners(event: HAServiceEventType): void {
+    for (const listener of this.listeners) {
+      listener(event);
+    }
   }
 
   /**
-   * Add a listener for state changes
+   * Add a typed listener for state change events
    */
-  addListener(callback: () => void): () => void {
+  addListener(callback: HAServiceListener): () => void {
     this.listeners.push(callback);
 
-    // Return unsubscribe function
     return () => {
       const index = this.listeners.indexOf(callback);
       if (index !== -1) {
@@ -285,7 +302,6 @@ class HomeAssistantService {
     });
 
     await this.loadRegistries();
-    this.notifyListeners();
   }
 
   /**
@@ -382,7 +398,7 @@ class HomeAssistantService {
       this.areas = [];
       this.deviceRegistry = [];
       this.entityRegistry = [];
-      this.notifyListeners();
+      this.notifyListeners('connection');
     }
   }
 }

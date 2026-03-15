@@ -49,25 +49,36 @@ export const homeAssistantStore = createStore<HomeAssistantStore>()((set, _get) 
     set({ connecting: true, error: null });
 
     try {
-      // Add listener to update store when service state changes
-      const unsubscribe = homeAssistantService.addListener(() => {
-        set({
-          connected: homeAssistantService.isConnected(),
-          config: homeAssistantService.getConfig(),
-          entities: homeAssistantService.getEntities(),
-          user: homeAssistantService.getUser(),
-          areas: homeAssistantService.getAreas(),
-          deviceRegistry: homeAssistantService.getDeviceRegistry(),
-          entityRegistry: homeAssistantService.getEntityRegistry(),
-          connection: homeAssistantService.getConnection(),
-          connecting: false,
-        });
+      // Subscribe to typed events — only update the slice of state that changed
+      const unsubscribe = homeAssistantService.addListener((event) => {
+        switch (event) {
+          case 'entities':
+            set({ entities: homeAssistantService.getEntities() });
+            break;
+          case 'config':
+            set({ config: homeAssistantService.getConfig() });
+            break;
+          case 'registries':
+            set({
+              areas: homeAssistantService.getAreas(),
+              deviceRegistry: homeAssistantService.getDeviceRegistry(),
+              entityRegistry: homeAssistantService.getEntityRegistry(),
+            });
+            break;
+          case 'connection':
+            set({
+              connected: homeAssistantService.isConnected(),
+              connection: homeAssistantService.getConnection(),
+              connecting: false,
+            });
+            break;
+        }
       });
 
       // Authenticate and connect
       await homeAssistantService.authenticate(config);
 
-      // Initial state update
+      // Populate full initial state after connection
       set({
         connected: homeAssistantService.isConnected(),
         config: homeAssistantService.getConfig(),
@@ -80,7 +91,6 @@ export const homeAssistantStore = createStore<HomeAssistantStore>()((set, _get) 
         connecting: false,
       });
 
-      // Return unsubscribe function
       return unsubscribe;
     } catch (error) {
       set({

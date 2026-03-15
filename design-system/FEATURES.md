@@ -83,7 +83,7 @@ Exposes global theme state including mode, effects quality, and primary color cu
 - Text: Dark gray primary, mid-gray secondary
 - Best for: Bright environments, accessibility
 
-**4. Black Theme**
+**4. Black Theme** (internal code: `contrast`)
 - Background: `#000000` (OLED black)
 - Cards: Near-pure black with stronger contrast treatment
 - Text: Pure white primary, bright accents
@@ -405,46 +405,53 @@ Beautiful placeholder screens for sections without data.
 
 ### State Management
 
-**Auth Context**
+All shared state is Zustand. Auth and config are stores, not React Context providers.
+
+**Auth store** (`src/app/stores/auth-store.ts`)
 ```tsx
-interface AuthContextType {
+interface AuthState {
   isAuthenticated: boolean;
-  user: User | null;
-  config: Config | null;
-  login: (url: string, token: string) => Promise<void>;
+  config: SessionConfig | null;
+  login: (url: string, token: string) => Promise<boolean>;
   logout: () => void;
 }
 ```
 
-**Theme hook**
+**Theme store** (`src/app/stores/theme-store.ts`)
 ```tsx
 interface ThemeState {
   theme: 'glass' | 'dark' | 'light' | 'contrast';
-  setTheme: (theme: ThemeType) => void;
   primaryColor: PrimaryColor;
-  setPrimaryColor: (color: PrimaryColor) => void;
+  customPrimaryColor: string | null;
+  wallpaper: string | null;
 }
 ```
 
-**Navigation hook**
+**Navigation store** (`src/app/stores/navigation-store.ts`)
 ```tsx
 interface NavigationState {
+  currentRoom: string;
   activeSection: Section;
-  setActiveSection: (section: Section) => void;
 }
 ```
 
-Theme, navigation, search, and Home Assistant access use direct hook modules instead of passthrough provider wrappers. Auth and config remain provider-backed shell concerns.
+Access these through their hook wrappers: `useAuth()`, `useTheme()`, `useNavigation()`. See
+`src/app/stores/selectors.ts` for optimized per-field selectors.
 
 ### Local Storage
 
 **Keys Used**
-- `ha_dashboard_auth` - Auth config and token
-- `ha_dashboard_theme` - Theme mode preference
-- `ha_dashboard_primary_color` - Primary color preference
-- `ha-dashboard-navigation` - Active section and current room
-- `navet-dashboard-entities` - Removed entity ids and onboarding state
-- Restarting onboarding should always return the user to Home / All before reopening the wizard
+- `ha_auth_config` — Auth config and token (`STORAGE_KEYS.authConfig`)
+- `ha-dashboard-config` — HA connection config (`STORAGE_KEYS.haConfig`)
+- `ha-dashboard-theme` — Theme mode and primary color (Zustand persist)
+- `ha-dashboard-settings` — User preferences (Zustand persist)
+- `ha-dashboard-navigation` — Active section and current room (Zustand persist)
+- `navet-dashboard-entities` — Hidden entity ids and onboarding state (Zustand persist)
+- `ha-dashboard-card-sizes` — Per-card size overrides
+- `ha-dashboard-card-orders` — Card ordering per room
+- `ha-dashboard-room-order` — Custom room sort order
+
+Restarting onboarding should always return the user to Home / All before reopening the wizard.
 
 ### CSS Variables
 
@@ -501,11 +508,15 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 
 ## Future Enhancements
 
-### Planned Features (v1.5)
+### Shipped since initial docs
+- [x] Drag & drop card and room reordering (via `@dnd-kit`)
+- [x] Export/import dashboard YAML config
+- [x] PWA installation support
+
+### Planned
 - [ ] Custom theme builder with color wheel
 - [ ] Light/dark theme auto-switching based on time
 - [ ] Per-section customization
-- [ ] Export/import theme configurations
 - [ ] User profile editing
 - [ ] Multiple dashboard layouts
 
@@ -522,11 +533,11 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 ## Best Practices
 
 ### When Adding New Sections
-1. Add the section to the navigation store types and exported navigation hook API
-2. Create section component in /components/sections.tsx
-3. Add icon and route to Sidebar component
-4. Include in mobile bottom navigation (if appropriate)
-5. Implement empty state if no data available, with the primary recovery action visible when possible
+1. Add the section to `src/app/navigation/sections.ts` and the exported navigation hook API
+2. Create the section component in `src/app/features/<name>/`
+3. Register in `src/app/features/dashboard/components/dashboard-section-router.tsx` using `lazy()`
+4. Add icon to the sidebar (`src/app/components/layout/sidebar.tsx`) and mobile bottom nav if appropriate
+5. Implement an empty state if no data is available, with the primary recovery action visible when possible
 6. Test at all breakpoints
 
 ### When Adding Theme-Dependent Styling

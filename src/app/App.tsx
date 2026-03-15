@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { NetworkStatusBanner } from './components/shared/network-status-banner';
 import { PwaUpdatePrompt } from './components/shared/pwa-update-prompt';
 import { Toaster } from './components/ui/sonner';
-import { AuthProvider, useAuth } from './contexts/auth-context';
-import { ConfigProvider, useConfig } from './contexts/config-context';
+import { useAuth } from './contexts/auth-context';
+import { useConfig } from './contexts/config-context';
 import { ErrorProvider } from './contexts/error-context';
 import { LoadingProvider } from './contexts/loading-context';
 import { LoginPage } from './features/auth/login-page';
@@ -11,7 +11,7 @@ import { DashboardPage } from './features/dashboard';
 import { useHomeAssistant } from './hooks';
 import { I18nProvider } from './i18n';
 import { useSettingsStore } from './stores';
-import { homeAssistantSelectors } from './stores/selectors';
+import { homeAssistantSelectors, settingsSelectors } from './stores/selectors';
 import { resolveEffectsQuality } from './utils/effects-quality';
 
 function AppContent() {
@@ -20,10 +20,10 @@ function AppContent() {
   const connected = useHomeAssistant(homeAssistantSelectors.connected);
   const connecting = useHomeAssistant(homeAssistantSelectors.connecting);
   const connect = useHomeAssistant(homeAssistantSelectors.connect);
-  const disableAnimations = useSettingsStore((state) => state.disableAnimations);
-  const lowPowerMode = useSettingsStore((state) => state.lowPowerMode);
-  const effectsQuality = useSettingsStore((state) => state.effectsQuality);
-  const pageZoom = useSettingsStore((state) => state.pageZoom);
+  const disableAnimations = useSettingsStore(settingsSelectors.disableAnimations);
+  const lowPowerMode = useSettingsStore(settingsSelectors.lowPowerMode);
+  const effectsQuality = useSettingsStore(settingsSelectors.effectsQuality);
+  const pageZoom = useSettingsStore(settingsSelectors.pageZoom);
   const resolvedEffectsQuality = resolveEffectsQuality(
     effectsQuality,
     disableAnimations || lowPowerMode
@@ -90,16 +90,12 @@ function AppContent() {
 
 export default function App() {
   return (
-    <ConfigProvider>
-      <I18nProvider>
-        <LoadingProvider>
-          <ErrorProvider>
-            <AuthProvider>
-              <AppContent />
-            </AuthProvider>
-          </ErrorProvider>
-        </LoadingProvider>
-      </I18nProvider>
-    </ConfigProvider>
+    <I18nProvider>
+      <LoadingProvider>
+        <ErrorProvider>
+          <AppContent />
+        </ErrorProvider>
+      </LoadingProvider>
+    </I18nProvider>
   );
 }
