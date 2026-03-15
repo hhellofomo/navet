@@ -245,9 +245,13 @@ export const svMessages = {
   'dashboard.feedback.configRestored': 'Dashboard-konfiguration återställd',
   'dashboard.onboarding.welcome': 'Välkommen',
   'dashboard.onboarding.heading.route': 'Hur ska Navet starta din dashboard?',
-  'dashboard.onboarding.heading.theme': 'Ställ in det första utseendet innan dashboarden visas.',
+  'dashboard.onboarding.heading.localization': 'Välj språk och format för din första vy.',
+  'dashboard.onboarding.heading.theme':
+    'Ställ in det första utseendet och språket innan dashboarden visas.',
   'dashboard.onboarding.body.route':
     'Välj en startrutt en gång. Import går direkt till återställning, medan nya starter låter dig välja det ursprungliga temat först.',
+  'dashboard.onboarding.body.localization':
+    'Välj språk samt standardformat för tid och temperatur som Navet ska använda från början.',
   'dashboard.onboarding.body.theme':
     'Välj grundtema och accentfärg som Navet ska använda innan dashboarden visas för första gången.',
   'dashboard.onboarding.route.all.title': 'Starta med alla enheter',
@@ -263,8 +267,11 @@ export const svMessages = {
     'Återställ en tidigare exporterad Navet YAML-konfiguration i stället för att börja från början.',
   'dashboard.onboarding.route.import.closingBody':
     'Förseglar onboardingupplevelsen och övergår till din återställda dashboard.',
-  'dashboard.onboarding.theme.stepLabel': 'Steg 2 av 2: ursprunglig temainställning',
+  'dashboard.onboarding.theme.stepLabel': 'Steg 2 av 2: utseende och lokalisering',
+  'dashboard.onboarding.localization.description':
+    'Välj språk för gränssnittet samt tids- och temperaturformat redan från början.',
   'dashboard.onboarding.back': 'Tillbaka',
+  'dashboard.onboarding.next': 'Nästa',
   'dashboard.onboarding.continue': 'Fortsätt till min dashboard',
   'dashboard.arrival.all.bakingKicker': 'Väcker ditt hem',
   'dashboard.arrival.all.bakingHeading': 'Tar fram varje rum och enhet.',
@@ -291,6 +298,7 @@ export const svMessages = {
   'dashboard.arrival.import.revealHeading': 'Din dashboard har återställts.',
   'dashboard.arrival.import.revealBody':
     'Allt från din backup är på plats och redo för att du ska kunna fortsätta.',
+  'dashboard.arrival.enter': 'Gå till min dashboard',
   'interactionPreview.cardTitle': 'Tryck på kort',
   'interactionPreview.iconTitle': 'Ikon',
   'interactionPreview.trailingButtonTitle': 'Efterföljande knapp',
@@ -367,8 +375,8 @@ export const svMessages = {
   'themeOption.dark.description': 'Subtila gradienter med dämpade färger',
   'themeOption.light.label': 'Ljus',
   'themeOption.light.description': 'Ljusa pasteller med mjuka accenter',
-  'themeOption.contrast.label': 'Hög kontrast',
-  'themeOption.contrast.description': 'Starka färger för bättre synlighet',
+  'themeOption.contrast.label': 'Svart',
+  'themeOption.contrast.description': 'Djupsvarta ytor med OLED-vänlig kontrast.',
   'weather.subtitle': 'Väder',
   'weather.settings.title': '{name}-inställningar',
   'weather.precipitation': 'Nederbörd',
@@ -532,8 +540,6 @@ export const svMessages = {
   'power.usingLess': 'Använder {amount} kW mindre än samma period förra månaden',
   'power.currentUsage': 'Nuvarande förbrukning',
   'power.lastMonth': 'Förra månaden',
-  'wifi.title': 'Wi-Fi',
-  'wifi.subtitle': 'Nätverk',
   'lighting.type.outlet': 'Uttag',
   'security.lock': 'Lås',
   'security.locked': 'Låst',
@@ -587,7 +593,6 @@ export const svMessages = {
   'deviceType.power': 'Ström',
   'deviceType.media': 'Media',
   'deviceType.weather': 'Väder',
-  'deviceType.wifi': 'Wi-Fi',
   'deviceType.switch': 'Brytare',
   'deviceType.cover': 'Cover',
   'deviceType.lock': 'Lås',

@@ -8,4 +8,4 @@ export interface DashboardOnboardingDialogProps {
 }
 
 export type WizardRoute = 'all' | 'blank' | null;
-export type WizardStep = 'route' | 'theme';
+export type WizardStep = 'route' | 'localization' | 'theme';

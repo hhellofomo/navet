@@ -248,10 +248,13 @@ export const esMessages = {
   'dashboard.feedback.configRestored': 'Configuración del panel restaurada',
   'dashboard.onboarding.welcome': 'Bienvenido',
   'dashboard.onboarding.heading.route': '¿Cómo debe iniciar Navet tu panel?',
+  'dashboard.onboarding.heading.localization': 'Elige idioma y formatos para tu primera vista.',
   'dashboard.onboarding.heading.theme':
-    'Define el aspecto inicial antes de la primera aparición del panel.',
+    'Define el aspecto y el idioma antes de la primera aparición del panel.',
   'dashboard.onboarding.body.route':
     'Elige una ruta inicial una sola vez. La importación salta directo a la restauración, mientras que los inicios nuevos te dejan elegir primero el tema inicial.',
+  'dashboard.onboarding.body.localization':
+    'Elige el idioma y los formatos predeterminados de hora y temperatura que Navet debe usar desde el inicio.',
   'dashboard.onboarding.body.theme':
     'Elige el tema base y el color de acento que Navet debe aplicar antes de mostrar el panel por primera vez.',
   'dashboard.onboarding.route.all.title': 'Empezar con todas las entidades',
@@ -267,8 +270,11 @@ export const esMessages = {
     'Restaura una configuración YAML de Navet exportada previamente en lugar de empezar desde cero.',
   'dashboard.onboarding.route.import.closingBody':
     'Se está cerrando la experiencia de onboarding y pasando a tu panel restaurado.',
-  'dashboard.onboarding.theme.stepLabel': 'Paso 2 de 2: configuración inicial del tema',
+  'dashboard.onboarding.theme.stepLabel': 'Paso 2 de 2: apariencia e idioma',
+  'dashboard.onboarding.localization.description':
+    'Elige el idioma de la interfaz y los formatos de hora y temperatura desde el inicio.',
   'dashboard.onboarding.back': 'Atrás',
+  'dashboard.onboarding.next': 'Siguiente',
   'dashboard.onboarding.continue': 'Continuar a mi panel',
   'dashboard.arrival.all.bakingKicker': 'Despertando tu hogar',
   'dashboard.arrival.all.bakingHeading': 'Llevando cada habitación y entidad a la vista.',
@@ -295,6 +301,7 @@ export const esMessages = {
   'dashboard.arrival.import.revealHeading': 'Tu panel ha sido restaurado.',
   'dashboard.arrival.import.revealBody':
     'Todo lo que había en tu respaldo está en su sitio y listo para que vuelvas.',
+  'dashboard.arrival.enter': 'Entrar a mi panel',
   'interactionPreview.cardTitle': 'Tocar tarjeta',
   'interactionPreview.iconTitle': 'Icono',
   'interactionPreview.trailingButtonTitle': 'Botón lateral',
@@ -372,8 +379,8 @@ export const esMessages = {
   'themeOption.dark.description': 'Gradientes sutiles con colores apagados',
   'themeOption.light.label': 'Claro',
   'themeOption.light.description': 'Pasteles brillantes con acentos suaves',
-  'themeOption.contrast.label': 'Alto contraste',
-  'themeOption.contrast.description': 'Colores vibrantes para una mejor visibilidad',
+  'themeOption.contrast.label': 'Negro',
+  'themeOption.contrast.description': 'Superficies negras profundas con contraste ideal para OLED.',
   'weather.subtitle': 'Clima',
   'weather.settings.title': 'Ajustes de {name}',
   'weather.precipitation': 'Precipitación',
@@ -538,8 +545,6 @@ export const esMessages = {
   'power.usingLess': 'Usando {amount} kW menos que en el mismo período del mes pasado',
   'power.currentUsage': 'Consumo actual',
   'power.lastMonth': 'Mes pasado',
-  'wifi.title': 'Wi-Fi',
-  'wifi.subtitle': 'Red',
   'lighting.type.outlet': 'Enchufe',
   'security.lock': 'Cerradura',
   'security.locked': 'Cerrada',
@@ -593,7 +598,6 @@ export const esMessages = {
   'deviceType.power': 'Energía',
   'deviceType.media': 'Media',
   'deviceType.weather': 'Tiempo',
-  'deviceType.wifi': 'Wi-Fi',
   'deviceType.switch': 'Interruptor',
   'deviceType.cover': 'Persiana',
   'deviceType.lock': 'Cerradura',

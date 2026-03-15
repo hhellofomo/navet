@@ -7,8 +7,7 @@ export function getSecurityCardSurfaceTokens(theme: ThemeType) {
   return {
     surface,
     containerShadowClassName: surface.cardShadow,
-    overlayClassName:
-      theme === 'light' ? surface.lightOverlay : theme === 'glass' ? 'bg-white/[0.03]' : null,
+    overlayClassName: theme === 'glass' ? 'bg-white/[0.03]' : null,
     primaryTextClassName: surface.textPrimary,
     secondaryTextClassName: surface.textSecondary,
     subtleButtonClassName:
@@ -20,13 +19,11 @@ export function getSecurityCardSurfaceTokens(theme: ThemeType) {
         ? 'bg-gray-100 text-gray-900 hover:bg-gray-200'
         : theme === 'glass'
           ? 'bg-white/8 text-white hover:bg-white/12'
-          : 'bg-white/5 text-white hover:bg-white/10',
+          : 'bg-zinc-900 text-white hover:bg-zinc-800',
     sliderTrackClassName:
-      theme === 'light' ? 'bg-gray-200' : theme === 'glass' ? 'bg-white/12' : 'bg-white/10',
+      theme === 'light' ? 'bg-gray-200' : theme === 'glass' ? 'bg-white/12' : 'bg-zinc-800',
     dialogContentClassName:
-      theme === 'glass'
-        ? 'bg-white/10 border-white/18'
-        : 'bg-gradient-to-br from-gray-900/95 to-gray-950/95 border-gray-700/50',
+      theme === 'glass' ? 'bg-white/10 border-white/18' : 'bg-zinc-950 border-zinc-700',
     dialogOptionClassName(themeSelected: boolean) {
       if (themeSelected) {
         return 'bg-indigo-500/20 border-indigo-500 shadow-lg shadow-indigo-500/20';
@@ -34,14 +31,14 @@ export function getSecurityCardSurfaceTokens(theme: ThemeType) {
 
       return theme === 'glass'
         ? 'bg-white/8 border-white/14 hover:bg-white/12 hover:border-white/22'
-        : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20';
+        : 'bg-zinc-900 border-zinc-700 hover:bg-zinc-800 hover:border-zinc-600';
     },
     dialogOptionIconWrapClassName(themeSelected: boolean) {
       if (themeSelected) {
         return 'bg-indigo-500/30';
       }
 
-      return theme === 'glass' ? 'bg-white/12' : 'bg-white/10';
+      return theme === 'glass' ? 'bg-white/12' : 'bg-zinc-800';
     },
     dialogOptionIconClassName(themeSelected: boolean) {
       return themeSelected ? 'text-indigo-400' : 'text-gray-300';
@@ -50,6 +47,6 @@ export function getSecurityCardSurfaceTokens(theme: ThemeType) {
       return themeSelected ? 'text-white' : 'text-gray-300';
     },
     dialogCancelButtonClassName:
-      theme === 'glass' ? 'bg-white/8 hover:bg-white/12' : 'bg-white/5 hover:bg-white/10',
+      theme === 'glass' ? 'bg-white/8 hover:bg-white/12' : 'bg-zinc-900 hover:bg-zinc-800',
   };
 }

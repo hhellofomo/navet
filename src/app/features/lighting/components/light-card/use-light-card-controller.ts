@@ -5,10 +5,9 @@ import { type CardSize, isExtraSmallCardSize } from '@/app/components/shared/car
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { DEFAULT_LIGHT_ICON, LIGHT_ICON_MAP } from '@/app/constants/icon-map';
 import { TEMP_OPTIONS } from '@/app/constants/light-constants';
-import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
+import { useHomeAssistant, useI18n } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
-import { getGradientColors } from '@/app/utils/color-utils';
 import { useBrightnessPresets } from '../../hooks/use-brightness-presets';
 import { useLightMemoryStore } from '../../stores/light-memory-store';
 import { type BrightnessPresetKey, useLightPresetStore } from '../../stores/light-preset-store';
@@ -44,7 +43,6 @@ export interface LightCardController {
   colorTemp: number;
   currentColor: string;
   customColor: string;
-  gradientColors: ReturnType<typeof getGradientColors>;
   iconButtonProps: HeaderIconButtonProps;
   IconComponent: LucideIcon;
   isOn: boolean;
@@ -95,7 +93,6 @@ export function useLightCardController({
   const [selectedIcon, setSelectedIcon] = useState(DEFAULT_LIGHT_ICON);
   const connection = useHomeAssistant(homeAssistantSelectors.connection);
   const entities = useHomeAssistant(homeAssistantSelectors.entities);
-  const { theme } = useTheme();
   const { t } = useI18n();
   const brightnessPresets = useBrightnessPresets(id);
   const rememberLightState = useLightMemoryStore((state) => state.rememberState);
@@ -117,7 +114,6 @@ export function useLightCardController({
   const lastKnownColorRef = useRef<string | null>(null);
 
   const effectiveSelectedColor = selectedColor ?? (isOn ? lastKnownColorRef.current : null);
-  const gradientColors = getGradientColors(isOn, effectiveSelectedColor, theme);
   const IconComponent = LIGHT_ICON_MAP[selectedIcon] || LIGHT_ICON_MAP[DEFAULT_LIGHT_ICON];
   const isHomeAssistantLight = Boolean(connection) && id.startsWith('light.');
   const supportsColorTemperature = supportsColorTemperatureControl(liveEntity);
@@ -538,7 +534,6 @@ export function useLightCardController({
     colorTemp,
     currentColor: effectiveSelectedColor ?? customColor,
     customColor,
-    gradientColors,
     iconButtonProps: cardInteraction.iconButtonProps,
     IconComponent,
     isOn,

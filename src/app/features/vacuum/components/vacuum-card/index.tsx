@@ -3,8 +3,8 @@ import { memo } from 'react';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
-import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
 import { useVacuumControl } from '../vacuum/use-vacuum-control';
 import { VacuumControlsLarge } from '../vacuum/vacuum-controls-large';
@@ -48,8 +48,8 @@ export const VacuumCard = memo(function VacuumCard({
     handleReturnHome,
   } = useVacuumControl({ initialStatus: status });
   const { theme, colors } = useTheme();
+  const cardShell = getCardShellSurfaceTokens(theme);
   const { t } = useI18n();
-  const surface = getThemeSurfaceTokens(theme);
   const isActive = currentStatus === 'cleaning' || currentStatus === 'returning';
   const stateSurface = getCardStateSurfaceTokens(theme, isActive);
   const cardColors = colors.vacuum[getVacuumThemeStatus(currentStatus)];
@@ -61,7 +61,7 @@ export const VacuumCard = memo(function VacuumCard({
   return (
     <div className="h-full w-full relative">
       <div
-        className={`relative h-full bg-gradient-to-br ${cardColors.gradient} backdrop-blur-xl rounded-3xl ${padding} border ${cardColors.border} overflow-hidden ${surface.cardShadow} ${stateSurface.containerClassName}`}
+        className={`relative h-full bg-gradient-to-br ${cardColors.gradient} ${cardShell.backdropClassName} rounded-3xl ${padding} ${theme !== 'dark' ? 'border' : ''} ${cardColors.border} overflow-hidden ${stateSurface.containerClassName}`}
       >
         {isActive && (
           <div
@@ -69,7 +69,6 @@ export const VacuumCard = memo(function VacuumCard({
           ></div>
         )}
 
-        {surface.lightOverlay && <div className={`absolute inset-0 ${surface.lightOverlay}`} />}
         {stateSurface.overlayClassName && (
           <div className={`absolute inset-0 ${stateSurface.overlayClassName}`} />
         )}

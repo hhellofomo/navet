@@ -2,6 +2,7 @@ import { Sunrise, Sunset } from 'lucide-react';
 import { memo, useState } from 'react';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
+import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { CaptionValue } from '@/app/components/ui/caption-value';
 import { CardWrapper } from '@/app/components/ui/card-wrapper';
@@ -64,6 +65,7 @@ export const WeatherCard = memo(function WeatherCard({
   const { theme } = useTheme();
   const { formatDate, formatTime, t } = useI18n();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const cardShell = getCardShellSurfaceTokens(theme);
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
   const shell = getAccentCardShellTokens(theme, 'blue');
@@ -91,7 +93,7 @@ export const WeatherCard = memo(function WeatherCard({
 
   return (
     <CardWrapper
-      className={`${shell.containerClassName} p-5`}
+      className={`${cardShell.backdropClassName} ${shell.containerClassName} p-5`}
       lightOverlayClassName={shell.overlayClassName || undefined}
     >
       {/* Subtle gradient overlay */}

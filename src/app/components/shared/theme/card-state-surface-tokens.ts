@@ -29,12 +29,12 @@ export function getCardStateSurfaceTokens(
 
   if (theme === 'light') {
     return {
-      containerClassName: 'saturate-[0.86]',
-      overlayClassName: 'bg-white/18',
+      containerClassName: 'brightness-[0.98]',
+      overlayClassName: null,
       primaryTextClassName: 'text-gray-700',
       secondaryTextClassName: 'text-gray-500',
       mutedTextClassName: 'text-gray-400',
-      artworkClassName: 'opacity-70 saturate-[0.72]',
+      artworkClassName: 'brightness-[0.92] saturate-[0.78]',
     };
   }
 
@@ -56,16 +56,16 @@ export function getCardStateSurfaceTokens(
       primaryTextClassName: 'text-white',
       secondaryTextClassName: 'text-gray-300',
       mutedTextClassName: 'text-gray-400',
-      artworkClassName: 'opacity-62 saturate-[0.68]',
+      artworkClassName: 'brightness-[0.88] saturate-[0.72]',
     };
   }
 
   return {
-    containerClassName: 'saturate-[0.84]',
-    overlayClassName: 'bg-black/10',
+    containerClassName: '',
+    overlayClassName: null,
     primaryTextClassName: 'text-white/90',
     secondaryTextClassName: 'text-gray-300',
     mutedTextClassName: 'text-gray-400',
-    artworkClassName: 'opacity-66 saturate-[0.72]',
+    artworkClassName: 'brightness-[0.88] saturate-[0.72]',
   };
 }

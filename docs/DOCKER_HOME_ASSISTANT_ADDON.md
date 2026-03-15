@@ -178,8 +178,8 @@ If you are the only consumer right now:
 
 ## Notes Specific to This Repo
 
-- `vite.config.ts` currently sets the dev server host to `navet.homeassistant.local` on port `5200`
-- Local development also requires a hosts-file entry such as `127.0.0.1 navet.homeassistant.local`
+- `vite.config.ts` currently sets the dev server host to `navet.local` on port `5200`
+- Local development also requires a hosts-file entry such as `127.0.0.1 navet.local`
 - That only affects development and does not block Docker packaging
 - `index.html` now loads `/config.js` before the app bootstraps
 - Home Assistant credentials are still persisted in browser storage after login

@@ -240,9 +240,12 @@ export const enMessages = {
   'dashboard.feedback.configRestored': 'Dashboard config restored',
   'dashboard.onboarding.welcome': 'Welcome',
   'dashboard.onboarding.heading.route': 'How should Navet start your dashboard?',
-  'dashboard.onboarding.heading.theme': 'Set the initial look before your first reveal.',
+  'dashboard.onboarding.heading.localization': 'Choose language and formats up front.',
+  'dashboard.onboarding.heading.theme': 'Set the initial look and locale before your first reveal.',
   'dashboard.onboarding.body.route':
     'Pick a starting route once. Import jumps straight into restore, while fresh starts let you choose the initial theme first.',
+  'dashboard.onboarding.body.localization':
+    'Pick the language, time format, and temperature unit Navet should use from the start.',
   'dashboard.onboarding.body.theme':
     'Choose the base theme and accent color Navet should apply before the dashboard appears for the first time.',
   'dashboard.onboarding.route.all.title': 'Start with all entities',
@@ -258,8 +261,11 @@ export const enMessages = {
     'Restore a previously exported Navet YAML dashboard config instead of starting from scratch.',
   'dashboard.onboarding.route.import.closingBody':
     'Sealing the onboarding experience and transitioning into your restored dashboard.',
-  'dashboard.onboarding.theme.stepLabel': 'Step 2 of 2: initial theme setup',
+  'dashboard.onboarding.theme.stepLabel': 'Step 2 of 2: appearance and localization',
+  'dashboard.onboarding.localization.description':
+    'Choose the interface language, time format, and temperature unit Navet should use from the start.',
   'dashboard.onboarding.back': 'Back',
+  'dashboard.onboarding.next': 'Next',
   'dashboard.onboarding.continue': 'Continue to my dashboard',
   'dashboard.arrival.all.bakingKicker': 'Waking Up Your Home',
   'dashboard.arrival.all.bakingHeading': 'Bringing every room and entity into view.',
@@ -286,6 +292,7 @@ export const enMessages = {
   'dashboard.arrival.import.revealHeading': 'Your dashboard has been restored.',
   'dashboard.arrival.import.revealBody':
     'Everything from your backup is in place and ready for you to return to.',
+  'dashboard.arrival.enter': 'Enter my dashboard',
   'interactionPreview.cardTitle': 'Tap card',
   'interactionPreview.iconTitle': 'Icon',
   'interactionPreview.trailingButtonTitle': 'Trailing button',
@@ -362,8 +369,8 @@ export const enMessages = {
   'themeOption.dark.description': 'Subtle gradients with muted colors',
   'themeOption.light.label': 'Light',
   'themeOption.light.description': 'Bright pastels with soft accents',
-  'themeOption.contrast.label': 'High Contrast',
-  'themeOption.contrast.description': 'Vibrant colors for better visibility',
+  'themeOption.contrast.label': 'Black',
+  'themeOption.contrast.description': 'Deep black surfaces with OLED-friendly contrast.',
   'weather.subtitle': 'Weather',
   'weather.settings.title': '{name} Settings',
   'weather.precipitation': 'Precipitation',
@@ -527,8 +534,6 @@ export const enMessages = {
   'power.usingLess': 'Using {amount} kW less than same period last month',
   'power.currentUsage': 'Current usage',
   'power.lastMonth': 'Last month',
-  'wifi.title': 'Wi-Fi',
-  'wifi.subtitle': 'Network',
   'lighting.type.outlet': 'Outlet',
   'security.lock': 'Lock',
   'security.locked': 'Locked',
@@ -582,7 +587,6 @@ export const enMessages = {
   'deviceType.power': 'Power',
   'deviceType.media': 'Media',
   'deviceType.weather': 'Weather',
-  'deviceType.wifi': 'Wi-Fi',
   'deviceType.switch': 'Switch',
   'deviceType.cover': 'Cover',
   'deviceType.lock': 'Lock',

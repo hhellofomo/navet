@@ -22,63 +22,63 @@ const ACCENT_CONFIG: Record<
   }
 > = {
   yellow: {
-    lightGradient: 'from-white to-yellow-50/80',
-    darkGradient: 'from-yellow-900/90 to-yellow-950/95',
-    darkBorder: 'border-yellow-700/30',
+    lightGradient: 'from-white to-yellow-50',
+    darkGradient: 'from-yellow-900 to-yellow-950',
+    darkBorder: 'border-yellow-700',
     glassGradient: 'from-white/16 via-yellow-200/10 to-white/[0.03]',
     lightGlow: 'from-yellow-50/40',
     darkGlow: 'from-blue-500/5',
     glassGlow: 'from-white/10 via-cyan-300/10',
   },
   green: {
-    lightGradient: 'from-white to-green-50/80',
-    darkGradient: 'from-green-900/90 to-green-950/95',
-    darkBorder: 'border-green-700/30',
+    lightGradient: 'from-white to-green-50',
+    darkGradient: 'from-green-900 to-green-950',
+    darkBorder: 'border-green-700',
     glassGradient: 'from-white/16 via-green-200/10 to-white/[0.03]',
     lightGlow: 'from-green-50/40',
     darkGlow: 'from-green-500/5',
     glassGlow: 'from-white/10 via-green-300/10',
   },
   teal: {
-    lightGradient: 'from-white to-teal-50/80',
-    darkGradient: 'from-teal-900/90 to-teal-950/95',
-    darkBorder: 'border-teal-700/30',
+    lightGradient: 'from-white to-teal-50',
+    darkGradient: 'from-teal-900 to-teal-950',
+    darkBorder: 'border-teal-700',
     glassGradient: 'from-white/16 via-teal-200/10 to-white/[0.03]',
     lightGlow: 'from-teal-50/40',
     darkGlow: 'from-teal-500/5',
     glassGlow: 'from-white/10 via-teal-300/10',
   },
   blue: {
-    lightGradient: 'from-white to-slate-50/80',
-    darkGradient: 'from-slate-900/95 to-slate-800/95',
-    darkBorder: 'border-slate-700/30',
+    lightGradient: 'from-white to-slate-50',
+    darkGradient: 'from-slate-900 to-slate-800',
+    darkBorder: 'border-slate-700',
     glassGradient: 'from-white/14 via-blue-200/10 to-white/[0.03]',
     lightGlow: 'from-blue-50/30 via-transparent to-cyan-50/30',
     darkGlow: 'from-blue-500/5 via-transparent to-cyan-500/5',
     glassGlow: 'from-white/10 via-blue-300/10 to-cyan-200/08',
   },
   purple: {
-    lightGradient: 'from-white to-purple-50/80',
-    darkGradient: 'from-purple-900/90 to-purple-950/95',
-    darkBorder: 'border-purple-700/30',
+    lightGradient: 'from-white to-purple-50',
+    darkGradient: 'from-purple-900 to-purple-950',
+    darkBorder: 'border-purple-700',
     glassGradient: 'from-white/16 via-purple-200/10 to-white/[0.03]',
     lightGlow: 'from-purple-50/40',
     darkGlow: 'from-purple-500/5',
     glassGlow: 'from-white/10 via-purple-300/10',
   },
   amber: {
-    lightGradient: 'from-white to-amber-50/80',
-    darkGradient: 'from-amber-900/90 to-amber-950/95',
-    darkBorder: 'border-amber-700/30',
+    lightGradient: 'from-white to-amber-50',
+    darkGradient: 'from-amber-900 to-amber-950',
+    darkBorder: 'border-amber-700',
     glassGradient: 'from-white/16 via-amber-200/10 to-white/[0.03]',
     lightGlow: 'from-amber-50/40',
     darkGlow: 'from-amber-500/5',
     glassGlow: 'from-white/10 via-amber-300/10',
   },
   emerald: {
-    lightGradient: 'from-white to-emerald-50/80',
-    darkGradient: 'from-emerald-900/90 to-emerald-950/95',
-    darkBorder: 'border-emerald-700/30',
+    lightGradient: 'from-white to-emerald-50',
+    darkGradient: 'from-emerald-900 to-emerald-950',
+    darkBorder: 'border-emerald-700',
     glassGradient: 'from-white/16 via-emerald-200/10 to-white/[0.03]',
     lightGlow: 'from-emerald-50/40',
     darkGlow: 'from-emerald-500/5',
@@ -92,9 +92,9 @@ export function getAccentCardShellTokens(theme: ThemeType, accent: AccentFamily)
 
   if (theme === 'light') {
     return {
-      containerClassName: `bg-gradient-to-br ${config.lightGradient} border-gray-200/80 shadow-lg`,
-      glowClassName: `bg-gradient-to-br ${config.lightGlow} to-transparent`,
-      overlayClassName: 'bg-white/60',
+      containerClassName: `bg-gradient-to-br ${config.lightGradient} border-gray-200 shadow-lg`,
+      glowClassName: '',
+      overlayClassName: null,
     };
   }
 
@@ -108,7 +108,7 @@ export function getAccentCardShellTokens(theme: ThemeType, accent: AccentFamily)
 
   return {
     containerClassName: `bg-gradient-to-br ${config.darkGradient} ${config.darkBorder}`,
-    glowClassName: `bg-gradient-to-br ${config.darkGlow} to-transparent`,
+    glowClassName: '',
     overlayClassName: null,
   };
 }

@@ -12,12 +12,12 @@ interface RoundControlStyles {
 export function getRoundControlStyles(theme: ThemeType): RoundControlStyles {
   if (theme === 'light') {
     return {
-      defaultButton: 'bg-gray-900/10 text-gray-900 hover:bg-gray-900/18',
+      defaultButton: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
       defaultIcon: 'text-gray-900',
-      disabledButton: 'bg-gray-900/10 text-gray-500 opacity-50 cursor-not-allowed',
+      disabledButton: 'bg-gray-100 text-gray-500 opacity-50 cursor-not-allowed',
       selectedText: 'text-white',
       emphasisButton:
-        'border border-white/55 bg-white/82 text-slate-900 shadow-[0_18px_40px_-24px_rgba(15,23,42,0.5)] backdrop-blur-lg supports-[backdrop-filter]:bg-white/72',
+        'border border-gray-200 bg-white text-slate-900 shadow-[0_18px_40px_-24px_rgba(15,23,42,0.5)]',
       emphasisIcon: 'text-slate-900',
     };
   }
@@ -36,23 +36,21 @@ export function getRoundControlStyles(theme: ThemeType): RoundControlStyles {
 
   if (theme === 'contrast') {
     return {
-      defaultButton: 'bg-black text-white hover:bg-white/8 border border-white/22',
+      defaultButton: 'bg-black text-white hover:bg-zinc-900 border border-zinc-700',
       defaultIcon: 'text-white',
-      disabledButton: 'bg-black text-white/60 opacity-50 cursor-not-allowed border border-white/22',
+      disabledButton: 'bg-black text-white/60 opacity-50 cursor-not-allowed border border-zinc-700',
       selectedText: 'text-white',
-      emphasisButton:
-        'border border-white/34 bg-black text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)]',
+      emphasisButton: 'border border-zinc-700 bg-black text-white',
       emphasisIcon: 'text-white',
     };
   }
 
   return {
-    defaultButton: 'bg-white/15 text-white hover:bg-white/25',
+    defaultButton: 'bg-zinc-800 text-white hover:bg-zinc-700',
     defaultIcon: 'text-white',
-    disabledButton: 'bg-white/15 text-white/60 opacity-50 cursor-not-allowed',
+    disabledButton: 'bg-zinc-800 text-white/60 opacity-50 cursor-not-allowed',
     selectedText: 'text-white',
-    emphasisButton:
-      'border border-white/18 bg-white/14 text-white shadow-[0_18px_40px_-24px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/10',
+    emphasisButton: 'border border-zinc-700 bg-zinc-900 text-white',
     emphasisIcon: 'text-white',
   };
 }

@@ -85,15 +85,6 @@ export interface MediaDevice extends BaseDevice {
   positionUpdatedAt?: string;
 }
 
-// WiFi device
-export interface WiFiDevice extends BaseDevice {
-  room: string;
-  networkName: string;
-  speed: number;
-  uploadSpeed: string;
-  downloadSpeed: string;
-}
-
 // Switch device
 export interface SwitchDevice extends BaseDevice {
   room: string;
@@ -185,7 +176,6 @@ export type Device =
   | WeatherDevice
   | PowerDevice
   | MediaDevice
-  | WiFiDevice
   | SwitchDevice
   | CoverDevice
   | LockDevice
@@ -203,7 +193,6 @@ export interface DeviceCollection {
   power: PowerDevice[];
   media: MediaDevice[];
   weather: WeatherDevice[];
-  wifi: WiFiDevice[];
   switches: SwitchDevice[];
   covers: CoverDevice[];
   locks: LockDevice[];

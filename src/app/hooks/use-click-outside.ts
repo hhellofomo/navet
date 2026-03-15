@@ -22,6 +22,10 @@ export function useClickOutside<T extends HTMLElement = HTMLElement>(
     }
 
     const handleClick = (event: PointerEvent) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
       if (ref.current && !ref.current.contains(event.target as Node)) {
         callback();
       }

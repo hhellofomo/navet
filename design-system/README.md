@@ -60,7 +60,7 @@ Complete feature implementation guide:
 3. **Room-Based Organization** - Filter devices by physical location
 4. **Consistent Icon Sizing** - Extra-small: 7×7 container / 3.5×3.5 icon, Small: 8×8 / 4×4, Medium/Large: 10×10 / 5×5
 5. **Smooth Transitions** - 500ms for state changes, 200ms for interactions
-6. **Theme Customization** - Four theme modes (Liquid Glass, Dark, Light, High Contrast) with 8 built-in accents, a custom accent picker, and visual quality tiers
+6. **Theme Customization** - Four theme modes (Liquid Glass, Dark, Light, Black) with 8 built-in accents, a custom accent picker, and visual quality tiers
 7. **Section-Based Navigation** - Organized into dedicated sections (Home, Security, Tasks, Locks, Lights, Media, Mock, Settings)
 8. **Shared Primitives First** - Cross-theme icon pills, nav/action pills, and card off-state surfaces should resolve through shared primitives before feature-level custom styling is added
 9. **One Climate Card Pattern** - Climate entities should use the HVAC card pattern; do not reintroduce a parallel legacy climate-card implementation
@@ -75,7 +75,7 @@ Complete feature implementation guide:
   - Liquid Glass - Frosted translucent panels with luminous accents
   - Dark - Subtle gradients with muted colors
   - Light - Bright pastels with soft accents
-  - High Contrast - OLED-black surfaces with stronger contrast
+  - Black - Deep black surfaces with OLED-friendly contrast
 - **Effects Quality**: High keeps the richest live glass treatment, Medium uses simulated glass, and Low reduces effects for constrained devices
 - **Primary Colors**: Orange (default), Blue, Green, Purple, Pink, Red, Yellow, Teal, or a custom accent color
 - **Dynamic Theming** - All active states, buttons, and indicators adapt to selected primary color
@@ -83,7 +83,7 @@ Complete feature implementation guide:
 ### Navigation Structure
 - **Sections**: Home (dashboard), Security, Tasks, Locks, Lights, Media, Mock, Settings
 - **Desktop**: Fixed vertical sidebar on left (16px wide)
-- **Mobile**: Compact icon-only bottom navigation bar with 6 key sections
+- **Mobile**: Compact iOS-style bottom navigation bar with icon + label tabs for 6 key sections
 - **Mobile Scroll Behavior**: Bottom navigation hides on downward scroll and returns near the top of the document
 - **Mobile Header**: Greeting, search, notifications, and avatar share one compact top row
 - **Empty States**: Beautiful placeholder screens for sections without data

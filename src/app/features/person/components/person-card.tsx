@@ -2,6 +2,7 @@ import { Home, MapPin, User } from 'lucide-react';
 import { memo } from 'react';
 import { ImageWithFallback } from '@/app/components/figma/ImageWithFallback';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
+import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { useAuth } from '@/app/contexts/auth-context';
 import { useI18n, useTheme } from '@/app/hooks';
 import { getPersonCardSurfaceTokens } from './person-card-surface-tokens';
@@ -31,6 +32,7 @@ export const PersonCard = memo(function PersonCard({
 }: PersonCardProps) {
   const { t } = useI18n();
   const { theme, colors } = useTheme();
+  const cardShell = getCardShellSurfaceTokens(theme);
   const { config } = useAuth();
 
   // Size-specific styling
@@ -45,7 +47,7 @@ export const PersonCard = memo(function PersonCard({
 
   return (
     <div
-      className={`relative h-full bg-gradient-to-br ${cardColors.gradient} backdrop-blur-xl rounded-3xl ${padding} border ${cardColors.border} overflow-hidden ${surface.containerShadowClassName}`}
+      className={`relative h-full bg-gradient-to-br ${cardColors.gradient} ${cardShell.backdropClassName} rounded-3xl ${padding} ${theme !== 'dark' ? 'border' : ''} ${cardColors.border} overflow-hidden ${surface.containerShadowClassName}`}
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${cardColors.glow} to-transparent`}></div>
 

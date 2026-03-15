@@ -24,9 +24,9 @@ export function getThemeDropdownSurfaceClasses(
 
   if (theme === 'glass') {
     return effectsQuality === 'high'
-      ? 'rounded-2xl border border-white/14 bg-slate-900/80 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]'
+      ? 'rounded-2xl border border-white/16 bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.05))] text-white shadow-[0_24px_56px_-32px_rgba(3,10,24,0.78),inset_0_1px_0_rgba(255,255,255,0.14)]'
       : effectsQuality === 'medium'
-        ? 'rounded-2xl border border-white/12 bg-slate-900/88 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]'
+        ? 'rounded-2xl border border-white/12 bg-[linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.03))] text-white shadow-[0_18px_40px_-30px_rgba(3,10,24,0.68),inset_0_1px_0_rgba(255,255,255,0.10)]'
         : 'rounded-2xl border border-white/10 bg-slate-950/94 text-white';
   }
 

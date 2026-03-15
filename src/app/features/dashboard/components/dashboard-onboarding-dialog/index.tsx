@@ -8,6 +8,7 @@ import {
 import { PRIMARY_COLOR_OPTIONS, THEME_OPTIONS } from '@/app/constants/theme-options';
 import { useI18n, useTheme } from '@/app/hooks';
 import type { PrimaryColor, ThemeType } from '@/app/hooks/use-theme';
+import { useSettingsStore } from '@/app/stores';
 import type { DashboardOnboardingDialogProps, WizardRoute, WizardStep } from './types';
 
 export function DashboardOnboardingDialog({
@@ -18,7 +19,7 @@ export function DashboardOnboardingDialog({
   phase = 'idle',
   onClosingAnimationComplete,
 }: DashboardOnboardingDialogProps) {
-  const { t } = useI18n();
+  const { languageOptions, t } = useI18n();
   const {
     customPrimaryColor,
     theme,
@@ -27,6 +28,10 @@ export function DashboardOnboardingDialog({
     setPrimaryColor,
     setTheme,
   } = useTheme();
+  const language = useSettingsStore((state) => state.language);
+  const use24HourTime = useSettingsStore((state) => state.use24HourTime);
+  const temperatureUnit = useSettingsStore((state) => state.temperatureUnit);
+  const updateSettings = useSettingsStore((state) => state.updateSettings);
   const [isImporting, setIsImporting] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState<WizardRoute>(null);
   const [step, setStep] = useState<WizardStep>('route');
@@ -139,11 +144,15 @@ export function DashboardOnboardingDialog({
       ? t('dashboard.onboarding.route.all.title')
       : t('dashboard.onboarding.route.blank.title');
 
-  const handleContinueToTheme = (route: Exclude<WizardRoute, null>) => {
+  const handleContinueToLocalization = (route: Exclude<WizardRoute, null>) => {
     setSelectedRoute(route);
     setSelectedTheme(theme);
     setSelectedAccent(primaryColor);
     setSelectedCustomAccent(customPrimaryColor);
+    setStep('localization');
+  };
+
+  const handleContinueToTheme = () => {
     setStep('theme');
   };
 
@@ -196,18 +205,24 @@ export function DashboardOnboardingDialog({
             <h2 className={`mt-3 text-3xl font-semibold tracking-tight ${textColor}`}>
               {step === 'route'
                 ? t('dashboard.onboarding.heading.route')
-                : t('dashboard.onboarding.heading.theme')}
+                : step === 'localization'
+                  ? t('dashboard.onboarding.heading.localization')
+                  : t('dashboard.onboarding.heading.theme')}
             </h2>
             <p className={`mt-3 max-w-2xl text-sm leading-relaxed ${mutedColor}`}>
               {step === 'route'
                 ? t('dashboard.onboarding.body.route')
-                : t('dashboard.onboarding.body.theme')}
+                : step === 'localization'
+                  ? t('dashboard.onboarding.body.localization')
+                  : t('dashboard.onboarding.body.theme')}
             </p>
           </div>
           <div className="flex items-center gap-2 pt-1">
-            {['route', 'theme'].map((item, index) => {
+            {['route', 'localization', 'theme'].map((item, index) => {
               const isActive = step === item;
-              const isComplete = step === 'theme' && item === 'route';
+              const isComplete =
+                (step === 'localization' && item === 'route') ||
+                (step === 'theme' && (item === 'route' || item === 'localization'));
 
               return (
                 <div
@@ -236,7 +251,7 @@ export function DashboardOnboardingDialog({
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             <button
               type="button"
-              onClick={() => handleContinueToTheme('all')}
+              onClick={() => handleContinueToLocalization('all')}
               disabled={isClosing}
               className={`flex h-full flex-col items-start rounded-[28px] border ${borderColor} ${cardBg} p-6 text-left transition-colors`}
             >
@@ -256,7 +271,7 @@ export function DashboardOnboardingDialog({
 
             <button
               type="button"
-              onClick={() => handleContinueToTheme('blank')}
+              onClick={() => handleContinueToLocalization('blank')}
               disabled={isClosing}
               className={`flex h-full flex-col items-start rounded-[28px] border ${borderColor} ${cardBg} p-6 text-left transition-colors`}
             >
@@ -302,6 +317,136 @@ export function DashboardOnboardingDialog({
               </p>
             </button>
           </div>
+        ) : step === 'localization' ? (
+          <div className={`mt-5 rounded-[28px] border ${borderColor} ${cardBg} p-5 md:p-6`}>
+            <div className="mb-4">
+              <p className={`text-sm font-semibold ${textColor}`}>
+                {t('settings.localization.sectionTitle')}
+              </p>
+              <p className={`mt-1 text-xs leading-relaxed ${mutedColor}`}>
+                {t('dashboard.onboarding.localization.description')}
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <p className={`mb-2 text-xs font-medium ${mutedColor}`}>
+                  {t('settings.localization.language.title')}
+                </p>
+                <div className="flex flex-wrap gap-2.5">
+                  {languageOptions.map((option) => {
+                    const isActive = language === option.value;
+                    return (
+                      <button
+                        type="button"
+                        key={option.value}
+                        onClick={() => updateSettings({ language: option.value })}
+                        style={
+                          isActive
+                            ? {
+                                backgroundColor: accentColor,
+                                color: '#ffffff',
+                              }
+                            : undefined
+                        }
+                        className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${borderColor} ${
+                          isActive ? 'shadow-sm' : `${pillBg} ${textColor}`
+                        }`}
+                        aria-pressed={isActive}
+                      >
+                        {option.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <p className={`mb-2 text-xs font-medium ${mutedColor}`}>
+                    {t('settings.localization.timeFormat.title')}
+                  </p>
+                  <div
+                    className={`inline-flex flex-wrap rounded-full border p-1 ${borderColor} ${pillBg}`}
+                  >
+                    {[
+                      { value: false, label: t('settings.localization.timeFormat.twelveHour') },
+                      {
+                        value: true,
+                        label: t('settings.localization.timeFormat.twentyFourHour'),
+                      },
+                    ].map((option) => {
+                      const isActive = use24HourTime === option.value;
+                      return (
+                        <button
+                          type="button"
+                          key={option.label}
+                          onClick={() => updateSettings({ use24HourTime: option.value })}
+                          style={
+                            isActive
+                              ? {
+                                  backgroundColor: accentColor,
+                                  color: '#ffffff',
+                                }
+                              : undefined
+                          }
+                          className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                            isActive ? 'shadow-sm' : textColor
+                          }`}
+                          aria-pressed={isActive}
+                        >
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <p className={`mb-2 text-xs font-medium ${mutedColor}`}>
+                    {t('settings.localization.temperatureUnit.title')}
+                  </p>
+                  <div
+                    className={`inline-flex flex-wrap rounded-full border p-1 ${borderColor} ${pillBg}`}
+                  >
+                    {[
+                      {
+                        value: 'fahrenheit' as const,
+                        label: t('settings.localization.temperatureUnit.fahrenheit'),
+                      },
+                      {
+                        value: 'celsius' as const,
+                        label: t('settings.localization.temperatureUnit.celsius'),
+                      },
+                    ].map((option) => {
+                      const isActive = temperatureUnit === option.value;
+                      return (
+                        <button
+                          type="button"
+                          key={option.value}
+                          onClick={() => updateSettings({ temperatureUnit: option.value })}
+                          style={
+                            isActive
+                              ? {
+                                  backgroundColor: accentColor,
+                                  color: '#ffffff',
+                                }
+                              : undefined
+                          }
+                          className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                            isActive ? 'shadow-sm' : textColor
+                          }`}
+                          aria-pressed={isActive}
+                        >
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         ) : (
           <div className="mt-8">
             <ThemeAppearancePicker
@@ -333,29 +478,44 @@ export function DashboardOnboardingDialog({
           </div>
         )}
 
-        {step === 'theme' ? (
+        {step !== 'route' ? (
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <button
               type="button"
-              onClick={() => setStep('route')}
+              onClick={() => setStep(step === 'theme' ? 'localization' : 'route')}
               disabled={isClosing}
               className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium ${borderColor} ${textColor}`}
             >
               <ArrowLeft className="h-4 w-4" />
               {t('dashboard.onboarding.back')}
             </button>
-            <button
-              type="button"
-              onClick={handleFinishThemeSetup}
-              disabled={isClosing}
-              className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]"
-              style={{
-                background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
-                boxShadow: `0 18px 40px ${accentColor}40`,
-              }}
-            >
-              {t('dashboard.onboarding.continue')}
-            </button>
+            {step === 'localization' ? (
+              <button
+                type="button"
+                onClick={handleContinueToTheme}
+                disabled={isClosing}
+                className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                style={{
+                  background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
+                  boxShadow: `0 18px 40px ${accentColor}40`,
+                }}
+              >
+                {t('dashboard.onboarding.next')}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleFinishThemeSetup}
+                disabled={isClosing}
+                className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                style={{
+                  background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
+                  boxShadow: `0 18px 40px ${accentColor}40`,
+                }}
+              >
+                {t('dashboard.onboarding.continue')}
+              </button>
+            )}
           </div>
         ) : null}
 

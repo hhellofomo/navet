@@ -7,6 +7,7 @@ import {
 } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
 import { CalendarEventDialog } from './calendar/calendar-event-dialog';
 import { CalendarLargeView } from './calendar/calendar-large-view';
@@ -38,6 +39,7 @@ export const CalendarCard = memo(function CalendarCard({
 }: CalendarCardProps) {
   const { t } = useI18n();
   const { theme, colors } = useTheme();
+  const cardShell = getCardShellSurfaceTokens(theme);
   const effectiveSize = getCompactCardSize(size);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
@@ -67,7 +69,7 @@ export const CalendarCard = memo(function CalendarCard({
           relative group overflow-hidden
           h-full w-full rounded-3xl
           bg-gradient-to-br ${colors.calendar.gradient}
-          backdrop-blur-xl border ${colors.calendar.border}
+          ${cardShell.backdropClassName} border ${colors.calendar.border}
           ${theme === 'light' ? 'shadow-lg' : 'shadow-lg hover:shadow-xl'}
           transition-all duration-300
           ${inEditMode ? 'cursor-move' : 'cursor-pointer'}

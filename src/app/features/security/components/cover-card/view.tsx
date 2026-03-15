@@ -9,6 +9,7 @@ import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
+import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { type ThemeType, useI18n } from '@/app/hooks';
 import { getSecurityCardSurfaceTokens } from '../security-card-surface-tokens';
@@ -78,6 +79,7 @@ export function CoverCardView({
   const padding = isSmall ? 'p-4' : 'p-5';
 
   const surface = getThemeSurfaceTokens(theme);
+  const cardShell = getCardShellSurfaceTokens(theme);
   const securitySurface = getSecurityCardSurfaceTokens(theme);
 
   const DeviceIcon = deviceClassConfig[deviceClass].icon;
@@ -85,7 +87,7 @@ export function CoverCardView({
   return (
     <div
       {...cardProps}
-      className={`relative h-full bg-gradient-to-br ${cardColors.gradient} backdrop-blur-xl rounded-3xl ${padding} border ${cardColors.border} overflow-hidden ${securitySurface.containerShadowClassName}`}
+      className={`relative h-full bg-gradient-to-br ${cardColors.gradient} ${cardShell.backdropClassName} rounded-3xl ${padding} ${theme !== 'dark' ? 'border' : ''} ${cardColors.border} overflow-hidden ${securitySurface.containerShadowClassName}`}
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${cardColors.glow} to-transparent`}></div>
 

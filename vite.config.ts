@@ -215,7 +215,7 @@ export default defineConfig(({ mode }) => {
 
 
   server: {
-    host: 'navet.homeassistant.local',
+    host: 'navet.local',
     port: 5200,
     strictPort: true,
     proxy: hassUrl

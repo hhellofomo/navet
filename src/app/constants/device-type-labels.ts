@@ -8,7 +8,6 @@ export const DEVICE_TYPE_LABEL_KEYS: Record<keyof DeviceCollection, TranslationK
   power: 'deviceType.power',
   media: 'deviceType.media',
   weather: 'deviceType.weather',
-  wifi: 'deviceType.wifi',
   switches: 'deviceType.switch',
   covers: 'deviceType.cover',
   locks: 'deviceType.lock',

@@ -1,6 +1,5 @@
 import { Check } from 'lucide-react';
 import { ColorInputSwatch } from '@/app/components/shared/color-input-swatch';
-import { SettingsLivePreviewFrame } from '@/app/components/shared/settings-live-preview-frame';
 import type { PrimaryColorOption, ThemeOption } from '@/app/constants/theme-options';
 import { useI18n } from '@/app/hooks';
 import type { PrimaryColor, ThemeType } from '@/app/hooks/use-theme';
@@ -38,7 +37,7 @@ export function ThemeAppearancePicker({
   const pickerTokens = getThemeAppearancePickerTokens(previewTheme, accentColor);
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr] lg:gap-6">
+    <div>
       <div
         className={`rounded-[22px] border p-4 md:rounded-[28px] md:p-5 ${pickerTokens.panelInsetClassName}`}
       >
@@ -59,7 +58,7 @@ export function ThemeAppearancePicker({
                   key={option.value}
                   type="button"
                   onClick={() => onThemeChange(option.value)}
-                  className={`flex h-full flex-col items-start justify-start rounded-[18px] border px-3.5 py-3.5 text-left transition-all sm:min-h-[132px] md:rounded-[22px] md:px-4 md:py-4 md:sm:min-h-[144px] ${pickerTokens.optionBorderClassName} ${pickerTokens.optionCardClassName} ${
+                  className={`flex flex-col items-start justify-start rounded-[18px] border px-3.5 py-3.5 text-left transition-all md:rounded-[22px] md:px-4 md:py-4 ${pickerTokens.optionBorderClassName} ${pickerTokens.optionCardClassName} ${
                     isActive ? 'shadow-sm' : ''
                   }`}
                   style={isActive ? pickerTokens.activeOptionStyle : undefined}
@@ -129,65 +128,6 @@ export function ThemeAppearancePicker({
             />
           </div>
         </div>
-      </div>
-
-      <div className="hidden md:block">
-        <SettingsLivePreviewFrame
-          accentColor={accentColor}
-          theme={selectedTheme}
-          title="Navet"
-          subtitle={t('themePicker.previewSubtitle', {
-            mode: t(
-              themeOptions.find((option) => option.value === selectedTheme)?.labelKey ??
-                'themeOption.light.label'
-            ),
-          })}
-          background={pickerTokens.previewBackground}
-          topBar={
-            <div
-              className="h-3 w-16 rounded-full"
-              style={{
-                background: `linear-gradient(90deg, ${accentColor}, ${accentColor}88)`,
-              }}
-            />
-          }
-        >
-          <div className="grid gap-3">
-            {[0, 1, 2].map((index) => (
-              <div
-                key={index}
-                className="rounded-[18px] border p-3"
-                style={{
-                  borderColor: `${accentColor}${index === 0 ? '55' : '22'}`,
-                  backgroundColor: pickerTokens.previewCardBackground(index),
-                }}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="h-9 w-9 rounded-2xl"
-                    style={{ backgroundColor: `${accentColor}26` }}
-                  />
-                  <div className="flex-1">
-                    <div
-                      className="h-3 rounded-full"
-                      style={{
-                        width: index === 0 ? '58%' : index === 1 ? '44%' : '50%',
-                        backgroundColor: pickerTokens.previewPrimaryBarColor,
-                      }}
-                    />
-                    <div
-                      className="mt-2 h-2 rounded-full"
-                      style={{
-                        width: index === 0 ? '36%' : '28%',
-                        backgroundColor: pickerTokens.previewSecondaryBarColor,
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </SettingsLivePreviewFrame>
       </div>
     </div>
   );

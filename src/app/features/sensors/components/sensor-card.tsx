@@ -4,6 +4,7 @@ import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-s
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
+import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
 
@@ -32,6 +33,7 @@ export const SensorCard = memo(function SensorCard({
 }: SensorCardProps) {
   const { theme } = useTheme();
   const { t } = useI18n();
+  const cardShell = getCardShellSurfaceTokens(theme);
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
   const shell = getAccentCardShellTokens(theme, 'teal');
@@ -50,7 +52,7 @@ export const SensorCard = memo(function SensorCard({
     theme === 'light' ? 'text-teal-700' : isGlass ? 'text-teal-200' : 'text-teal-400';
   return (
     <div
-      className={`relative h-full backdrop-blur-xl rounded-3xl ${padding} border overflow-hidden ${shell.containerClassName}`}
+      className={`relative h-full ${cardShell.backdropClassName} rounded-3xl ${padding} ${theme !== 'dark' ? 'border' : ''} overflow-hidden ${shell.containerClassName}`}
     >
       <div className={`absolute inset-0 ${shell.glowClassName}`}></div>
 
