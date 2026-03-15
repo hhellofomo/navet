@@ -60,9 +60,9 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
                   ? `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}${isLowEffects ? '38' : '46'}, ${getThemeColorValue(primaryColor)}${isLowEffects ? '22' : '2a'}, transparent 70%)`
                   : isGlass
                     ? resolvedEffectsQuality === 'high'
-                      ? `radial-gradient(circle at 16% 18%, ${getThemeColorValue(primaryColor)}55 0%, transparent 34%), radial-gradient(circle at 84% 12%, rgba(255,255,255,0.18) 0%, transparent 26%), linear-gradient(135deg, rgba(255,255,255,0.12), transparent 58%)`
+                      ? `radial-gradient(circle at 14% 14%, rgba(255,255,255,0.24) 0%, transparent 18%), radial-gradient(circle at 16% 18%, ${getThemeColorValue(primaryColor)}52 0%, transparent 34%), radial-gradient(circle at 84% 12%, rgba(255,255,255,0.22) 0%, transparent 24%), linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04) 24%, transparent 58%)`
                       : isMediumEffects
-                        ? `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}24, rgba(255,255,255,0.06), rgba(15,23,42,0.18) 72%)`
+                        ? `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}28, rgba(255,255,255,0.08), rgba(15,23,42,0.18) 72%)`
                         : `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}18, rgba(15,23,42,0.12), transparent 72%)`
                     : `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}40, ${getThemeColorValue(primaryColor)}20, transparent 60%)`,
               mixBlendMode:
@@ -81,9 +81,9 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
                     : 'rgba(249, 250, 251, 0.50)'
                   : isGlass
                     ? resolvedEffectsQuality === 'high'
-                      ? 'rgba(7, 12, 22, 0.46)'
+                      ? 'rgba(7, 12, 22, 0.40)'
                       : isMediumEffects
-                        ? 'rgba(8, 13, 22, 0.70)'
+                        ? 'rgba(8, 13, 22, 0.66)'
                         : 'rgba(8, 12, 20, 0.82)'
                     : 'rgba(10, 10, 10, 0.55)',
             }}
@@ -98,7 +98,7 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
             style={{
               background:
                 resolvedEffectsQuality === 'high'
-                  ? 'radial-gradient(circle at 14% 18%, rgba(255,255,255,0.14) 0%, transparent 26%), radial-gradient(circle at 82% 14%, rgba(255,255,255,0.08) 0%, transparent 24%), radial-gradient(circle at 18% 80%, rgba(59,130,246,0.18) 0%, transparent 28%), radial-gradient(circle at 78% 72%, rgba(255,255,255,0.06) 0%, transparent 22%), linear-gradient(180deg, rgba(12,18,32,0.96), rgba(7,10,18,0.98))'
+                  ? 'radial-gradient(circle at 12% 10%, rgba(255,255,255,0.20) 0%, transparent 18%), radial-gradient(circle at 14% 18%, rgba(255,255,255,0.10) 0%, transparent 26%), radial-gradient(circle at 18% 80%, rgba(59,130,246,0.20) 0%, transparent 28%), radial-gradient(circle at 82% 14%, rgba(255,255,255,0.10) 0%, transparent 24%), radial-gradient(circle at 78% 72%, rgba(255,255,255,0.06) 0%, transparent 22%), linear-gradient(180deg, rgba(12,18,32,0.95), rgba(7,10,18,0.98))'
                   : isMediumEffects
                     ? 'linear-gradient(180deg, rgba(18,24,38,0.96), rgba(10,14,24,0.98)), linear-gradient(135deg, rgba(255,255,255,0.05), transparent 42%)'
                     : 'linear-gradient(180deg, rgba(12,18,32,0.98), rgba(7,10,18,0.99))',

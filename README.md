@@ -29,7 +29,7 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 ## ✨ Features
 
 ### 🎨 Design
-- **Adaptive Glass Interface** - Premium glass-inspired surfaces with visual quality tiers for high, medium, and low-power devices
+- **Adaptive Glass Interface** - Premium liquid-glass surfaces with layered frost, brighter edge highlights, and quality-aware depth for high, medium, and low-power devices
 - **4 Theme Modes** - Liquid Glass, Dark, Light, and Black
 - **Custom Accent Colors** - 8 built-in accents plus a custom accent color picker
 - **Multi-Language UI** - English, Swedish, German, French, and Spanish interface support with locale-aware date, time, and number formatting
@@ -39,7 +39,7 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 ### 🏠 Smart Home Control
 - **Multi-Entity Support** - Lights, HVAC, switches, covers, locks, sensors, helpers, scripts, people, media players, vacuums, and more
 - **Unified Climate Controls** - Home Assistant climate entities now render through the HVAC card and settings flow across the dashboard
-- **Home Assistant Media Controls** - Media player cards now use live Home Assistant playback, volume, mute, metadata, remaining-time, and artwork data
+- **Home Assistant Media Controls** - Media player cards now use live Home Assistant playback, local mute/unmute volume memory, metadata, remaining-time, and artwork data
 - **Real-Time Updates** - Live state updates from your smart home system
 - **Quick Actions** - Toggle, adjust, and control devices with intuitive controls
 - **Room Organization** - Organized by rooms with dedicated room views
@@ -164,7 +164,7 @@ Use the production preview flow when you need to verify runtime config, Home Ass
 pnpm preview
 ```
 
-This builds the app, writes `dist/config.js` from `NAVET_HASS_URL` and `NAVET_HASS_TOKEN`, and serves the production bundle on `http://localhost:4173`.
+This builds the app, writes `dist/config.js` from `NAVET_HASS_URL` and `NAVET_HASS_TOKEN`, and serves the production bundle on `http://localhost:4173`. It is the recommended local check for Home Assistant proxy-backed artwork and other production-only media behavior.
 
 ## 📖 Usage
 
@@ -201,6 +201,7 @@ This builds the app, writes `dist/config.js` from `NAVET_HASS_URL` and `NAVET_HA
 #### Themes
 - Access **Settings** from the user menu
 - Choose from **4 modes**: Liquid Glass, Dark, Light, and Black
+- Liquid Glass now uses a denser frosted treatment with stronger rim highlights and deeper control surfaces instead of a flatter transparent blur
 - Select from **8 built-in accents** or choose a **custom accent color**
 - Choose **Visual Quality** in **Settings -> Appearance**: **High**, **Medium**, or **Low**
 - Choose the app **Language** in **Settings -> Localization** to switch locale-aware interface formatting
