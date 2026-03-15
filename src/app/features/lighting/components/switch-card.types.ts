@@ -8,6 +8,8 @@ export interface SwitchCardProps {
   room: string;
   initialState?: boolean;
   entityType?: string;
+  serviceDomain?: string;
+  serviceAction?: string;
   power?: number;
   voltage?: number;
   energy?: number;

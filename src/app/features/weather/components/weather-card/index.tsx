@@ -1,5 +1,5 @@
 import { Sunrise, Sunset } from 'lucide-react';
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
@@ -7,6 +7,7 @@ import { CaptionValue } from '@/app/components/ui/caption-value';
 import { CardWrapper } from '@/app/components/ui/card-wrapper';
 import { useI18n, useTheme } from '@/app/hooks';
 import { type WeatherCondition, WeatherIcon } from './weather-icon';
+import { WeatherSettingsDialog } from './weather-settings-dialog';
 
 // Re-export types
 export type { WeatherCondition };
@@ -42,7 +43,7 @@ interface WeatherCardProps {
  * High-quality design inspired by modern weather apps
  */
 export const WeatherCard = memo(function WeatherCard({
-  id: _id,
+  id,
   location,
   temperature,
   condition,
@@ -62,6 +63,7 @@ export const WeatherCard = memo(function WeatherCard({
 }: WeatherCardProps) {
   const { theme } = useTheme();
   const { formatDate, formatTime, t } = useI18n();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
   const shell = getAccentCardShellTokens(theme, 'blue');
@@ -96,25 +98,33 @@ export const WeatherCard = memo(function WeatherCard({
       <div className={`absolute inset-0 ${shell.glowClassName}`} />
 
       <div className="relative z-[2] h-full flex flex-col">
-        {/* Header: Location + Icon */}
-        <div className="flex items-start justify-between mb-2">
-          <div className="min-w-0 flex-1">
-            <h3
-              className={`font-semibold ${textPrimary} truncate ${isSmall ? 'text-xs' : 'text-sm'}`}
+        <button
+          type="button"
+          className="mb-2 block w-full text-left"
+          onClick={(event) => {
+            event.stopPropagation();
+            setIsSettingsOpen(true);
+          }}
+        >
+          <div className="flex items-start justify-between">
+            <div className="min-w-0 flex-1">
+              <h3
+                className={`font-semibold ${textPrimary} truncate ${isSmall ? 'text-xs' : 'text-sm'}`}
+              >
+                {location}
+              </h3>
+              <p className={`mt-0.5 truncate text-[10px] ${surface.textMuted}`}>
+                {t('weather.subtitle')}
+              </p>
+              {!isSmall && <p className={`text-xs ${textSecondary}`}>{dateTime}</p>}
+            </div>
+            <div
+              className={`${isSmall ? 'h-8 w-8' : 'h-10 w-10'} rounded-full flex shrink-0 items-center justify-center ${iconBg}`}
             >
-              {location}
-            </h3>
-            <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5`}>
-              {t('weather.subtitle')}
-            </p>
-            {!isSmall && <p className={`text-xs ${textSecondary}`}>{dateTime}</p>}
+              <WeatherIcon condition={condition} className={`${isSmall ? 'h-4 w-4' : 'h-5 w-5'}`} />
+            </div>
           </div>
-          <div
-            className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full flex items-center justify-center flex-shrink-0 ${iconBg}`}
-          >
-            <WeatherIcon condition={condition} className={`${isSmall ? 'w-4 h-4' : 'w-5 h-5'}`} />
-          </div>
-        </div>
+        </button>
 
         {isSmall ? (
           // SMALL: Compact view - Just temp and condition
@@ -198,6 +208,17 @@ export const WeatherCard = memo(function WeatherCard({
           </div>
         )}
       </div>
+
+      {isSettingsOpen ? (
+        <WeatherSettingsDialog
+          entityId={id}
+          isOpen={isSettingsOpen}
+          onOpenChange={setIsSettingsOpen}
+          theme={theme}
+          title={location}
+          location={t('weather.subtitle')}
+        />
+      ) : null}
     </CardWrapper>
   );
 });

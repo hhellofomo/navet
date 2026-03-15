@@ -19,7 +19,7 @@ Complete documentation for the Navet smart home dashboard.
   - Creating custom widgets
   - Widget storage and API
 - **[Main README](../README.md#installable-pwa)** - Installable PWA shell and build verification
-- **[Main README](../README.md#-features)** - Current product features, including the unified HVAC-based climate card path, live calendar cards, Home Assistant notifications/repairs, and card-level room reassignment
+- **[Main README](../README.md#-features)** - Current product features, including the unified HVAC-based climate card path, live calendar/weather cards, person/helper/script support, Home Assistant notifications/repairs, and card-level room reassignment
 - **[Main README](../README.md#room-navigation)** - Dashboard room navigation, All-view grouping modes, and dashboard dropdown behavior
 - **[Main README](../README.md#search)** - Dashboard search behavior, including Home Assistant entity-id and domain queries
 - **[Main README](../README.md#themes)** - Theme modes, adaptive glass visual quality tiers, shared appearance primitives, custom accents, and the light card ambience setting

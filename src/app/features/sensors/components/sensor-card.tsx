@@ -13,6 +13,7 @@ interface SensorCardProps {
   value: string;
   unit: string;
   icon?: 'gauge' | 'trend-up' | 'trend-down';
+  subtitle?: string;
   size: CardSize;
   onSizeChange: (id: string, size: CardSize) => void;
   isEditMode: boolean;
@@ -24,6 +25,7 @@ export const SensorCard = memo(function SensorCard({
   value,
   unit,
   icon = 'gauge',
+  subtitle,
   size,
   onSizeChange: _onSizeChange,
   isEditMode: _isEditMode,
@@ -57,7 +59,7 @@ export const SensorCard = memo(function SensorCard({
       <div className="relative h-full flex flex-col">
         <EntityCardHeader
           title={name}
-          subtitle={t('sensors.single')}
+          subtitle={subtitle || t('sensors.single')}
           size={size}
           leading={
             <EntityCardHeaderIcon IconComponent={IconComponent} isActive={true} size={size} />

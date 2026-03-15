@@ -156,6 +156,8 @@ export const renderCard = ({
           size={size}
           initialState={device.state as boolean | undefined}
           entityType={device.entityType as string | undefined}
+          serviceDomain={device.serviceDomain as string | undefined}
+          serviceAction={device.serviceAction as string | undefined}
           power={device.power as number | undefined}
           voltage={device.voltage as number | undefined}
           energy={device.energy as number | undefined}
@@ -182,9 +184,12 @@ export const renderCard = ({
     case 'persons':
       return (
         <PersonCard
+          id={device.id as string}
           name={device.name as string}
+          room={device.room as string}
           location={device.location as string}
           state={device.state as 'home' | 'away'}
+          entityPicture={device.entityPicture as string | undefined}
           size={size}
           onSizeChange={handleSizeChange}
           isEditMode={isEditMode}
@@ -197,6 +202,8 @@ export const renderCard = ({
           room={device.room as string}
           value={device.value as string}
           unit={device.unit as string}
+          icon={device.icon as 'gauge' | 'trend-up' | 'trend-down' | undefined}
+          subtitle={device.entityType as string | undefined}
           size={size}
           onSizeChange={handleSizeChange}
           isEditMode={isEditMode}

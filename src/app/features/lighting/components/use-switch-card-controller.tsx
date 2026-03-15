@@ -1,6 +1,7 @@
 import { Power } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { isExtraSmallCardSize } from '@/app/components/shared/card-size-selector';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import { iconMap } from '@/app/features/sensors';
@@ -31,6 +32,8 @@ export function useSwitchCardController({
   size,
   initialState = false,
   entityType,
+  serviceDomain,
+  serviceAction,
   power,
   voltage,
   energy,
@@ -44,6 +47,9 @@ export function useSwitchCardController({
   const { t } = useI18n();
   const liveEntity = entities?.[id];
   const resolvedEntityType = entityType || t('lighting.type.switch');
+  const resolvedServiceDomain = serviceDomain || id.split('.')[0];
+  const resolvedServiceAction = serviceAction || 'binary';
+  const isExtraSmall = isExtraSmallCardSize(size);
 
   useEffect(() => {
     if (liveEntity) {
@@ -184,14 +190,53 @@ export function useSwitchCardController({
     ariaPressed: isOn,
     isEditMode,
     onToggle: () => {
+      if (resolvedServiceAction === 'turn_on') {
+        setIsOn(true);
+        void homeAssistantService
+          .callService(resolvedServiceDomain, 'turn_on', {}, { entity_id: id })
+          .then(() => {
+            window.setTimeout(() => setIsOn(false), 700);
+          })
+          .catch((error) => {
+            setIsOn(false);
+            toast.error(
+              error instanceof Error ? error.message : t('lighting.feedback.updateSwitchFailed')
+            );
+          });
+        return;
+      }
+
+      if (resolvedServiceAction === 'press') {
+        setIsOn(true);
+        void homeAssistantService
+          .callService(resolvedServiceDomain, 'press', {}, { entity_id: id })
+          .then(() => {
+            window.setTimeout(() => setIsOn(false), 500);
+          })
+          .catch((error) => {
+            setIsOn(false);
+            toast.error(
+              error instanceof Error ? error.message : t('lighting.feedback.updateSwitchFailed')
+            );
+          });
+        return;
+      }
+
       const nextIsOn = !isOn;
       setIsOn(nextIsOn);
-      void homeAssistantService.updateSwitch(id, nextIsOn ? 'on' : 'off').catch((error) => {
-        setIsOn(!nextIsOn);
-        toast.error(
-          error instanceof Error ? error.message : t('lighting.feedback.updateSwitchFailed')
-        );
-      });
+      void homeAssistantService
+        .callService(
+          resolvedServiceDomain,
+          nextIsOn ? 'turn_on' : 'turn_off',
+          {},
+          { entity_id: id }
+        )
+        .catch((error) => {
+          setIsOn(!nextIsOn);
+          toast.error(
+            error instanceof Error ? error.message : t('lighting.feedback.updateSwitchFailed')
+          );
+        });
     },
     onOpenControls: () => {
       if (hasControlsDialog) {
@@ -281,6 +326,7 @@ export function useSwitchCardController({
     setIsDialogOpen,
     settingsButtonClass,
     showSettingsButton,
+    isExtraSmall,
     textColor,
     theme,
     valueColor,

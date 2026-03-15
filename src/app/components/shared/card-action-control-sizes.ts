@@ -8,6 +8,15 @@ export interface CardActionControlSizes {
 }
 
 export function getCardActionControlSizes(size: CardSize | 'large'): CardActionControlSizes {
+  if (size === 'extra-small') {
+    return {
+      button: 'h-7 w-7',
+      icon: 'h-3 w-3',
+      inner: 'h-3.5 w-3.5',
+      dot: 'h-1.5 w-1.5',
+    };
+  }
+
   if (size === 'large') {
     return {
       button: 'h-9 w-9',

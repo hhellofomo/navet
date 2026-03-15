@@ -1,28 +1,37 @@
 import { Home, MapPin, User } from 'lucide-react';
 import { memo } from 'react';
+import { ImageWithFallback } from '@/app/components/figma/ImageWithFallback';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
+import { useAuth } from '@/app/contexts/auth-context';
 import { useI18n, useTheme } from '@/app/hooks';
 import { getPersonCardSurfaceTokens } from './person-card-surface-tokens';
 
 interface PersonCardProps {
+  id: string;
   name: string;
+  room: string;
   location: string;
   state: 'home' | 'away';
+  entityPicture?: string;
   size: CardSize;
   onSizeChange: (id: string, size: CardSize) => void;
   isEditMode: boolean;
 }
 
 export const PersonCard = memo(function PersonCard({
+  id: _id,
   name,
+  room,
   location,
   state,
+  entityPicture,
   size,
   onSizeChange: _onSizeChange,
   isEditMode: _isEditMode,
 }: PersonCardProps) {
   const { t } = useI18n();
   const { theme, colors } = useTheme();
+  const { config } = useAuth();
 
   // Size-specific styling
   const isSmall = isCompactCardSize(size);
@@ -30,6 +39,9 @@ export const PersonCard = memo(function PersonCard({
 
   const cardColors = state === 'home' ? colors.person.home : colors.person.away;
   const surface = getPersonCardSurfaceTokens(theme, state);
+  const resolvedEntityPicture = entityPicture?.startsWith('/')
+    ? `${config?.url ?? ''}${entityPicture}`
+    : entityPicture;
 
   return (
     <div
@@ -53,7 +65,11 @@ export const PersonCard = memo(function PersonCard({
             <p className={`mt-0.5 truncate text-[10px] ${surface.typeLabelClassName}`}>
               {t('deviceType.person')}
             </p>
-            {!isSmall && <p className={`text-xs ${surface.locationClassName}`}>{location}</p>}
+            {!isSmall && (
+              <p className={`text-xs ${surface.locationClassName}`}>
+                {state === 'home' ? room : location}
+              </p>
+            )}
           </div>
         </div>
 
@@ -65,7 +81,17 @@ export const PersonCard = memo(function PersonCard({
                 : surface.avatarAwayBgClassName
             }`}
           >
-            <User className={`${isSmall ? 'w-5 h-5' : 'w-7 h-7'} ${surface.avatarIconClassName}`} />
+            {resolvedEntityPicture ? (
+              <ImageWithFallback
+                src={resolvedEntityPicture}
+                alt={name}
+                className="h-full w-full rounded-full object-cover"
+              />
+            ) : (
+              <User
+                className={`${isSmall ? 'w-5 h-5' : 'w-7 h-7'} ${surface.avatarIconClassName}`}
+              />
+            )}
           </div>
 
           {!isSmall && (

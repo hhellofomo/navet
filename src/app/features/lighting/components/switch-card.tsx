@@ -16,9 +16,9 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
     <>
       <div
         {...controller.cardInteraction.cardProps}
-        className={`relative h-full w-full bg-gradient-to-br ${controller.cardColors.gradient} backdrop-blur-xl rounded-3xl p-4 border ${controller.cardColors.border} overflow-hidden transition-all duration-500 ${
+        className={`relative h-full w-full bg-gradient-to-br ${controller.cardColors.gradient} backdrop-blur-xl rounded-3xl border ${controller.cardColors.border} overflow-hidden transition-all duration-500 ${
           props.isEditMode ? 'cursor-move active:cursor-grabbing' : 'cursor-pointer'
-        } ${stateSurface.containerClassName} ${controller.theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
+        } ${controller.isExtraSmall ? 'px-3.5 pb-3.5 pt-3' : 'p-4'} ${stateSurface.containerClassName} ${controller.theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
       >
         {controller.isOn && (
           <div
@@ -37,27 +37,29 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
         )}
 
         <div className="relative h-full flex flex-col">
-          <div className="mb-2 flex items-start gap-3">
+          <div
+            className={`${controller.isExtraSmall ? 'mb-1.5 gap-2' : 'mb-2 gap-3'} flex items-start`}
+          >
             <EntityCardHeaderIcon
               IconComponent={Power}
               isActive={controller.isOn}
-              size="small"
+              size={controller.isExtraSmall ? 'extra-small' : 'small'}
               ariaLabel={controller.cardInteraction.iconButtonProps['aria-label']}
               onClick={controller.cardInteraction.iconButtonProps.onClick}
             />
             <div className="min-w-0 flex-1">
               <h3
-                className={`font-semibold text-xs ${stateSurface.primaryTextClassName} transition-colors duration-500 truncate text-left`}
+                className={`font-semibold ${controller.isExtraSmall ? 'text-[11px]' : 'text-xs'} ${stateSurface.primaryTextClassName} transition-colors duration-500 truncate text-left`}
               >
                 {props.name}
               </h3>
               <p
-                className={`text-[10px] ${stateSurface.mutedTextClassName} truncate mt-0.5 text-left`}
+                className={`${controller.isExtraSmall ? 'mt-0 text-[9px]' : 'mt-0.5 text-[10px]'} ${stateSurface.mutedTextClassName} truncate text-left`}
               >
                 {controller.entityType}
               </p>
             </div>
-            {controller.showSettingsButton && (
+            {controller.showSettingsButton && !controller.isExtraSmall && (
               <RoundControlButton
                 theme={controller.theme}
                 size="small"
@@ -73,13 +75,19 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
           <div className="flex-1" />
 
           {controller.selectedMetrics.length > 0 && (
-            <div className="space-y-0.5">
+            <div className={controller.isExtraSmall ? 'space-y-0' : 'space-y-0.5'}>
               {controller.selectedMetrics.map((metric) => (
-                <div key={metric.label} className="flex items-center justify-between gap-2 text-xs">
+                <div
+                  key={metric.label}
+                  className={`flex items-center justify-between ${controller.isExtraSmall ? 'gap-1.5 text-[10px]' : 'gap-2 text-xs'}`}
+                >
                   <span
-                    className={`${stateSurface.secondaryTextClassName} min-w-0 flex items-center gap-1 pr-2`}
+                    className={`${stateSurface.secondaryTextClassName} min-w-0 flex items-center ${controller.isExtraSmall ? 'gap-1 pr-1' : 'gap-1 pr-2'}`}
                   >
-                    {controller.renderMetricIcon(metric, 'h-3 w-3 flex-shrink-0')}
+                    {controller.renderMetricIcon(
+                      metric,
+                      `${controller.isExtraSmall ? 'h-2.5 w-2.5' : 'h-3 w-3'} flex-shrink-0`
+                    )}
                     <span className="truncate">{controller.getMetricLabel(metric)}</span>
                   </span>
                   <span

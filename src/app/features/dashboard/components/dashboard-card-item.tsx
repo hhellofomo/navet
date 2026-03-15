@@ -114,6 +114,7 @@ function getAllowedSizes(device?: DeviceWithType, card?: CustomCard): CardSize[]
     case 'weather':
       return ['large'];
     case 'switches':
+      return ['extra-small', 'small'];
     case 'locks':
       return [device.size as CardSize];
     default:

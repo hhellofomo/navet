@@ -12,6 +12,7 @@ import type {
   LockDevice,
   MediaDevice,
   PersonDevice,
+  SensorDevice,
   SwitchDevice,
   VacuumDevice,
   WeatherDevice,
@@ -319,6 +320,7 @@ export const useHADevices = (): DeviceCollection => {
     const climate: ClimateDevice[] = [];
     const media: MediaDevice[] = [];
     const persons: PersonDevice[] = [];
+    const sensors: SensorDevice[] = [];
     const covers: CoverDevice[] = [];
     const locks: LockDevice[] = [];
     const vacuums: VacuumDevice[] = [];
@@ -643,6 +645,50 @@ export const useHADevices = (): DeviceCollection => {
       return null;
     };
 
+    const formatSensorValue = (entity: HassEntity): { value: string; unit: string } | null => {
+      const unit =
+        typeof entity.attributes?.unit_of_measurement === 'string'
+          ? entity.attributes.unit_of_measurement
+          : typeof entity.attributes?.native_unit_of_measurement === 'string'
+            ? entity.attributes.native_unit_of_measurement
+            : '';
+
+      const candidate =
+        typeof entity.state === 'string' && entity.state.length > 0
+          ? entity.state
+          : typeof entity.attributes?.native_value === 'string' ||
+              typeof entity.attributes?.native_value === 'number'
+            ? String(entity.attributes.native_value)
+            : typeof entity.attributes?.value === 'string' ||
+                typeof entity.attributes?.value === 'number'
+              ? String(entity.attributes.value)
+              : '';
+
+      if (!candidate) {
+        return null;
+      }
+
+      return { value: candidate, unit };
+    };
+
+    const helperLabelForDomain = (domain: string): string => {
+      switch (domain) {
+        case 'script':
+          return t('deviceType.script');
+        case 'input_boolean':
+          return t('deviceType.helper');
+        case 'input_number':
+        case 'input_select':
+        case 'input_text':
+        case 'input_datetime':
+        case 'button':
+        case 'input_button':
+          return t('deviceType.helper');
+        default:
+          return t('deviceType.sensor');
+      }
+    };
+
     Object.entries(entities).forEach(([entityId, entity]) => {
       const domain = entityId.split('.')[0];
       if (domain === 'sensor') {
@@ -795,6 +841,45 @@ export const useHADevices = (): DeviceCollection => {
           break;
         }
 
+        case 'input_boolean':
+          switches.push({
+            id: entityId,
+            name,
+            room,
+            size: 'small',
+            state: entity.state === 'on',
+            entityType: helperLabelForDomain(domain),
+            serviceDomain: 'input_boolean',
+          });
+          break;
+
+        case 'script':
+          switches.push({
+            id: entityId,
+            name,
+            room,
+            size: 'small',
+            state: entity.state === 'on',
+            entityType: helperLabelForDomain(domain),
+            serviceDomain: 'script',
+            serviceAction: 'turn_on',
+          });
+          break;
+
+        case 'button':
+        case 'input_button':
+          switches.push({
+            id: entityId,
+            name,
+            room,
+            size: 'small',
+            state: false,
+            entityType: helperLabelForDomain(domain),
+            serviceDomain: domain,
+            serviceAction: 'press',
+          });
+          break;
+
         case 'climate':
           climate.push({
             id: entityId,
@@ -880,15 +965,38 @@ export const useHADevices = (): DeviceCollection => {
           break;
         }
 
-        case 'person':
+        case 'person': {
+          const personState = typeof entity.state === 'string' ? entity.state : 'not_home';
+          const personLocation =
+            personState === 'home'
+              ? t('person.home')
+              : personState === 'not_home'
+                ? t('person.away')
+                : personState
+                    .split('_')
+                    .map((segment) =>
+                      segment.length > 0
+                        ? `${segment[0]?.toUpperCase() ?? ''}${segment.slice(1)}`
+                        : segment
+                    )
+                    .join(' ');
+
           persons.push({
             id: entityId,
             name,
+            room,
             size: 'small',
-            location: entity.state,
-            state: entity.state === 'home' ? 'home' : 'away',
+            location: personLocation,
+            state: personState === 'home' ? 'home' : 'away',
+            entityPicture:
+              (typeof entity.attributes?.entity_picture === 'string' &&
+                entity.attributes.entity_picture) ||
+              (typeof entity.attributes?.entity_picture_local === 'string' &&
+                entity.attributes.entity_picture_local) ||
+              undefined,
           });
           break;
+        }
 
         case 'cover':
           covers.push({
@@ -909,6 +1017,50 @@ export const useHADevices = (): DeviceCollection => {
             state: entity.state === 'locked',
           });
           break;
+
+        case 'sensor':
+        case 'binary_sensor':
+        case 'number':
+        case 'input_number':
+        case 'select':
+        case 'input_select':
+        case 'input_text':
+        case 'text':
+        case 'input_datetime':
+        case 'datetime':
+        case 'date': {
+          const formatted = formatSensorValue(entity);
+          if (!formatted) {
+            break;
+          }
+
+          const entityType =
+            domain === 'sensor' || domain === 'binary_sensor'
+              ? t('deviceType.sensor')
+              : helperLabelForDomain(domain);
+          const icon =
+            domain === 'sensor' || domain === 'binary_sensor'
+              ? inferMetricIcon(
+                  typeof entity.attributes?.device_class === 'string'
+                    ? entity.attributes.device_class.toLowerCase()
+                    : null,
+                  `${entityId} ${name}`,
+                  formatted.unit
+                )
+              : 'gauge';
+
+          sensors.push({
+            id: entityId,
+            name,
+            room,
+            size: 'small',
+            value: formatted.value,
+            unit: formatted.unit,
+            icon,
+            entityType,
+          });
+          break;
+        }
 
         case 'vacuum': {
           const batteryLevel = parseNumberish(entity.attributes?.battery_level);

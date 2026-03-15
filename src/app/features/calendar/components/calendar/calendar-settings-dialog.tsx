@@ -56,17 +56,13 @@ export function CalendarSettingsDialog({
             title={t('calendar.settings.title')}
             description={t('calendar.settings.description', { title })}
             isOn={isOn}
-            trailing={
-              entityId ? (
-                <EntityRoomSelector
-                  entityId={entityId}
-                  label={t('calendar.settings.room')}
-                  compact
-                  className="w-32"
-                />
-              ) : undefined
-            }
           />
+
+          {entityId ? (
+            <div className={`mb-4 rounded-2xl p-4 ${surface.subtleBg}`}>
+              <EntityRoomSelector entityId={entityId} label={t('calendar.settings.room')} />
+            </div>
+          ) : null}
 
           <div className="mb-4">
             <div className={`mb-2 text-xs font-medium ${surface.textSecondary}`}>
