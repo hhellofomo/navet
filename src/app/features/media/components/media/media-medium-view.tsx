@@ -12,6 +12,7 @@ import { useMediaArtworkColors, withAlpha } from './use-media-artwork-colors';
 interface MediaMediumViewProps {
   entityId: string;
   artwork?: string | null;
+  paletteArtwork?: string | null;
   onArtworkError?: (imageUrl?: string | null) => void;
   title: string;
   artist: string;
@@ -33,6 +34,7 @@ interface MediaMediumViewProps {
 export function MediaMediumView({
   entityId,
   artwork,
+  paletteArtwork,
   onArtworkError,
   title,
   artist,
@@ -53,7 +55,13 @@ export function MediaMediumView({
   const { t } = useI18n();
   const displayVolume = Math.max(0, Math.min(100, isMuted ? 0 : volume));
   const stateSurface = getCardStateSurfaceTokens(theme, isActive);
-  const palette = useMediaArtworkColors(artwork, theme, entityId, `${title}::${artist}`);
+  const palette = useMediaArtworkColors(
+    artwork,
+    theme,
+    entityId,
+    `${title}::${artist}`,
+    paletteArtwork
+  );
   const iconTone = stateSurface.primaryTextClassName;
   const subtitleTone = stateSurface.secondaryTextClassName;
   const displayRemaining = formatMediaTime(Math.max(0, durationSeconds - elapsedSeconds));

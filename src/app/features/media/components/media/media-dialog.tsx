@@ -13,6 +13,7 @@ interface MediaDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   artwork?: string | null;
+  paletteArtwork?: string | null;
   onArtworkError?: (imageUrl?: string | null) => void;
   title: string;
   artist: string;
@@ -33,6 +34,7 @@ export function MediaDialog({
   isOpen,
   onOpenChange,
   artwork,
+  paletteArtwork,
   onArtworkError,
   title,
   artist,
@@ -51,7 +53,13 @@ export function MediaDialog({
   const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
-  const palette = useMediaArtworkColors(artwork, theme, 'media-dialog', `${title}::${artist}`);
+  const palette = useMediaArtworkColors(
+    artwork,
+    theme,
+    entityId,
+    `${title}::${artist}`,
+    paletteArtwork
+  );
   const displayRemaining = formatMediaTime(Math.max(0, durationSeconds - elapsedSeconds));
   const displayDuration = durationSeconds > 0 ? formatMediaTime(durationSeconds) : '--:--';
   const presetButton = (isActive: boolean) =>

@@ -1,12 +1,19 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useAuth } from '@/app/contexts/auth-context';
-import { useI18n } from '@/app/hooks';
+import { fetchMediaThumbnailDataUrl } from '@/app/features/media/utils/media-thumbnail';
+import { useHomeAssistant, useI18n } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
+import {
+  resolveHomeAssistantAbsoluteUrl,
+  resolveHomeAssistantProxyUrl,
+} from '@/app/utils/home-assistant-url';
 
 interface UseMediaCardControllerParams {
   entityId: string;
   entityPicture?: string;
+  artworkKey?: string;
   initialState: 'playing' | 'paused' | 'idle' | 'off';
   initialVolume: number;
   initialMuted: boolean;
@@ -15,68 +22,17 @@ interface UseMediaCardControllerParams {
   initialPositionUpdatedAt?: string;
 }
 
-function normalizeMediaArtworkUrl(
-  entityPicture: string,
-  hassUrl?: string,
-  preferRelativeProxy = false
+function isFailedArtworkCandidate(
+  candidate: string | null | undefined,
+  failedArtworkUrl: string | null
 ) {
-  if (!entityPicture) {
-    return null;
-  }
-
-  if (entityPicture.startsWith('/api/') || entityPicture.startsWith('/media/')) {
-    return preferRelativeProxy
-      ? entityPicture
-      : hassUrl
-        ? `${hassUrl}${entityPicture}`
-        : entityPicture;
-  }
-
-  if (!entityPicture.startsWith('http://') && !entityPicture.startsWith('https://')) {
-    return hassUrl ? `${hassUrl}${entityPicture}` : entityPicture;
-  }
-
-  if (!hassUrl) {
-    return entityPicture;
-  }
-
-  try {
-    const resolvedArtworkUrl = new URL(entityPicture);
-    const resolvedHassUrl = new URL(hassUrl);
-
-    if (
-      resolvedArtworkUrl.origin === resolvedHassUrl.origin &&
-      resolvedArtworkUrl.pathname.startsWith('/api/')
-    ) {
-      return preferRelativeProxy
-        ? `${resolvedArtworkUrl.pathname}${resolvedArtworkUrl.search}`
-        : entityPicture;
-    }
-  } catch {
-    return entityPicture;
-  }
-
-  return entityPicture;
-}
-
-function shouldFetchArtworkWithToken(artworkUrl: string, hassUrl?: string) {
-  if (!hassUrl) {
-    return artworkUrl.startsWith('/api/') || artworkUrl.startsWith('/media/');
-  }
-
-  try {
-    const resolvedArtworkUrl = new URL(artworkUrl, hassUrl);
-    const resolvedHassUrl = new URL(hassUrl);
-
-    return resolvedArtworkUrl.origin === resolvedHassUrl.origin;
-  } catch {
-    return artworkUrl.startsWith('/api/') || artworkUrl.startsWith('/media/');
-  }
+  return Boolean(candidate) && candidate === failedArtworkUrl;
 }
 
 export function useMediaCardController({
   entityId,
   entityPicture,
+  artworkKey,
   initialState,
   initialVolume,
   initialMuted,
@@ -85,6 +41,8 @@ export function useMediaCardController({
   initialPositionUpdatedAt,
 }: UseMediaCardControllerParams) {
   const { config: authConfig } = useAuth();
+  const connected = useHomeAssistant(homeAssistantSelectors.connected);
+  const connection = useHomeAssistant(homeAssistantSelectors.connection);
   const { t } = useI18n();
   const [state, setState] = useState(initialState);
   const [volume, setVolume] = useState(initialVolume);
@@ -94,8 +52,13 @@ export function useMediaCardController({
   const [durationSeconds, setDurationSeconds] = useState(initialDurationSeconds ?? 0);
   const [failedArtworkUrl, setFailedArtworkUrl] = useState<string | null>(null);
   const [resolvedAlbumArt, setResolvedAlbumArt] = useState<string | null>(null);
-  const previousEntityPictureRef = useRef(entityPicture);
-  const objectUrlRef = useRef<string | null>(null);
+  const [thumbnailAlbumArt, setThumbnailAlbumArt] = useState<string | null>(null);
+  const artworkRequestKey = [entityId, artworkKey].filter(Boolean).join('::');
+  const fallbackArtwork = entityPicture
+    ? import.meta.env.DEV
+      ? resolveHomeAssistantProxyUrl(entityPicture, authConfig?.url)
+      : resolveHomeAssistantAbsoluteUrl(entityPicture, authConfig?.url)
+    : null;
 
   useEffect(() => {
     setState(initialState);
@@ -117,103 +80,61 @@ export function useMediaCardController({
     setDurationSeconds(initialDurationSeconds ?? 0);
   }, [initialDurationSeconds]);
 
-  const albumArt = useMemo(() => {
-    if (!entityPicture) {
-      return null;
-    }
-
-    const normalizedArtworkUrl = normalizeMediaArtworkUrl(
-      entityPicture,
-      authConfig?.url,
-      import.meta.env.DEV
-    );
-    if (!normalizedArtworkUrl || normalizedArtworkUrl === failedArtworkUrl) {
-      return null;
-    }
-
-    return normalizedArtworkUrl;
-  }, [authConfig, entityPicture, failedArtworkUrl]);
-
   useEffect(() => {
-    if (!albumArt) {
-      if (objectUrlRef.current) {
-        URL.revokeObjectURL(objectUrlRef.current);
-        objectUrlRef.current = null;
-      }
-      setResolvedAlbumArt(null);
+    if (!artworkRequestKey) {
+      setThumbnailAlbumArt(null);
+      setResolvedAlbumArt(
+        isFailedArtworkCandidate(fallbackArtwork, failedArtworkUrl) ? null : fallbackArtwork
+      );
       return;
     }
 
-    if (
-      albumArt.startsWith('blob:') ||
-      albumArt.startsWith('data:') ||
-      !shouldFetchArtworkWithToken(albumArt, authConfig?.url)
-    ) {
-      if (objectUrlRef.current) {
-        URL.revokeObjectURL(objectUrlRef.current);
-        objectUrlRef.current = null;
-      }
-      setResolvedAlbumArt(albumArt);
-      return;
-    }
-
-    const controller = new AbortController();
     let cancelled = false;
 
-    void fetch(albumArt, {
-      headers: authConfig?.token ? { Authorization: `Bearer ${authConfig.token}` } : undefined,
-      signal: controller.signal,
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(`Failed to load artwork: ${response.status}`);
+    void (async () => {
+      if (!connected || !connection) {
+        if (!cancelled) {
+          setResolvedAlbumArt(
+            isFailedArtworkCandidate(fallbackArtwork, failedArtworkUrl) ? null : fallbackArtwork
+          );
         }
+        return;
+      }
 
-        const blob = await response.blob();
-        if (!blob.type.startsWith('image/')) {
-          throw new Error('Artwork response is not an image');
-        }
-
-        const nextObjectUrl = URL.createObjectURL(blob);
+      const thumbnailDataUrl = await fetchMediaThumbnailDataUrl(entityId, connection).catch(
+        () => null
+      );
+      if (thumbnailDataUrl && !isFailedArtworkCandidate(thumbnailDataUrl, failedArtworkUrl)) {
         if (cancelled) {
-          URL.revokeObjectURL(nextObjectUrl);
           return;
         }
 
-        if (objectUrlRef.current) {
-          URL.revokeObjectURL(objectUrlRef.current);
-        }
+        setThumbnailAlbumArt(thumbnailDataUrl);
+        setResolvedAlbumArt(thumbnailDataUrl);
+        return;
+      }
 
-        objectUrlRef.current = nextObjectUrl;
-        setResolvedAlbumArt(nextObjectUrl);
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setResolvedAlbumArt(null);
-        }
-      });
+      if (!cancelled) {
+        setThumbnailAlbumArt(null);
+        setResolvedAlbumArt(
+          isFailedArtworkCandidate(fallbackArtwork, failedArtworkUrl) ? null : fallbackArtwork
+        );
+      }
+    })();
 
     return () => {
       cancelled = true;
-      controller.abort();
     };
-  }, [albumArt, authConfig?.token, authConfig?.url]);
+  }, [artworkRequestKey, connected, connection, entityId, failedArtworkUrl, fallbackArtwork]);
 
   useEffect(() => {
-    if (previousEntityPictureRef.current !== entityPicture) {
-      previousEntityPictureRef.current = entityPicture;
-      setFailedArtworkUrl(null);
+    if (!artworkRequestKey) {
+      return;
     }
-  });
 
-  useEffect(() => {
-    return () => {
-      if (objectUrlRef.current) {
-        URL.revokeObjectURL(objectUrlRef.current);
-        objectUrlRef.current = null;
-      }
-    };
-  }, []);
+    setFailedArtworkUrl(null);
+    setThumbnailAlbumArt(null);
+  }, [artworkRequestKey]);
 
   const isPlaying = state === 'playing';
 
@@ -325,11 +246,13 @@ export function useMediaCardController({
       return;
     }
 
+    setResolvedAlbumArt((current) => (current === imageUrl ? null : current));
     setFailedArtworkUrl((current) => current ?? imageUrl);
   }, []);
 
   return {
     albumArt: resolvedAlbumArt,
+    thumbnailAlbumArt,
     closeDialog,
     durationSeconds,
     elapsedSeconds,

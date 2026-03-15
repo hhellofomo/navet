@@ -5,6 +5,7 @@ import { RoundControlButton } from '@/app/components/shared/round-control-button
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
+import { isMediaPlayerProxyUrl } from '@/app/utils/home-assistant-url';
 import { getMediaControlStyles } from './media-control-styles';
 import { MediaFallbackArtwork } from './media-fallback-artwork';
 import { formatMediaTime } from './media-time';
@@ -14,6 +15,7 @@ import { useMediaArtworkColors, withAlpha } from './use-media-artwork-colors';
 interface MediaSmallViewProps {
   entityId: string;
   artwork?: string | null;
+  paletteArtwork?: string | null;
   onArtworkError?: (imageUrl?: string | null) => void;
   title: string;
   artist: string;
@@ -33,6 +35,7 @@ interface MediaSmallViewProps {
 export function MediaSmallView({
   entityId,
   artwork,
+  paletteArtwork,
   onArtworkError,
   title,
   artist,
@@ -73,10 +76,20 @@ export function MediaSmallView({
   const subtitleTone = stateSurface.secondaryTextClassName;
   const displayRemaining = formatMediaTime(Math.max(0, durationSeconds - elapsedSeconds));
   const controls = getMediaControlStyles(theme);
-  const palette = useMediaArtworkColors(artwork, theme, entityId, `${title}::${artist}`);
+  const palette = useMediaArtworkColors(
+    artwork,
+    theme,
+    entityId,
+    `${title}::${artist}`,
+    paletteArtwork
+  );
   const controlSizes = getCardActionControlSizes('small');
   const primaryControlSizes = getCardActionControlSizes('medium');
   const subduedFallback = !artwork && !isActive;
+  const shouldRenderDecorativeArtworkLayers =
+    artwork !== null &&
+    artwork !== undefined &&
+    (import.meta.env.DEV || !isMediaPlayerProxyUrl(artwork));
   const backgroundBaseStyle = {
     background: subduedFallback
       ? `linear-gradient(165deg, ${withAlpha(palette.dominant, 0.18)} 0%, ${withAlpha(
@@ -124,7 +137,7 @@ export function MediaSmallView({
     <div className="relative -m-4 flex h-[calc(100%+2rem)] flex-col overflow-hidden rounded-[inherit]">
       <div className="pointer-events-none absolute inset-0" style={backgroundBaseStyle} />
       {artwork ? (
-        showDeferredBackdrop ? (
+        showDeferredBackdrop && shouldRenderDecorativeArtworkLayers ? (
           <>
             <img
               src={artwork}

@@ -1,0 +1,23 @@
+server {
+  listen 80;
+  server_name _;
+
+  root /usr/share/nginx/html;
+  index index.html;
+
+  location /__navet_ha_proxy__/ {
+    proxy_pass ${NAVET_HASS_URL}/;
+    proxy_http_version 1.1;
+    proxy_set_header Host $proxy_host;
+${NAVET_PROXY_AUTH_DIRECTIVE}
+  }
+
+  location = /config.js {
+    add_header Cache-Control "no-store";
+    try_files $uri =404;
+  }
+
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+}
