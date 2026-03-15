@@ -97,6 +97,8 @@ const buildExportedSettings = (
     disableAnimations: undefined,
     lowPowerMode: undefined,
     effectsQuality: effectsQuality !== defaultSettings.effectsQuality ? effectsQuality : undefined,
+    pageZoom:
+      settingsState.pageZoom !== defaultSettings.pageZoom ? settingsState.pageZoom : undefined,
     entityInteractionMode:
       settingsState.entityInteractionMode !== defaultSettings.entityInteractionMode
         ? settingsState.entityInteractionMode
@@ -242,6 +244,10 @@ export const importDashboardConfig = (value: unknown) => {
         : defaultSettings.compactMode,
     ...getLegacyReducedEffectsFlags(effectsQuality),
     effectsQuality,
+    pageZoom:
+      settings.pageZoom === 75 || settings.pageZoom === 85 || settings.pageZoom === 100
+        ? settings.pageZoom
+        : defaultSettings.pageZoom,
     entityInteractionMode:
       settings.entityInteractionMode === 'control-first' ||
       settings.entityInteractionMode === 'toggle-first'

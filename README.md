@@ -51,6 +51,7 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 - **Entity Visibility Control** - Start with all entities, a blank board, or import a saved config, then add/remove entities as needed
 - **Search & Filter** - Real-time search filters dashboard view, including Home Assistant-style entity id queries such as `light.`, `sensor.`, and full ids, with compact mobile search access from the header
 - **All View Modes** - Switch the `All` room between custom, room, type, or flat grouping
+- **Page Zoom Setting** - Appearance settings include page zoom presets so the whole dashboard can be scaled without relying on browser zoom
 - **Live Weather Entity Card** - Home Assistant weather entities now render as the dashboard weather card with forecast and solar data from Home Assistant
 - **Calendar Entities** - Home Assistant calendar entities now render through the live calendar card with per-card source selection, week/month views, and event details
 - **Person Entities** - Home Assistant `person.*` entities render as live person cards with profile images and normalized presence/location text
@@ -76,6 +77,7 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 - **Lazy-Loaded UI** - Settings, add-card flows, widgets, and media dialogs load on demand
 - **Deferred Room Rendering** - Offscreen room groups are deferred in the All view
 - **Batched Room Mounting** - Visible All-view room sections now hydrate cards in smaller batches instead of one large render burst
+- **Offscreen Card Skipping** - Non-edit dashboard cards now use browser offscreen rendering hints to reduce `All` view scroll cost on large boards
 - **Virtualized Entity Picker** - The Add Entity dialog window-renders large Home Assistant entity lists
 - **Smart Re-renders** - Selector-based Home Assistant subscriptions and stable device maps reduce dashboard churn during live entity updates
 - **Low-Power Mode** - Optional reduced-effects mode for slower devices, with cheaper glass rendering and contained light cards
@@ -204,6 +206,7 @@ This builds the app, writes `dist/config.js` from `NAVET_HASS_URL` and `NAVET_HA
 - Liquid Glass now uses a denser frosted treatment with stronger rim highlights and deeper control surfaces instead of a flatter transparent blur
 - Select from **8 built-in accents** or choose a **custom accent color**
 - Choose **Visual Quality** in **Settings -> Appearance**: **High**, **Medium**, or **Low**
+- Choose **Page Zoom** in **Settings -> Appearance** to scale the whole interface with built-in presets such as `75%`
 - Choose the app **Language** in **Settings -> Localization** to switch locale-aware interface formatting
 - Theme mode names and descriptions follow the selected app language
 - First-run onboarding now gives **Localization** its own step for language, time format, and temperature unit before the appearance step

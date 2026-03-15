@@ -1,7 +1,7 @@
 import { Image as ImageIcon, Palette, Upload, X } from 'lucide-react';
 import { ThemeAppearancePicker } from '@/app/components/shared/theme/theme-appearance-picker';
 import { useI18n } from '@/app/hooks';
-import type { EffectsQuality } from '@/app/stores/settings-store';
+import type { EffectsQuality, PageZoom } from '@/app/stores/settings-store';
 import { getLegacyReducedEffectsFlags } from '@/app/utils/effects-quality';
 import type { SettingsSectionController } from '../hooks/use-settings-section-controller';
 import { AmbientLightPreviewCard } from './ambient-light-preview-card';
@@ -20,6 +20,7 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
     effectsQuality,
     handleRemoveWallpaper,
     handleWallpaperUpload,
+    pageZoom,
     primaryColor,
     setPrimaryColor,
     setCustomPrimaryColor,
@@ -36,6 +37,11 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
     { value: 'high', label: t('settings.system.effectsQuality.high') },
     { value: 'medium', label: t('settings.system.effectsQuality.medium') },
     { value: 'low', label: t('settings.system.effectsQuality.low') },
+  ];
+  const pageZoomOptions: Array<{ value: PageZoom; label: string }> = [
+    { value: 75, label: '75%' },
+    { value: 85, label: '85%' },
+    { value: 100, label: '100%' },
   ];
 
   return (
@@ -83,6 +89,41 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
                     ...getLegacyReducedEffectsFlags(option.value),
                   })
                 }
+                style={
+                  isActive
+                    ? {
+                        backgroundColor: styles.accentColor,
+                        color: '#ffffff',
+                      }
+                    : undefined
+                }
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-all md:px-5 ${
+                  isActive ? 'shadow-sm' : styles.chipTextColor
+                }`}
+                aria-pressed={isActive}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+      </SettingsItem>
+
+      <SettingsItem
+        title={t('settings.appearance.pageZoom.title')}
+        description={t('settings.appearance.pageZoom.description')}
+        styles={styles}
+      >
+        <div
+          className={`inline-flex flex-wrap rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
+        >
+          {pageZoomOptions.map((option) => {
+            const isActive = pageZoom === option.value;
+            return (
+              <button
+                type="button"
+                key={option.label}
+                onClick={() => updateSettings({ pageZoom: option.value })}
                 style={
                   isActive
                     ? {

@@ -35,6 +35,9 @@ export const enMessages = {
   'settings.appearance.wallpaper.title': 'Wallpaper',
   'settings.appearance.wallpaper.description':
     'Add a background image that blends with the active accent and theme.',
+  'settings.appearance.pageZoom.title': 'Page zoom',
+  'settings.appearance.pageZoom.description':
+    'Scale the full interface to fit more on screen. 100% keeps the default layout.',
   'settings.appearance.wallpaper.previewAlt': 'Wallpaper preview',
   'settings.appearance.wallpaper.replace': 'Replace wallpaper',
   'settings.appearance.wallpaper.upload': 'Upload wallpaper',

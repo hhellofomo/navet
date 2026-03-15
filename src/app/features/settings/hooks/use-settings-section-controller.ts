@@ -63,6 +63,7 @@ export function useSettingsSectionController() {
   const effectsQuality = useSettingsStore((state) => state.effectsQuality);
   const lowPowerMode = useSettingsStore((state) => state.lowPowerMode);
   const language = useSettingsStore((state) => state.language);
+  const pageZoom = useSettingsStore((state) => state.pageZoom);
   const temperatureUnit = useSettingsStore((state) => state.temperatureUnit);
   const use24HourTime = useSettingsStore((state) => state.use24HourTime);
   const entityInteractionMode = useSettingsStore((state) => state.entityInteractionMode);
@@ -169,6 +170,7 @@ export function useSettingsSectionController() {
     language,
     languageOptions,
     lowPowerMode,
+    pageZoom,
     primaryColor,
     reopenOnboarding,
     setPrimaryColor,

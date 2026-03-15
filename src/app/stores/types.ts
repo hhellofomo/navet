@@ -1,7 +1,7 @@
 import type { CardSize } from '../components/shared/card-size-selector';
 import type { AppLanguage } from '../i18n';
 import type { Section } from '../navigation/sections';
-import type { EffectsQuality, EntityInteractionMode } from './settings-store';
+import type { EffectsQuality, EntityInteractionMode, PageZoom } from './settings-store';
 import type { PrimaryColor, ThemeMode } from './theme-store';
 
 export type ThemeType = ThemeMode;
@@ -51,6 +51,7 @@ interface UserSettings {
   disableAnimations: boolean;
   lowPowerMode: boolean;
   effectsQuality: EffectsQuality;
+  pageZoom: PageZoom;
   entityInteractionMode: EntityInteractionMode;
   ambientLightBleed: boolean;
 }

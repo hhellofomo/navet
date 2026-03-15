@@ -42,6 +42,14 @@ export const DashboardCardItem = memo(function DashboardCardItem({
     device?.type === 'media' && size === 'large' ? 'col-span-1 row-span-4' : getCardSpanClass(size);
   const editControlSize = device?.type === 'media' && size === 'large' ? 'medium' : size;
   const allowedSizes = getAllowedSizes(device, card);
+  const intrinsicSize =
+    size === 'extra-small'
+      ? '190px 87px'
+      : size === 'small'
+        ? '190px 178px'
+        : size === 'medium'
+          ? '396px 178px'
+          : '396px 360px';
   const cardContent = (
     <>
       {isEditMode && device && allowEntityRemoval && onRemoveEntity && (
@@ -89,7 +97,17 @@ export const DashboardCardItem = memo(function DashboardCardItem({
   );
 
   if (!isEditMode) {
-    return <div className={`h-full relative ${spanClass}`}>{cardContent}</div>;
+    return (
+      <div
+        className={`h-full relative ${spanClass}`}
+        style={{
+          contentVisibility: 'auto',
+          containIntrinsicSize: intrinsicSize,
+        }}
+      >
+        {cardContent}
+      </div>
+    );
   }
 
   return (
