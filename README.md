@@ -370,22 +370,7 @@ Found a bug or have an idea? [Open an issue](https://github.com/awesomestvi/nave
 
 ## 🗺️ Roadmap
 
-- [x] Custom widgets (RSS Feed, Photo Frame, Notes)
-- [x] Data persistence with localStorage
-- [x] Configuration UI with setup wizard
-- [x] Loading states and error handling
-- [x] Delete custom widgets
-- [x] Onboarding-based entity visibility and add/remove entity flow
-- [x] Export/import dashboard configuration
-- [ ] Widget settings (customize content)
-- [ ] Automations management
-- [ ] History and analytics
-- [x] Multi-language interface support
-- [ ] Scene management
-- [x] Home Assistant calendar entity integration
-- [x] RSS feed provider integration
-- [x] Home Assistant weather entity and forecast integration
-- [ ] Energy dashboard
+See [docs/ROADMAP.md](docs/ROADMAP.md) for planned features and shipped history.
 
 ## 🙏 Acknowledgments
 
