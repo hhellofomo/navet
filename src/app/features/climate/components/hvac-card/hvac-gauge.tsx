@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
 import {
   getHVACBackgroundGlowColor,
@@ -28,6 +29,7 @@ export const HVACGauge = memo(function HVACGauge({
   const textShadow = getHVACTextShadow(mode);
   const bgGlowColor = getHVACBackgroundGlowColor(mode);
   const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const tempTextColor =
     theme === 'light'
       ? isOn
@@ -36,7 +38,7 @@ export const HVACGauge = memo(function HVACGauge({
       : isOn
         ? 'text-white'
         : 'text-gray-500';
-  const currentTempColor = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
+  const currentTempColor = surface.textSubtle;
   const tickColor = theme === 'light' ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.2)';
   const arcBgStroke = theme === 'light' ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.05)';
   const arcInnerStroke = theme === 'light' ? 'rgba(0, 0, 0, 0.04)' : 'rgba(0, 0, 0, 0.3)';

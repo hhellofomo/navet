@@ -5,6 +5,7 @@ import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
 import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
 import { SensorGroupSettingsDialog } from './sensor-group-settings';
 import {
@@ -48,6 +49,7 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
   const { theme } = useTheme();
   const { t } = useI18n();
   const cardShell = getCardShellSurfaceTokens(theme);
+  const surface = getThemeSurfaceTokens(theme);
 
   // Size-specific styling with intelligent layout adaptation
   const isSmall = isCompactCardSize(size);
@@ -56,8 +58,8 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
 
   const colors = theme === 'light' ? lightColorMap[accentColor] : darkColorMap[accentColor];
   const shell = getAccentCardShellTokens(theme, accentColor);
-  const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
+  const textPrimary = surface.textPrimary;
+  const textSecondary = surface.textSubtle;
 
   // Get primary icon (first sensor's icon or default)
   const PrimaryIcon = selectedSensors[0]?.icon ? iconMap[selectedSensors[0].icon] : Gauge;

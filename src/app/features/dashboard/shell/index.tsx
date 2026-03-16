@@ -65,8 +65,13 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
                         ? `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}28, rgba(255,255,255,0.08), rgba(15,23,42,0.18) 72%)`
                         : `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}18, rgba(15,23,42,0.12), transparent 72%)`
                     : `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}40, ${getThemeColorValue(primaryColor)}20, transparent 60%)`,
-              mixBlendMode:
-                theme === 'light' ? 'multiply' : isGlass && !isLowEffects ? 'screen' : 'normal',
+              mixBlendMode: isLowEffects
+                ? undefined
+                : theme === 'light'
+                  ? 'multiply'
+                  : isGlass
+                    ? 'screen'
+                    : undefined,
             }}
           />
 

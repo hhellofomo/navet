@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
 import type { HVACCardProps } from './hvac-card.types';
 
@@ -32,6 +33,7 @@ export function useHVACCardController({
   const [isOn, setIsOn] = useState(initialState);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { colors, theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
 
   useEffect(() => {
     setTargetTemp(initialTemp);
@@ -116,7 +118,7 @@ export function useHVACCardController({
       : isOn
         ? 'text-white'
         : 'text-gray-300';
-  const secondaryTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
+  const secondaryTextColor = surface.textSecondary;
 
   const cardInteraction = useEntityCardInteractionController({
     ariaLabel: `${name} ${t('climate.subtitle').toLowerCase()}`,

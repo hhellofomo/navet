@@ -1,4 +1,3 @@
-import { closestCenter, DndContext } from '@dnd-kit/core';
 import { Lightbulb } from 'lucide-react';
 import { lazy, type ReactNode, Suspense } from 'react';
 import { RoomNav } from '@/app/components/layout/room-nav';
@@ -42,9 +41,6 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     customCards,
     deviceMap,
     handleDeleteCard,
-    handleDragEnd,
-    handleDragOver,
-    handleDragStart,
     handleRemoveEntity,
     handleUpdateCard,
     hiddenEntityIds,
@@ -58,8 +54,6 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     onToggleEditMode,
     orderedCardIds,
     roomOrder,
-    sensors,
-    showAddEntityDialog,
     updateCardSize,
   } = controller;
   const sectionStackProps = {
@@ -221,19 +215,5 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     return dashboardContent;
   }
 
-  if (!isEditMode || showAddEntityDialog) {
-    return dashboardContent;
-  }
-
-  return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-    >
-      {dashboardContent}
-    </DndContext>
-  );
+  return dashboardContent;
 }

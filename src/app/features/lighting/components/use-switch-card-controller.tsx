@@ -1,8 +1,9 @@
 import { Power } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { isExtraSmallCardSize } from '@/app/components/shared/card-size-selector';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import { iconMap } from '@/app/features/sensors';
 import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
@@ -42,6 +43,15 @@ export function useSwitchCardController({
 }: Omit<SwitchCardProps, 'room'>) {
   const [isOn, setIsOn] = useState(initialState);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const resetTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current !== null) {
+        clearTimeout(resetTimerRef.current);
+      }
+    };
+  }, []);
   const entities = useHomeAssistant(homeAssistantSelectors.entities);
   const { colors, theme } = useTheme();
   const { t } = useI18n();
@@ -165,6 +175,7 @@ export function useSwitchCardController({
   const hasMetrics = availableMetrics.length > 0;
   const hasControlsDialog = hasMetrics;
 
+  const surface = getThemeSurfaceTokens(theme);
   const cardColors = isOn ? colors.switch.on : colors.switch.off;
   const textColor =
     theme === 'light'
@@ -174,8 +185,8 @@ export function useSwitchCardController({
       : isOn
         ? 'text-white'
         : 'text-gray-100';
-  const valueColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const labelColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
+  const valueColor = surface.textPrimary;
+  const labelColor = surface.textSecondary;
   const settingsButtonClass =
     theme === 'light'
       ? 'bg-gray-100 hover:bg-gray-200 text-gray-900'
@@ -195,7 +206,7 @@ export function useSwitchCardController({
         void homeAssistantService
           .callService(resolvedServiceDomain, 'turn_on', {}, { entity_id: id })
           .then(() => {
-            window.setTimeout(() => setIsOn(false), 700);
+            resetTimerRef.current = window.setTimeout(() => setIsOn(false), 700);
           })
           .catch((error) => {
             setIsOn(false);
@@ -211,7 +222,7 @@ export function useSwitchCardController({
         void homeAssistantService
           .callService(resolvedServiceDomain, 'press', {}, { entity_id: id })
           .then(() => {
-            window.setTimeout(() => setIsOn(false), 500);
+            resetTimerRef.current = window.setTimeout(() => setIsOn(false), 500);
           })
           .catch((error) => {
             setIsOn(false);

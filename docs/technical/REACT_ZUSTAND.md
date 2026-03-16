@@ -163,3 +163,20 @@ only iterates `orderedIds` that belong to *this* section when checking `deviceMa
 whose devices are unmodified skip re-rendering entirely when another section's device
 updates.
 
+**`useCardOrdering` identity key** — Card ordering only needs to rebuild when device IDs
+or room assignments change, not on every HA state update (temperature, brightness, etc.).
+A `deviceIdentityKey` string (`id:room` pairs joined) is computed from `devices` and used
+to gate `buildOrders` recreation. The actual pairs are read via a `useRef` so the callback
+never goes stale. This decouples ordering from HA state churn entirely.
+
+**Edit mode `startTransition`** — Toggling edit mode causes every `DashboardCardItem` to
+re-render (the `isEditMode` prop changes) and mounts ~200 new DOM nodes (remove + resize
+buttons per card). Wrapping the `toggleEditMode` call in `startTransition` marks the
+update as non-urgent, keeping the UI responsive on low-end hardware (RPi) while React
+processes the batch in the background.
+
+**Stable event handlers** — Where multiple sibling elements share the same logical action
+(icon picker grid, brightness preset buttons), a single `useCallback`-memoized handler is
+passed to all buttons via `data-*` attributes and `e.currentTarget`. This produces one
+function allocation instead of N closures per render.
+
