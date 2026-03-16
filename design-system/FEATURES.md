@@ -494,9 +494,22 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 - CSS variables for dynamic color changes
 - Memoized components prevent unnecessary re-renders
 
-### Dashboard Drag & Drop
-- Drag reordering uses local state during the drag — the global store is written only once on drop, eliminating per-event re-renders and localStorage writes
+### Dashboard Room Reordering
+- Room pill drag reordering uses local state during the drag — the global store is written only once on drop, eliminating per-event re-renders and localStorage writes
+- Card drag-and-drop has been removed; cards are ordered via the card ordering store
 - `contain: layout style` on card wrappers reduces cross-card style recalculation during scroll
+
+### Edit Mode Performance
+- Toggling edit mode is wrapped in `startTransition` — marks the 100+ card re-renders and ~200 new DOM node insertions as non-urgent, keeping the UI responsive on low-end hardware (RPi) while React processes the batch in the background
+
+### HA Entity Update Performance
+- `deviceIdentityKey` — a stable string of `id:room` pairs gates `buildOrders` recreation in `useCardOrdering`; HA state-only updates (temperature, brightness) never trigger a card ordering rebuild
+- `useDeviceMap` reference stabilization — unchanged device objects reuse their old reference; when no devices changed, the same Map instance is returned, collapsing the cascade of re-renders
+- `RoomSection` custom memo comparator — only checks devices belonging to the current section, so sections with no changes skip re-rendering entirely when another section's device updates
+- Edit-mode action handlers use a single stable `useCallback` per action type shared across all cards via event delegation, rather than per-card closures
+
+### Low-Power Mode CSS
+- The `[data-effects-quality="low"] *` universal selector strips `backdrop-filter`, `-webkit-backdrop-filter`, and `will-change` from the entire subtree in one rule, avoiding per-component media query checks on RPi-class hardware
 
 ### Navigation
 - Section-based code splitting (future enhancement)
@@ -513,7 +526,7 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 ## Future Enhancements
 
 ### Shipped since initial docs
-- [x] Drag & drop card and room reordering (via `@dnd-kit`)
+- [x] Drag & drop room reordering (via `@dnd-kit`); card drag removed in favour of card ordering store
 - [x] Export/import dashboard YAML config
 - [x] PWA installation support
 

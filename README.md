@@ -46,7 +46,7 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 - **Configurable Card Interactions** - Choose whether card tap toggles devices or opens controls
 
 ### 🛠️ Functionality
-- **Edit Mode** - Drag-and-drop card reordering and resizing, entered from **Customize**
+- **Edit Mode** - Card resizing and room reordering, entered from **Customize**
 - **Custom Widgets** - Add RSS Feed, Photo Frame, and Quick Note widgets
 - **Entity Visibility Control** - Start with all entities, a blank board, or import a saved config, then add/remove entities as needed
 - **Search & Filter** - Real-time search filters dashboard view, including Home Assistant-style entity id queries such as `light.`, `sensor.`, and full ids, with compact mobile search access from the header
@@ -188,7 +188,7 @@ This builds the app, writes `dist/config.js` from `NAVET_HASS_URL` and `NAVET_HA
 - Use supported card settings dialogs to move an entity directly into a different room
 - Use the card remove action to remove entities from the dashboard
 - Edit-mode remove/delete/resize actions are delegated from the grid container instead of attaching separate edit handlers and menus to every card
-- **Drag cards** to reorder them
+- **Drag room pills** in the room nav to reorder rooms
 - Use the top-right resize action to change card size (`extra-small`/small/medium/large, depending on card type)
 - **Save changes** when done
 
