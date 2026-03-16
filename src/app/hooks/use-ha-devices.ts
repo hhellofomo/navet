@@ -1,5 +1,5 @@
 import type { Connection, HassEntity } from 'home-assistant-js-websocket';
-import { useEffect, useMemo, useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useI18n } from '../i18n';
 import { homeAssistantSelectors } from '../stores/selectors';
 import type {
@@ -117,7 +117,9 @@ export const useHADevices = (): DeviceCollection => {
   const areas = useHomeAssistant(homeAssistantSelectors.areas);
   const connection = useHomeAssistant(homeAssistantSelectors.connection);
   const deviceRegistry = useHomeAssistant(homeAssistantSelectors.deviceRegistry);
-  const entities = useHomeAssistant(homeAssistantSelectors.entities);
+  // Deferred: device collection rebuilds are low-priority. HA state-only updates
+  // (brightness, temperature) won't block user interactions or the main thread.
+  const entities = useDeferredValue(useHomeAssistant(homeAssistantSelectors.entities));
   const entityRegistry = useHomeAssistant(homeAssistantSelectors.entityRegistry);
   const { locale, t } = useI18n();
   const primaryWeatherEntityId = useMemo(() => {

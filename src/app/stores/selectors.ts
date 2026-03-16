@@ -135,6 +135,10 @@ export const homeAssistantSelectors = {
   connecting: (state: HomeAssistantStore) => state.connecting,
   config: (state: HomeAssistantStore) => state.config,
   entities: (state: HomeAssistantStore) => state.entities,
+  // Per-entity selector — only re-renders when that specific entity's reference changes.
+  // home-assistant-js-websocket preserves entity object references for unchanged entities,
+  // so this produces no re-render when a different entity updates.
+  entity: (entityId: string) => (state: HomeAssistantStore) => state.entities?.[entityId],
   user: (state: HomeAssistantStore) => state.user,
   areas: (state: HomeAssistantStore) => state.areas,
   deviceRegistry: (state: HomeAssistantStore) => state.deviceRegistry,

@@ -73,7 +73,7 @@ Planned and in-progress features. Check off items as they ship. Add new ideas to
 - [x] **Widget settings** — RSS Feed and Quick Note widgets support post-creation configuration (feed URLs, note content)
 - [x] **Configuration UI with setup wizard** — in-app onboarding and login screen
 - [x] **Multi-language interface** — English, Swedish, German, French, Spanish with locale-aware formatting
-- [x] **Drag & drop room reordering** — room pills can be dragged to reorder
+- [x] **Room ordering** — rooms display in their natural Home Assistant area order
 - [x] **Export / import dashboard config** — YAML backup and restore of layout and preferences
 - [x] **PWA install** — manifest, service worker, offline shell, install prompt
 - [x] **Page zoom setting** — scale the whole dashboard without browser zoom

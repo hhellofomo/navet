@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useDeferredValue, useMemo } from 'react';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import { useHomeAssistant } from '@/app/hooks';
 import { usePersistedState } from '@/app/hooks/use-persisted-state';
@@ -14,7 +14,7 @@ const toProviderId = (value: string): string =>
     .replace(/^-+|-+$/g, '');
 
 export function useRSSFeedSources(cardId: string) {
-  const entities = useHomeAssistant(homeAssistantSelectors.entities);
+  const entities = useDeferredValue(useHomeAssistant(homeAssistantSelectors.entities));
   const [customProviders, setCustomProviders] = usePersistedState<RSSProvider[]>(
     STORAGE_KEYS.rssFeedProviders,
     DEFAULT_RSS_PROVIDERS

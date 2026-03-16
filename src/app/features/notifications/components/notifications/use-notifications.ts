@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useHomeAssistant } from '@/app/hooks/use-home-assistant';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
@@ -156,7 +156,7 @@ const inferNotificationType = (
 
 export function useNotifications(): UseNotificationsReturn {
   const connection = useHomeAssistant(homeAssistantSelectors.connection);
-  const entities = useHomeAssistant(homeAssistantSelectors.entities);
+  const entities = useDeferredValue(useHomeAssistant(homeAssistantSelectors.entities));
   const [readNotifications, setReadNotifications] = useState<string[]>(loadReadNotifications);
   const [hiddenNotifications, setHiddenNotifications] = useState<string[]>(loadHiddenNotifications);
   const [pendingUpdateInstalls, setPendingUpdateInstalls] =

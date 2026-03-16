@@ -1,6 +1,3 @@
-import { DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { Check, ChevronDown, Edit3, LayoutGrid, Lightbulb } from 'lucide-react';
 import {
   type ButtonHTMLAttributes,
@@ -31,7 +28,6 @@ interface RoomNavProps {
   isEditMode: boolean;
   onAllViewGroupingChange?: (grouping: AllViewGrouping) => void;
   onToggleEditMode: () => void;
-  onMoveRoom?: (activeRoom: string, overRoom: string) => void;
   onAddCard?: () => void;
   onAddEntity?: () => void;
   addEntityLabel?: string;
@@ -41,7 +37,6 @@ interface RoomNavItemProps {
   room: string;
   activeRoom: string;
   allLabel: string;
-  isEditMode: boolean;
   textSecondary: string;
   hoverBg: string;
   onRoomChange: (room: string) => void;
@@ -111,7 +106,6 @@ export const RoomNav = memo(function RoomNav({
   isEditMode,
   onAllViewGroupingChange,
   onToggleEditMode,
-  onMoveRoom,
   onAddCard,
   onAddEntity,
   addEntityLabel = 'Add Entity',
@@ -121,14 +115,6 @@ export const RoomNav = memo(function RoomNav({
   const surface = getThemeSurfaceTokens(theme);
   const { stickyMarkerRef, stickyRef, shellRef } = useStickyActivation();
   const visibleRooms = ['All', ...rooms];
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 6,
-      },
-    })
-  );
-
   const textSecondary = surface.textSecondary;
   const inactiveBg = surface.subtleBg;
   const hoverBg = surface.hoverBg;
@@ -176,19 +162,6 @@ export const RoomNav = memo(function RoomNav({
     { label: t('dashboard.roomNav.grouping.none'), value: 'none' },
   ];
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) {
-      return;
-    }
-
-    if (active.id === 'All' || over.id === 'All') {
-      return;
-    }
-
-    onMoveRoom?.(String(active.id), String(over.id));
-  };
-
   return (
     <>
       <div
@@ -202,24 +175,19 @@ export const RoomNav = memo(function RoomNav({
         <div ref={shellRef} className="room-nav-shell" data-theme={theme} style={stickyShellStyle}>
           <div className="flex items-center gap-1 md:gap-1.5">
             <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
-              <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-                <SortableContext items={visibleRooms} strategy={horizontalListSortingStrategy}>
-                  <div className="flex items-center gap-1 min-w-max md:gap-1.5">
-                    {visibleRooms.map((room) => (
-                      <RoomNavItem
-                        key={room}
-                        room={room}
-                        activeRoom={activeRoom}
-                        allLabel={t('dashboard.roomNav.all')}
-                        isEditMode={isEditMode}
-                        textSecondary={textSecondary}
-                        hoverBg={hoverBg}
-                        onRoomChange={onRoomChange}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
+              <div className="flex items-center gap-1 min-w-max md:gap-1.5">
+                {visibleRooms.map((room) => (
+                  <RoomNavItem
+                    key={room}
+                    room={room}
+                    activeRoom={activeRoom}
+                    allLabel={t('dashboard.roomNav.all')}
+                    textSecondary={textSecondary}
+                    hoverBg={hoverBg}
+                    onRoomChange={onRoomChange}
+                  />
+                ))}
+              </div>
             </div>
 
             <div className="flex items-center gap-1 flex-shrink-0 pl-1 md:gap-1.5 md:pl-1.5">
@@ -337,32 +305,17 @@ const RoomNavItem = memo(function RoomNavItem({
   room,
   activeRoom,
   allLabel,
-  isEditMode,
   textSecondary,
   hoverBg,
   onRoomChange,
 }: RoomNavItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: room,
-    disabled: !isEditMode || room === 'All',
-  });
-
   return (
     <InteractivePill
-      ref={setNodeRef}
       active={activeRoom === room}
       onClick={() => onRoomChange(room)}
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition,
-      }}
       className={`room-nav-item px-2.5 md:px-3 py-1.5 md:py-2 rounded-[22px] text-xs md:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
         activeRoom === room ? 'room-nav-item-active text-white' : `${textSecondary} ${hoverBg}`
-      } ${isEditMode && room !== 'All' ? 'cursor-move active:cursor-grabbing' : ''} ${
-        isDragging ? 'opacity-50' : ''
       }`}
-      {...(isEditMode && room !== 'All' ? attributes : {})}
-      {...(isEditMode && room !== 'All' ? listeners : {})}
     >
       {room === 'All' ? allLabel : room}
     </InteractivePill>

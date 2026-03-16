@@ -8,7 +8,7 @@ interface UseDashboardDerivedStateParams {
   cardOrders: Record<string, string[]>;
   deviceMap: Map<string, DeviceWithType>;
   hiddenEntityIds: string[];
-  roomOrder: string[];
+  rooms: string[];
 }
 
 export function useDashboardDerivedState({
@@ -17,7 +17,7 @@ export function useDashboardDerivedState({
   cardOrders,
   deviceMap,
   hiddenEntityIds,
-  roomOrder,
+  rooms,
 }: UseDashboardDerivedStateParams) {
   const allEntityIds = useMemo(() => Array.from(availableDeviceMap.keys()), [availableDeviceMap]);
   const addableEntityIds = useMemo(
@@ -38,8 +38,8 @@ export function useDashboardDerivedState({
         roomsWithLights.add(room);
       }
     });
-    return roomOrder.filter((room) => roomsWithLights.has(room));
-  }, [lightDeviceMap, roomOrder]);
+    return rooms.filter((room) => roomsWithLights.has(room));
+  }, [lightDeviceMap, rooms]);
 
   const orderedCardIds = cardOrders[activeRoom] || [];
 

@@ -24,8 +24,6 @@ import { useCustomCards } from './use-custom-cards';
 import { useDashboardDerivedState } from './use-dashboard-derived-state';
 import { type DashboardDialogs, useDashboardDialogs } from './use-dashboard-dialogs';
 import { type OnboardingController, useOnboardingController } from './use-onboarding-controller';
-import { useRoomOrdering } from './use-room-ordering';
-
 export type DashboardController = OnboardingController &
   DashboardDialogs & {
     activeRoom: string;
@@ -56,9 +54,8 @@ export type DashboardController = OnboardingController &
     lightRooms: string[];
     onToggleEditMode: () => void;
     orderedCardIds: string[];
-    onMoveRoom: (activeRoom: string, overRoom: string) => void;
     onSetAllViewGrouping: (grouping: AllViewGrouping) => void;
-    roomOrder: string[];
+    rooms: string[];
     setActiveSection: (section: Section) => void;
     updateCardSize: ReturnType<typeof useCardState>['updateCardSize'];
   };
@@ -94,7 +91,6 @@ export function useDashboardController(): DashboardController {
   const { isEditMode, toggleEditMode } = useEditMode();
   const { cardSizes, updateCardSize } = useCardState(devices);
   const { cardOrders } = useCardOrdering(devices, rooms, allCustomCards);
-  const { roomOrder, moveRoom } = useRoomOrdering(rooms);
   const { deviceMap } = useDeviceMap(devices);
   const { deviceMap: availableDeviceMap } = useDeviceMap(allDevices);
   const { addableEntityIds, allEntityIds, lightDeviceMap, lightRooms, orderedCardIds } =
@@ -104,7 +100,7 @@ export function useDashboardController(): DashboardController {
       cardOrders,
       deviceMap,
       hiddenEntityIds,
-      roomOrder,
+      rooms,
     });
   const dialogs = useDashboardDialogs();
   const onboarding = useOnboardingController({ allEntityIds, changeRoom });
@@ -173,11 +169,10 @@ export function useDashboardController(): DashboardController {
     isEditMode,
     lightDeviceMap,
     lightRooms,
-    onMoveRoom: moveRoom,
     onSetAllViewGrouping: setAllViewGrouping,
     onToggleEditMode: () => startTransition(toggleEditMode),
     orderedCardIds,
-    roomOrder,
+    rooms,
     setActiveSection,
     updateCardSize,
     // Onboarding
