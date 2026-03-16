@@ -255,7 +255,7 @@ export const frMessages = {
   'dashboard.onboarding.heading.localization':
     'Choisissez la langue et les formats de votre première vue.',
   'dashboard.onboarding.heading.theme':
-    'Définissez l’apparence et la langue avant la première apparition du tableau de bord.',
+    'Définissez l’apparence avant la première apparition du tableau de bord.',
   'dashboard.onboarding.body.route':
     'Choisissez une route de départ une seule fois. L’import passe directement à la restauration, tandis qu’un démarrage neuf vous laisse choisir le thème initial d’abord.',
   'dashboard.onboarding.body.localization':
@@ -275,7 +275,8 @@ export const frMessages = {
     'Restaurez une configuration YAML Navet exportée précédemment au lieu de repartir de zéro.',
   'dashboard.onboarding.route.import.closingBody':
     'L’expérience d’onboarding se referme et la transition vers votre tableau restauré commence.',
-  'dashboard.onboarding.theme.stepLabel': 'Étape 2 sur 2 : apparence et langue',
+  'dashboard.onboarding.localization.stepLabel': 'Étape 2 sur 3 : langue et formats',
+  'dashboard.onboarding.theme.stepLabel': 'Étape 3 sur 3 : apparence',
   'dashboard.onboarding.localization.description':
     'Choisissez la langue de l’interface ainsi que les formats d’heure et de température dès le départ.',
   'dashboard.onboarding.back': 'Retour',

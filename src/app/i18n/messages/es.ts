@@ -253,7 +253,7 @@ export const esMessages = {
   'dashboard.onboarding.heading.route': '¿Cómo debe iniciar Navet tu panel?',
   'dashboard.onboarding.heading.localization': 'Elige idioma y formatos para tu primera vista.',
   'dashboard.onboarding.heading.theme':
-    'Define el aspecto y el idioma antes de la primera aparición del panel.',
+    'Define el aspecto antes de la primera aparición del panel.',
   'dashboard.onboarding.body.route':
     'Elige una ruta inicial una sola vez. La importación salta directo a la restauración, mientras que los inicios nuevos te dejan elegir primero el tema inicial.',
   'dashboard.onboarding.body.localization':
@@ -273,7 +273,8 @@ export const esMessages = {
     'Restaura una configuración YAML de Navet exportada previamente en lugar de empezar desde cero.',
   'dashboard.onboarding.route.import.closingBody':
     'Se está cerrando la experiencia de onboarding y pasando a tu panel restaurado.',
-  'dashboard.onboarding.theme.stepLabel': 'Paso 2 de 2: apariencia e idioma',
+  'dashboard.onboarding.localization.stepLabel': 'Paso 2 de 3: idioma y formatos',
+  'dashboard.onboarding.theme.stepLabel': 'Paso 3 de 3: apariencia',
   'dashboard.onboarding.localization.description':
     'Elige el idioma de la interfaz y los formatos de hora y temperatura desde el inicio.',
   'dashboard.onboarding.back': 'Atrás',

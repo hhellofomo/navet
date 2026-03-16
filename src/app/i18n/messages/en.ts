@@ -244,7 +244,7 @@ export const enMessages = {
   'dashboard.onboarding.welcome': 'Welcome',
   'dashboard.onboarding.heading.route': 'How should Navet start your dashboard?',
   'dashboard.onboarding.heading.localization': 'Choose language and formats up front.',
-  'dashboard.onboarding.heading.theme': 'Set the initial look and locale before your first reveal.',
+  'dashboard.onboarding.heading.theme': 'Set the look before your first reveal.',
   'dashboard.onboarding.body.route':
     'Pick a starting route once. Import jumps straight into restore, while fresh starts let you choose the initial theme first.',
   'dashboard.onboarding.body.localization':
@@ -264,7 +264,8 @@ export const enMessages = {
     'Restore a previously exported Navet YAML dashboard config instead of starting from scratch.',
   'dashboard.onboarding.route.import.closingBody':
     'Sealing the onboarding experience and transitioning into your restored dashboard.',
-  'dashboard.onboarding.theme.stepLabel': 'Step 2 of 2: appearance and localization',
+  'dashboard.onboarding.localization.stepLabel': 'Step 2 of 3: language and formats',
+  'dashboard.onboarding.theme.stepLabel': 'Step 3 of 3: appearance',
   'dashboard.onboarding.localization.description':
     'Choose the interface language, time format, and temperature unit Navet should use from the start.',
   'dashboard.onboarding.back': 'Back',
