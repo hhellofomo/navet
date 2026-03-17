@@ -111,6 +111,7 @@ export const svMessages = {
   'settings.system.effectsQuality.high': 'Hög',
   'settings.system.effectsQuality.medium': 'Medium',
   'settings.system.effectsQuality.low': 'Låg',
+  'settings.system.effectsQuality.recommended': 'Rekommenderat för den här enheten',
   'settings.system.connection.title': 'Anslutning',
   'settings.system.connection.description':
     'Granska aktuell server, öppna Home Assistant eller nollställ sparad anslutning.',

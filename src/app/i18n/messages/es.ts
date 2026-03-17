@@ -111,6 +111,7 @@ export const esMessages = {
   'settings.system.effectsQuality.high': 'Alta',
   'settings.system.effectsQuality.medium': 'Media',
   'settings.system.effectsQuality.low': 'Baja',
+  'settings.system.effectsQuality.recommended': 'Recomendado para este dispositivo',
   'settings.system.connection.title': 'Conexión',
   'settings.system.connection.description':
     'Revisa el servidor actual, abre Home Assistant o restablece la conexión guardada.',

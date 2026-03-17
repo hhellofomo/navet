@@ -112,6 +112,7 @@ export const frMessages = {
   'settings.system.effectsQuality.high': 'Élevée',
   'settings.system.effectsQuality.medium': 'Moyenne',
   'settings.system.effectsQuality.low': 'Faible',
+  'settings.system.effectsQuality.recommended': 'Recommandé pour cet appareil',
   'settings.system.connection.title': 'Connexion',
   'settings.system.connection.description':
     'Consultez la cible serveur actuelle, ouvrez Home Assistant ou réinitialisez la connexion enregistrée.',

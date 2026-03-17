@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { type AppLanguage, getNavigatorLanguage } from '@/app/i18n/config';
+import { detectDeviceTier } from '@/app/utils/detect-device-tier';
 
 export type EntityInteractionMode = 'control-first' | 'toggle-first';
 export type EffectsQuality = 'high' | 'medium' | 'low';
@@ -47,10 +48,28 @@ export const defaultSettings: UserSettings = {
   ambientLightBleed: true,
 };
 
+/**
+ * On first load (no persisted settings), auto-detect the device's rendering
+ * tier so RPi-class hardware gets low effects without manual configuration.
+ * Returns the default 'high' on subsequent loads — persist middleware then
+ * overwrites it with the user's saved preference.
+ */
+function getInitialEffectsQuality(): EffectsQuality {
+  try {
+    if (typeof localStorage !== 'undefined' && !localStorage.getItem('ha-dashboard-settings')) {
+      return detectDeviceTier();
+    }
+  } catch {
+    // localStorage may be unavailable in some private-browsing environments
+  }
+  return defaultSettings.effectsQuality;
+}
+
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       ...defaultSettings,
+      effectsQuality: getInitialEffectsQuality(),
       updateSettings: (newSettings) => set((state) => ({ ...state, ...newSettings })),
       resetSettings: () => set(defaultSettings),
     }),

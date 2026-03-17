@@ -108,6 +108,7 @@ export const enMessages = {
   'settings.system.effectsQuality.high': 'High',
   'settings.system.effectsQuality.medium': 'Medium',
   'settings.system.effectsQuality.low': 'Low',
+  'settings.system.effectsQuality.recommended': 'Recommended for this device',
   'settings.system.connection.title': 'Connection',
   'settings.system.connection.description':
     'Review the current server target, open Home Assistant, or reset the saved connection.',

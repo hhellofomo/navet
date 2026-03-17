@@ -1,7 +1,9 @@
 import { Image as ImageIcon, Palette, Upload, X } from 'lucide-react';
+import { useMemo } from 'react';
 import { ThemeAppearancePicker } from '@/app/components/shared/theme/theme-appearance-picker';
 import { useI18n } from '@/app/hooks';
 import type { EffectsQuality, PageZoom } from '@/app/stores/settings-store';
+import { detectDeviceTier } from '@/app/utils/detect-device-tier';
 import { getLegacyReducedEffectsFlags } from '@/app/utils/effects-quality';
 import type { SettingsSectionController } from '../hooks/use-settings-section-controller';
 import { AmbientLightPreviewCard } from './ambient-light-preview-card';
@@ -31,6 +33,7 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
     updateSettings,
     wallpaper,
   } = controller;
+  const detectedTier = useMemo(() => detectDeviceTier(), []);
   const ambienceDisabled = effectsQuality !== 'high';
   const effectiveAmbientLightBleed = ambientLightBleed && !ambienceDisabled;
   const qualityOptions: Array<{ value: EffectsQuality; label: string }> = [
@@ -74,38 +77,44 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
         description={t('settings.system.effectsQuality.description')}
         styles={styles}
       >
-        <div
-          className={`inline-flex flex-wrap rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
-        >
-          {qualityOptions.map((option) => {
-            const isActive = effectsQuality === option.value;
-            return (
-              <button
-                type="button"
-                key={option.label}
-                onClick={() =>
-                  updateSettings({
-                    effectsQuality: option.value,
-                    ...getLegacyReducedEffectsFlags(option.value),
-                  })
-                }
-                style={
-                  isActive
-                    ? {
-                        backgroundColor: styles.accentColor,
-                        color: '#ffffff',
-                      }
-                    : undefined
-                }
-                className={`rounded-full px-4 py-2 text-sm font-medium transition-all md:px-5 ${
-                  isActive ? 'shadow-sm' : styles.chipTextColor
-                }`}
-                aria-pressed={isActive}
-              >
-                {option.label}
-              </button>
-            );
-          })}
+        <div className="space-y-2">
+          <div
+            className={`inline-flex flex-wrap rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
+          >
+            {qualityOptions.map((option) => {
+              const isActive = effectsQuality === option.value;
+              return (
+                <button
+                  type="button"
+                  key={option.label}
+                  onClick={() =>
+                    updateSettings({
+                      effectsQuality: option.value,
+                      ...getLegacyReducedEffectsFlags(option.value),
+                    })
+                  }
+                  style={
+                    isActive
+                      ? {
+                          backgroundColor: styles.accentColor,
+                          color: '#ffffff',
+                        }
+                      : undefined
+                  }
+                  className={`rounded-full px-4 py-2 text-sm font-medium transition-all md:px-5 ${
+                    isActive ? 'shadow-sm' : styles.chipTextColor
+                  }`}
+                  aria-pressed={isActive}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+          <p className={`text-sm ${styles.subtleColor}`}>
+            {t('settings.system.effectsQuality.recommended')}:{' '}
+            {qualityOptions.find((o) => o.value === detectedTier)?.label}
+          </p>
         </div>
       </SettingsItem>
 
