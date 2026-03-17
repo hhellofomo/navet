@@ -61,10 +61,8 @@ export function CalendarEventItem({
         </div>
 
         <div
-          className={`mt-0.5 ${textSecondary} ${
-            isCompact
-              ? 'flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px]'
-              : 'flex items-center gap-1 text-[11px]'
+          className={`mt-0.5 flex flex-col ${textSecondary} ${
+            isCompact ? 'gap-0.5 text-[10px]' : 'gap-0.5 text-[11px]'
           }`}
         >
           <span className="inline-flex items-center gap-1">
@@ -73,8 +71,8 @@ export function CalendarEventItem({
           </span>
           {event.location ? (
             <span className="inline-flex min-w-0 items-center gap-1">
-              <MapPin className={`${isCompact ? 'h-2.5 w-2.5' : 'mt-0.5 h-3 w-3'} flex-shrink-0`} />
-              <span className={isCompact ? 'break-words' : 'truncate'}>{event.location}</span>
+              <MapPin className={`${isCompact ? 'h-2.5 w-2.5' : 'h-3 w-3'} flex-shrink-0`} />
+              <span className="truncate">{event.location}</span>
             </span>
           ) : null}
         </div>

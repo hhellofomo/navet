@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 
-export type CardType = 'rss' | 'photo' | 'note';
+export type CardType = 'rss' | 'photo' | 'note' | 'battery' | 'button';
 
 export interface CustomCard {
   id: string;

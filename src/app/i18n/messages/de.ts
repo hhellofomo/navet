@@ -23,6 +23,11 @@ export const deMessages = {
   'settings.appearance.sectionTitle': 'Darstellung',
   'settings.appearance.sectionDescription':
     'Thema, Hintergrundbild, Glasintensität und Lichtambiente, die Navets visuelle Identität prägen.',
+  'settings.appearance.systemTheme.title': 'Systemdarstellung folgen',
+  'settings.appearance.systemTheme.description':
+    'Automatisch zwischen Dunkel und Hell wechseln, basierend auf den Darstellungseinstellungen des Geräts.',
+  'settings.appearance.systemTheme.auto': 'Auto',
+  'settings.appearance.systemTheme.manual': 'Manuell',
   'settings.appearance.themeAccent.title': 'Thema und Akzent',
   'settings.appearance.themeAccent.description':
     'Wähle den visuellen Grundton und die Akzentfarbe mit demselben Picker wie im Onboarding.',
@@ -493,6 +498,7 @@ export const deMessages = {
   'rss.settings.selectedProviders': 'Ausgewählte Anbieter',
   'rss.settings.deleteSelected': 'Auswahl löschen',
   'rss.settings.removeProvider': '{name} entfernen',
+  'rss.settings.articleCount': 'Artikel abrufen',
   'rss.settings.addDirectFeed': 'Direkten Feed hinzufügen',
   'rss.settings.providerName': 'Anbietername',
   'rss.settings.providerUrl': 'https://example.com/feed.xml',
@@ -660,6 +666,27 @@ export const deMessages = {
   'widgets.photoFrame.photo.forestMist.subtitle': 'Weiche Naturtöne',
   'widgets.photoFrame.photo.coastalBreeze.title': 'Coastal Breeze',
   'widgets.photoFrame.photo.coastalBreeze.subtitle': 'Meerschaum und Sand',
+  'widgets.photoFrame.settings.title': 'Fotoquellen',
+  'widgets.photoFrame.settings.addUrl': 'URL hinzufügen',
+  'widgets.photoFrame.settings.urlPlaceholder': 'https://beispiel.de/foto.jpg',
+  'widgets.photoFrame.settings.noPhotos':
+    'Keine Fotos hinzugefügt. Füge eine URL hinzu, um eigene Bilder anzuzeigen.',
+  'widgets.photoFrame.settings.emptyHint': 'Zeigt integrierte Fotos',
+  'widgets.battery.title': 'Akkuübersicht',
+  'widgets.battery.noBatteries': 'Keine Akkusensoren gefunden',
+  'widgets.battery.low': 'Niedrig',
+  'widgets.button.title': 'Aktionsschaltfläche',
+  'widgets.button.labelPlaceholder': 'Schaltflächenbeschriftung',
+  'widgets.button.servicePlaceholder': 'z.B. scene.turn_on',
+  'widgets.button.entityPlaceholder': 'z.B. scene.movie_time',
+  'widgets.button.configure': 'Konfigurieren',
+  'widgets.button.unconfigured': 'Tippen zum Einrichten',
+  'dashboard.addCard.templates.battery.name': 'Akkuübersicht',
+  'dashboard.addCard.templates.battery.description':
+    'Alle Akkusensoren nach Ladestand sortiert, niedrigste zuerst.',
+  'dashboard.addCard.templates.button.name': 'Aktionsschaltfläche',
+  'dashboard.addCard.templates.button.description':
+    'Tippen zum Auslösen eines Home Assistant-Dienstes, einer Szene oder eines Skripts.',
   'widgets.note.title': 'Schnelle Notiz',
   'widgets.note.emptyState': 'Klicken Sie, um eine Notiz hinzuzufugen...',
   'widgets.note.placeholder': 'Schreiben Sie Ihre Notiz hier...',

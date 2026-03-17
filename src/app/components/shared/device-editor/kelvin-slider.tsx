@@ -4,42 +4,35 @@ import {
   isCompactCardSize,
   isExtraSmallCardSize,
 } from '@/app/components/shared/card-size-selector';
-import { resolvePrimaryColorToken } from '@/app/components/shared/theme/theme-colors';
+import { kelvinToColor } from '@/app/features/lighting/components/light-card/light-card-utils';
 import { useI18n, useTheme } from '@/app/hooks';
 import type { CardSize } from '../card-size-selector';
 import { getDeviceEditorSurfaceTokens } from './device-editor-surface-tokens';
 
-const BRIGHTNESS_ACCENT_COLORS = {
-  orange: { from: '#fb923c', to: '#f97316', ring: '#f97316' },
-  blue: { from: '#60a5fa', to: '#3b82f6', ring: '#3b82f6' },
-  green: { from: '#4ade80', to: '#22c55e', ring: '#22c55e' },
-  purple: { from: '#c084fc', to: '#a855f7', ring: '#a855f7' },
-  pink: { from: '#f472b6', to: '#ec4899', ring: '#ec4899' },
-  red: { from: '#f87171', to: '#ef4444', ring: '#ef4444' },
-  yellow: { from: '#facc15', to: '#eab308', ring: '#eab308' },
-  teal: { from: '#2dd4bf', to: '#14b8a6', ring: '#14b8a6' },
-} as const;
-
-interface BrightnessSliderProps {
+interface KelvinSliderProps {
   value: number;
+  currentTempColor: string;
   onChange: (value: number) => void;
   onCommit?: (value: number) => void;
   isOn?: boolean;
-  disabled?: boolean;
+  min: number;
+  max: number;
   showLabel?: boolean;
   size?: CardSize;
 }
 
-export const BrightnessSlider = memo(function BrightnessSlider({
+export const KelvinSlider = memo(function KelvinSlider({
   value,
+  currentTempColor,
   onChange,
   onCommit,
   isOn = true,
-  disabled = false,
+  min,
+  max,
   showLabel = true,
   size = 'medium',
-}: BrightnessSliderProps) {
-  const { theme, primaryColor } = useTheme();
+}: KelvinSliderProps) {
+  const { theme } = useTheme();
   const { t } = useI18n();
   const isExtraSmall = isExtraSmallCardSize(size);
   const isCompact = isCompactCardSize(size);
@@ -51,15 +44,14 @@ export const BrightnessSlider = memo(function BrightnessSlider({
     : isCompact || size === 'medium'
       ? 'w-4 h-4'
       : 'w-5 h-5';
-  const trackBg = theme === 'light' ? 'bg-gray-200' : 'bg-white/10';
-  const activeColor = BRIGHTNESS_ACCENT_COLORS[resolvePrimaryColorToken(primaryColor)];
-  const rangeBg = isOn
-    ? theme === 'glass'
-      ? `linear-gradient(to right, rgba(255,255,255,0.52), ${activeColor.to}88)`
-      : `linear-gradient(to right, ${activeColor.from}, ${activeColor.to})`
+  const roundedValue = Math.round(value / 100) * 100;
+
+  const trackBg = isOn
+    ? `linear-gradient(to right, ${kelvinToColor(min)}, ${kelvinToColor(max)})`
     : theme === 'light'
-      ? 'linear-gradient(to right, #d1d5db, #9ca3af)'
-      : 'linear-gradient(to right, rgba(255,255,255,0.24), rgba(255,255,255,0.14))';
+      ? '#e5e7eb'
+      : 'rgba(255,255,255,0.1)';
+
   const thumbBg = isOn
     ? theme === 'glass'
       ? 'rgba(255,255,255,0.92)'
@@ -67,10 +59,9 @@ export const BrightnessSlider = memo(function BrightnessSlider({
     : theme === 'light'
       ? '#f3f4f6'
       : '#d1d5db';
+
   const thumbRing = isOn
-    ? theme === 'glass'
-      ? 'rgba(255,255,255,0.34)'
-      : activeColor.ring
+    ? currentTempColor
     : theme === 'light'
       ? '#9ca3af'
       : 'rgba(255,255,255,0.24)';
@@ -80,10 +71,10 @@ export const BrightnessSlider = memo(function BrightnessSlider({
       {showLabel && (
         <div className="flex items-center justify-between mb-1.5">
           <span className={`text-xs ${editorSurface.sectionLabelClassName}`}>
-            {t('lighting.brightness')}
+            {t('lighting.colorTemperature')}
           </span>
           <span className={`text-sm font-bold ${editorSurface.sectionValueClassName}`}>
-            {value}%
+            {roundedValue}K
           </span>
         </div>
       )}
@@ -92,18 +83,19 @@ export const BrightnessSlider = memo(function BrightnessSlider({
         value={[value]}
         onValueChange={(val) => onChange(val[0])}
         onValueCommit={(val) => onCommit?.(val[0])}
-        min={1}
-        max={100}
-        step={1}
-        disabled={disabled}
+        min={min}
+        max={max}
+        step={100}
+        disabled={!isOn}
         className={`relative flex items-center w-full select-none touch-none ${heightClass}`}
       >
-        <Slider.Track className={`relative grow rounded-full ${trackHeightClass} ${trackBg}`}>
+        <Slider.Track
+          className={`relative grow rounded-full ${trackHeightClass}`}
+          style={{ background: trackBg }}
+        >
           <Slider.Range
             className="absolute h-full rounded-full"
-            style={{
-              backgroundImage: rangeBg,
-            }}
+            style={{ background: 'transparent' }}
           />
         </Slider.Track>
         <Slider.Thumb

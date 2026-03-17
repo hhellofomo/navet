@@ -1,10 +1,15 @@
 import type { LucideIcon } from 'lucide-react';
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { CardActionRow } from '@/app/components/shared/card-action-row';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
-import { BrightnessPresetsInline, BrightnessSlider } from '@/app/components/shared/device-editor';
+import {
+  BrightnessPresetsInline,
+  BrightnessSlider,
+  KelvinSlider,
+} from '@/app/components/shared/device-editor';
 import { useTheme } from '@/app/hooks';
 import { CustomColorTrigger } from './custom-color-trigger';
+import { KelvinColorTrigger } from './kelvin-color-trigger';
 import { LightCardHeader } from './light-card-header';
 import type { HeaderIconButtonProps, LightBrightnessPreset } from './light-card-types';
 
@@ -13,13 +18,21 @@ interface LightCardMediumProps {
   room: string;
   brightness: number;
   currentColor: string;
+  colorTemp: number;
+  currentTempColor: string;
+  minColorTemp: number;
+  maxColorTemp: number;
+  tempOptions: Array<{ value: number; color: string; label: string }>;
   brightnessPresets: LightBrightnessPreset[];
   isOn: boolean;
   IconComponent: LucideIcon;
   supportsColorControl: boolean;
+  supportsColorTemperature: boolean;
   onBrightnessChange: (value: number) => void;
   onBrightnessCommit: (value: number) => void;
   onColorChange: (color: string) => void;
+  onTempChange: (temp: number) => void;
+  onTempCommit: (temp: number) => void;
   iconButtonProps: HeaderIconButtonProps;
   settingsButtonProps: HeaderIconButtonProps;
   showSettingsButton: boolean;
@@ -30,19 +43,31 @@ export const LightCardMedium = memo(function LightCardMedium({
   name,
   brightness,
   currentColor,
+  colorTemp,
+  currentTempColor,
+  minColorTemp,
+  maxColorTemp,
   brightnessPresets,
   isOn,
   IconComponent,
   supportsColorControl,
+  supportsColorTemperature,
   onBrightnessChange,
   onBrightnessCommit,
   onColorChange,
+  onTempChange,
+  onTempCommit,
   iconButtonProps,
   settingsButtonProps,
   showSettingsButton,
   showPresetOverflow,
-}: Omit<LightCardMediumProps, 'room'>) {
+}: Omit<LightCardMediumProps, 'room' | 'tempOptions'>) {
   const { theme } = useTheme();
+  const [isKelvinMode, setIsKelvinMode] = useState(false);
+
+  const handleKelvinToggle = () => {
+    if (isOn) setIsKelvinMode((prev) => !prev);
+  };
 
   return (
     <>
@@ -57,21 +82,42 @@ export const LightCardMedium = memo(function LightCardMedium({
       />
 
       <div className="flex-1 flex flex-col justify-end gap-4">
-        {/* Brightness slider */}
-        <BrightnessSlider
-          value={brightness}
-          onChange={onBrightnessChange}
-          onCommit={onBrightnessCommit}
-          isOn={isOn}
-          size="medium"
-        />
+        {isKelvinMode && supportsColorTemperature ? (
+          <KelvinSlider
+            value={colorTemp}
+            currentTempColor={currentTempColor}
+            onChange={onTempChange}
+            onCommit={onTempCommit}
+            isOn={isOn}
+            min={minColorTemp}
+            max={maxColorTemp}
+            size="medium"
+          />
+        ) : (
+          <BrightnessSlider
+            value={brightness}
+            onChange={onBrightnessChange}
+            onCommit={onBrightnessCommit}
+            isOn={isOn}
+            size="medium"
+          />
+        )}
 
-        {/* Color controls */}
         <CardActionRow
           theme={theme}
           size="medium"
           leftContent={
             <>
+              {supportsColorTemperature && (
+                <KelvinColorTrigger
+                  isOn={isOn}
+                  currentTempColor={currentTempColor}
+                  isActive={isKelvinMode}
+                  size="medium"
+                  onClick={handleKelvinToggle}
+                />
+              )}
+
               {supportsColorControl && (
                 <CustomColorTrigger
                   isOn={isOn}

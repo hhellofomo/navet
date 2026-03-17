@@ -23,6 +23,11 @@ export const frMessages = {
   'settings.appearance.sectionTitle': 'Apparence',
   'settings.appearance.sectionDescription':
     'Thème, fond, intensité du verre et ambiance lumineuse qui définissent l’identité visuelle de Navet.',
+  'settings.appearance.systemTheme.title': "Suivre l'apparence du système",
+  'settings.appearance.systemTheme.description':
+    "Basculer automatiquement entre Sombre et Clair selon le réglage d'apparence de votre appareil.",
+  'settings.appearance.systemTheme.auto': 'Auto',
+  'settings.appearance.systemTheme.manual': 'Manuel',
   'settings.appearance.themeAccent.title': 'Thème et accent',
   'settings.appearance.themeAccent.description':
     'Choisissez le ton visuel global et la couleur d’accent avec le même sélecteur que pendant l’onboarding.',
@@ -496,6 +501,7 @@ export const frMessages = {
   'rss.settings.selectedProviders': 'Fournisseurs sélectionnés',
   'rss.settings.deleteSelected': 'Supprimer la sélection',
   'rss.settings.removeProvider': 'Supprimer {name}',
+  'rss.settings.articleCount': 'Articles à charger',
   'rss.settings.addDirectFeed': 'Ajouter un flux direct',
   'rss.settings.providerName': 'Nom du fournisseur',
   'rss.settings.providerUrl': 'https://example.com/feed.xml',
@@ -663,6 +669,27 @@ export const frMessages = {
   'widgets.photoFrame.photo.forestMist.subtitle': 'Tons naturels doux',
   'widgets.photoFrame.photo.coastalBreeze.title': 'Coastal Breeze',
   'widgets.photoFrame.photo.coastalBreeze.subtitle': 'Ecume et sable',
+  'widgets.photoFrame.settings.title': 'Sources photos',
+  'widgets.photoFrame.settings.addUrl': 'Ajouter une URL',
+  'widgets.photoFrame.settings.urlPlaceholder': 'https://exemple.fr/photo.jpg',
+  'widgets.photoFrame.settings.noPhotos':
+    'Aucune photo ajoutée. Ajoutez une URL pour afficher vos propres images.',
+  'widgets.photoFrame.settings.emptyHint': 'Affichage des photos intégrées',
+  'widgets.battery.title': 'Aperçu des batteries',
+  'widgets.battery.noBatteries': 'Aucun capteur de batterie trouvé',
+  'widgets.battery.low': 'Faible',
+  'widgets.button.title': "Bouton d'action",
+  'widgets.button.labelPlaceholder': 'Libellé du bouton',
+  'widgets.button.servicePlaceholder': 'ex. scene.turn_on',
+  'widgets.button.entityPlaceholder': 'ex. scene.movie_time',
+  'widgets.button.configure': 'Configurer',
+  'widgets.button.unconfigured': 'Appuyez pour configurer',
+  'dashboard.addCard.templates.battery.name': 'Aperçu des batteries',
+  'dashboard.addCard.templates.battery.description':
+    'Tous les capteurs de batterie triés par niveau de charge, les plus bas en premier.',
+  'dashboard.addCard.templates.button.name': "Bouton d'action",
+  'dashboard.addCard.templates.button.description':
+    'Appuyez pour déclencher un service, une scène ou un script Home Assistant.',
   'widgets.note.title': 'Note rapide',
   'widgets.note.emptyState': 'Cliquez pour ajouter une note...',
   'widgets.note.placeholder': 'Ecrivez votre note ici...',

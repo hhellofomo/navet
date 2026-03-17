@@ -1,6 +1,25 @@
 import type { SVGProps } from 'react';
 import type { CardTemplate } from './types';
 
+function BatteryIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <title>Battery</title>
+      <rect x="2" y="7" width="16" height="10" rx="2" />
+      <path d="M22 11v2" />
+    </svg>
+  );
+}
+
+function Zap(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <title>Action</title>
+      <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
+    </svg>
+  );
+}
+
 function Newspaper(props: SVGProps<SVGSVGElement>) {
   return (
     <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -57,6 +76,20 @@ export const cardTemplates: CardTemplate[] = [
     nameKey: 'dashboard.addCard.templates.note.name',
     descriptionKey: 'dashboard.addCard.templates.note.description',
     icon: <StickyNote className="w-5 h-5" />,
+    defaultSize: 'small',
+  },
+  {
+    id: 'battery',
+    nameKey: 'dashboard.addCard.templates.battery.name',
+    descriptionKey: 'dashboard.addCard.templates.battery.description',
+    icon: <BatteryIcon className="w-5 h-5" />,
+    defaultSize: 'large',
+  },
+  {
+    id: 'button',
+    nameKey: 'dashboard.addCard.templates.button.name',
+    descriptionKey: 'dashboard.addCard.templates.button.description',
+    icon: <Zap className="w-5 h-5" />,
     defaultSize: 'small',
   },
 ];

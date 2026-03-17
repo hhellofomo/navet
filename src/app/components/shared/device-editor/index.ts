@@ -15,3 +15,4 @@ export { CustomScrollbar } from './custom-scrollbar';
 export { getDeviceEditorSurfaceTokens } from './device-editor-surface-tokens';
 export { DialogHeader } from './dialog-header';
 export { IconPicker } from './icon-picker';
+export { KelvinSlider } from './kelvin-slider';

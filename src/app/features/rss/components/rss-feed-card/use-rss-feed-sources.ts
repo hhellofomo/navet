@@ -23,6 +23,15 @@ export function useRSSFeedSources(cardId: string) {
     Record<string, string[]>
   >(STORAGE_KEYS.rssCardProviders, {});
 
+  const [articleCountByCardId, setArticleCountByCardId] = usePersistedState<Record<string, number>>(
+    STORAGE_KEYS.rssCardArticleCount,
+    {}
+  );
+  const articleCount = articleCountByCardId[cardId] ?? 10;
+  const setArticleCount = (count: number) => {
+    setArticleCountByCardId((current) => ({ ...current, [cardId]: count }));
+  };
+
   const homeAssistantProviders = useMemo<RSSProvider[]>(() => {
     if (!entities) {
       return [];
@@ -131,5 +140,7 @@ export function useRSSFeedSources(cardId: string) {
     addProvider,
     removeProvider,
     homeAssistantProviders,
+    articleCount,
+    setArticleCount,
   };
 }

@@ -314,9 +314,11 @@ class HomeAssistantService {
       brightnessPct?: number;
       kelvin?: number;
       rgbColor?: [number, number, number];
+      hsColor?: [number, number];
+      xyColor?: [number, number];
     }
   ): Promise<void> {
-    const { state = 'on', brightnessPct, kelvin, rgbColor } = options;
+    const { state = 'on', brightnessPct, kelvin, rgbColor, hsColor, xyColor } = options;
 
     if (state === 'off') {
       await this.callService('light', 'turn_off', {}, { entity_id: entityId });
@@ -332,6 +334,18 @@ class HomeAssistantService {
     }
     if (rgbColor) {
       serviceData.rgb_color = rgbColor;
+    }
+    if (hsColor) {
+      serviceData.hs_color = [
+        Math.max(0, Math.min(360, hsColor[0])),
+        Math.max(0, Math.min(100, hsColor[1])),
+      ];
+    }
+    if (xyColor) {
+      serviceData.xy_color = [
+        Math.max(0, Math.min(1, xyColor[0])),
+        Math.max(0, Math.min(1, xyColor[1])),
+      ];
     }
 
     await this.callService('light', 'turn_on', serviceData, { entity_id: entityId });

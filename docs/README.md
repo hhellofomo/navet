@@ -24,6 +24,7 @@ Complete documentation for the Navet smart home dashboard.
 - **[Main README](../README.md#search)** - Dashboard search behavior, including Home Assistant entity-id and domain queries
 - **[Main README](../README.md#themes)** - Theme modes, adaptive glass visual quality tiers, shared appearance primitives, custom accents, and the light card ambience setting
 - **[Main README](../README.md#themes)** - Settings are organized into Appearance, Localization, Interaction, Dashboard, System, and Project sections
+- **[Main README](../README.md#-features)** - Dashboard widget coverage now includes battery overview, button widgets, and expanded photo frame options, alongside refreshed lighting card controls
 - **[Design System](../design-system/README.md#core-design-principles)** - Shared primitives, including icon pills, nav/action pills, and card off-state surface tokens
 - **[Docker and Home Assistant Add-on](DOCKER_HOME_ASSISTANT_ADDON.md)** - Packaging and deployment guide
   - Standalone Docker image
@@ -170,5 +171,5 @@ docs/
 
 ---
 
-**Last Updated:** March 13, 2026  
+**Last Updated:** March 17, 2026  
 **Documentation Status:** ✅ Complete and organized

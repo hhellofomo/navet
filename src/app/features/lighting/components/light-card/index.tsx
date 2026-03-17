@@ -7,6 +7,7 @@ import { LightCardLarge } from './light-card-large';
 import { LightCardMedium } from './light-card-medium';
 import { LightCardSmall } from './light-card-small';
 import { getLightCardSurfaceTokens } from './light-card-surface-tokens';
+import { kelvinToColor } from './light-card-utils';
 import { LightSettingsDialog } from './light-settings-dialog';
 import { useLightCardController } from './use-light-card-controller';
 
@@ -57,6 +58,8 @@ export const LightCard = memo(function LightCard({
 
   const isSmall = isCompactCardSize(size);
 
+  const currentTempColor = kelvinToColor(controller.colorTemp);
+
   return (
     <>
       <div className="relative h-full w-full overflow-visible">
@@ -97,23 +100,30 @@ export const LightCard = memo(function LightCard({
                 size={size}
                 brightness={controller.brightness}
                 currentColor={controller.currentColor}
+                currentTempColor={currentTempColor}
                 brightnessPresets={controller.brightnessPresets}
                 isOn={controller.isOn}
                 IconComponent={controller.IconComponent}
                 iconButtonProps={controller.iconButtonProps}
                 settingsButtonProps={controller.settingsButtonProps}
                 showSettingsButton={controller.showSettingsButton}
-                showPresetOverflow={controller.showPresetOverflow}
                 supportsColorControl={controller.supportsColorControl}
+                supportsColorTemperature={controller.supportsColorTemperature}
+                colorTemp={controller.colorTemp}
+                minColorTemp={controller.minColorTemp}
+                maxColorTemp={controller.maxColorTemp}
                 onBrightnessChange={controller.onBrightnessChange}
                 onBrightnessCommit={controller.onBrightnessCommit}
                 onColorChange={controller.onColorChange}
+                onTempChange={controller.onTempChange}
+                onTempCommit={controller.onTempCommit}
               />
             ) : size === 'medium' ? (
               <LightCardMedium
                 name={name}
                 brightness={controller.brightness}
                 currentColor={controller.currentColor}
+                currentTempColor={currentTempColor}
                 brightnessPresets={controller.brightnessPresets}
                 isOn={controller.isOn}
                 IconComponent={controller.IconComponent}
@@ -122,9 +132,15 @@ export const LightCard = memo(function LightCard({
                 showSettingsButton={controller.showSettingsButton}
                 showPresetOverflow={controller.showPresetOverflow}
                 supportsColorControl={controller.supportsColorControl}
+                supportsColorTemperature={controller.supportsColorTemperature}
+                colorTemp={controller.colorTemp}
+                minColorTemp={controller.minColorTemp}
+                maxColorTemp={controller.maxColorTemp}
                 onBrightnessChange={controller.onBrightnessChange}
                 onBrightnessCommit={controller.onBrightnessCommit}
                 onColorChange={controller.onColorChange}
+                onTempChange={controller.onTempChange}
+                onTempCommit={controller.onTempCommit}
               />
             ) : (
               <LightCardLarge
@@ -133,15 +149,22 @@ export const LightCard = memo(function LightCard({
                 brightnessPresets={controller.brightnessPresets}
                 selectedColor={controller.selectedColor}
                 currentColor={controller.currentColor}
+                currentTempColor={currentTempColor}
                 isOn={controller.isOn}
                 IconComponent={controller.IconComponent}
                 iconButtonProps={controller.iconButtonProps}
                 settingsButtonProps={controller.settingsButtonProps}
                 showSettingsButton={controller.showSettingsButton}
                 supportsColorControl={controller.supportsColorControl}
+                supportsColorTemperature={controller.supportsColorTemperature}
+                colorTemp={controller.colorTemp}
+                minColorTemp={controller.minColorTemp}
+                maxColorTemp={controller.maxColorTemp}
                 onBrightnessChange={controller.onBrightnessChange}
                 onBrightnessCommit={controller.onBrightnessCommit}
                 onColorChange={controller.onColorChange}
+                onTempChange={controller.onTempChange}
+                onTempCommit={controller.onTempCommit}
               />
             )}
           </div>

@@ -28,10 +28,13 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
     setSelectedProviderIds,
     addProvider,
     removeProvider,
+    articleCount,
+    setArticleCount,
   } = useRSSFeedSources(cardId);
-  const { latestArticle, mediumArticles, largeArticles, isLoading, error } = useRSSFeedItems(
+  const { latestArticle, items, isLoading, error } = useRSSFeedItems(
     selectedProviders,
-    entities
+    entities,
+    articleCount
   );
 
   const handleArticleClick = (url: string) => {
@@ -93,8 +96,7 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
         isSmall={isSmall}
         isMedium={isMedium}
         latestArticle={latestArticle}
-        mediumArticles={mediumArticles}
-        largeArticles={largeArticles}
+        items={items}
         handleArticleClick={handleArticleClick}
         isLoading={isLoading}
         error={error}
@@ -135,6 +137,8 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
               toast.success(t('rss.feedback.removedProvider', { name: provider.name }));
             }
           }}
+          articleCount={articleCount}
+          onArticleCountChange={setArticleCount}
           onDeleteSelectedProviders={handleDeleteSelectedProviders}
         />
       ) : null}

@@ -10,4 +10,6 @@ export const STORAGE_KEYS = {
   calendarCardViewModes: 'ha-dashboard-calendar-card-view-modes',
   rssFeedProviders: 'ha-dashboard-rss-feed-providers',
   rssCardProviders: 'ha-dashboard-rss-card-providers',
+  rssCardArticleCount: 'ha-dashboard-rss-card-article-count',
+  lightMemoryState: 'ha-dashboard-light-memory-state',
 } as const;

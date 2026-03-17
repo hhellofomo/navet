@@ -15,10 +15,12 @@ export type PrimaryColor =
 
 interface ThemeState {
   theme: ThemeMode;
+  followSystemTheme: boolean;
   primaryColor: PrimaryColor;
   customPrimaryColor: string | null;
   wallpaper: string | null;
   setTheme: (theme: ThemeMode) => void;
+  setFollowSystemTheme: (follow: boolean) => void;
   setPrimaryColor: (color: PrimaryColor) => void;
   setCustomPrimaryColor: (color: string | null) => void;
   setWallpaper: (wallpaper: string | null) => void;
@@ -28,10 +30,12 @@ export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
       theme: 'dark',
+      followSystemTheme: false,
       primaryColor: 'orange',
       customPrimaryColor: null,
       wallpaper: null,
       setTheme: (theme) => set({ theme }),
+      setFollowSystemTheme: (followSystemTheme) => set({ followSystemTheme }),
       setPrimaryColor: (primaryColor) => set({ primaryColor }),
       setCustomPrimaryColor: (customPrimaryColor) => set({ customPrimaryColor }),
       setWallpaper: (wallpaper) => set({ wallpaper }),

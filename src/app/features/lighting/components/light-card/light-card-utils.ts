@@ -67,7 +67,50 @@ export function getReportedColorHex(entity: HassEntity): string | null {
     return hsToHex(hsColor[0], hsColor[1]);
   }
 
+  const xyColor = entity.attributes?.xy_color;
+  if (
+    Array.isArray(xyColor) &&
+    xyColor.length >= 2 &&
+    xyColor.every((value) => typeof value === 'number' && Number.isFinite(value))
+  ) {
+    const brightnessRaw = parseNumberish(entity.attributes?.brightness);
+    const brightnessPctRaw = parseNumberish(entity.attributes?.brightness_pct);
+    const brightness =
+      brightnessRaw !== null
+        ? brightnessRaw <= 1
+          ? brightnessRaw * 255
+          : brightnessRaw
+        : brightnessPctRaw !== null
+          ? (brightnessPctRaw / 100) * 255
+          : undefined;
+    return xyToHex(xyColor[0], xyColor[1], brightness);
+  }
+
   return null;
+}
+
+// Absolute Kelvin → hex color using physical anchor points.
+// 2700K = warm amber, 4600K = neutral white, 6500K = cool blue-white.
+const KELVIN_COLOR_STOPS = [
+  { k: 2700, r: 0xff, g: 0xb3, b: 0x66 },
+  { k: 4600, r: 0xff, g: 0xf4, b: 0xe6 },
+  { k: 6500, r: 0xe6, g: 0xf2, b: 0xff },
+] as const;
+
+export function kelvinToColor(temp: number): string {
+  const clamped = Math.max(2700, Math.min(6500, temp));
+  for (let i = 0; i < KELVIN_COLOR_STOPS.length - 1; i++) {
+    const a = KELVIN_COLOR_STOPS[i];
+    const b = KELVIN_COLOR_STOPS[i + 1];
+    if (clamped <= b.k) {
+      const t = (clamped - a.k) / (b.k - a.k);
+      const r = Math.round(a.r + (b.r - a.r) * t);
+      const g = Math.round(a.g + (b.g - a.g) * t);
+      const bl = Math.round(a.b + (b.b - a.b) * t);
+      return `#${[r, g, bl].map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+    }
+  }
+  return '#e6f2ff';
 }
 
 export function roundKelvin(value: number): number {
@@ -181,6 +224,44 @@ function hsToHex(hue: number, saturation: number): string {
   }
 
   return rgbToHex((red + match) * 255, (green + match) * 255, (blue + match) * 255);
+}
+
+function xyToHex(x: number, y: number, brightness255?: number): string | null {
+  if (!Number.isFinite(x) || !Number.isFinite(y) || y <= 0) {
+    return null;
+  }
+
+  const safeX = Math.max(0, Math.min(1, x));
+  const safeY = Math.max(0.0001, Math.min(1, y));
+  const safeBrightness =
+    typeof brightness255 === 'number' && Number.isFinite(brightness255)
+      ? Math.max(1, Math.min(255, brightness255))
+      : 255;
+  const luminance = safeBrightness / 255;
+
+  const X = (luminance / safeY) * safeX;
+  const Y = luminance;
+  const Z = (luminance / safeY) * (1 - safeX - safeY);
+
+  let red = X * 1.656492 - Y * 0.354851 - Z * 0.255038;
+  let green = -X * 0.707196 + Y * 1.655397 + Z * 0.036152;
+  let blue = X * 0.051713 - Y * 0.121364 + Z * 1.01153;
+
+  red = Math.max(0, red);
+  green = Math.max(0, green);
+  blue = Math.max(0, blue);
+
+  const maxChannel = Math.max(red, green, blue);
+  if (maxChannel > 1) {
+    red /= maxChannel;
+    green /= maxChannel;
+    blue /= maxChannel;
+  }
+
+  const gammaCorrect = (value: number) =>
+    value <= 0.0031308 ? 12.92 * value : 1.055 * value ** (1 / 2.4) - 0.055;
+
+  return rgbToHex(gammaCorrect(red) * 255, gammaCorrect(green) * 255, gammaCorrect(blue) * 255);
 }
 
 function rgbToHex(red: number, green: number, blue: number): string {
