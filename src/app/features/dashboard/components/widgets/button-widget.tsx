@@ -2,7 +2,6 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Settings2, X, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useI18n, useTheme } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
@@ -15,7 +14,6 @@ export interface ButtonWidgetData {
 }
 
 interface ButtonWidgetProps {
-  size?: CardSize;
   data?: ButtonWidgetData;
   onUpdate?: (data: ButtonWidgetData) => void;
   isEditMode?: boolean;
@@ -107,12 +105,7 @@ function ButtonSettingsDialog({
   );
 }
 
-export function ButtonWidget({
-  size: _size = 'small',
-  data = {},
-  onUpdate,
-  isEditMode = false,
-}: ButtonWidgetProps) {
+export function ButtonWidget({ data = {}, onUpdate, isEditMode = false }: ButtonWidgetProps) {
   const { theme, primaryColor } = useTheme();
   const { t } = useI18n();
   const surface = getDashboardWidgetSurfaceTokens(theme);

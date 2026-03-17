@@ -18,7 +18,6 @@ import type { HeaderIconButtonProps, LightBrightnessPreset } from './light-card-
 
 interface LightCardLargeProps {
   name: string;
-  room: string;
   brightness: number;
   brightnessPresets: LightBrightnessPreset[];
   selectedColor: string | null;
@@ -27,7 +26,6 @@ interface LightCardLargeProps {
   currentTempColor: string;
   minColorTemp: number;
   maxColorTemp: number;
-  tempOptions: Array<{ value: number; color: string; label: string }>;
   isOn: boolean;
   IconComponent: LucideIcon;
   supportsColorControl: boolean;
@@ -64,7 +62,7 @@ export const LightCardLarge = memo(function LightCardLarge({
   iconButtonProps,
   settingsButtonProps,
   showSettingsButton,
-}: Omit<LightCardLargeProps, 'room' | 'tempOptions'>) {
+}: LightCardLargeProps) {
   const { theme } = useTheme();
   const { t } = useI18n();
   const stateSurface = getCardStateSurfaceTokens(theme, isOn);

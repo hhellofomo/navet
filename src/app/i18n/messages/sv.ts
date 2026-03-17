@@ -27,6 +27,25 @@ export const svMessages = {
     'Växla automatiskt mellan Mörkt och Ljust baserat på enhetens utseendeinställning.',
   'settings.appearance.systemTheme.auto': 'Auto',
   'settings.appearance.systemTheme.manual': 'Manuell',
+  'themePicker.systemModeHelp':
+    'Välj om Navet ska följa enhetens utseende eller använda ett fast tema som du väljer här.',
+  'themePicker.manualThemeTitle': 'Välj manuellt',
+  'themePicker.manualThemeDescription': 'Använd samma tema hela tiden, oavsett enhetens utseende.',
+  'themePicker.currentAppearance': 'Aktuellt utseende',
+  'themePicker.systemActiveSummary': 'Följer systemutseende: {mode}',
+  'themePicker.systemActiveDetail':
+    'Navet använder just nu temat som matchar din enhet. Manuella temaval pausas tills Auto stängs av.',
+  'themePicker.manualActiveSummary': 'Manuellt tema används: {mode}',
+  'themePicker.manualActiveDetail':
+    'Det här temat förblir aktivt tills du ändrar det eller aktiverar Följ systemutseende.',
+  'themePicker.manualThemeDisabledHelp':
+    'Manuell temaväljare är inte tillgänglig medan Auto följer enhetens utseende.',
+  'themePicker.manualThemeEnabledHelp': 'Välj det fasta tema som Navet ska använda.',
+  'themePicker.accentHelp':
+    'Accentfärgen gäller i både Auto och Manuellt läge och är oberoende av temaläget.',
+  'themePicker.activeBadge': 'Aktiv',
+  'themePicker.savedBadge': 'Sparad',
+  'themePicker.selectedBadge': 'Vald',
   'settings.appearance.themeAccent.title': 'Tema och accent',
   'settings.appearance.themeAccent.description':
     'Välj den övergripande visuella tonen och accentfärgen med samma väljare som visas under onboarding.',

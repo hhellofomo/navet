@@ -7,6 +7,7 @@ import { useDashboardEntitiesStore } from '@/app/features/dashboard';
 import { useI18n, useTheme } from '@/app/hooks';
 import { type EntityInteractionMode, useSettingsStore } from '@/app/stores';
 import { useNavigationStore } from '@/app/stores/navigation-store';
+import { useThemeStore } from '@/app/stores/theme-store';
 import {
   downloadDashboardConfig,
   importDashboardConfigFromFile,
@@ -58,6 +59,7 @@ export function useSettingsSectionController() {
     wallpaper,
     setWallpaper,
   } = useTheme();
+  const manualTheme = useThemeStore((state) => state.theme);
   const { languageOptions, t } = useI18n();
   const { logout, config } = useAuth();
   const { clearConfig } = useConfig();
@@ -174,6 +176,7 @@ export function useSettingsSectionController() {
     language,
     languageOptions,
     lowPowerMode,
+    manualTheme,
     pageZoom,
     primaryColor,
     reopenOnboarding,

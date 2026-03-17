@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react';
+import { Check, Monitor, Palette } from 'lucide-react';
 import { ColorInputSwatch } from '@/app/components/shared/color-input-swatch';
 import type { PrimaryColorOption, ThemeOption } from '@/app/constants/theme-options';
 import { useI18n } from '@/app/hooks';
@@ -11,6 +11,7 @@ interface ThemeAppearancePickerProps {
   customAccent: string | null;
   selectedAccent: PrimaryColor;
   selectedTheme: ThemeType;
+  effectiveTheme?: ThemeType;
   themeOptions: ThemeOption[];
   onAccentChange: (accent: PrimaryColor) => void;
   onCustomAccentChange: (accent: string | null) => void;
@@ -25,6 +26,7 @@ export function ThemeAppearancePicker({
   customAccent,
   selectedAccent,
   selectedTheme,
+  effectiveTheme,
   themeOptions,
   onAccentChange,
   onCustomAccentChange,
@@ -37,10 +39,19 @@ export function ThemeAppearancePicker({
   const customAccentValue = customAccent ?? '#f97316';
   const accentColor =
     selectedAccent === 'custom' && customAccent ? customAccent : getThemeColorValue(selectedAccent);
-  const previewTheme = selectedTheme;
+  const previewTheme = effectiveTheme ?? selectedTheme;
   const pickerTokens = getThemeAppearancePickerTokens(previewTheme, accentColor);
   const showSystemTheme =
     followSystemTheme !== undefined && onFollowSystemThemeChange !== undefined;
+  const manualThemeLocked = showSystemTheme && followSystemTheme;
+  const activeThemeLabel = t(
+    themeOptions.find((option) => option.value === previewTheme)?.labelKey ??
+      'themeOption.dark.label'
+  );
+  const selectedThemeLabel = t(
+    themeOptions.find((option) => option.value === selectedTheme)?.labelKey ??
+      'themeOption.dark.label'
+  );
 
   return (
     <div>
@@ -49,10 +60,112 @@ export function ThemeAppearancePicker({
       >
         {lead ? <div className="mb-4 md:mb-6">{lead}</div> : null}
 
-        <div>
-          <p className={`text-sm font-semibold ${pickerTokens.textClassName}`}>
-            {t('themePicker.themeMode')}
-          </p>
+        {showSystemTheme ? (
+          <div>
+            <p className={`text-sm font-semibold ${pickerTokens.textClassName}`}>
+              {t('settings.appearance.systemTheme.title')}
+            </p>
+            <p className={`mt-1 text-xs leading-relaxed ${pickerTokens.mutedClassName}`}>
+              {t('themePicker.systemModeHelp')}
+            </p>
+
+            <div className="mt-3 grid gap-2.5 md:grid-cols-2 md:gap-3">
+              {[
+                {
+                  value: true,
+                  icon: Monitor,
+                  title: t('settings.appearance.systemTheme.title'),
+                  description: t('settings.appearance.systemTheme.description'),
+                },
+                {
+                  value: false,
+                  icon: Palette,
+                  title: t('themePicker.manualThemeTitle'),
+                  description: t('themePicker.manualThemeDescription'),
+                },
+              ].map((option) => {
+                const isActive = followSystemTheme === option.value;
+                const Icon = option.icon;
+
+                return (
+                  <button
+                    key={option.title}
+                    type="button"
+                    onClick={() => onFollowSystemThemeChange(option.value)}
+                    className={`flex items-start gap-3 rounded-[18px] border px-3.5 py-3.5 text-left transition-all md:rounded-[22px] md:px-4 md:py-4 ${pickerTokens.optionBorderClassName} ${pickerTokens.optionCardClassName} ${
+                      isActive ? 'shadow-sm' : ''
+                    }`}
+                    style={isActive ? pickerTokens.activeOptionStyle : undefined}
+                    aria-pressed={isActive}
+                  >
+                    <div
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl"
+                      style={{ backgroundColor: isActive ? `${accentColor}20` : undefined }}
+                    >
+                      <Icon
+                        className="h-4 w-4"
+                        style={{ color: isActive ? accentColor : undefined }}
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <p
+                        className={`text-sm font-semibold ${pickerTokens.textClassName}`}
+                        style={isActive ? { color: accentColor } : undefined}
+                      >
+                        {option.title}
+                      </p>
+                      <p className={`mt-1 text-xs leading-relaxed ${pickerTokens.mutedClassName}`}>
+                        {option.description}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div
+              className={`mt-3 rounded-[18px] border px-3.5 py-3 md:rounded-[20px] md:px-4 ${pickerTokens.optionBorderClassName} ${pickerTokens.optionCardClassName}`}
+            >
+              <p
+                className={`text-xs font-semibold uppercase tracking-[0.16em] ${pickerTokens.mutedClassName}`}
+              >
+                {t('themePicker.currentAppearance')}
+              </p>
+              <p className={`mt-1 text-sm font-semibold ${pickerTokens.textClassName}`}>
+                {followSystemTheme
+                  ? t('themePicker.systemActiveSummary', { mode: activeThemeLabel })
+                  : t('themePicker.manualActiveSummary', { mode: selectedThemeLabel })}
+              </p>
+              <p className={`mt-1 text-xs leading-relaxed ${pickerTokens.mutedClassName}`}>
+                {followSystemTheme
+                  ? t('themePicker.systemActiveDetail')
+                  : t('themePicker.manualActiveDetail')}
+              </p>
+            </div>
+          </div>
+        ) : null}
+
+        <div className="mt-5 md:mt-6">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className={`text-sm font-semibold ${pickerTokens.textClassName}`}>
+                {t('themePicker.themeMode')}
+              </p>
+              <p className={`mt-1 text-xs leading-relaxed ${pickerTokens.mutedClassName}`}>
+                {manualThemeLocked
+                  ? t('themePicker.manualThemeDisabledHelp')
+                  : t('themePicker.manualThemeEnabledHelp')}
+              </p>
+            </div>
+            {manualThemeLocked ? (
+              <span
+                className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${pickerTokens.optionBorderClassName} ${pickerTokens.mutedClassName}`}
+              >
+                {t('settings.appearance.systemTheme.auto')}
+              </span>
+            ) : null}
+          </div>
+
           <div className="mt-3 grid gap-2.5 sm:grid-cols-2 md:gap-3">
             {themeOptions.map((option) => {
               const isActive = selectedTheme === option.value;
@@ -64,9 +177,10 @@ export function ThemeAppearancePicker({
                   key={option.value}
                   type="button"
                   onClick={() => onThemeChange(option.value)}
+                  disabled={manualThemeLocked}
                   className={`flex flex-col items-start justify-start rounded-[18px] border px-3.5 py-3.5 text-left transition-all md:rounded-[22px] md:px-4 md:py-4 ${pickerTokens.optionBorderClassName} ${pickerTokens.optionCardClassName} ${
                     isActive ? 'shadow-sm' : ''
-                  }`}
+                  } ${manualThemeLocked ? 'cursor-not-allowed opacity-50' : ''}`}
                   style={isActive ? pickerTokens.activeOptionStyle : undefined}
                 >
                   <p
@@ -87,6 +201,9 @@ export function ThemeAppearancePicker({
         <div className="mt-5 md:mt-6">
           <p className={`text-sm font-semibold ${pickerTokens.textClassName}`}>
             {t('themePicker.accentColor')}
+          </p>
+          <p className={`mt-1 text-xs leading-relaxed ${pickerTokens.mutedClassName}`}>
+            {t('themePicker.accentHelp')}
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2.5 md:gap-3">
             {colorOptions
@@ -134,40 +251,6 @@ export function ThemeAppearancePicker({
             />
           </div>
         </div>
-
-        {showSystemTheme ? (
-          <div className="mt-5 md:mt-6">
-            <p className={`text-sm font-semibold ${pickerTokens.textClassName}`}>
-              {t('settings.appearance.systemTheme.title')}
-            </p>
-            <div
-              className={`mt-3 inline-flex rounded-full border p-1 ${pickerTokens.optionBorderClassName}`}
-            >
-              {[
-                { value: true, label: t('settings.appearance.systemTheme.auto') },
-                { value: false, label: t('settings.appearance.systemTheme.manual') },
-              ].map((option) => {
-                const isActive = followSystemTheme === option.value;
-                return (
-                  <button
-                    type="button"
-                    key={option.label}
-                    onClick={() => onFollowSystemThemeChange(option.value)}
-                    style={
-                      isActive ? { backgroundColor: accentColor, color: '#ffffff' } : undefined
-                    }
-                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all md:px-5 ${
-                      isActive ? 'shadow-sm' : pickerTokens.mutedClassName
-                    }`}
-                    aria-pressed={isActive}
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ) : null}
       </div>
     </div>
   );

@@ -46,7 +46,6 @@ const mockPhotos = [
 
 interface PhotoFrameWidgetProps {
   size?: CardSize;
-  cardId?: string;
   photoUrls?: string[];
   onUpdateUrls?: (urls: string[]) => void;
   isEditMode?: boolean;
@@ -167,7 +166,6 @@ export function PhotoFrameWidget({
           {Array.from({ length: photoCount }).map((_, index) => (
             <button
               type="button"
-              // biome-ignore lint/suspicious/noArrayIndexKey: dot index is stable
               key={index}
               onClick={() => setCurrentIndex(index)}
               className="w-2 h-2 rounded-full transition-all"

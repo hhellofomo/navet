@@ -25,7 +25,6 @@ const ButtonWidget = lazy(async () => {
 interface WidgetCardProps {
   card: CustomCard;
   isEditMode: boolean;
-  onDelete?: (cardId: string) => void;
   onUpdate?: (cardId: string, data: Record<string, unknown>) => void;
 }
 
@@ -33,7 +32,7 @@ function WidgetFallback() {
   return <div className="h-full rounded-2xl border border-white/10 bg-white/5 animate-pulse" />;
 }
 
-export function WidgetCard({ card, isEditMode, onDelete: _onDelete, onUpdate }: WidgetCardProps) {
+export function WidgetCard({ card, isEditMode, onUpdate }: WidgetCardProps) {
   const handleNoteChange = (note: string) => {
     if (onUpdate) {
       onUpdate(card.id, { note });
@@ -49,7 +48,6 @@ export function WidgetCard({ card, isEditMode, onDelete: _onDelete, onUpdate }: 
       widgetContent = (
         <PhotoFrameWidget
           size={card.size}
-          cardId={card.id}
           photoUrls={card.data?.photoUrls as string[] | undefined}
           onUpdateUrls={
             onUpdate ? (urls) => onUpdate(card.id, { ...card.data, photoUrls: urls }) : undefined
@@ -69,7 +67,6 @@ export function WidgetCard({ card, isEditMode, onDelete: _onDelete, onUpdate }: 
     case 'button':
       widgetContent = (
         <ButtonWidget
-          size={card.size}
           data={card.data as { label?: string; service?: string; entityId?: string } | undefined}
           onUpdate={onUpdate ? (data) => onUpdate(card.id, { ...card.data, ...data }) : undefined}
           isEditMode={isEditMode}
