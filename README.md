@@ -79,7 +79,7 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 - **Batched Room Mounting** - Visible All-view room sections now hydrate cards in smaller batches instead of one large render burst
 - **Offscreen Card Skipping** - Non-edit dashboard cards now use browser offscreen rendering hints to reduce `All` view scroll cost on large boards
 - **Virtualized Entity Picker** - The Add Entity dialog window-renders large Home Assistant entity lists
-- **Smart Re-renders** - Selector-based Home Assistant subscriptions and stable device maps reduce dashboard churn during live entity updates
+- **Smart Re-renders** - Per-entity subscriptions mean each card reacts only to its own HA state changes; the device map rebuilds only when entities are added or removed, not on every state update
 - **Low-Power Mode** - Optional reduced-effects mode for slower devices, with cheaper glass rendering and contained light cards
 - **Local Config Backup** - Export and restore dashboard layout/preferences from a YAML file
 - **Tree-shakeable** - Only imports what's actually used

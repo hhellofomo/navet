@@ -1,5 +1,5 @@
-import type { Connection, HassEntity } from 'home-assistant-js-websocket';
-import { useDeferredValue, useEffect, useMemo, useState } from 'react';
+import type { Connection, HassEntities, HassEntity } from 'home-assistant-js-websocket';
+import { useEffect, useMemo, useState } from 'react';
 import { useI18n } from '../i18n';
 import { homeAssistantSelectors } from '../stores/selectors';
 import type {
@@ -111,15 +111,32 @@ async function fetchCalendarEvents(
 }
 
 /**
+ * Structural equality for HassEntities: returns true when the set of entity IDs is unchanged.
+ * Entity state changes (brightness, temperature, etc.) do not trigger a DeviceCollection rebuild —
+ * those are handled by per-card per-entity subscriptions via homeAssistantSelectors.entity(id).
+ */
+function entityStructureEqual(prev: HassEntities | null, next: HassEntities | null): boolean {
+  if (prev === next) return true;
+  if (!prev || !next) return false;
+  const prevKeys = Object.keys(prev);
+  const nextKeys = Object.keys(next);
+  if (prevKeys.length !== nextKeys.length) return false;
+  for (const key of prevKeys) {
+    if (!(key in next)) return false;
+  }
+  return true;
+}
+
+/**
  * Maps raw Home Assistant entities to typed device collections.
  */
 export const useHADevices = (): DeviceCollection => {
   const areas = useHomeAssistant(homeAssistantSelectors.areas);
   const connection = useHomeAssistant(homeAssistantSelectors.connection);
   const deviceRegistry = useHomeAssistant(homeAssistantSelectors.deviceRegistry);
-  // Deferred: device collection rebuilds are low-priority. HA state-only updates
-  // (brightness, temperature) won't block user interactions or the main thread.
-  const entities = useDeferredValue(useHomeAssistant(homeAssistantSelectors.entities));
+  // Structural equality: DeviceCollection only rebuilds when entities are added/removed,
+  // not on every state change. Per-card subscriptions handle live state updates.
+  const entities = useHomeAssistant(homeAssistantSelectors.entities, entityStructureEqual);
   const entityRegistry = useHomeAssistant(homeAssistantSelectors.entityRegistry);
   const { locale, t } = useI18n();
   const primaryWeatherEntityId = useMemo(() => {

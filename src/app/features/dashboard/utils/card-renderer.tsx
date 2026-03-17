@@ -166,7 +166,11 @@ export const renderCard = ({
       );
     case 'locks':
       return (
-        <LockCard name={device.name as string} initialState={device.state as boolean | undefined} />
+        <LockCard
+          id={device.id as string}
+          name={device.name as string}
+          initialState={device.state as boolean | undefined}
+        />
       );
     case 'persons':
       return (
@@ -185,6 +189,7 @@ export const renderCard = ({
     case 'sensors':
       return (
         <SensorCard
+          id={device.id as string}
           name={device.name as string}
           room={device.room as string}
           value={device.value as string}

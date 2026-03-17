@@ -52,10 +52,9 @@ export function useSwitchCardController({
       }
     };
   }, []);
-  const entities = useHomeAssistant(homeAssistantSelectors.entities);
+  const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
   const { colors, theme } = useTheme();
   const { t } = useI18n();
-  const liveEntity = entities?.[id];
   const resolvedEntityType = entityType || t('lighting.type.switch');
   const resolvedServiceDomain = serviceDomain || id.split('.')[0];
   const resolvedServiceAction = serviceAction || 'binary';

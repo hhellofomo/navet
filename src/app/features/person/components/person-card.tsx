@@ -4,7 +4,8 @@ import { ImageWithFallback } from '@/app/components/figma/ImageWithFallback';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { useAuth } from '@/app/contexts/auth-context';
-import { useI18n, useTheme } from '@/app/hooks';
+import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { getPersonCardSurfaceTokens } from './person-card-surface-tokens';
 
 interface PersonCardProps {
@@ -20,7 +21,7 @@ interface PersonCardProps {
 }
 
 export const PersonCard = memo(function PersonCard({
-  id: _id,
+  id,
   name,
   room,
   location,
@@ -34,16 +35,29 @@ export const PersonCard = memo(function PersonCard({
   const { theme, colors } = useTheme();
   const cardShell = getCardShellSurfaceTokens(theme);
   const { config } = useAuth();
+  const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
 
   // Size-specific styling
   const isSmall = isCompactCardSize(size);
   const padding = isSmall ? 'p-4' : 'p-5';
 
-  const cardColors = state === 'home' ? colors.person.home : colors.person.away;
-  const surface = getPersonCardSurfaceTokens(theme, state);
-  const resolvedEntityPicture = entityPicture?.startsWith('/')
-    ? `${config?.url ?? ''}${entityPicture}`
-    : entityPicture;
+  const liveState: 'home' | 'away' =
+    liveEntity?.state === 'home' ? 'home' : liveEntity ? 'away' : state;
+  const liveLocation =
+    liveEntity && liveEntity.state !== 'home' && liveEntity.state !== 'not_home'
+      ? liveEntity.state
+      : location;
+  const liveAttrs = liveEntity?.attributes as Record<string, unknown> | undefined;
+  const liveEntityPicture =
+    typeof liveAttrs?.entity_picture === 'string'
+      ? (liveAttrs.entity_picture as string)
+      : entityPicture;
+
+  const cardColors = liveState === 'home' ? colors.person.home : colors.person.away;
+  const surface = getPersonCardSurfaceTokens(theme, liveState);
+  const resolvedEntityPicture = liveEntityPicture?.startsWith('/')
+    ? `${config?.url ?? ''}${liveEntityPicture}`
+    : liveEntityPicture;
 
   return (
     <div
@@ -69,7 +83,7 @@ export const PersonCard = memo(function PersonCard({
             </p>
             {!isSmall && (
               <p className={`text-xs ${surface.locationClassName}`}>
-                {state === 'home' ? room : location}
+                {liveState === 'home' ? room : liveLocation}
               </p>
             )}
           </div>
@@ -78,7 +92,7 @@ export const PersonCard = memo(function PersonCard({
         <div className="flex-1 flex flex-col items-center justify-center">
           <div
             className={`${isSmall ? 'w-10 h-10' : 'w-14 h-14'} rounded-full flex items-center justify-center mb-2 ${
-              state === 'home'
+              liveState === 'home'
                 ? 'bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg shadow-blue-500/50'
                 : surface.avatarAwayBgClassName
             }`}
@@ -100,7 +114,7 @@ export const PersonCard = memo(function PersonCard({
             <div
               className={`flex items-center gap-1.5 rounded-full px-3 py-1 ${surface.statusPillClassName}`}
             >
-              {state === 'home' ? (
+              {liveState === 'home' ? (
                 <>
                   <Home className={`h-3 w-3 ${surface.homeIconClassName}`} />
                   <span className={`text-xs font-medium ${surface.statusLabelClassName}`}>
