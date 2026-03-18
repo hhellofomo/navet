@@ -122,6 +122,10 @@ export function useSettingsSectionController() {
     setWallpaper(null);
   };
 
+  const handleSelectWallpaper = (nextWallpaper: string) => {
+    setWallpaper(nextWallpaper);
+  };
+
   const handleExportDashboardConfig = () => {
     downloadDashboardConfig();
     toast.success(t('settings.feedback.configExported'));
@@ -170,6 +174,7 @@ export function useSettingsSectionController() {
     handleRemoveWallpaper,
     handleResetConnection,
     handleRestartOnboarding,
+    handleSelectWallpaper,
     handleWallpaperUpload,
     hiddenEntityIds,
     importInputRef,

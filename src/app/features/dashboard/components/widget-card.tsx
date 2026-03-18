@@ -1,6 +1,29 @@
-import { lazy, Suspense } from 'react';
+import type { ReactNode } from 'react';
+import { Component, lazy, Suspense } from 'react';
 import { RSSFeedCard } from '@/app/features/rss';
 import type { CustomCard } from '../stores/custom-cards-store';
+
+class WidgetErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex h-full items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-xs text-white/40">
+          Widget failed to load
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const NoteWidget = lazy(async () => {
   const module = await import('./widgets/note-widget');
@@ -79,7 +102,9 @@ export function WidgetCard({ card, isEditMode, onUpdate }: WidgetCardProps) {
 
   return (
     <div className="relative h-full">
-      <Suspense fallback={<WidgetFallback />}>{widgetContent}</Suspense>
+      <WidgetErrorBoundary>
+        <Suspense fallback={<WidgetFallback />}>{widgetContent}</Suspense>
+      </WidgetErrorBoundary>
     </div>
   );
 }

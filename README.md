@@ -212,6 +212,7 @@ This builds the app, writes `dist/config.js` from `NAVET_HASS_URL` and `NAVET_HA
 - Theme mode names and descriptions follow the selected app language
 - First-run onboarding now gives **Localization** its own step for language, time format, and temperature unit before the appearance step
 - In **Settings -> Appearance**, choose whether active light cards use **Ambient bleed** or stay **Contained** inside the card
+- Choose from **4 built-in wallpapers** (Serene Dawn, Starfield Nocturne, Aurora Veil, Rainforest Canopy) or upload your own image as a dashboard background
 - Custom accent colors, preset accent colors, light colors, and Kelvin swatches now share the same color-picker primitive and sizing language
 - Light brightness presets now use a compact **3-preset** set: **Bright**, **Dim**, and **Night**
 - Shared theme-sensitive pieces such as entity icon pills and nav/action pills now resolve through reusable shared primitives rather than per-feature inline styling
@@ -298,7 +299,7 @@ This builds the app, writes `dist/config.js` from `NAVET_HASS_URL` and `NAVET_HA
 #### Navigation Sections
 - **Home** for the main dashboard
 - **Security**, **Tasks**, **Locks**, **Lights**, and **Media** as dedicated sections
-- **Mock** as a temporary flat staging area for mock entities that are not yet integrated into room-based dashboard flow
+- **Dashboard Builder** for building the Home screen: add homescreen widgets, shape the overall layout, and organize the device library
 - **Settings** for appearance, dashboard, config export/import, and onboarding reset
 - On mobile, the bottom navigation hides on downward scroll and reappears when you return near the top of the page
 

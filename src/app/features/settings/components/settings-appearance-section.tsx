@@ -22,6 +22,7 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
     effectsQuality,
     followSystemTheme,
     handleRemoveWallpaper,
+    handleSelectWallpaper,
     handleWallpaperUpload,
     manualTheme,
     pageZoom,
@@ -36,6 +37,31 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
     updateSettings,
     wallpaper,
   } = controller;
+  const builtInWallpapers = useMemo(
+    () => [
+      {
+        id: 'serene-dawn',
+        src: '/wallpapers/serene-dawn.svg',
+        label: t('settings.appearance.wallpaper.stock.sereneDawn'),
+      },
+      {
+        id: 'starfield-nocturne',
+        src: '/wallpapers/starfield-nocturne.svg',
+        label: t('settings.appearance.wallpaper.stock.starfieldNocturne'),
+      },
+      {
+        id: 'aurora-veil',
+        src: '/wallpapers/aurora-veil.svg',
+        label: t('settings.appearance.wallpaper.stock.auroraVeil'),
+      },
+      {
+        id: 'rainforest-canopy',
+        src: '/wallpapers/rainforest-canopy.svg',
+        label: t('settings.appearance.wallpaper.stock.rainforestCanopy'),
+      },
+    ],
+    [t]
+  );
   const detectedTier = useMemo(() => detectDeviceTier(), []);
   const ambienceDisabled = effectsQuality !== 'high';
   const effectiveAmbientLightBleed = ambientLightBleed && !ambienceDisabled;
@@ -223,46 +249,66 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
         description={t('settings.appearance.wallpaper.description')}
         styles={styles}
       >
-        {wallpaper ? (
-          <div className="relative max-w-2xl">
-            <div
-              className="relative h-28 overflow-hidden rounded-[20px] border md:h-36 md:rounded-[24px]"
-              style={{ borderColor: `${styles.accentColor}40` }}
-            >
-              <img
-                src={wallpaper}
-                alt={t('settings.appearance.wallpaper.previewAlt')}
-                className="h-full w-full object-cover"
-              />
+        <div className="space-y-4">
+          {wallpaper ? (
+            <div className="relative max-w-2xl">
               <div
-                className="absolute inset-0"
-                style={{
-                  background: `linear-gradient(135deg, ${styles.accentColor}55, ${styles.accentColor}10)`,
-                  mixBlendMode: styles.mixBlendMode,
-                }}
-              />
-            </div>
-
-            <button
-              type="button"
-              onClick={handleRemoveWallpaper}
-              className={`absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full ${styles.floatingButtonBg} ${styles.floatingButtonText} shadow-lg transition-all hover:scale-110`}
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-
-            <label
-              className={`mt-3 flex h-14 cursor-pointer items-center justify-center gap-3 rounded-[18px] border-2 border-dashed md:mt-4 md:h-16 md:rounded-[20px] ${styles.lineColor} transition-colors ${styles.hoverBg}`}
-            >
-              <Upload className={`h-4 w-4 ${styles.mutedColor}`} />
-              <div className="text-center">
-                <p className={`text-sm font-medium ${styles.textColor}`}>
-                  {t('settings.appearance.wallpaper.replace')}
-                </p>
-                <p className={`text-[11px] ${styles.subtleColor}`}>
-                  {t('settings.appearance.wallpaper.fileHint')}
-                </p>
+                className="relative h-28 overflow-hidden rounded-[20px] border md:h-36 md:rounded-[24px]"
+                style={{ borderColor: `${styles.accentColor}40` }}
+              >
+                <img
+                  src={wallpaper}
+                  alt={t('settings.appearance.wallpaper.previewAlt')}
+                  className="h-full w-full object-cover"
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: `linear-gradient(135deg, ${styles.accentColor}55, ${styles.accentColor}10)`,
+                    mixBlendMode: styles.mixBlendMode,
+                  }}
+                />
               </div>
+
+              <button
+                type="button"
+                onClick={handleRemoveWallpaper}
+                className={`absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full ${styles.floatingButtonBg} ${styles.floatingButtonText} shadow-lg transition-all hover:scale-110`}
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+
+              <label
+                className={`mt-3 flex h-14 cursor-pointer items-center justify-center gap-3 rounded-[18px] border-2 border-dashed md:mt-4 md:h-16 md:rounded-[20px] ${styles.lineColor} transition-colors ${styles.hoverBg}`}
+              >
+                <Upload className={`h-4 w-4 ${styles.mutedColor}`} />
+                <div className="text-center">
+                  <p className={`text-sm font-medium ${styles.textColor}`}>
+                    {t('settings.appearance.wallpaper.replace')}
+                  </p>
+                  <p className={`text-[11px] ${styles.subtleColor}`}>
+                    {t('settings.appearance.wallpaper.fileHint')}
+                  </p>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleWallpaperUpload}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          ) : (
+            <label
+              className={`flex h-28 max-w-2xl cursor-pointer flex-col items-center justify-center rounded-[20px] border-2 border-dashed text-center transition-colors md:h-36 md:rounded-[24px] ${styles.lineColor} ${styles.hoverBg}`}
+            >
+              <ImageIcon className={`mb-2 h-8 w-8 md:mb-3 md:h-9 md:w-9 ${styles.mutedColor}`} />
+              <span className={`text-sm font-medium ${styles.textColor}`}>
+                {t('settings.appearance.wallpaper.upload')}
+              </span>
+              <span className={`mt-1 text-[11px] ${styles.subtleColor}`}>
+                {t('settings.appearance.wallpaper.fileHint')}
+              </span>
               <input
                 type="file"
                 accept="image/*"
@@ -270,26 +316,68 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
                 className="hidden"
               />
             </label>
+          )}
+
+          <div className="space-y-3 max-w-5xl">
+            <div>
+              <h3 className={`text-sm font-semibold ${styles.textColor}`}>
+                {t('settings.appearance.wallpaper.stockTitle')}
+              </h3>
+              <p className={`mt-1 text-sm ${styles.subtleColor}`}>
+                {t('settings.appearance.wallpaper.stockDescription')}
+              </p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5">
+              {builtInWallpapers.map((option) => {
+                const isSelected = wallpaper === option.src;
+
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => handleSelectWallpaper(option.src)}
+                    aria-pressed={isSelected}
+                    className={`group flex h-full min-h-[11.5rem] flex-col overflow-hidden rounded-[20px] border text-left transition-all ${styles.hoverBg}`}
+                    style={{
+                      borderColor: isSelected ? `${styles.accentColor}88` : undefined,
+                      boxShadow: isSelected ? `0 0 0 1px ${styles.accentColor}55` : undefined,
+                    }}
+                  >
+                    <div className="relative h-28 shrink-0 overflow-hidden">
+                      <img
+                        src={option.src}
+                        alt={option.label}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                      />
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          background: `linear-gradient(180deg, transparent, ${styles.accentColor}18)`,
+                          mixBlendMode: styles.mixBlendMode,
+                        }}
+                      />
+                    </div>
+                    <div className="flex flex-1 items-start justify-between gap-3 px-4 py-3">
+                      <span
+                        className={`line-clamp-2 min-h-[2.75rem] text-sm font-medium leading-5 ${styles.textColor}`}
+                      >
+                        {option.label}
+                      </span>
+                      <span
+                        className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full transition-opacity"
+                        style={{
+                          backgroundColor: styles.accentColor,
+                          opacity: isSelected ? 1 : 0.22,
+                        }}
+                      />
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        ) : (
-          <label
-            className={`flex h-28 max-w-2xl cursor-pointer flex-col items-center justify-center rounded-[20px] border-2 border-dashed text-center transition-colors md:h-36 md:rounded-[24px] ${styles.lineColor} ${styles.hoverBg}`}
-          >
-            <ImageIcon className={`mb-2 h-8 w-8 md:mb-3 md:h-9 md:w-9 ${styles.mutedColor}`} />
-            <span className={`text-sm font-medium ${styles.textColor}`}>
-              {t('settings.appearance.wallpaper.upload')}
-            </span>
-            <span className={`mt-1 text-[11px] ${styles.subtleColor}`}>
-              {t('settings.appearance.wallpaper.fileHint')}
-            </span>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleWallpaperUpload}
-              className="hidden"
-            />
-          </label>
-        )}
+        </div>
       </SettingsItem>
     </SettingsSectionShell>
   );

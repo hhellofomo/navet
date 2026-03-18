@@ -202,7 +202,7 @@ Manages section navigation state across desktop and mobile layouts through a dir
 | Locks    | Smart lock controls            | Lock      | Active    |
 | Lights   | Lighting control center        | Lightbulb | Active    |
 | Media    | Media player management        | Tv        | Active    |
-| Mock     | Flat staging area for mock entities | FlaskConical | Active |
+| Dashboard Builder | Build homescreen widgets and organize the device library | FlaskConical | Active |
 | Settings | App settings and preferences   | Settings  | Active    |
 
 #### Desktop Sidebar
@@ -225,7 +225,7 @@ Manages section navigation state across desktop and mobile layouts through a dir
 - **Active state**: theme-aware shared pill treatment
 - **Inactive state**: transparent/ghost buttons; only the selected item carries the pill
 - **Scroll behavior**: slides down and hides on downward scroll, returns when the user is near the top
-- **Sections shown**: Home, Security, Lights, Media, Mock, Settings
+- **Sections shown**: Home, Security, Lights, Media, Dashboard Builder, Settings
 
 #### Implementation
 ```tsx
@@ -251,6 +251,7 @@ Full-page settings interface with card-based organization.
 - **Theme Mode Selection**: 2 × 2 grid of theme option cards
 - **Primary Color Picker**: 8 built-in accent circles plus a custom accent swatch
 - **Visual quality**: choose between High, Medium, and Low glass rendering; shows the recommended tier for the current device based on an automatic benchmark run at first load
+- **Built-in wallpapers**: 4 bundled SVG scenes (Serene Dawn, Starfield Nocturne, Aurora Veil, Rainforest Canopy) selectable directly from the wallpaper setting; custom image upload still available alongside them
 - **Localized theme picker copy**: theme names and descriptions resolve through the shared i18n dictionaries
 - **Light card ambience**: global visual toggle between ambient bleed and contained light-card rendering
 - **Theme-aware ambience preview**: the ambience preview uses the shared preview-frame primitive, and the shared `Live Preview` header localizes with the active language

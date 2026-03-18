@@ -29,6 +29,11 @@ export type DashboardController = OnboardingController &
     activeRoom: string;
     activeSection: Section;
     addableEntityIds: string[];
+    allCustomCards: ReturnType<typeof useCustomCards>['getCardsForRoom'] extends (
+      room: string
+    ) => infer T
+      ? T
+      : never;
     allEntityIds: string[];
     allViewGrouping: AllViewGrouping;
     availableDeviceMap: ReturnType<typeof useDeviceMap>['deviceMap'];
@@ -150,6 +155,7 @@ export function useDashboardController(): DashboardController {
     activeRoom,
     activeSection,
     addableEntityIds,
+    allCustomCards,
     allEntityIds,
     allViewGrouping,
     availableDeviceMap,

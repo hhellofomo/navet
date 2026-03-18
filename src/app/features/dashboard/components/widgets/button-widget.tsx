@@ -154,6 +154,7 @@ export function ButtonWidget({ data = {}, onUpdate, isEditMode = false }: Button
         type="button"
         onClick={handleTap}
         disabled={isEditMode || !isConfigured}
+        aria-label={data.label || (isConfigured ? data.service : t('widgets.button.unconfigured'))}
         className="flex flex-col items-center gap-3 transition-transform disabled:cursor-default"
         style={{ transform: isPressed ? 'scale(0.93)' : 'scale(1)' }}
       >
