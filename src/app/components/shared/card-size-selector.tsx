@@ -210,7 +210,7 @@ export function getCardSpanClass(size: CardSize): string {
     case 'large':
       return 'col-span-2 row-span-4'; // 2 columns × 2 rows
     case 'hero':
-      return 'col-span-6 row-span-3'; // 6 columns × 3 rows (12-col grid)
+      return 'col-span-full row-span-3'; // full zone width × 3 rows
     default:
       return 'col-span-1 row-span-2';
   }

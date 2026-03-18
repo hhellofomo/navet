@@ -125,6 +125,10 @@ This keeps the same design language while making the UI practical on devices lik
 - Focus states
 - Shared color picker swatches used for custom accents, light colors, and Kelvin presets
 
+#### Dynamic Color Class Safety
+
+`generateThemeColors` builds Tailwind class names dynamically (e.g. `` `from-${color}-900` ``), which Tailwind's content scanner cannot detect. All required class combinations for every accent color and theme are listed as literal strings in `src/app/components/shared/theme/theme-color-safelist.ts`. This file must be kept in sync with `generateThemeColors` whenever new color/shade/opacity combinations are added.
+
 #### Shared Theme Primitives
 
 Recent UI cleanup moved repeated theme logic into shared primitives so cross-theme behavior can be changed in one place:
@@ -181,6 +185,7 @@ Navet now uses a live Home Assistant-backed media card flow.
 - Artwork is rendered only when the entity exposes artwork; Navet no longer injects a default placeholder image
 - Production artwork color extraction uses the Navet Home Assistant proxy path instead of direct cross-origin image reads
 - The media dialog and card views share the same transport/action visual language
+- Volume sliders use a small circular thumb (10 px, `h-2.5 w-2.5`) positioned at the fill percentage; color is driven by the album artwork palette
 
 ---
 
@@ -190,20 +195,20 @@ Navet now uses a live Home Assistant-backed media card flow.
 
 **Location**: `/src/app/hooks/use-navigation.ts`
 
-Manages section navigation state across desktop and mobile layouts through a direct hook API backed by shared client state.
+Manages section navigation state across desktop and mobile layouts through a direct hook API backed by shared client state. Each section maps to a dedicated URL path; the active section is derived from `window.location.pathname` on load rather than persisted to localStorage.
 
 #### Sections
 
-| Section  | Description                    | Icon      | Status    |
-|----------|--------------------------------|-----------|-----------|
-| Home     | Main dashboard with all cards  | Home      | Active    |
-| Security | Security cameras and monitoring | Video     | Placeholder |
-| Tasks    | Automations and routines       | Clipboard | Placeholder |
-| Locks    | Smart lock controls            | Lock      | Active    |
-| Lights   | Lighting control center        | Lightbulb | Active    |
-| Media    | Media player management        | Tv        | Active    |
-| Dashboard Builder | Build homescreen widgets and organize the device library | FlaskConical | Active |
-| Settings | App settings and preferences   | Settings  | Active    |
+| Section  | URL Path    | Description                    | Icon      | Status    |
+|----------|-------------|--------------------------------|-----------|-----------|
+| Home     | `/`         | Main dashboard with all cards  | Home      | Active    |
+| Security | `/security` | Security cameras and monitoring | Video     | Placeholder |
+| Tasks    | `/tasks`    | Automations and routines       | Clipboard | Placeholder |
+| Locks    | `/locks`    | Smart lock controls            | Lock      | Active    |
+| Lights   | `/lights`   | Lighting control center        | Lightbulb | Active    |
+| Media    | `/media`    | Media player management        | Tv        | Active    |
+| Dashboard Builder | `/mock` | Build homescreen widgets and organize the device library | FlaskConical | Active |
+| Settings | `/settings` | App settings and preferences   | Settings  | Active    |
 
 #### Desktop Sidebar
 
@@ -227,11 +232,21 @@ Manages section navigation state across desktop and mobile layouts through a dir
 - **Scroll behavior**: slides down and hides on downward scroll, returns when the user is near the top
 - **Sections shown**: Home, Security, Lights, Media, Dashboard Builder, Settings
 
+#### URL Routing
+
+Sections are URL-addressable. `setActiveSection` calls `history.pushState` and scrolls to the top; browser back/forward updates the Zustand store via a `popstate` listener. The active section is not persisted to localStorage — the URL is the sole source of truth.
+
+Path helpers live in `src/app/navigation/sections.ts`:
+- `sectionToPath(section)` — returns the URL path for a section
+- `pathToSection(pathname)` — parses a URL pathname back to a `Section`
+
+The PWA workbox config (`navigateFallback: '/index.html'`) and Vite's default SPA mode both serve `index.html` for deep-linked section URLs in production and development respectively.
+
 #### Implementation
 ```tsx
 const { activeSection, setActiveSection } = useNavigation();
 
-// Navigate to section
+// Navigate to section (also pushes URL and scrolls to top)
 setActiveSection('lights');
 ```
 
@@ -257,6 +272,7 @@ Full-page settings interface with card-based organization.
 - **Theme-aware ambience preview**: the ambience preview uses the shared preview-frame primitive, and the shared `Live Preview` header localizes with the active language
 - **Shared color picker primitive**: custom accents, light colors, and Kelvin swatches reuse the same base control with size variants
 - **Brightness presets**: light cards use a compact 3-preset set (`Bright`, `Dim`, `Night`) that fits inline without an overflow menu
+- **Kelvin slider auto-reset**: tapping the Kelvin swatch on a light card replaces the brightness slider with the color temperature slider; it reverts automatically after 3 seconds of inactivity or when the user taps outside the card — `isKelvinMode` state is owned by the `LightCard` index component and passed down to all size variants
 - **Layout**: Left-aligned text, right-aligned selection indicator
 
 **2. Localization**

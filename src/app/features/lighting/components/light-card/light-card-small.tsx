@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { CardActionRow } from '@/app/components/shared/card-action-row';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
 import { type CardSize, isExtraSmallCardSize } from '@/app/components/shared/card-size-selector';
@@ -26,9 +26,11 @@ interface LightCardSmallProps {
   maxColorTemp: number;
   brightnessPresets: LightBrightnessPreset[];
   isOn: boolean;
+  isKelvinMode: boolean;
   IconComponent: LucideIcon;
   supportsColorControl: boolean;
   supportsColorTemperature: boolean;
+  onKelvinToggle: () => void;
   onBrightnessChange: (value: number) => void;
   onBrightnessCommit: (value: number) => void;
   onColorChange: (color: string) => void;
@@ -50,9 +52,11 @@ export const LightCardSmall = memo(function LightCardSmall({
   maxColorTemp,
   brightnessPresets,
   isOn,
+  isKelvinMode,
   IconComponent,
   supportsColorControl,
   supportsColorTemperature,
+  onKelvinToggle,
   onBrightnessChange,
   onBrightnessCommit,
   onColorChange,
@@ -70,11 +74,6 @@ export const LightCardSmall = memo(function LightCardSmall({
   // If no color features: show all presets inline.
   const presetMaxVisible = hasColorFeatures ? Math.max(0, 2 - colorButtonCount) : undefined;
   const presetOverflow: 'menu' | 'hide' = hasColorFeatures ? 'menu' : 'hide';
-  const [isKelvinMode, setIsKelvinMode] = useState(false);
-
-  const handleKelvinToggle = () => {
-    if (isOn) setIsKelvinMode((prev) => !prev);
-  };
 
   return (
     <>
@@ -148,7 +147,7 @@ export const LightCardSmall = memo(function LightCardSmall({
                     currentTempColor={currentTempColor}
                     isActive={isKelvinMode}
                     size="small"
-                    onClick={handleKelvinToggle}
+                    onClick={onKelvinToggle}
                   />
                 )}
 

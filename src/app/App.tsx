@@ -8,7 +8,7 @@ import { ErrorProvider } from './contexts/error-context';
 import { LoadingProvider } from './contexts/loading-context';
 import { LoginPage } from './features/auth/login-page';
 import { DashboardPage } from './features/dashboard';
-import { useHomeAssistant } from './hooks';
+import { useHomeAssistant, useTheme } from './hooks';
 import { I18nProvider } from './i18n';
 import { useSettingsStore } from './stores';
 import { homeAssistantSelectors, settingsSelectors } from './stores/selectors';
@@ -20,6 +20,7 @@ function AppContent() {
   const connected = useHomeAssistant(homeAssistantSelectors.connected);
   const connecting = useHomeAssistant(homeAssistantSelectors.connecting);
   const connect = useHomeAssistant(homeAssistantSelectors.connect);
+  const { accentColor } = useTheme();
   const disableAnimations = useSettingsStore(settingsSelectors.disableAnimations);
   const lowPowerMode = useSettingsStore(settingsSelectors.lowPowerMode);
   const effectsQuality = useSettingsStore(settingsSelectors.effectsQuality);
@@ -44,6 +45,13 @@ function AppContent() {
       }).catch((_err) => {});
     }
   }, [isAuthenticated, authConfig, haConfig, connected, connecting, connect]);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--navet-accent', accentColor);
+    return () => {
+      document.documentElement.style.removeProperty('--navet-accent');
+    };
+  }, [accentColor]);
 
   useEffect(() => {
     document.documentElement.dataset.noAnimation = reducedEffectsEnabled ? 'true' : 'false';

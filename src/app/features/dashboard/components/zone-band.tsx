@@ -1,3 +1,4 @@
+import { useDroppable } from '@dnd-kit/core';
 import { type CSSProperties, memo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
@@ -9,6 +10,7 @@ import type { CustomCard } from '../stores/custom-cards-store';
 import { ZONE_I18N_KEYS, type ZoneName } from '../zones/zone-types';
 import { DashboardCardItem } from './dashboard-card-item';
 import { DashboardEditActions } from './dashboard-edit-actions';
+import { ZonePlaceholder } from './zone-placeholder';
 
 interface ZoneBandProps {
   zone: ZoneName;
@@ -21,6 +23,8 @@ interface ZoneBandProps {
   onDeleteCard?: (cardId: string) => void;
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
 }
+
+const PLACEHOLDER_COUNT = 3;
 
 export const ZoneBand = memo(function ZoneBand({
   zone,
@@ -38,9 +42,15 @@ export const ZoneBand = memo(function ZoneBand({
   const surface = getThemeSurfaceTokens(theme);
   const colCount = useBreakpointCols();
 
+  const { setNodeRef, isOver } = useDroppable({
+    id: `zone-band-${zone}`,
+    data: { zone },
+  });
+
   const gridContent = (
     <div
-      className="grid w-full auto-rows-[87px] grid-flow-row-dense gap-2 md:gap-3 lg:gap-4 [grid-template-columns:repeat(var(--zone-cols),minmax(0,1fr))]"
+      ref={setNodeRef}
+      className={`grid w-full auto-rows-[87px] grid-flow-row-dense gap-2 md:gap-3 lg:gap-4 [grid-template-columns:repeat(var(--zone-cols),minmax(0,1fr))] ${isOver ? 'rounded-2xl ring-1 ring-white/20' : ''}`}
       style={{ '--zone-cols': colCount } as CSSProperties}
     >
       {orderedIds.map((id) => {
@@ -76,6 +86,10 @@ export const ZoneBand = memo(function ZoneBand({
           />
         );
       })}
+      {isEditMode &&
+        Array.from({ length: PLACEHOLDER_COUNT }, (_, i) => (
+          <ZonePlaceholder key={`placeholder-${zone}-${i}`} zone={zone} index={i} />
+        ))}
     </div>
   );
 

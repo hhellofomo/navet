@@ -1,4 +1,6 @@
-import { EyeOff, X } from 'lucide-react';
+import { useDraggable } from '@dnd-kit/core';
+import { CSS } from '@dnd-kit/utilities';
+import { EyeOff, GripVertical, X } from 'lucide-react';
 import { memo } from 'react';
 import { CardEditActionButton } from '@/app/components/shared/card-edit-action-button';
 import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-size-selector';
@@ -47,6 +49,15 @@ export const DashboardCardItem = memo(function DashboardCardItem({
     device?.type === 'media' && size === 'large' ? 'col-span-1 row-span-4' : getCardSpanClass(size);
   const editControlSize = device?.type === 'media' && size === 'large' ? 'medium' : size;
   const allowedSizes = getAllowedSizes(device, card, zone);
+
+  // Drag is only enabled in edit mode when the card is inside a zone band.
+  const draggable = isEditMode && zone !== undefined;
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id,
+    disabled: !draggable,
+    data: { zone },
+  });
+
   const cardContent = (
     <>
       {isEditMode && device && allowEntityRemoval && onRemoveEntity && (
@@ -90,9 +101,22 @@ export const DashboardCardItem = memo(function DashboardCardItem({
 
   return (
     <div
-      className={`relative h-full ${device?.type === 'lights' && ambientLightBleed ? '[contain:layout_style]' : '[contain:layout_style_paint]'} ${spanClass}`}
+      ref={setNodeRef}
+      className={`relative h-full ${device?.type === 'lights' && ambientLightBleed ? '[contain:layout_style]' : '[contain:layout_style_paint]'} ${spanClass} ${isDragging ? 'opacity-40' : ''}`}
+      style={transform ? { transform: CSS.Translate.toString(transform) } : undefined}
       data-draggable-card="true"
     >
+      {draggable && (
+        <button
+          type="button"
+          aria-label="Drag to rezone"
+          className="absolute bottom-2 left-1/2 z-50 -translate-x-1/2 cursor-grab touch-none rounded-full p-1 opacity-40 hover:opacity-80 active:cursor-grabbing"
+          {...listeners}
+          {...attributes}
+        >
+          <GripVertical className="h-4 w-4 text-white" />
+        </button>
+      )}
       {cardContent}
     </div>
   );

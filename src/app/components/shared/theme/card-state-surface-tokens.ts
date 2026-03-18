@@ -16,25 +16,25 @@ export function getCardStateSurfaceTokens(
 ): CardStateSurfaceTokens {
   const surface = getThemeSurfaceTokens(theme);
 
+  if (theme === 'light') {
+    return {
+      containerClassName: isActive ? '' : 'brightness-[0.98]',
+      overlayClassName: null,
+      primaryTextClassName: isActive ? surface.textPrimary : 'text-gray-700',
+      secondaryTextClassName: isActive ? surface.textSecondary : 'text-gray-500',
+      mutedTextClassName: isActive ? surface.textMuted : 'text-gray-400',
+      artworkClassName: isActive ? '' : 'brightness-[0.92] saturate-[0.78]',
+    };
+  }
+
   if (isActive) {
     return {
       containerClassName: '',
       overlayClassName: null,
-      primaryTextClassName: surface.textPrimary,
+      primaryTextClassName: 'card-primary-text',
       secondaryTextClassName: surface.textSecondary,
-      mutedTextClassName: surface.textMuted,
+      mutedTextClassName: 'card-muted-text',
       artworkClassName: '',
-    };
-  }
-
-  if (theme === 'light') {
-    return {
-      containerClassName: 'brightness-[0.98]',
-      overlayClassName: null,
-      primaryTextClassName: 'text-gray-700',
-      secondaryTextClassName: 'text-gray-500',
-      mutedTextClassName: 'text-gray-400',
-      artworkClassName: 'brightness-[0.92] saturate-[0.78]',
     };
   }
 
@@ -42,9 +42,9 @@ export function getCardStateSurfaceTokens(
     return {
       containerClassName: 'saturate-[0.82]',
       overlayClassName: 'bg-slate-950/14',
-      primaryTextClassName: 'text-white/88',
+      primaryTextClassName: 'card-primary-text',
       secondaryTextClassName: 'text-white/66',
-      mutedTextClassName: 'text-white/52',
+      mutedTextClassName: 'card-muted-text',
       artworkClassName: 'opacity-68 saturate-[0.74]',
     };
   }
@@ -53,19 +53,20 @@ export function getCardStateSurfaceTokens(
     return {
       containerClassName: '',
       overlayClassName: null,
-      primaryTextClassName: 'text-white',
+      primaryTextClassName: 'card-primary-text',
       secondaryTextClassName: 'text-gray-300',
-      mutedTextClassName: 'text-gray-400',
+      mutedTextClassName: 'card-muted-text',
       artworkClassName: 'brightness-[0.88] saturate-[0.72]',
     };
   }
 
+  // dark (default)
   return {
     containerClassName: '',
     overlayClassName: null,
-    primaryTextClassName: 'text-white/90',
+    primaryTextClassName: 'card-primary-text',
     secondaryTextClassName: 'text-gray-300',
-    mutedTextClassName: 'text-gray-400',
+    mutedTextClassName: 'card-muted-text',
     artworkClassName: 'brightness-[0.88] saturate-[0.72]',
   };
 }

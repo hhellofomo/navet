@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { CardActionRow } from '@/app/components/shared/card-action-row';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
 import {
@@ -28,9 +28,11 @@ interface LightCardLargeProps {
   minColorTemp: number;
   maxColorTemp: number;
   isOn: boolean;
+  isKelvinMode: boolean;
   IconComponent: LucideIcon;
   supportsColorControl: boolean;
   supportsColorTemperature: boolean;
+  onKelvinToggle: () => void;
   onBrightnessChange: (value: number) => void;
   onBrightnessCommit: (value: number) => void;
   onColorChange: (color: string) => void;
@@ -52,9 +54,11 @@ export const LightCardLarge = memo(function LightCardLarge({
   minColorTemp,
   maxColorTemp,
   isOn,
+  isKelvinMode,
   IconComponent,
   supportsColorControl,
   supportsColorTemperature,
+  onKelvinToggle,
   onBrightnessChange,
   onBrightnessCommit,
   onColorChange,
@@ -69,11 +73,6 @@ export const LightCardLarge = memo(function LightCardLarge({
   const stateSurface = getCardStateSurfaceTokens(theme, isOn);
   const secondaryTextColor = stateSurface.secondaryTextClassName;
   const textColor = stateSurface.primaryTextClassName;
-  const [isKelvinMode, setIsKelvinMode] = useState(false);
-
-  const handleKelvinToggle = () => {
-    if (isOn) setIsKelvinMode((prev) => !prev);
-  };
 
   const roundedTemp = roundKelvin(colorTemp);
 
@@ -149,7 +148,7 @@ export const LightCardLarge = memo(function LightCardLarge({
                   currentTempColor={currentTempColor}
                   isActive={isKelvinMode}
                   size="large"
-                  onClick={handleKelvinToggle}
+                  onClick={onKelvinToggle}
                 />
               )}
               {supportsColorControl && (
