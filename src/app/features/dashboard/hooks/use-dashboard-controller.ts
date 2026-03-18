@@ -19,7 +19,9 @@ import { homeAssistantSelectors } from '@/app/stores/selectors';
 import type { AllViewGrouping } from '../all-view-grid';
 import type { CardType } from '../components/add-card-dialog';
 import { useDashboardEntitiesStore } from '../stores/dashboard-entities-store';
+import type { ZoneName } from '../zones/zone-types';
 import { useCardOrdering } from './use-card-ordering';
+import { useCardZones } from './use-card-zones';
 import { useCustomCards } from './use-custom-cards';
 import { useDashboardDerivedState } from './use-dashboard-derived-state';
 import { type DashboardDialogs, useDashboardDialogs } from './use-dashboard-dialogs';
@@ -39,6 +41,7 @@ export type DashboardController = OnboardingController &
     availableDeviceMap: ReturnType<typeof useDeviceMap>['deviceMap'];
     cardOrders: ReturnType<typeof useCardOrdering>['cardOrders'];
     cardSizes: ReturnType<typeof useCardState>['cardSizes'];
+    cardZones: ReturnType<typeof useCardZones>['cardZones'];
     changeRoom: (room: string) => void;
     customCards: ReturnType<typeof useCustomCards>['getCardsForRoom'] extends (
       room: string
@@ -63,6 +66,7 @@ export type DashboardController = OnboardingController &
     rooms: string[];
     setActiveSection: (section: Section) => void;
     updateCardSize: ReturnType<typeof useCardState>['updateCardSize'];
+    updateCardZone: (id: string, zone: ZoneName) => void;
   };
 
 export function useDashboardController(): DashboardController {
@@ -96,6 +100,7 @@ export function useDashboardController(): DashboardController {
   const { isEditMode, toggleEditMode } = useEditMode();
   const { cardSizes, updateCardSize } = useCardState(devices);
   const { cardOrders } = useCardOrdering(devices, rooms, allCustomCards);
+  const { cardZones, updateCardZone } = useCardZones();
   const { deviceMap } = useDeviceMap(devices);
   const { deviceMap: availableDeviceMap } = useDeviceMap(allDevices);
   const { addableEntityIds, allEntityIds, lightDeviceMap, lightRooms, orderedCardIds } =
@@ -161,6 +166,7 @@ export function useDashboardController(): DashboardController {
     availableDeviceMap,
     cardOrders,
     cardSizes,
+    cardZones,
     changeRoom,
     customCards,
     deviceMap,
@@ -181,6 +187,7 @@ export function useDashboardController(): DashboardController {
     rooms,
     setActiveSection,
     updateCardSize,
+    updateCardZone,
     // Onboarding
     ...onboarding,
     // Dialogs

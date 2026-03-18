@@ -293,6 +293,10 @@ export const frMessages = {
   'dashboard.homeOverview.stats.visibleDevices': 'Appareils visibles',
   'dashboard.homeOverview.stats.featuredCards': 'Cartes mises en avant',
   'dashboard.homeOverview.stats.hiddenDevices': 'Appareils masqués',
+  'dashboard.zones.hero': "Vue d'ensemble",
+  'dashboard.zones.actions': 'Actions rapides',
+  'dashboard.zones.status': 'Statut',
+  'dashboard.zones.analytics': 'Analyses',
   'dashboard.shell.noLightsTitle': 'Aucune lumière',
   'dashboard.shell.noLightsHidden':
     'Toutes les entités lumière ont été retirées du tableau de bord.',

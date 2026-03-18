@@ -1,11 +1,14 @@
 import { ChevronRight, LayoutDashboard, Plus, Shield } from 'lucide-react';
 import { memo, useMemo } from 'react';
-import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-size-selector';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
 import type { Section } from '@/app/navigation/sections';
 import type { DeviceWithType } from '@/app/types/device.types';
-import { DashboardCardItem } from './dashboard-card-item';
+import type { CustomCard } from '../stores/custom-cards-store';
+import { useZoneLayout } from '../zones/use-zone-layout';
+import type { ZoneName } from '../zones/zone-types';
+import { ZoneBand } from './zone-band';
 
 interface HomeDashboardOverviewProps {
   deviceMap: Map<string, DeviceWithType>;
@@ -13,15 +16,14 @@ interface HomeDashboardOverviewProps {
   updateCardSize: (id: string, size: CardSize) => void;
   isEditMode: boolean;
   hiddenEntityCount: number;
+  allCustomCards: CustomCard[];
+  cardZones: Record<string, ZoneName>;
   onOpenAddEntityDialog?: () => void;
   onOpenBuilder: () => void;
+  onDeleteCard?: (cardId: string) => void;
+  onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
   setActiveSection: (section: Section) => void;
 }
-
-type FeaturedCard = {
-  device: DeviceWithType;
-  size: CardSize;
-};
 
 export const HomeDashboardOverview = memo(function HomeDashboardOverview({
   deviceMap,
@@ -29,42 +31,33 @@ export const HomeDashboardOverview = memo(function HomeDashboardOverview({
   updateCardSize,
   isEditMode,
   hiddenEntityCount,
+  allCustomCards,
+  cardZones,
   onOpenAddEntityDialog,
   onOpenBuilder,
+  onDeleteCard,
+  onUpdateCard,
   setActiveSection,
 }: HomeDashboardOverviewProps) {
   const { t } = useI18n();
   const { theme, accentColor } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
 
-  const featuredCards = useMemo<FeaturedCard[]>(() => {
-    const devices = Array.from(deviceMap.values());
-    const usedIds = new Set<string>();
+  // Only include custom cards assigned to the home screen (room === 'All')
+  const homeCustomCards = useMemo(
+    () => allCustomCards.filter((c) => c.room === 'All'),
+    [allCustomCards]
+  );
 
-    const pick = (types: string[], size: CardSize, count = 1): FeaturedCard[] => {
-      const matches = devices.filter(
-        (device) => types.includes(device.type) && !usedIds.has(device.id)
-      );
+  const customCardMap = useMemo(
+    () => new Map(homeCustomCards.map((c) => [c.id, c])),
+    [homeCustomCards]
+  );
 
-      return matches.slice(0, count).map((device) => {
-        usedIds.add(device.id);
-        return { device, size };
-      });
-    };
+  const zoneSections = useZoneLayout(deviceMap, homeCustomCards, cardZones);
 
-    return [
-      ...pick(['weather'], 'large'),
-      ...pick(['calendars'], 'large'),
-      ...pick(['media', 'climate', 'lights'], 'medium', 2),
-      ...pick(['power', 'grouped-sensors', 'sensors', 'switches'], 'medium', 2),
-      ...pick(['persons'], 'small', 2),
-      ...pick(['locks'], 'small', 2),
-      ...pick(['covers', 'vacuums'], 'medium', 2),
-    ];
-  }, [deviceMap]);
-
-  const visibleDeviceCount = deviceMap.size;
-  const hasFeaturedCards = featuredCards.length > 0;
+  const totalZonedCards = zoneSections.reduce((sum, s) => sum + s.orderedIds.length, 0);
+  const hasCards = totalZonedCards > 0;
 
   const primaryButtonStyle = {
     background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
@@ -72,8 +65,8 @@ export const HomeDashboardOverview = memo(function HomeDashboardOverview({
   };
 
   const summaryItems = [
-    { label: t('dashboard.homeOverview.stats.visibleDevices'), value: visibleDeviceCount },
-    { label: t('dashboard.homeOverview.stats.featuredCards'), value: featuredCards.length },
+    { label: t('dashboard.homeOverview.stats.visibleDevices'), value: deviceMap.size },
+    { label: t('dashboard.homeOverview.stats.featuredCards'), value: totalZonedCards },
     { label: t('dashboard.homeOverview.stats.hiddenDevices'), value: hiddenEntityCount },
   ];
 
@@ -147,56 +140,24 @@ export const HomeDashboardOverview = memo(function HomeDashboardOverview({
               </div>
             ))}
           </div>
-
-          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-            <div>
-              <h2 className={`text-lg font-semibold ${surface.textPrimary}`}>
-                {t('dashboard.homeOverview.featuredTitle')}
-              </h2>
-              <p className={`mt-1 text-sm ${surface.textSecondary}`}>
-                {t('dashboard.homeOverview.featuredDescription')}
-              </p>
-            </div>
-          </div>
         </div>
 
-        {hasFeaturedCards ? (
-          <div className="mt-5 grid w-full auto-rows-[87px] grid-flow-row-dense grid-cols-2 gap-2 md:grid-cols-4 md:gap-3 lg:gap-4 xl:grid-cols-6 2xl:grid-cols-8">
-            {featuredCards.map(({ device, size }) => (
-              <DashboardCardItem
-                key={device.id}
-                id={device.id}
-                device={device}
-                size={cardSizes[device.id] || size}
-                isEditMode={isEditMode}
+        {hasCards ? (
+          <div className="mt-6 flex flex-col gap-8">
+            {zoneSections.map(({ zone, orderedIds }) => (
+              <ZoneBand
+                key={zone}
+                zone={zone}
+                orderedIds={orderedIds}
+                deviceMap={deviceMap}
+                customCardMap={customCardMap}
+                cardSizes={cardSizes}
                 handleSizeChange={updateCardSize}
+                isEditMode={isEditMode}
+                onDeleteCard={onDeleteCard}
+                onUpdateCard={onUpdateCard}
               />
             ))}
-
-            <div
-              className={`relative h-full rounded-3xl border p-5 ${surface.borderStrong} ${surface.panelMuted} ${getCardSpanClass('medium')}`}
-            >
-              <div
-                className="flex h-11 w-11 items-center justify-center rounded-2xl"
-                style={{ backgroundColor: `${accentColor}18`, color: accentColor }}
-              >
-                <Shield className="h-5 w-5" />
-              </div>
-              <h3 className={`mt-4 text-base font-semibold ${surface.textPrimary}`}>
-                {t('dashboard.homeOverview.securityTitle')}
-              </h3>
-              <p className={`mt-2 text-sm leading-6 ${surface.textSecondary}`}>
-                {t('dashboard.homeOverview.securityDescription')}
-              </p>
-              <button
-                type="button"
-                onClick={() => setActiveSection('security')}
-                className={`mt-5 inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-medium transition-colors ${surface.border} ${surface.textPrimary} ${surface.hoverBg}`}
-              >
-                {t('sidebar.security')}
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
           </div>
         ) : (
           <div

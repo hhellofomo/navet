@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import type { ZoneName } from '../zones/zone-types';
 
 export type CardType = 'rss' | 'photo' | 'note' | 'battery' | 'button';
 
@@ -9,6 +10,8 @@ export interface CustomCard {
   type: CardType;
   size: CardSize;
   room: string;
+  /** Explicit zone assignment for home-screen zone layout. Undefined = default by card type. */
+  zone?: ZoneName;
   data?: Record<string, unknown>;
   createdAt: number;
 }

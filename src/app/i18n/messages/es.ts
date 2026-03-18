@@ -292,6 +292,10 @@ export const esMessages = {
   'dashboard.homeOverview.stats.visibleDevices': 'Dispositivos visibles',
   'dashboard.homeOverview.stats.featuredCards': 'Tarjetas destacadas',
   'dashboard.homeOverview.stats.hiddenDevices': 'Dispositivos ocultos',
+  'dashboard.zones.hero': 'Resumen',
+  'dashboard.zones.actions': 'Acciones rápidas',
+  'dashboard.zones.status': 'Estado',
+  'dashboard.zones.analytics': 'Análisis',
   'dashboard.shell.noLightsTitle': 'Sin luces',
   'dashboard.shell.noLightsHidden': 'Todas las entidades de luz se han eliminado del panel.',
   'dashboard.shell.noLightsEmpty':

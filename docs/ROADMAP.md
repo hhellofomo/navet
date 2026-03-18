@@ -47,6 +47,10 @@ Planned and in-progress features. Check off items as they ship. Add new ideas to
 - [ ] **Advanced accessibility settings** — font size, reduced motion, high contrast overrides
 - [ ] **Widget marketplace** — community-contributed widget types beyond RSS/Photo/Note
 
+### Integrations
+
+- [ ] **OpenHAB backend** — connect to OpenHAB via its WebSocket API as an alternative to Home Assistant; items map to the same device types (lights, switches, climate, media); requires a `BackendService` abstraction layer and OpenHAB-specific state/command adapters for each device type
+
 ### Smart Home
 
 - [ ] **Automations management** — view, trigger, and edit Home Assistant automations

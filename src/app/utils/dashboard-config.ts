@@ -36,6 +36,7 @@ interface DashboardConfigPayload {
   >;
   cardSizes?: Record<string, string>;
   cardOrders?: Record<string, string[]>;
+  cardZones?: Record<string, string>;
   roomOrder?: string[];
 }
 
@@ -157,6 +158,9 @@ export const exportDashboardConfig = (): DashboardConfigPayload => {
     ),
     cardOrders: pruneEmptyRecord(
       parseStoredJson<Record<string, string[]>>(STORAGE_KEYS.cardOrders, {})
+    ),
+    cardZones: pruneEmptyRecord(
+      parseStoredJson<Record<string, string>>(STORAGE_KEYS.cardZones, {})
     ),
     roomOrder: pruneEmptyArray(parseStoredJson<string[]>(STORAGE_KEYS.roomOrder, [])),
   };
@@ -295,6 +299,7 @@ export const importDashboardConfig = (value: unknown) => {
 
   storage.set(STORAGE_KEYS.cardSizes, isRecord(value.cardSizes) ? value.cardSizes : {});
   storage.set(STORAGE_KEYS.cardOrders, isRecord(value.cardOrders) ? value.cardOrders : {});
+  storage.set(STORAGE_KEYS.cardZones, isRecord(value.cardZones) ? value.cardZones : {});
   storage.set(STORAGE_KEYS.roomOrder, Array.isArray(value.roomOrder) ? value.roomOrder : []);
 };
 
