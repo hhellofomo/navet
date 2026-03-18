@@ -230,6 +230,7 @@ export const esMessages = {
   'dashboard.addCard.size.small': 'small',
   'dashboard.addCard.size.medium': 'medium',
   'dashboard.addCard.size.large': 'large',
+  'dashboard.addCard.size.hero': 'hero',
   'dashboard.addCard.templates.rss.name': 'Feed RSS',
   'dashboard.addCard.templates.rss.description':
     'Sigue artículos de tus proveedores de feeds seleccionados',

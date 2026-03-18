@@ -73,6 +73,7 @@ Planned and in-progress features. Check off items as they ship. Add new ideas to
 
 ## Shipped
 
+- [x] **Zone-based Home screen layout** — Home view organises all devices into Overview, Quick Actions, Status, and Analytics zone bands; per-card zone overrides persist to localStorage and YAML export; `hero` card size (6×3) available for weather, calendars, photo, and RSS in the Overview zone; responsive 12-column grid via CSS custom property aligned with Tailwind breakpoints
 - [x] **Custom accent color picker** — custom color input alongside 8 built-in accent presets in Settings → Appearance
 - [x] **Widget settings** — RSS Feed and Quick Note widgets support post-creation configuration (feed URLs, note content)
 - [x] **Configuration UI with setup wizard** — in-app onboarding and login screen
