@@ -590,6 +590,21 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 
 ---
 
-**Last Updated**: March 5, 2026  
-**Version**: 1.5  
+**Last Updated**: March 19, 2026
+**Version**: 1.6
 **Status**: Living Document
+
+---
+
+## Shared Hooks
+
+### `useHaCommandQueue`
+
+`src/app/hooks/use-ha-command-queue.ts`
+
+Debounces async HA service calls with in-flight request tracking. Used by the light card controller for brightness and color temperature slider interactions.
+
+- Queues the latest value and flushes after a configurable debounce window (default 75 ms)
+- If a request is already in flight, re-flushes automatically once it resolves
+- Exposes `cancel()` to drop a pending value (e.g. a color change cancels a queued temp sync)
+- Manages its own cleanup on unmount

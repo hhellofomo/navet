@@ -5,7 +5,7 @@ import { type CardSize, isExtraSmallCardSize } from '@/app/components/shared/car
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { DEFAULT_LIGHT_ICON, LIGHT_ICON_MAP } from '@/app/constants/icon-map';
 import { TEMP_OPTIONS } from '@/app/constants/light-constants';
-import { useHomeAssistant, useI18n } from '@/app/hooks';
+import { useHaCommandQueue, useHomeAssistant, useI18n } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { useBrightnessPresets } from '../../hooks/use-brightness-presets';
@@ -106,14 +106,8 @@ export function useLightCardController({
   const lastColorTempRef = useRef(rememberedLightState?.colorTemp ?? roundKelvin(initialTemp));
   const pendingBrightnessRef = useRef<number | null>(null);
   const brightnessSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const brightnessSendTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const queuedBrightnessRef = useRef<number | null>(null);
-  const brightnessRequestInFlightRef = useRef(false);
   const pendingTempRef = useRef<number | null>(null);
   const tempSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const tempSendTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const queuedTempRef = useRef<number | null>(null);
-  const tempRequestInFlightRef = useRef(false);
   const lastKnownColorRef = useRef<string | null>(null);
 
   const effectiveSelectedColor = selectedColor ?? (isOn ? lastKnownColorRef.current : null);
@@ -211,14 +205,8 @@ export function useLightCardController({
       if (brightnessSyncTimeoutRef.current) {
         clearTimeout(brightnessSyncTimeoutRef.current);
       }
-      if (brightnessSendTimeoutRef.current) {
-        clearTimeout(brightnessSendTimeoutRef.current);
-      }
       if (tempSyncTimeoutRef.current) {
         clearTimeout(tempSyncTimeoutRef.current);
-      }
-      if (tempSendTimeoutRef.current) {
-        clearTimeout(tempSendTimeoutRef.current);
       }
     };
   }, []);
@@ -333,82 +321,12 @@ export function useLightCardController({
     [id, isHomeAssistantLight, t]
   );
 
-  const flushQueuedBrightnessSync = useCallback(() => {
-    if (brightnessRequestInFlightRef.current || queuedBrightnessRef.current === null) {
-      return;
-    }
-
-    const nextBrightness = queuedBrightnessRef.current;
-    queuedBrightnessRef.current = null;
-    brightnessRequestInFlightRef.current = true;
-
-    void syncLightWithHomeAssistant({ state: 'on', brightnessPct: nextBrightness }).finally(() => {
-      brightnessRequestInFlightRef.current = false;
-      if (queuedBrightnessRef.current !== null) {
-        flushQueuedBrightnessSync();
-      }
-    });
-  }, [syncLightWithHomeAssistant]);
-
-  const queueBrightnessSync = useCallback(
-    (nextBrightness: number, immediate = false) => {
-      queuedBrightnessRef.current = nextBrightness;
-
-      if (brightnessSendTimeoutRef.current) {
-        clearTimeout(brightnessSendTimeoutRef.current);
-        brightnessSendTimeoutRef.current = null;
-      }
-
-      if (immediate) {
-        flushQueuedBrightnessSync();
-        return;
-      }
-
-      brightnessSendTimeoutRef.current = setTimeout(() => {
-        brightnessSendTimeoutRef.current = null;
-        flushQueuedBrightnessSync();
-      }, 75);
-    },
-    [flushQueuedBrightnessSync]
+  const { queue: queueBrightnessSync } = useHaCommandQueue((pct: number) =>
+    syncLightWithHomeAssistant({ state: 'on', brightnessPct: pct })
   );
 
-  const flushQueuedTempSync = useCallback(() => {
-    if (tempRequestInFlightRef.current || queuedTempRef.current === null) {
-      return;
-    }
-
-    const nextTemp = queuedTempRef.current;
-    queuedTempRef.current = null;
-    tempRequestInFlightRef.current = true;
-
-    void syncLightWithHomeAssistant({ state: 'on', kelvin: nextTemp }).finally(() => {
-      tempRequestInFlightRef.current = false;
-      if (queuedTempRef.current !== null) {
-        flushQueuedTempSync();
-      }
-    });
-  }, [syncLightWithHomeAssistant]);
-
-  const queueTempSync = useCallback(
-    (nextTemp: number, immediate = false) => {
-      queuedTempRef.current = nextTemp;
-
-      if (tempSendTimeoutRef.current) {
-        clearTimeout(tempSendTimeoutRef.current);
-        tempSendTimeoutRef.current = null;
-      }
-
-      if (immediate) {
-        flushQueuedTempSync();
-        return;
-      }
-
-      tempSendTimeoutRef.current = setTimeout(() => {
-        tempSendTimeoutRef.current = null;
-        flushQueuedTempSync();
-      }, 75);
-    },
-    [flushQueuedTempSync]
+  const { queue: queueTempSync, cancel: cancelTempSync } = useHaCommandQueue((kelvin: number) =>
+    syncLightWithHomeAssistant({ state: 'on', kelvin })
   );
 
   const hexToRgb = useCallback((hex: string): [number, number, number] | null => {
@@ -566,11 +484,7 @@ export function useLightCardController({
   const onColorChange = useCallback(
     (color: string) => {
       // Cancel any queued kelvin sync — otherwise it fires after the color change and overrides it.
-      if (tempSendTimeoutRef.current) {
-        clearTimeout(tempSendTimeoutRef.current);
-        tempSendTimeoutRef.current = null;
-      }
-      queuedTempRef.current = null;
+      cancelTempSync();
 
       setSelectedColor(color);
       lastKnownColorRef.current = color;
@@ -627,7 +541,16 @@ export function useLightCardController({
         });
       }
     },
-    [brightness, hexToRgb, isOn, liveEntity, rgbToHs, rgbToXy, syncLightWithHomeAssistant]
+    [
+      brightness,
+      cancelTempSync,
+      hexToRgb,
+      isOn,
+      liveEntity,
+      rgbToHs,
+      rgbToXy,
+      syncLightWithHomeAssistant,
+    ]
   );
 
   const toggleLightState = useCallback(
