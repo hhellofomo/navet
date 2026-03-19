@@ -631,6 +631,7 @@ export const svMessages = {
   'security.locked': 'Låst',
   'security.unlocked': 'Olåst',
   'sidebar.home': 'Hem',
+  'sidebar.energy': 'Energi',
   'sidebar.security': 'Säkerhet',
   'sidebar.tasks': 'Uppgifter',
   'sidebar.locks': 'Lås',

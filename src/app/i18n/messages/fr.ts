@@ -640,6 +640,7 @@ export const frMessages = {
   'security.locked': 'Verrouille',
   'security.unlocked': 'Déverrouillé',
   'sidebar.home': 'Accueil',
+  'sidebar.energy': 'Énergie',
   'sidebar.security': 'Securite',
   'sidebar.tasks': 'Taches',
   'sidebar.locks': 'Serrures',

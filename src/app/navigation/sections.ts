@@ -1,5 +1,6 @@
 export type Section =
   | 'home'
+  | 'energy'
   | 'security'
   | 'tasks'
   | 'locks'
@@ -10,6 +11,7 @@ export type Section =
 
 export const NAVIGATION_SECTIONS = [
   'home',
+  'energy',
   'security',
   'tasks',
   'locks',

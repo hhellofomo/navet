@@ -114,6 +114,9 @@ Complete documentation for the Navet smart home dashboard.
 **Understand media card behavior and Home Assistant wiring:**
 → See [Main README -> Features](../README.md#-features)
 
+**Understand the energy dashboard, widgets, and chart primitives:**
+→ See [Features -> Energy Dashboard](../design-system/FEATURES.md#energy-dashboard)
+
 **Understand calendar card behavior and source selection:**
 → See [Main README -> Calendar Cards](../README.md#calendar-cards)
 

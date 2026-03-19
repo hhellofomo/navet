@@ -596,6 +596,74 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 
 ---
 
+---
+
+## Energy Dashboard
+
+**Location**: `src/app/features/energy/`
+
+A dedicated full-page section for monitoring solar production, battery storage, grid dependency, home load, and energy cost. Reads from the Home Assistant energy domain via `useEnergyDashboard`.
+
+### Widgets
+
+Nine memoized widget components, each receiving only its required props from the orchestrating `EnergySection`:
+
+| Widget | Props | Description |
+|---|---|---|
+| `EnergyStatusWidget` | `liveStats` | Live stat cards grid — solar, battery, load, grid, cost-today |
+| `EnergyFlowWidget` | `flow`, `onNodeSelect` | Clickable source/sink cards with tone gradients; drives drill-down |
+| `EnergyTrendWidget` | `trend`, `accentColor` | Bar chart (kWh per period) + area chart (solar % of load) |
+| `EnergyStorageWidget` | `batteryPercent`, `solarW`, `currentLoadW`, `importW` | Semi-circle gauges for battery and solar coverage; quality bar for grid dependency |
+| `EnergyConsumersWidget` | `consumers` | Top-5 highest-draw appliances |
+| `EnergyCostWidget` | `costToday`, `projectedMonthCost` | Today vs projected month cost |
+| `EnergyHeatingWidget` | `consumers` | Heating/HVAC appliance breakdown (pre-filtered by `HEATING_CATEGORIES`) |
+| `EnergyInsightsWidget` | `insights` | Critical/warning/info insight messages with `SEVERITY_CLASS` color map |
+| `EnergyDrilldownWidget` | `node` | Detail panel for the selected flow node |
+
+### Chart Primitives
+
+All charts are custom SVG — zero bundle cost, full theme control, Raspberry Pi-safe. Located in `src/app/features/energy/components/charts/`.
+
+**`EnergyGauge`** (`energy-gauge.tsx`)
+- Semi-circle arc gauge using `stroke-dasharray` trick
+- Arc: center `(100, 100)`, radius 78, `viewBox="0 0 200 115"` (crops below center line)
+- `SEMI_CIRC = Math.PI * R`; `filled = (value/100) * SEMI_CIRC`
+- Props: `value` (0–100), `color`, `label`, `sublabel`
+
+**`EnergyBarChart`** (`energy-bar-chart.tsx`)
+- Vertical gradient bars, `viewBox="0 0 400 160"`
+- Per-bar `linearGradient` in `<defs>`; diagonal stripe `<pattern>` overlay for alert bars
+- Alert indicator: SVG polygon triangle + vertical line + dot
+- Props: `data: EnergyBarDatum[]`, `color`, `alertColor`
+
+**`EnergyAreaChart`** (`energy-area-chart.tsx`)
+- Step-style area + line, `viewBox="0 0 400 140"`, `PAD = { top:10, right:6, bottom:26, left:36 }`
+- Grid lines at `yTicks`; y-axis labels with `yUnit` suffix; x-axis labels
+- `useId()` for gradient ID uniqueness across multiple instances
+- Props: `data: EnergyAreaPoint[]`, `yMax`, `yTicks`, `yUnit`, `color`
+
+**`EnergyQualityBar`** (`energy-quality-bar.tsx`)
+- Horizontal segmented bar (44 segments default)
+- `STOP_COLORS` scale from red → green; active segments at `opacity 0.88`, inactive at `0.10`
+- Props: `value` (0–100), `label`, `badLabel`, `goodLabel`, `segments`
+
+**`EnergySparkline`** (`energy-sparkline.tsx`)
+- Compact smooth curve for real-time power trace; no axes, no labels
+- Catmull-Rom → cubic bezier conversion for smooth interpolation
+- `preserveAspectRatio="none"` — fills any container aspect ratio
+- Live endpoint dot at the last data point
+- Props: `data: EnergySparklinePoint[]`, `color`, `height`
+
+### Data Constants
+
+`src/app/features/energy/data/energy-constants.ts` — module-level constants extracted from render paths:
+
+- `FLOW_TO_NODE_ID` — maps flow tone strings to HA node IDs
+- `FLOW_TONE_GRADIENT` — CSS gradient strings per flow tone
+- `HEATING_CATEGORIES: ReadonlySet<EnergyConsumerCategory>` — O(1) `.has()` lookups for heating appliance filtering
+
+---
+
 ## Shared Hooks
 
 ### `useHaCommandQueue`

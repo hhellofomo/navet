@@ -636,6 +636,7 @@ export const deMessages = {
   'security.locked': 'Verriegelt',
   'security.unlocked': 'Entriegelt',
   'sidebar.home': 'Start',
+  'sidebar.energy': 'Energie',
   'sidebar.security': 'Sicherheit',
   'sidebar.tasks': 'Aufgaben',
   'sidebar.locks': 'Schlösser',

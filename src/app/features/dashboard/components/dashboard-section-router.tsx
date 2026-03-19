@@ -4,6 +4,7 @@ import { RoomNav } from '@/app/components/layout/room-nav';
 import { EmptyState } from '@/app/components/shared/empty-state';
 import { LoadingSpinner } from '@/app/components/shared/loading-spinner';
 import { RenderProfiler } from '@/app/components/shared/render-profiler';
+import { EnergySection } from '@/app/features/energy';
 import { useI18n } from '@/app/hooks';
 import { AllViewGrid } from '../all-view-grid';
 import { DeviceGrid } from '../device-grid';
@@ -67,6 +68,12 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
       <Suspense fallback={<LoadingSpinner />}>
         <SecuritySection />
       </Suspense>
+    );
+  } else if (activeSection === 'energy') {
+    sectionContent = (
+      <RenderProfiler id="EnergySection">
+        <EnergySection />
+      </RenderProfiler>
     );
   } else if (activeSection === 'tasks') {
     sectionContent = (
@@ -216,6 +223,7 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
 
   if (
     activeSection === 'security' ||
+    activeSection === 'energy' ||
     activeSection === 'tasks' ||
     activeSection === 'locks' ||
     activeSection === 'lights' ||

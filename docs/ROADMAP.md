@@ -28,8 +28,7 @@ Planned and in-progress features. Check off items as they ship. Add new ideas to
 
 ### Energy
 
-- [ ] **Energy dashboard** — grid/solar/battery/home flow diagram from HA energy data
-- [ ] **Energy history** — per-device and per-source consumption over time
+- [ ] **Energy history** — per-device and per-source consumption over time with drill-down to individual appliances
 
 ### Multi-user
 
@@ -101,3 +100,4 @@ Planned and in-progress features. Check off items as they ship. Add new ideas to
 - [x] **Quick Note widget** — freeform text note card
 - [x] **Low-power mode** — reduced-effects mode for RPi-class hardware
 - [x] **Deferred / batched room rendering** — offscreen rooms defer and visible rooms hydrate in batches
+- [x] **Energy dashboard** — dedicated energy section with live stats, solar/battery/grid flow diagram, trend charts, storage gauges, top consumers, cost projection, heating breakdown, smart insights, and node drill-down; backed by custom zero-bundle SVG chart primitives (bar chart, area chart, semi-circle gauge, segmented quality bar, Catmull-Rom sparkline)

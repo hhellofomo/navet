@@ -626,6 +626,7 @@ export const enMessages = {
   'security.locked': 'Locked',
   'security.unlocked': 'Unlocked',
   'sidebar.home': 'Home',
+  'sidebar.energy': 'Energy',
   'sidebar.security': 'Security',
   'sidebar.tasks': 'Tasks',
   'sidebar.locks': 'Locks',
