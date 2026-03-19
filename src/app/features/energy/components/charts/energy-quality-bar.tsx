@@ -1,4 +1,6 @@
 import { memo } from 'react';
+import { useTheme } from '@/app/hooks';
+import { getEnergyChartTokens } from './energy-chart-tokens';
 
 interface EnergyQualityBarProps {
   /** 0–100 — how far along the Bad→Good scale the current performance is */
@@ -8,20 +10,13 @@ interface EnergyQualityBarProps {
   goodLabel?: string;
   /** Number of vertical tick segments */
   segments?: number;
-}
-
-// Color stops from bad (red) → good (green)
-const STOP_COLORS = ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', '#10b981'];
-
-function colorAt(t: number): string {
-  const i = Math.min(STOP_COLORS.length - 1, Math.floor(t * STOP_COLORS.length));
-  return STOP_COLORS[i];
+  accentColor: string;
 }
 
 const VB_W = 400;
-const VB_H = 44;
-const BAR_TOP = 6;
-const BAR_H = 22;
+const VB_H = 34;
+const BAR_TOP = 4;
+const BAR_H = 14;
 
 export const EnergyQualityBar = memo(function EnergyQualityBar({
   value,
@@ -29,14 +24,17 @@ export const EnergyQualityBar = memo(function EnergyQualityBar({
   badLabel = 'Bad',
   goodLabel = 'Good',
   segments = 44,
+  accentColor,
 }: EnergyQualityBarProps) {
+  const { theme } = useTheme();
+  const tokens = getEnergyChartTokens(theme, accentColor);
   const activeCount = Math.round(Math.min(1, Math.max(0, value / 100)) * segments);
   const segW = VB_W / segments;
 
   return (
     <svg
       viewBox={`0 0 ${VB_W} ${VB_H}`}
-      className="w-full"
+      className="h-12 w-full"
       role="img"
       aria-label={label ?? 'Quality bar'}
     >
@@ -51,29 +49,21 @@ export const EnergyQualityBar = memo(function EnergyQualityBar({
             width={segW - 2}
             height={BAR_H}
             rx="2"
-            fill={colorAt(t)}
-            opacity={active ? 0.88 : 0.1}
+            fill={t < 0.33 ? tokens.alert : t < 0.66 ? tokens.warn : tokens.good}
+            opacity={active ? 0.58 : 0.12}
           />
         );
       })}
 
-      {/* Bad / Good labels */}
-      <text x={0} y={VB_H - 4} fontSize="9" fill="rgba(255,255,255,0.3)">
+      <text x={0} y={VB_H - 4} fontSize="9" fill={tokens.labelSubtle}>
         {badLabel}
       </text>
-      <text x={VB_W} y={VB_H - 4} textAnchor="end" fontSize="9" fill="rgba(255,255,255,0.3)">
+      <text x={VB_W} y={VB_H - 4} textAnchor="end" fontSize="9" fill={tokens.labelSubtle}>
         {goodLabel}
       </text>
 
-      {/* Optional center label */}
       {label && (
-        <text
-          x={VB_W / 2}
-          y={VB_H - 4}
-          textAnchor="middle"
-          fontSize="9"
-          fill="rgba(255,255,255,0.45)"
-        >
+        <text x={VB_W / 2} y={VB_H - 4} textAnchor="middle" fontSize="9" fill={tokens.labelMuted}>
           {label}
         </text>
       )}

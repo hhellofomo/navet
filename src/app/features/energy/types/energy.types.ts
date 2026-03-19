@@ -28,6 +28,7 @@ export type EnergyWidgetId =
   | 'consumers'
   | 'cost'
   | 'trend'
+  | 'battery'
   | 'storage'
   | 'heating'
   | 'insights';
@@ -83,6 +84,39 @@ export interface EnergyInsight {
   affectedNodeIds: string[];
 }
 
+// ─── User-facing source configuration ──────────────────────────────────────
+
+export interface EnergyDeviceSource {
+  /** kWh statistics entity — also used as the device's stable id */
+  entityId: string;
+  name: string;
+  category: EnergyConsumerCategory;
+  /** Live W sensor (optional — consumers widget shows 0 W if absent) */
+  powerEntityId?: string;
+}
+
+export interface EnergySourceConfig {
+  // Live power (W) — drives status cards, flow diagram, and storage gauges.
+  // Convention for batteryPowerEntityId: positive = charging, negative = discharging.
+  solarPowerEntityId?: string;
+  batterySocEntityId?: string;
+  batteryPowerEntityId?: string;
+  gridImportPowerEntityId?: string;
+  gridExportPowerEntityId?: string;
+  /** Optional — derived as solar + import − export when absent */
+  homeLoadPowerEntityId?: string;
+
+  // Cumulative energy (kWh statistics) — used by the trend chart.
+  solarEnergyEntityId?: string;
+  gridImportEnergyEntityId?: string;
+  gridExportEnergyEntityId?: string;
+
+  /** Individual appliance monitors */
+  devices: EnergyDeviceSource[];
+}
+
+// ─── Overview model ─────────────────────────────────────────────────────────
+
 export interface EnergyOverview {
   liveStats: EnergyStat[];
   flow: EnergyFlowDatum[];
@@ -95,6 +129,8 @@ export interface EnergyOverview {
     batteryPercent: number;
     importW: number;
     exportW: number;
+    importTodayKWh: number;
+    solarTodayKWh: number;
     gasTodayKWh: number;
     hotWaterTodayKWh: number;
     costToday: number;

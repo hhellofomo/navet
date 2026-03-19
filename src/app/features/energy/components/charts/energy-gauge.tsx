@@ -1,77 +1,74 @@
 import { memo } from 'react';
+import { useTheme } from '@/app/hooks';
+import { getEnergyChartTokens } from './energy-chart-tokens';
 
 interface EnergyGaugeProps {
   /** 0–100 */
   value: number;
-  color?: string;
+  accentColor: string;
   /** Main text in the center of the arc */
   label?: string;
   /** Smaller text below the main label */
   sublabel?: string;
 }
 
-// Semi-circle: center (100, 100), radius 78
-// Arc from (22, 100) → (178, 100) over the top
+// Semi-circle: center (100, 90), radius 64
 const CX = 100;
-const CY = 100;
-const R = 78;
-const TRACK_W = 10;
+const CY = 90;
+const R = 64;
+const TRACK_W = 9;
 const SEMI_CIRC = Math.PI * R; // ≈ 245
 
 const ARC_D = `M ${CX - R} ${CY} A ${R} ${R} 0 0 1 ${CX + R} ${CY}`;
 
 export const EnergyGauge = memo(function EnergyGauge({
   value,
-  color = '#22d3ee',
+  accentColor,
   label,
   sublabel,
 }: EnergyGaugeProps) {
+  const { theme } = useTheme();
+  const tokens = getEnergyChartTokens(theme, accentColor);
   const filled = Math.min(1, Math.max(0, value / 100)) * SEMI_CIRC;
 
   return (
-    // viewBox height = 115 — crops below the center line, leaving space for sublabel
-    <svg viewBox="0 0 200 115" className="w-full" role="img" aria-label={label ?? 'Gauge'}>
-      {/* Track */}
+    <svg viewBox="0 0 200 110" className="h-44 w-full" role="img" aria-label={label ?? 'Gauge'}>
       <path
         d={ARC_D}
         fill="none"
-        stroke="rgba(255,255,255,0.08)"
+        stroke={tokens.track}
         strokeWidth={TRACK_W}
         strokeLinecap="round"
       />
-      {/* Value arc */}
       <path
         d={ARC_D}
         fill="none"
-        stroke={color}
+        stroke={tokens.accent}
         strokeWidth={TRACK_W}
         strokeLinecap="round"
         strokeDasharray={`${filled} ${SEMI_CIRC}`}
       />
-      {/* Main label */}
       {label && (
         <text
           x={CX}
-          y={CY - 8}
+          y={CY - 6}
           textAnchor="middle"
-          fontSize="26"
+          fontSize="22"
           fontWeight="700"
-          fill="rgba(255,255,255,0.9)"
+          fill={tokens.label}
         >
           {label}
         </text>
       )}
-      {/* Sublabel */}
       {sublabel && (
-        <text x={CX} y={CY + 12} textAnchor="middle" fontSize="11" fill="rgba(255,255,255,0.38)">
+        <text x={CX} y={CY + 10} textAnchor="middle" fontSize="10" fill={tokens.labelMuted}>
           {sublabel}
         </text>
       )}
-      {/* Min / max tick labels */}
-      <text x={CX - R + 2} y={CY + 18} fontSize="9" fill="rgba(255,255,255,0.25)">
+      <text x={CX - R + 2} y={CY + 16} fontSize="8.5" fill={tokens.labelSubtle}>
         0
       </text>
-      <text x={CX + R - 2} y={CY + 18} textAnchor="end" fontSize="9" fill="rgba(255,255,255,0.25)">
+      <text x={CX + R - 2} y={CY + 16} textAnchor="end" fontSize="8.5" fill={tokens.labelSubtle}>
         100
       </text>
     </svg>

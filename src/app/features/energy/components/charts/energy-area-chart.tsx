@@ -1,4 +1,6 @@
 import { memo, useId } from 'react';
+import { useTheme } from '@/app/hooks';
+import { getEnergyChartTokens } from './energy-chart-tokens';
 
 export interface EnergyAreaPoint {
   x: string;
@@ -11,21 +13,23 @@ interface EnergyAreaChartProps {
   yTicks?: number[];
   /** Unit suffix shown on y-axis labels e.g. "%" or "kW" */
   yUnit?: string;
-  color?: string;
+  accentColor: string;
 }
 
 const VB_W = 400;
-const VB_H = 140;
-const PAD = { top: 10, right: 6, bottom: 26, left: 36 };
+const VB_H = 96;
+const PAD = { top: 8, right: 6, bottom: 22, left: 32 };
 
 export const EnergyAreaChart = memo(function EnergyAreaChart({
   data,
   yMax = 100,
   yTicks = [0, 25, 50, 75, 100],
   yUnit = '%',
-  color = '#06b6d4',
+  accentColor,
 }: EnergyAreaChartProps) {
+  const { theme } = useTheme();
   const id = useId();
+  const tokens = getEnergyChartTokens(theme, accentColor);
   const cW = VB_W - PAD.left - PAD.right;
   const cH = VB_H - PAD.top - PAD.bottom;
   const baseline = PAD.top + cH;
@@ -49,15 +53,14 @@ export const EnergyAreaChart = memo(function EnergyAreaChart({
   }
 
   return (
-    <svg viewBox={`0 0 ${VB_W} ${VB_H}`} className="w-full" role="img" aria-label="Area chart">
+    <svg viewBox={`0 0 ${VB_W} ${VB_H}`} className="h-28 w-full" role="img" aria-label="Area chart">
       <defs>
         <linearGradient id={`${id}-ag`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.28" />
-          <stop offset="100%" stopColor={color} stopOpacity="0.02" />
+          <stop offset="0%" stopColor={tokens.accent} stopOpacity="0.18" />
+          <stop offset="100%" stopColor={tokens.accent} stopOpacity="0.02" />
         </linearGradient>
       </defs>
 
-      {/* Grid lines + y-axis labels */}
       {yTicks.map((v) => {
         const y = yAt(v);
         return (
@@ -67,7 +70,7 @@ export const EnergyAreaChart = memo(function EnergyAreaChart({
               y1={y}
               x2={VB_W - PAD.right}
               y2={y}
-              stroke="rgba(255,255,255,0.06)"
+              stroke={v === 0 ? tokens.gridStrong : tokens.grid}
               strokeWidth="1"
             />
             <text
@@ -75,7 +78,7 @@ export const EnergyAreaChart = memo(function EnergyAreaChart({
               y={y + 3.5}
               textAnchor="end"
               fontSize="9"
-              fill="rgba(255,255,255,0.28)"
+              fill={tokens.labelSubtle}
             >
               {v}
               {yUnit}
@@ -84,13 +87,8 @@ export const EnergyAreaChart = memo(function EnergyAreaChart({
         );
       })}
 
-      {/* Filled area */}
       <path d={area} fill={`url(#${id}-ag)`} />
-
-      {/* Step line */}
-      <path d={line} fill="none" stroke={color} strokeWidth="1.5" strokeLinejoin="miter" />
-
-      {/* X-axis labels */}
+      <path d={line} fill="none" stroke={tokens.accent} strokeWidth="1.5" strokeLinejoin="miter" />
       {data.map((d, i) => (
         <text
           key={`${d.x}-${i}`}
@@ -98,7 +96,7 @@ export const EnergyAreaChart = memo(function EnergyAreaChart({
           y={VB_H - 7}
           textAnchor="middle"
           fontSize="9"
-          fill="rgba(255,255,255,0.28)"
+          fill={tokens.labelMuted}
         >
           {d.x}
         </text>

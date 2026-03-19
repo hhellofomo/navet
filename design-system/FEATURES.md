@@ -590,8 +590,8 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 
 ---
 
-**Last Updated**: March 19, 2026
-**Version**: 1.6
+**Last Updated**: March 20, 2026
+**Version**: 1.7
 **Status**: Living Document
 
 ---
@@ -602,23 +602,58 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 
 **Location**: `src/app/features/energy/`
 
-A dedicated full-page section for monitoring solar production, battery storage, grid dependency, home load, and energy cost. Reads from the Home Assistant energy domain via `useEnergyDashboard`.
+A dedicated full-page section for monitoring home load, grid dependency, individual device energy, and bathroom/toilet demand. Connects to the Home Assistant energy domain via `useEnergyDashboard`.
+
+### Setup and Configuration
+
+`EnergySetupPanel` (`components/energy-setup-panel.tsx`) — an inline form that maps HA sensor entity IDs to each energy source:
+
+- **Auto-detect** — calls `energy/get_prefs` over WebSocket to read the user's HA Energy dashboard configuration and pre-fills all source fields. Uses `homeAssistantService.getConnection()` directly (not the Zustand-stored connection, which loses prototype methods after state diffing). The button is disabled when not connected to HA.
+- **Source fields** — solar power/energy, battery SoC/power, grid import/export power and energy, home load power. Each field has a native `<datalist>` autocomplete populated from live sensor entity IDs.
+- **Devices section** — auto-detected individual device monitors (from `device_consumption` in HA Energy prefs) are shown as editable rows. Each device shows its name, cumulative kWh entity ID, and an optional live power sensor input. Devices can be removed individually.
+- **Save** — persists to `energy-dashboard-store` via `setSourceConfig`. The store uses Zustand `persist` middleware.
+
+### Data Layer
+
+**`useEnergyHaData`** (`hooks/use-energy-ha-data.ts`) — assembles `EnergyOverview` from live HA entity states. Falls back to mock data when no config is saved.
+
+- Reads entity states via `useHomeAssistant(homeAssistantSelectors.entities)` (minimal selector).
+- Home load is derived as `solar + gridImport − gridExport` when no dedicated load sensor is configured.
+- `liveStats` array is conditionally built — solar/battery/grid stats are only included when the corresponding entity IDs are configured, so unconfigured sources are never shown.
+- Three module-level helpers keep the hook under 50 lines: `buildLiveStats`, `buildFlow`, `buildConsumers`. These are pure functions called inside `useMemo`.
+
+**`useEnergyStatisticsToday`** (`hooks/use-energy-statistics-today.ts`) — polls `recorder/statistics_during_period` with `period: 'day'` and `types: ['change']` to get today's kWh delta for all configured energy entities. Refreshes every 5 minutes. Returns a `Record<entityId, kWh>` map. Silently fails — the dashboard remains usable without statistics.
+
+**`useEnergyDashboard`** (`hooks/use-energy-dashboard.ts`) — orchestrating hook consumed by `EnergySection`. Derived values computed with `useMemo`:
+
+- `bathroomToiletConsumers` — consumers filtered by `bathroom_heater` / `toilet_heater` / `floor_heating` category
+- `bathroomToiletTodayKWh` / `bathroomToiletPowerW` — summed totals for the focus-zones widget
+- `topDeviceTotals` — top 8 consumers (sorted by `energyKWh` desc in `buildConsumers`)
+- `gridAllocation` — distributes today's grid import kWh proportionally across tracked devices; adds an "Untracked / shared loads" remainder entry
+- `batteryDevices` — all HA battery-class sensors, sorted by level asc (for the battery overview widget)
+- `periodTotals` — multi-period statistics from `useEnergyStatisticsPeriods`
 
 ### Widgets
 
-Nine memoized widget components, each receiving only its required props from the orchestrating `EnergySection`:
+Memoized widget components, each receiving only its required props from `EnergySection`:
 
-| Widget | Props | Description |
+| Widget | Key props | Description |
 |---|---|---|
-| `EnergyStatusWidget` | `liveStats` | Live stat cards grid — solar, battery, load, grid, cost-today |
-| `EnergyFlowWidget` | `flow`, `onNodeSelect` | Clickable source/sink cards with tone gradients; drives drill-down |
-| `EnergyTrendWidget` | `trend`, `accentColor` | Bar chart (kWh per period) + area chart (solar % of load) |
-| `EnergyStorageWidget` | `batteryPercent`, `solarW`, `currentLoadW`, `importW` | Semi-circle gauges for battery and solar coverage; quality bar for grid dependency |
-| `EnergyConsumersWidget` | `consumers` | Top-5 highest-draw appliances |
-| `EnergyCostWidget` | `costToday`, `projectedMonthCost` | Today vs projected month cost |
-| `EnergyHeatingWidget` | `consumers` | Heating/HVAC appliance breakdown (pre-filtered by `HEATING_CATEGORIES`) |
-| `EnergyInsightsWidget` | `insights` | Critical/warning/info insight messages with `SEVERITY_CLASS` color map |
-| `EnergyDrilldownWidget` | `node` | Detail panel for the selected flow node |
+| `EnergyStatusWidget` | `liveStats`, `importTodayKWh?`, `solarTodayKWh?` | Live stat cards grid; shows a "Today" panel with grid import kWh and solar kWh when those props are provided (only passed when `isConfigured`) |
+| `EnergyNowWidget` | `currentLoadW`, `gridImportW`, `trend`, `accentColor` | Live load reading with a sparkline trend of recent values |
+| `EnergyDeviceTotalsWidget` | `consumers` | Top devices ranked by today's kWh; shows live W alongside kWh when a power sensor is configured; shows empty state when no devices are tracked |
+| `EnergyFocusZonesWidget` | `todayKWh`, `currentPowerW`, `consumers` | Bathroom and toilet energy focus — today's kWh total, live W, and per-device breakdown |
+| `EnergyGridAllocationWidget` | `importTodayKWh`, `allocation` | Grid import split across individual devices + untracked remainder |
+| `EnergyStorageWidget` | `batteryPercent`, `solarW`, `currentLoadW`, `importW`, `hasBattery?`, `hasSolar?` | Semi-circle gauges for battery reserve and solar coverage; quality bar for grid dependency. Gauges hidden when the corresponding source is not configured |
+
+Widget visibility is toggled via filter pills in the section header; state persists in `energy-dashboard-store`.
+
+### HA API Calls
+
+| Call | Hook / Service | Purpose |
+|---|---|---|
+| `energy/get_prefs` | `energy-ha-service.ts` | Auto-detect source and device entity IDs from HA Energy config |
+| `recorder/statistics_during_period` | `energy-statistics-service.ts` | Today's kWh delta per entity (period: day, types: change) |
 
 ### Chart Primitives
 

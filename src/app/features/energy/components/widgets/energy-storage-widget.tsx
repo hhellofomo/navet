@@ -11,6 +11,8 @@ interface EnergyStorageWidgetProps {
   solarW: number;
   currentLoadW: number;
   importW: number;
+  hasBattery?: boolean;
+  hasSolar?: boolean;
 }
 
 export const EnergyStorageWidget = memo(function EnergyStorageWidget({
@@ -18,6 +20,8 @@ export const EnergyStorageWidget = memo(function EnergyStorageWidget({
   solarW,
   currentLoadW,
   importW,
+  hasBattery = true,
+  hasSolar = true,
 }: EnergyStorageWidgetProps) {
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
@@ -28,33 +32,34 @@ export const EnergyStorageWidget = memo(function EnergyStorageWidget({
   return (
     <EnergyWidgetShell title="Storage and solar" eyebrow="Resilience">
       <div className="grid gap-4">
-        {/* Battery gauge */}
-        <div className={`rounded-3xl border p-4 ${surface.border} ${surface.panelMuted}`}>
-          <div className={`text-xs uppercase tracking-[0.16em] ${surface.textMuted}`}>
-            Battery reserve
+        {hasBattery && (
+          <div className={`rounded-3xl border p-4 ${surface.border} ${surface.panelMuted}`}>
+            <div className={`text-xs uppercase tracking-[0.16em] ${surface.textMuted}`}>
+              Battery reserve
+            </div>
+            <EnergyGauge
+              value={batteryPercent}
+              accentColor="#34d399"
+              label={`${batteryPercent}%`}
+              sublabel="charge"
+            />
           </div>
-          <EnergyGauge
-            value={batteryPercent}
-            color="#22c55e"
-            label={`${batteryPercent}%`}
-            sublabel="charge"
-          />
-        </div>
+        )}
 
-        {/* Solar coverage gauge */}
-        <div className={`rounded-3xl border p-4 ${surface.border} ${surface.panelMuted}`}>
-          <div className={`text-xs uppercase tracking-[0.16em] ${surface.textMuted}`}>
-            Solar coverage
+        {hasSolar && (
+          <div className={`rounded-3xl border p-4 ${surface.border} ${surface.panelMuted}`}>
+            <div className={`text-xs uppercase tracking-[0.16em] ${surface.textMuted}`}>
+              Solar coverage
+            </div>
+            <EnergyGauge
+              value={solarCoverage}
+              accentColor="#f59e0b"
+              label={`${solarCoverage}%`}
+              sublabel="of current load"
+            />
           </div>
-          <EnergyGauge
-            value={solarCoverage}
-            color="#facc15"
-            label={`${solarCoverage}%`}
-            sublabel="of current load"
-          />
-        </div>
+        )}
 
-        {/* Grid dependency quality bar */}
         <div className={`rounded-3xl border p-4 ${surface.border} ${surface.panelMuted}`}>
           <div className={`flex items-center justify-between gap-4`}>
             <div className={`text-xs uppercase tracking-[0.16em] ${surface.textMuted}`}>
@@ -72,6 +77,7 @@ export const EnergyStorageWidget = memo(function EnergyStorageWidget({
               value={gridQuality}
               badLabel="Grid heavy"
               goodLabel="Self-sufficient"
+              accentColor="#34d399"
             />
           </div>
         </div>

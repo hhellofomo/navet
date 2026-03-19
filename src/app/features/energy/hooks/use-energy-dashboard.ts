@@ -1,7 +1,12 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { useHomeAssistant } from '@/app/hooks';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { HEATING_CATEGORIES } from '../data/energy-constants';
-import { getMockEnergyOverview } from '../data/mock-energy-dashboard';
 import { useEnergyDashboardStore } from '../stores/energy-dashboard-store';
+import type { EnergySourceConfig } from '../types/energy.types';
+import { useEnergyHaData } from './use-energy-ha-data';
+import { useEnergyLoadHistory } from './use-energy-load-history';
+import { useEnergyStatisticsPeriods } from './use-energy-statistics-periods';
 
 export function useEnergyDashboard() {
   const range = useEnergyDashboardStore((state) => state.range);
@@ -10,8 +15,16 @@ export function useEnergyDashboard() {
   const setSelectedNodeId = useEnergyDashboardStore((state) => state.setSelectedNodeId);
   const visibleWidgets = useEnergyDashboardStore((state) => state.visibleWidgets);
   const toggleWidgetVisibility = useEnergyDashboardStore((state) => state.toggleWidgetVisibility);
+  const sourceConfig = useEnergyDashboardStore((state) => state.sourceConfig);
+  const setSourceConfig = useEnergyDashboardStore((state) => state.setSourceConfig);
+  const clearSourceConfig = useEnergyDashboardStore((state) => state.clearSourceConfig);
+  const entities = useHomeAssistant(homeAssistantSelectors.entities);
 
-  const overview = useMemo(() => getMockEnergyOverview(range), [range]);
+  const [showSetup, setShowSetup] = useState(false);
+
+  const { overview, isConfigured } = useEnergyHaData(range);
+  const recentLoadTrend = useEnergyLoadHistory(overview.totals.currentLoadW);
+  const periodTotals = useEnergyStatisticsPeriods(sourceConfig?.gridImportEnergyEntityId);
 
   const selectedNode = useMemo(
     () => overview.nodes.find((node) => node.id === selectedNodeId) ?? overview.nodes[0] ?? null,
@@ -23,7 +36,90 @@ export function useEnergyDashboard() {
     [overview.topConsumers]
   );
 
+  const bathroomToiletConsumers = useMemo(
+    () =>
+      overview.topConsumers.filter((consumer) => {
+        const room = consumer.room?.toLowerCase() ?? '';
+        return (
+          consumer.category === 'bathroom_heater' ||
+          consumer.category === 'floor_heating' ||
+          consumer.category === 'toilet_heater' ||
+          room.includes('bathroom') ||
+          room.includes('toilet')
+        );
+      }),
+    [overview.topConsumers]
+  );
+
+  const bathroomToiletTodayKWh = useMemo(
+    () => bathroomToiletConsumers.reduce((sum, consumer) => sum + consumer.energyKWh, 0),
+    [bathroomToiletConsumers]
+  );
+
+  const bathroomToiletPowerW = useMemo(
+    () => bathroomToiletConsumers.reduce((sum, consumer) => sum + consumer.powerW, 0),
+    [bathroomToiletConsumers]
+  );
+
+  const topDeviceTotals = useMemo(() => overview.topConsumers.slice(0, 8), [overview.topConsumers]);
+
+  const gridAllocation = useMemo(() => {
+    const measuredTotal = topDeviceTotals.reduce((sum, consumer) => sum + consumer.energyKWh, 0);
+    const gridToday = overview.totals.importTodayKWh;
+
+    if (gridToday <= 0 || measuredTotal <= 0) {
+      return [];
+    }
+
+    const tracked = topDeviceTotals.map((consumer) => ({
+      id: consumer.id,
+      name: consumer.name,
+      kWh: +(gridToday * (consumer.energyKWh / measuredTotal)).toFixed(2),
+      share: consumer.energyKWh / measuredTotal,
+    }));
+
+    const allocated = tracked.reduce((sum, item) => sum + item.kWh, 0);
+    const untrackedKWh = Math.max(0, +(gridToday - allocated).toFixed(2));
+
+    return untrackedKWh > 0
+      ? [
+          ...tracked,
+          {
+            id: 'untracked',
+            name: 'Untracked / shared loads',
+            kWh: untrackedKWh,
+            share: gridToday > 0 ? untrackedKWh / gridToday : 0,
+          },
+        ]
+      : tracked;
+  }, [overview.totals.importTodayKWh, topDeviceTotals]);
+
+  const batteryDevices = useMemo(() => {
+    if (!entities) return [];
+
+    return Object.entries(entities)
+      .filter(([, entity]) => {
+        const attributes = entity.attributes as Record<string, unknown>;
+        return attributes.device_class === 'battery' && !Number.isNaN(Number(entity.state));
+      })
+      .map(([id, entity]) => {
+        const attributes = entity.attributes as Record<string, unknown>;
+        return {
+          id,
+          name:
+            (attributes.friendly_name as string) || id.replace(/^sensor\./, '').replace(/_/g, ' '),
+          level: Math.min(100, Math.max(0, Math.round(Number(entity.state)))),
+        };
+      })
+      .sort((a, b) => a.level - b.level);
+  }, [entities]);
+
   const visibleWidgetSet = useMemo(() => new Set(visibleWidgets), [visibleWidgets]);
+
+  function handleSaveConfig(config: EnergySourceConfig) {
+    setSourceConfig(config);
+    setShowSetup(false);
+  }
 
   return {
     overview,
@@ -33,6 +129,21 @@ export function useEnergyDashboard() {
     setSelectedNodeId,
     visibleWidgetSet,
     toggleWidgetVisibility,
+    isConfigured,
+    sourceConfig,
+    showSetup,
+    openSetup: () => setShowSetup(true),
+    closeSetup: () => setShowSetup(false),
+    handleSaveConfig,
+    clearSourceConfig,
     heatingConsumers,
+    bathroomToiletConsumers,
+    bathroomToiletTodayKWh,
+    bathroomToiletPowerW,
+    topDeviceTotals,
+    gridAllocation,
+    recentLoadTrend,
+    periodTotals,
+    batteryDevices,
   };
 }
