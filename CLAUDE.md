@@ -3,8 +3,8 @@
 Navet is a smart home dashboard PWA built on React 18 + TypeScript 5 + Zustand + Tailwind CSS 4.
 Connects to Home Assistant over WebSocket.
 
-> Process rules (commit format, verification triggers) are in `AGENTS.md`. This file covers
-> architecture, patterns, and how to extend the codebase correctly.
+> Process rules (commit format, verification triggers, branding) are in `AGENTS.md`. This file covers
+> architecture, engineering standards, patterns, and how to extend the codebase correctly.
 
 ---
 
@@ -55,9 +55,66 @@ src/app/
 
 ---
 
+## Engineering Standards
+
+These rules apply to all code written for this project. Follow them before writing, and verify against them before finishing.
+
+### Architecture and Maintainability
+
+- Prefer reusable, composable, detachable components over large monolithic ones.
+- Keep components focused on a single responsibility.
+- Extract repeated UI, logic, and utility patterns instead of duplicating them.
+- Keep code scalable and easy to extend without rewriting existing functionality.
+- Use clear separation of concerns: UI, state, business logic, and utilities belong in separate layers.
+- Shared cross-feature UI belongs in `src/app/components/shared/`. Feature-specific logic stays in the feature module.
+- Do not add new feature-specific hooks, stores, or utilities to global folders unless they are genuinely shared across multiple features.
+
+### React Standards
+
+- Use modern React best practices throughout.
+- Avoid unnecessary prop drilling — prefer better composition or lifting state only when needed.
+- Keep state as local as possible; only lift it when multiple components need it.
+- Avoid over-engineering, but do not allow quick hacks that reduce maintainability.
+- Prefer predictable and consistent patterns across the codebase over one-off solutions.
+
+### Performance
+
+- Optimize for both high-end devices and low-power devices (tablets, Raspberry Pi, dashboards).
+- Avoid unnecessary re-renders — use minimal Zustand selectors and memoize only where it provides real value.
+- Avoid heavy computations during render; move them to `useMemo` or outside the component if they are expensive.
+- Lazy load expensive features where appropriate (see existing `lazy()` usage in the dashboard).
+- Keep DOM structure lean and avoid deep nesting.
+- Be careful with animations, shadows, blur, and heavy CSS effects — they must remain smooth on weaker hardware. Flag any tradeoff where visual richness may hurt performance on low-power devices.
+
+### Code Quality
+
+- Follow DRY, but do not abstract prematurely — three similar lines are better than a premature abstraction.
+- Prefer readability over cleverness.
+- Reuse existing components, hooks, and utilities before creating new ones.
+- Do not introduce duplicate utilities, hooks, or component variants unless clearly justified.
+- Keep naming consistent and descriptive.
+
+### Before Writing Code
+
+1. Check whether an existing component, hook, utility, or pattern should be reused.
+2. If creating something new, make it reusable if that is realistically beneficial.
+3. Explain any architectural decision that affects maintainability or performance.
+4. Flag any tradeoff where visual richness may hurt performance on low-power devices.
+5. Do not produce shortcut code that solves the immediate task but worsens the codebase.
+
+### Before Finalizing Code
+
+- Is this reusable?
+- Is this consistent with existing patterns?
+- Is this the simplest maintainable solution?
+- Will this perform well on weaker devices?
+- Does this avoid duplication?
+
+---
+
 ## Architecture Rules
 
-### State management
+### State Management
 
 - **All shared state is Zustand.** Do not introduce React Context for reactive state.
 - Context is only for infrastructure without reactive state: `I18nProvider`, `LoadingProvider`, `ErrorProvider`.
@@ -66,7 +123,7 @@ src/app/
   `merge` function that validates before rehydrating. Never use raw `window.localStorage` in stores.
 - See `docs/technical/REACT_ZUSTAND.md` for the full state management guide.
 
-### Zustand stores
+### Zustand Stores
 
 | Store | Responsibility |
 |---|---|
@@ -79,13 +136,7 @@ src/app/
 | `edit-mode-store` | Dashboard edit mode toggle |
 | `search-store` | Search query and filtered device ids |
 
-### Service → Store event flow
-
-`HomeAssistantService` emits typed events: `'entities' | 'config' | 'registries' | 'connection'`.
-The store subscribes and updates only the affected slice. Do not add catch-all listeners that
-copy all service state on every event.
-
-### Selector usage
+### Selector Usage
 
 ```ts
 // Good — minimal subscription
@@ -99,6 +150,12 @@ const { disableAnimations, effectsQuality, pageZoom } = useSettingsStore(
 // Avoid — re-renders on every store change
 const store = useHomeAssistant();
 ```
+
+### Service → Store Event Flow
+
+`HomeAssistantService` emits typed events: `'entities' | 'config' | 'registries' | 'connection'`.
+The store subscribes and updates only the affected slice. Do not add catch-all listeners that
+copy all service state on every event.
 
 ---
 
@@ -192,7 +249,7 @@ const store = useHomeAssistant();
 
 ---
 
-## Anti-patterns
+## Anti-Patterns
 
 - Do not use `window.localStorage` directly — use `src/app/utils/storage`.
 - Do not call `storeInstance.setState()` from outside the store file — use its action methods.
@@ -201,3 +258,5 @@ const store = useHomeAssistant();
 - Do not make multiple `useXyzStore(state => state.field)` calls when a combined selector exists.
 - Do not make a controller hook longer than ~150 lines — split it.
 - Do not import from inside a feature's subdirectories across feature boundaries — use the feature root `index.ts`.
+- Do not duplicate a component, hook, or utility — check if something reusable already exists first.
+- Do not solve a task with shortcut code that makes the codebase harder to maintain.
