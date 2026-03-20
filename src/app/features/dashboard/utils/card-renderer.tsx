@@ -6,7 +6,7 @@ import { LightCard, SwitchCard } from '@/app/features/lighting';
 import { MediaCard } from '@/app/features/media';
 import { PersonCard } from '@/app/features/person';
 import { PowerCard } from '@/app/features/power';
-import { CoverCard, LockCard } from '@/app/features/security';
+import { CameraCard, CoverCard, LockCard } from '@/app/features/security';
 import { GroupedSensorCard, SensorCard, type SensorReading } from '@/app/features/sensors';
 import { VacuumCard } from '@/app/features/vacuum';
 import { WeatherCard } from '@/app/features/weather';
@@ -170,6 +170,18 @@ export const renderCard = ({
           id={device.id as string}
           name={device.name as string}
           initialState={device.state as boolean | undefined}
+        />
+      );
+    case 'cameras':
+      return (
+        <CameraCard
+          id={device.id as string}
+          name={device.name as string}
+          room={device.room as string}
+          entityPicture={device.entityPicture as string | undefined}
+          size={size}
+          onSizeChange={handleSizeChange}
+          isEditMode={isEditMode}
         />
       );
     case 'persons':

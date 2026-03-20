@@ -4,17 +4,32 @@ import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-si
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { DEVICES } from '@/app/data/mock-devices';
 import { renderCard } from '@/app/features/dashboard';
-import { useDeviceMap, useDevices, useI18n, useTheme } from '@/app/hooks';
-import type { DeviceWithType } from '@/app/types/device.types';
+import { useCardState, useDeviceMap, useDevices, useI18n, useTheme } from '@/app/hooks';
+import type { DeviceCollection, DeviceWithType } from '@/app/types/device.types';
 import { EmptyState } from '../shared/empty-state';
 
 export function SecuritySection() {
   const { t } = useI18n();
+  const devices = useDevices();
+  const cameraDevices = devices.cameras;
+
+  if (cameraDevices.length === 0) {
+    return (
+      <EmptyState
+        icon={Video}
+        title={t('sections.security.emptyTitle')}
+        description={t('sections.security.emptyDescription')}
+      />
+    );
+  }
+
   return (
-    <EmptyState
-      icon={Video}
-      title={t('sections.security.emptyTitle')}
-      description={t('sections.security.emptyDescription')}
+    <EntityGrid
+      devices={cameraDevices.map((device) => ({ ...device, type: 'cameras' as const }))}
+      rawDevices={devices}
+      title={t('sections.security.title')}
+      singularLabel={t('sections.security.singular')}
+      pluralLabel={t('sections.security.plural')}
     />
   );
 }
@@ -48,6 +63,7 @@ export function LocksSection() {
   return (
     <EntityGrid
       devices={lockDevices.map((device) => ({ ...device, type: 'locks' as const }))}
+      rawDevices={devices}
       title={t('sections.locks.title')}
       singularLabel={t('sections.locks.singular')}
       pluralLabel={t('sections.locks.plural')}
@@ -84,6 +100,7 @@ export function MediaSection() {
   return (
     <EntityGrid
       devices={mediaDevices.map((device) => ({ ...device, type: 'media' as const }))}
+      rawDevices={devices}
       title={t('sections.media.title')}
       singularLabel={t('sections.media.singular')}
       pluralLabel={t('sections.media.plural')}
@@ -91,21 +108,22 @@ export function MediaSection() {
   );
 }
 
-const noopHandleSizeChange = () => {};
-
 const EntityGrid = memo(function EntityGrid({
   devices,
+  rawDevices,
   title,
   singularLabel,
   pluralLabel,
 }: {
   devices: DeviceWithType[];
+  rawDevices: DeviceCollection;
   title: string;
   singularLabel: string;
   pluralLabel: string;
 }) {
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
+  const { cardSizes, updateCardSize } = useCardState(rawDevices);
 
   return (
     <section className="space-y-4">
@@ -117,14 +135,14 @@ const EntityGrid = memo(function EntityGrid({
       </div>
       <div className="grid w-full auto-rows-[87px] grid-flow-row-dense grid-cols-2 gap-2 md:grid-cols-4 md:gap-3 lg:gap-4 xl:grid-cols-6 2xl:grid-cols-8">
         {devices.map((device) => {
-          const size = device.size as CardSize;
+          const size = (cardSizes[device.id] ?? device.size) as CardSize;
 
           return (
             <div key={device.id} className={getCardSpanClass(size)}>
               {renderCard({
-                device,
+                device: { ...device, size },
                 size,
-                handleSizeChange: noopHandleSizeChange,
+                handleSizeChange: updateCardSize,
                 isEditMode: false,
               })}
             </div>
@@ -160,7 +178,7 @@ const MockEntityGrid = memo(function MockEntityGrid({ devices }: { devices: Devi
               {renderCard({
                 device,
                 size,
-                handleSizeChange: noopHandleSizeChange,
+                handleSizeChange: () => {},
                 isEditMode: false,
               })}
             </div>

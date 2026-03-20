@@ -4,6 +4,7 @@ import { useI18n } from '../i18n';
 import { homeAssistantSelectors } from '../stores/selectors';
 import type {
   CalendarDevice,
+  CameraDevice,
   ClimateDevice,
   CoverDevice,
   DeviceCollection,
@@ -231,6 +232,7 @@ export const useHADevices = (): DeviceCollection => {
         sensors: [],
         vacuums: [],
         calendars: [],
+        cameras: [],
         'grouped-sensors': [],
       };
     }
@@ -251,6 +253,7 @@ export const useHADevices = (): DeviceCollection => {
     const vacuums: VacuumDevice[] = [];
     const weather: WeatherDevice[] = [];
     const calendars: CalendarDevice[] = [];
+    const cameras: CameraDevice[] = [];
     const areaMap = new Map(areas.map((area) => [area.area_id, area.name]));
     const entityRegistryMap = new Map(
       entityRegistry.map((registryEntry) => [registryEntry.entity_id, registryEntry])
@@ -592,6 +595,20 @@ export const useHADevices = (): DeviceCollection => {
           });
           break;
 
+        case 'camera':
+          cameras.push({
+            id: entityId,
+            name,
+            room,
+            size: 'medium',
+            entityPicture:
+              typeof entity.attributes?.entity_picture === 'string'
+                ? entity.attributes.entity_picture
+                : undefined,
+            state: entity.state,
+          });
+          break;
+
         case 'sensor':
         case 'binary_sensor':
         case 'number':
@@ -886,6 +903,7 @@ export const useHADevices = (): DeviceCollection => {
       sensors: [],
       vacuums,
       calendars,
+      cameras,
       'grouped-sensors': [],
     };
   }, [

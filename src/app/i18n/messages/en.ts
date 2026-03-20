@@ -635,6 +635,9 @@ export const enMessages = {
   'sidebar.mock': 'Dashboard Builder',
   'sidebar.settings': 'Settings',
   'sidebar.brandLogoAlt': 'Brand Logo',
+  'sections.security.title': 'Security Cameras',
+  'sections.security.singular': 'camera',
+  'sections.security.plural': 'cameras',
   'sections.security.emptyTitle': 'No Security Cameras',
   'sections.security.emptyDescription':
     "You don't have any security cameras configured yet. Add cameras to monitor your home.",
@@ -684,6 +687,7 @@ export const enMessages = {
   'deviceType.helper': 'Helper',
   'deviceType.vacuum': 'Vacuum',
   'deviceType.calendar': 'Calendar',
+  'deviceType.camera': 'Camera',
   'deviceType.sensorGroup': 'Sensor Group',
   'common.close': 'Close',
   'common.loading': 'Loading...',
@@ -796,4 +800,7 @@ export const enMessages = {
   'iconPicker.circleDot': 'Circle Dot',
   'iconPicker.circleDashed': 'Dashed Circle',
   'iconPicker.orbit': 'Orbit',
+  'camera.settings.title': 'Camera Controls',
+  'camera.settings.room': 'Room',
+  'camera.settings.noControls': 'No controls available for this camera.',
 } as const;

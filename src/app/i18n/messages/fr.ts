@@ -649,6 +649,9 @@ export const frMessages = {
   'sidebar.mock': 'Constructeur du tableau de bord',
   'sidebar.settings': 'Paramètres',
   'sidebar.brandLogoAlt': 'Logo de la marque',
+  'sections.security.title': 'Caméras de sécurité',
+  'sections.security.singular': 'caméra',
+  'sections.security.plural': 'caméras',
   'sections.security.emptyTitle': 'Aucune caméra de sécurité',
   'sections.security.emptyDescription':
     'Vous n’avez pas encore de caméras de sécurité configurées. Ajoutez des caméras pour surveiller votre maison.',
@@ -698,6 +701,7 @@ export const frMessages = {
   'deviceType.helper': 'Assistant',
   'deviceType.vacuum': 'Aspirateur',
   'deviceType.calendar': 'Calendrier',
+  'deviceType.camera': 'Caméra',
   'deviceType.sensorGroup': 'Groupe de capteurs',
   'common.close': 'Fermer',
   'common.loading': 'Chargement...',
@@ -811,4 +815,7 @@ export const frMessages = {
   'iconPicker.circleDot': 'Cercle avec point',
   'iconPicker.circleDashed': 'Cercle pointille',
   'iconPicker.orbit': 'Orbite',
+  'camera.settings.title': 'Contrôles de caméra',
+  'camera.settings.room': 'Pièce',
+  'camera.settings.noControls': 'Aucun contrôle disponible pour cette caméra.',
 } as const;

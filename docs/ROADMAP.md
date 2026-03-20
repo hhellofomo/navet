@@ -54,7 +54,7 @@ Planned and in-progress features. Check off items as they ship. Add new ideas to
 
 - [ ] **Automations management** — view, trigger, and edit Home Assistant automations
 - [ ] **Scene management** — view and activate Home Assistant scenes from the dashboard
-- [ ] **Camera / video feed card** — live stream from `camera.*` entities with snapshot fallback
+- [ ] **Camera / video feed card** — live stream from `camera.*` entities; MJPEG streaming and recording controls
 - [ ] **Light group card** — control a group of lights as one unit (brightness, color, on/off)
 - [ ] **Alarm panel card** — arm, disarm, and show state of `alarm_control_panel.*` entities
 - [ ] **Timer card** — start, pause, and cancel Home Assistant timers from the dashboard
@@ -102,3 +102,4 @@ Planned and in-progress features. Check off items as they ship. Add new ideas to
 - [x] **Deferred / batched room rendering** — offscreen rooms defer and visible rooms hydrate in batches
 - [x] **Energy dashboard** — dedicated energy section with live stats, solar/battery/grid flow diagram, trend charts, storage gauges, top consumers, cost projection, heating breakdown, smart insights, and node drill-down; backed by custom zero-bundle SVG chart primitives (bar chart, area chart, semi-circle gauge, segmented quality bar, Catmull-Rom sparkline)
 - [x] **Energy live HA wiring** — setup panel with auto-detect from HA `energy/get_prefs`, per-device power sensor mapping, datalist autocomplete; live entity state reading via `useEnergyHaData`; today's kWh via `recorder/statistics_during_period` polled every 5 min; conditional display hides unconfigured solar/battery gauges; bathroom/toilet and device-level energy breakdowns
+- [x] **Camera card** — snapshot display for `camera.*` entities via HA camera proxy; manual refresh; unavailable placeholder; dark card with name/room overlay
