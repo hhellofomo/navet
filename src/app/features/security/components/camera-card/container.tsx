@@ -1,7 +1,6 @@
 import { memo, useCallback, useMemo, useState } from 'react';
-import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useAuth } from '@/app/contexts/auth-context';
-import { useHomeAssistant, useTheme } from '@/app/hooks';
+import { useHomeAssistant } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { CameraSettingsDialog } from './camera-settings-dialog';
@@ -18,8 +17,6 @@ export const CameraCardContainer = memo(function CameraCardContainer({
   isEditMode,
 }: CameraCardProps) {
   const { config } = useAuth();
-  const { theme } = useTheme();
-  const surface = getThemeSurfaceTokens(theme);
   const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
   const entityRegistry = useHomeAssistant(homeAssistantSelectors.entityRegistry);
   const allEntities = useHomeAssistant(homeAssistantSelectors.entities);
@@ -80,8 +77,6 @@ export const CameraCardContainer = memo(function CameraCardContainer({
         size={size}
         onSizeChange={onSizeChange}
         isEditMode={isEditMode}
-        surface={surface}
-        theme={theme}
         onRefresh={handleRefresh}
         onTogglePower={handleTogglePower}
         onOpenSettings={() => setIsSettingsOpen(true)}

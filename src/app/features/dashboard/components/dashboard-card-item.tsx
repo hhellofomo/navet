@@ -23,8 +23,10 @@ interface DashboardCardItemProps {
   zone?: ZoneName;
   onDeleteCard?: (cardId: string) => void;
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
+  onRemoveFromLayout?: (cardId: string) => void;
   onRemoveEntity?: (entityId: string) => void;
   allowEntityRemoval?: boolean;
+  allowHeroSizes?: boolean;
   usesHideAction?: boolean;
 }
 
@@ -38,8 +40,10 @@ export const DashboardCardItem = memo(function DashboardCardItem({
   zone,
   onDeleteCard,
   onUpdateCard,
+  onRemoveFromLayout,
   onRemoveEntity,
   allowEntityRemoval = false,
+  allowHeroSizes = zone === 'hero' || zone === undefined,
   usesHideAction = false,
 }: DashboardCardItemProps) {
   const ambientLightBleed = useSettingsStore(settingsSelectors.ambientLightBleed);
@@ -48,7 +52,7 @@ export const DashboardCardItem = memo(function DashboardCardItem({
   const spanClass =
     device?.type === 'media' && size === 'large' ? 'col-span-1 row-span-4' : getCardSpanClass(size);
   const editControlSize = device?.type === 'media' && size === 'large' ? 'medium' : size;
-  const allowedSizes = getAllowedSizes(device, card, zone);
+  const allowedSizes = getAllowedSizes(device, card, allowHeroSizes);
 
   // Drag is only enabled in edit mode when the card is inside a zone band.
   const draggable = isEditMode && zone !== undefined;
@@ -60,7 +64,7 @@ export const DashboardCardItem = memo(function DashboardCardItem({
 
   const cardContent = (
     <>
-      {isEditMode && device && allowEntityRemoval && onRemoveEntity && (
+      {isEditMode && !onRemoveFromLayout && device && allowEntityRemoval && onRemoveEntity && (
         <CardEditActionButton
           cardSize={editControlSize}
           Icon={RemoveActionIcon}
@@ -71,7 +75,18 @@ export const DashboardCardItem = memo(function DashboardCardItem({
           aria-label={removeAriaLabel}
         />
       )}
-      {isEditMode && !device && card && onDeleteCard && (
+      {isEditMode && onRemoveFromLayout ? (
+        <CardEditActionButton
+          cardSize={editControlSize}
+          Icon={X}
+          placement="top-left"
+          variant="neutral"
+          data-dashboard-edit-action="remove-layout"
+          data-card-id={id}
+          aria-label="Remove from home"
+        />
+      ) : null}
+      {isEditMode && !onRemoveFromLayout && !device && card && onDeleteCard && (
         <CardEditActionButton
           cardSize={editControlSize}
           Icon={X}
@@ -122,9 +137,11 @@ export const DashboardCardItem = memo(function DashboardCardItem({
   );
 }, areDashboardCardItemPropsEqual);
 
-function getAllowedSizes(device?: DeviceWithType, card?: CustomCard, zone?: ZoneName): CardSize[] {
-  const heroAllowed = zone === 'hero' || zone === undefined;
-
+function getAllowedSizes(
+  device?: DeviceWithType,
+  card?: CustomCard,
+  heroAllowed = true
+): CardSize[] {
   if (card) {
     if (heroAllowed && (card.type === 'photo' || card.type === 'rss')) {
       return ['small', 'medium', 'large', 'hero'];
@@ -164,8 +181,10 @@ function areDashboardCardItemPropsEqual(
     previous.handleSizeChange === next.handleSizeChange &&
     previous.onDeleteCard === next.onDeleteCard &&
     previous.onUpdateCard === next.onUpdateCard &&
+    previous.onRemoveFromLayout === next.onRemoveFromLayout &&
     previous.onRemoveEntity === next.onRemoveEntity &&
     previous.allowEntityRemoval === next.allowEntityRemoval &&
+    previous.allowHeroSizes === next.allowHeroSizes &&
     previous.usesHideAction === next.usesHideAction
   );
 }

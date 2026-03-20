@@ -1,5 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { DashboardHeroSection } from '@/app/features/dashboard/components/dashboard-hero-section';
 import { useI18n } from '@/app/hooks';
 import type {
   SectionNavItem,
@@ -85,45 +87,31 @@ export function SettingsItem({ title, description, styles, children }: SettingsI
 
 export function SettingsHero({ navItems, styles }: SettingsHeroProps) {
   const { t } = useI18n();
+  const surface = {
+    ...getThemeSurfaceTokens(styles.isLightTheme ? 'light' : 'glass'),
+    border: styles.borderColor,
+    panel: styles.cardBg,
+    cardShadow: styles.elevatedShadow,
+    textPrimary: styles.textColor,
+    textSecondary: styles.subtleColor,
+    textMuted: styles.subtleColor,
+  };
 
   return (
-    <section
-      className={`relative overflow-hidden rounded-[30px] border px-5 py-6 md:rounded-[36px] md:px-8 md:py-10 ${styles.borderColor} ${styles.cardBg}`}
-    >
-      <div
-        className="absolute inset-x-0 top-0 h-px"
-        style={{
-          background: `linear-gradient(90deg, transparent, ${styles.accentColor}88, transparent)`,
-        }}
-      />
-      <div
-        className="absolute right-[-36px] top-[-28px] h-28 w-28 rounded-full blur-3xl md:h-36 md:w-36"
-        style={{ backgroundColor: `${styles.accentColor}18` }}
-      />
-      <div
-        className="absolute left-[-20px] bottom-[-44px] h-24 w-24 rounded-full blur-3xl md:h-32 md:w-32"
-        style={{ backgroundColor: `${styles.accentColor}10` }}
-      />
-      <div className={`absolute inset-0 bg-gradient-to-br ${styles.softBg} opacity-35`} />
-
-      <div className="relative">
+    <DashboardHeroSection
+      accentColor={styles.accentColor}
+      surface={surface}
+      eyebrow={
         <p
           className={`text-[11px] font-semibold uppercase tracking-[0.24em] ${styles.subtleColor}`}
         >
           {t('settings.hero.eyebrow')}
         </p>
-        <h1
-          className={`mt-3 max-w-3xl text-2xl font-semibold tracking-tight sm:text-3xl md:mt-4 md:text-5xl ${styles.textColor}`}
-        >
-          {t('settings.hero.title')}
-        </h1>
-        <p
-          className={`mt-3 max-w-2xl text-sm leading-6 md:mt-4 md:text-base md:leading-7 ${styles.subtleColor}`}
-        >
-          {t('settings.hero.description')}
-        </p>
-
-        <div className="-mx-1 mt-5 flex gap-2 overflow-x-auto px-1 pb-1 md:mx-0 md:mt-8 md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
+      }
+      title={t('settings.hero.title')}
+      description={t('settings.hero.description')}
+      actions={
+        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
           {navItems.map(({ id, label, icon: Icon }) => (
             <a
               key={id}
@@ -135,7 +123,7 @@ export function SettingsHero({ navItems, styles }: SettingsHeroProps) {
             </a>
           ))}
         </div>
-      </div>
-    </section>
+      }
+    />
   );
 }

@@ -250,33 +250,6 @@ export const deMessages = {
   'dashboard.roomNav.addCard': 'Karte hinzufügen',
   'dashboard.roomNav.doneEditing': 'Bearbeitung beenden',
   'dashboard.roomNav.customize': 'Anpassen',
-  'dashboard.organizer.eyebrow': 'Dashboard-Organizer',
-  'dashboard.organizer.title': 'Baue einen persönlichen Startbildschirm für dein Zuhause.',
-  'dashboard.organizer.description':
-    'Nutze Start als Startfläche: Füge persönliche Karten hinzu, forme einen Homescreen und behalte die gesamte Gerätebibliothek griffbereit, während du alles organisierst.',
-  'dashboard.organizer.quickAddTitle': 'Schnell einrichten',
-  'dashboard.organizer.quickAddDescription':
-    'Starte mit fertigen Karten, damit das Dashboard sofort nützlich wird, noch bevor du es fein abstimmst.',
-  'dashboard.organizer.openLibrary': 'Kartenbibliothek öffnen',
-  'dashboard.organizer.addThisCard': 'Diese Karte hinzufügen',
-  'dashboard.organizer.homescreenTitle': 'Homescreen-Karten',
-  'dashboard.organizer.homescreenDescription':
-    'Karten, die in Start hinzugefügt werden, erscheinen zuerst hier, damit du eine persönliche Startfläche aufbauen kannst, bevor du in Räume wechselst.',
-  'dashboard.organizer.addHomescreenCard': 'Homescreen-Karte hinzufügen',
-  'dashboard.organizer.homescreenEmptyTitle': 'Beginne deinen Homescreen mit etwas Nützlichem',
-  'dashboard.organizer.homescreenEmptyDescription':
-    'Füge Notizen, Aktionen, Feeds, Fotos oder Batterieübersichten hinzu und verwandle Start in eine persönliche Steuerzentrale.',
-  'dashboard.organizer.startWithNote': 'Mit Notiz beginnen',
-  'dashboard.organizer.deviceLibraryTitle': 'Gerätebibliothek',
-  'dashboard.organizer.deviceLibraryDescription':
-    'Durchsuche alles, was bereits vorhanden ist, und entscheide, wie der Rest des Dashboards gruppiert werden soll.',
-  'dashboard.organizer.deviceLibraryEmptyTitle': 'Noch keine sichtbaren Geräte',
-  'dashboard.organizer.deviceLibraryEmptyDescription':
-    'Hole Geräte aus der verborgenen Liste zurück oder verbinde weitere Entitäten und ordne sie dann um deine Homescreen-Karten an.',
-  'dashboard.organizer.stats.homescreenCards': 'Homescreen-Karten',
-  'dashboard.organizer.stats.devices': 'Sichtbare Geräte',
-  'dashboard.organizer.stats.rooms': 'Räume',
-  'dashboard.organizer.stats.hidden': 'Verborgene Geräte',
   'dashboard.homeOverview.eyebrow': 'Erster Blick',
   'dashboard.homeOverview.title': 'Erfasse den Zustand deines Zuhauses, bevor du etwas antippst.',
   'dashboard.homeOverview.description':
@@ -294,6 +267,36 @@ export const deMessages = {
   'dashboard.homeOverview.stats.visibleDevices': 'Sichtbare Geräte',
   'dashboard.homeOverview.stats.featuredCards': 'Hervorgehobene Karten',
   'dashboard.homeOverview.stats.hiddenDevices': 'Verborgene Geräte',
+  'dashboard.homePersonal.eyebrow': 'Persönliches Zuhause',
+  'dashboard.homePersonal.title': 'Mach Home zu deinem Dashboard, nicht zu unserem.',
+  'dashboard.homePersonal.description':
+    'Starte mit einer leeren Fläche, ziehe nur die Karten hinein, die dir wichtig sind, und wechsle jederzeit zwischen fließendem Bento und abschnittsweisem Layout.',
+  'dashboard.homePersonal.switchToSections': 'Abschnitte verwenden',
+  'dashboard.homePersonal.switchToFlow': 'Fließendes Layout',
+  'dashboard.homePersonal.hideHero': 'Hero ausblenden',
+  'dashboard.homePersonal.showHero': 'Hero anzeigen',
+  'dashboard.homePersonal.createWidget': 'Widget erstellen',
+  'dashboard.homePersonal.stats.cards': 'Karten auf Home',
+  'dashboard.homePersonal.stats.available': 'Verfügbar zum Platzieren',
+  'dashboard.homePersonal.stats.widgets': 'Gespeicherte Widgets',
+  'dashboard.homePersonal.stats.hidden': 'Verborgene Geräte',
+  'dashboard.homePersonal.mode.flow': 'Fließendes Bento',
+  'dashboard.homePersonal.mode.sectioned': 'Abschnitts-Bento',
+  'dashboard.homePersonal.canvasTitle': 'Home-Fläche',
+  'dashboard.homePersonal.canvasSectioned':
+    'Erstelle Abschnitte und lege Karten in jeden Block, um deine eigene Startseite zu formen.',
+  'dashboard.homePersonal.canvasFlow':
+    'Halte Home locker und fließend mit einem durchgehenden Bento-Raster.',
+  'dashboard.homePersonal.addSection': 'Abschnitt hinzufügen',
+  'dashboard.homePersonal.noSections': 'Noch keine Abschnitte',
+  'dashboard.homePersonal.noSectionsDescription':
+    'Erstelle zuerst einen Abschnitt und ziehe dann Karten aus der Bibliothek hinein.',
+  'dashboard.homePersonal.libraryTitle': 'Kartenbibliothek',
+  'dashboard.homePersonal.libraryDescription':
+    'Ziehe Gerätekarten und gespeicherte Widgets von hier nach Home.',
+  'dashboard.homePersonal.libraryEmptyTitle': 'Alles ist bereits auf Home',
+  'dashboard.homePersonal.libraryEmptyDescription':
+    'Entferne etwas von der Fläche, wenn du es neu anordnen willst.',
   'dashboard.zones.hero': 'Übersicht',
   'dashboard.zones.actions': 'Schnellaktionen',
   'dashboard.zones.status': 'Status',
@@ -642,7 +645,6 @@ export const deMessages = {
   'sidebar.locks': 'Schlösser',
   'sidebar.lights': 'Lichter',
   'sidebar.media': 'Medien',
-  'sidebar.mock': 'Dashboard-Builder',
   'sidebar.settings': 'Einstellungen',
   'sidebar.brandLogoAlt': 'Markenlogo',
   'sections.security.title': 'Sicherheitskameras',
@@ -671,9 +673,6 @@ export const deMessages = {
   'sections.media.plural': 'Player',
   'sections.common.entity': 'Eintrag',
   'sections.common.entities': 'Einträge',
-  'sections.mock.title': 'Dashboard-Builder',
-  'sections.mock.description':
-    'Baue hier dein persönliches Dashboard: Füge Homescreen-Widgets hinzu, forme das Gesamtlayout und organisiere die Gerätebibliothek darum herum.',
   'userDropdown.defaultUser': 'Benutzer',
   'userDropdown.defaultInitial': 'B',
   'userDropdown.openMenu': 'Benutzermenü öffnen',

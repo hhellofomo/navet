@@ -2,6 +2,7 @@ import { Settings } from 'lucide-react';
 import { memo } from 'react';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
+import { DashboardHeroSection } from '../../dashboard/components/dashboard-hero-section';
 import { useEnergyDashboard } from '../hooks/use-energy-dashboard';
 import type { EnergyRange, EnergyWidgetId } from '../types/energy.types';
 import { EnergySetupPanel } from './energy-setup-panel';
@@ -47,28 +48,14 @@ export const EnergySection = memo(function EnergySection() {
 
   return (
     <div className="flex flex-col gap-6">
-      <section
-        className={`rounded-[32px] border p-5 md:p-6 ${surface.border} ${surface.panel} ${surface.cardShadow}`}
-      >
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-3xl">
-            <div
-              className={`text-[11px] font-semibold uppercase tracking-[0.2em] ${surface.textMuted}`}
-            >
-              Energy Dashboard
-            </div>
-            <h1
-              className={`mt-2 text-2xl font-semibold tracking-tight md:text-3xl ${surface.textPrimary}`}
-            >
-              Your own energy workspace with live load, period totals, device usage, and battery
-              status.
-            </h1>
-            <p className={`mt-3 max-w-2xl text-sm leading-6 ${surface.textSecondary}`}>
-              Built around user-selected widgets so each household can shape a different dashboard.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
+      <DashboardHeroSection
+        accentColor={accentColor}
+        surface={surface}
+        eyebrow="Energy Dashboard"
+        title="Your own energy workspace with live load, period totals, device usage, and battery status."
+        description="Built around user-selected widgets so each household can shape a different dashboard."
+        actions={
+          <>
             {isConfigured && (
               <button
                 type="button"
@@ -95,10 +82,14 @@ export const EnergySection = memo(function EnergySection() {
                 {option}
               </button>
             ))}
-          </div>
-        </div>
+          </>
+        }
+      />
 
-        <div className="mt-5 flex flex-wrap gap-2">
+      <section
+        className={`rounded-[32px] border p-5 md:p-6 ${surface.border} ${surface.panel} ${surface.cardShadow}`}
+      >
+        <div className="flex flex-wrap gap-2">
           {widgetOptions.map(({ id, label }) => {
             const active = visibleWidgetSet.has(id);
             return (

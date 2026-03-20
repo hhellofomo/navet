@@ -1,32 +1,55 @@
-import { Clipboard, FlaskConical, Lightbulb, Lock, Tv, Video } from 'lucide-react';
+import { Clipboard, Lightbulb, Lock, type LucideIcon, Tv, Video } from 'lucide-react';
 import { memo } from 'react';
 import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-size-selector';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { DEVICES } from '@/app/data/mock-devices';
 import { renderCard } from '@/app/features/dashboard';
-import { useCardState, useDeviceMap, useDevices, useI18n, useTheme } from '@/app/hooks';
+import { useCardState, useDevices, useI18n, useTheme } from '@/app/hooks';
 import type { DeviceCollection, DeviceWithType } from '@/app/types/device.types';
 import { EmptyState } from '../shared/empty-state';
+
+function DeviceSectionLayout({
+  devices,
+  rawDevices,
+  emptyIcon,
+  emptyTitle,
+  emptyDescription,
+  title,
+  singularLabel,
+  pluralLabel,
+}: {
+  devices: DeviceWithType[];
+  rawDevices: DeviceCollection;
+  emptyIcon: LucideIcon;
+  emptyTitle: string;
+  emptyDescription: string;
+  title: string;
+  singularLabel: string;
+  pluralLabel: string;
+}) {
+  if (devices.length === 0) {
+    return <EmptyState icon={emptyIcon} title={emptyTitle} description={emptyDescription} />;
+  }
+  return (
+    <EntityGrid
+      devices={devices}
+      rawDevices={rawDevices}
+      title={title}
+      singularLabel={singularLabel}
+      pluralLabel={pluralLabel}
+    />
+  );
+}
 
 export function SecuritySection() {
   const { t } = useI18n();
   const devices = useDevices();
-  const cameraDevices = devices.cameras;
-
-  if (cameraDevices.length === 0) {
-    return (
-      <EmptyState
-        icon={Video}
-        title={t('sections.security.emptyTitle')}
-        description={t('sections.security.emptyDescription')}
-      />
-    );
-  }
-
   return (
-    <EntityGrid
-      devices={cameraDevices.map((device) => ({ ...device, type: 'cameras' as const }))}
+    <DeviceSectionLayout
+      devices={devices.cameras.map((d) => ({ ...d, type: 'cameras' as const }))}
       rawDevices={devices}
+      emptyIcon={Video}
+      emptyTitle={t('sections.security.emptyTitle')}
+      emptyDescription={t('sections.security.emptyDescription')}
       title={t('sections.security.title')}
       singularLabel={t('sections.security.singular')}
       pluralLabel={t('sections.security.plural')}
@@ -48,22 +71,13 @@ export function TasksSection() {
 export function LocksSection() {
   const { t } = useI18n();
   const devices = useDevices();
-  const lockDevices = devices.locks;
-
-  if (lockDevices.length === 0) {
-    return (
-      <EmptyState
-        icon={Lock}
-        title={t('sections.locks.emptyTitle')}
-        description={t('sections.locks.emptyDescription')}
-      />
-    );
-  }
-
   return (
-    <EntityGrid
-      devices={lockDevices.map((device) => ({ ...device, type: 'locks' as const }))}
+    <DeviceSectionLayout
+      devices={devices.locks.map((d) => ({ ...d, type: 'locks' as const }))}
       rawDevices={devices}
+      emptyIcon={Lock}
+      emptyTitle={t('sections.locks.emptyTitle')}
+      emptyDescription={t('sections.locks.emptyDescription')}
       title={t('sections.locks.title')}
       singularLabel={t('sections.locks.singular')}
       pluralLabel={t('sections.locks.plural')}
@@ -85,22 +99,13 @@ export function LightsSection() {
 export function MediaSection() {
   const { t } = useI18n();
   const devices = useDevices();
-  const mediaDevices = devices.media;
-
-  if (mediaDevices.length === 0) {
-    return (
-      <EmptyState
-        icon={Tv}
-        title={t('sections.media.emptyTitle')}
-        description={t('sections.media.emptyDescription')}
-      />
-    );
-  }
-
   return (
-    <EntityGrid
-      devices={mediaDevices.map((device) => ({ ...device, type: 'media' as const }))}
+    <DeviceSectionLayout
+      devices={devices.media.map((d) => ({ ...d, type: 'media' as const }))}
       rawDevices={devices}
+      emptyIcon={Tv}
+      emptyTitle={t('sections.media.emptyTitle')}
+      emptyDescription={t('sections.media.emptyDescription')}
       title={t('sections.media.title')}
       singularLabel={t('sections.media.singular')}
       pluralLabel={t('sections.media.plural')}
@@ -152,74 +157,3 @@ const EntityGrid = memo(function EntityGrid({
     </section>
   );
 });
-
-const MockEntityGrid = memo(function MockEntityGrid({ devices }: { devices: DeviceWithType[] }) {
-  const { t } = useI18n();
-  const { theme } = useTheme();
-  const surface = getThemeSurfaceTokens(theme);
-
-  return (
-    <section className="space-y-4">
-      <div className="flex items-center gap-3">
-        <h2 className={`text-lg md:text-xl font-semibold ${surface.textPrimary}`}>
-          All Mock Entities
-        </h2>
-        <span className={`text-xs md:text-sm ${surface.textSecondary}`}>
-          {devices.length}{' '}
-          {devices.length === 1 ? t('sections.common.entity') : t('sections.common.entities')}
-        </span>
-      </div>
-      <div className="grid w-full grid-flow-row-dense grid-cols-2 gap-2 auto-rows-[87px] md:grid-cols-4 md:gap-3 xl:grid-cols-6 lg:gap-4 2xl:grid-cols-8">
-        {devices.map((device) => {
-          const size = device.size as CardSize;
-
-          return (
-            <div key={device.id} className={getCardSpanClass(size)}>
-              {renderCard({
-                device,
-                size,
-                handleSizeChange: () => {},
-                isEditMode: false,
-              })}
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-});
-
-export function MockEntitiesSection() {
-  const { deviceMap } = useDeviceMap(DEVICES);
-  const { t } = useI18n();
-  const { theme } = useTheme();
-  const surface = getThemeSurfaceTokens(theme);
-  const isGlass = theme === 'glass';
-  const mockDevices = Array.from(deviceMap.values());
-
-  return (
-    <div className="space-y-8">
-      <section
-        className={`rounded-[32px] border px-6 py-6 md:px-8 md:py-8 ${surface.panel} ${surface.borderStrong} ${isGlass ? 'backdrop-blur-2xl' : ''}`}
-      >
-        <div className="flex items-start gap-4">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-500/15">
-            <FlaskConical className="h-5 w-5 text-orange-500" />
-          </div>
-          <div className="min-w-0">
-            <h1
-              className={`text-xl font-semibold tracking-tight md:text-2xl ${surface.textPrimary}`}
-            >
-              {t('sections.mock.title')}
-            </h1>
-            <p className={`mt-2 max-w-3xl text-sm leading-relaxed ${surface.textSecondary}`}>
-              {t('sections.mock.description')}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <MockEntityGrid devices={mockDevices} />
-    </div>
-  );
-}

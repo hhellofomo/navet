@@ -19,6 +19,7 @@ interface DashboardEditActionsProps {
   children: ReactNode;
   isEditMode: boolean;
   onDeleteCard?: (cardId: string) => void;
+  onRemoveFromLayout?: (cardId: string) => void;
   onRemoveEntity?: (entityId: string) => void;
   onSizeChange: (id: string, size: CardSize) => void;
 }
@@ -35,6 +36,7 @@ export function DashboardEditActions({
   children,
   isEditMode,
   onDeleteCard,
+  onRemoveFromLayout,
   onRemoveEntity,
   onSizeChange,
 }: DashboardEditActionsProps) {
@@ -119,6 +121,11 @@ export function DashboardEditActions({
 
           if (action === 'remove-entity' && onRemoveEntity) {
             onRemoveEntity(cardId);
+            return;
+          }
+
+          if (action === 'remove-layout' && onRemoveFromLayout) {
+            onRemoveFromLayout(cardId);
             return;
           }
 

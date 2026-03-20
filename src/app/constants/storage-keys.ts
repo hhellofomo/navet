@@ -13,4 +13,5 @@ export const STORAGE_KEYS = {
   rssCardArticleCount: 'ha-dashboard-rss-card-article-count',
   lightMemoryState: 'ha-dashboard-light-memory-state',
   cardZones: 'ha-dashboard-card-zones',
+  homeDashboardLayout: 'ha-dashboard-home-layout',
 } as const;

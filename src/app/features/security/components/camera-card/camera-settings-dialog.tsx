@@ -29,15 +29,7 @@ function getDisplayName(entityId: string, entity: HassEntity): string {
   return withoutDomain.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-const SwitchRow = memo(function SwitchRow({
-  entityId,
-  label,
-  isOn,
-}: {
-  entityId: string;
-  label: string;
-  isOn: boolean;
-}) {
+function SwitchRow({ entityId, label, isOn }: { entityId: string; label: string; isOn: boolean }) {
   const handleToggle = useCallback(async () => {
     await homeAssistantService.callService(
       'switch',
@@ -67,9 +59,9 @@ const SwitchRow = memo(function SwitchRow({
       </div>
     </button>
   );
-});
+}
 
-const SelectRow = memo(function SelectRow({
+function SelectRow({
   entityId,
   label,
   current,
@@ -113,9 +105,9 @@ const SelectRow = memo(function SelectRow({
       </div>
     </div>
   );
-});
+}
 
-const NumberRow = memo(function NumberRow({
+function NumberRow({
   entityId,
   label,
   value,
@@ -160,7 +152,7 @@ const NumberRow = memo(function NumberRow({
       />
     </div>
   );
-});
+}
 
 export const CameraSettingsDialog = memo(function CameraSettingsDialog({
   entityId,

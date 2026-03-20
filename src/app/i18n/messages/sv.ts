@@ -246,33 +246,6 @@ export const svMessages = {
   'dashboard.roomNav.addCard': 'Lägg till kort',
   'dashboard.roomNav.doneEditing': 'Klar med redigering',
   'dashboard.roomNav.customize': 'Anpassa',
-  'dashboard.organizer.eyebrow': 'Dashboard-organisatör',
-  'dashboard.organizer.title': 'Bygg en personlig startskärm för ditt hem.',
-  'dashboard.organizer.description':
-    'Använd Hem som din startyta: lägg till personliga kort, bygg en hemskärm och ha hela enhetsbiblioteket nära till hands medan du organiserar allt.',
-  'dashboard.organizer.quickAddTitle': 'Snabbstart',
-  'dashboard.organizer.quickAddDescription':
-    'Börja med färdiga kort så att dashboarden blir användbar innan du finjusterar den.',
-  'dashboard.organizer.openLibrary': 'Öppna kortbibliotek',
-  'dashboard.organizer.addThisCard': 'Lägg till detta kort',
-  'dashboard.organizer.homescreenTitle': 'Hemskärmskort',
-  'dashboard.organizer.homescreenDescription':
-    'Kort som läggs till i Hem visas här först, så att du kan bygga en personlig landningsyta innan du går in i rum.',
-  'dashboard.organizer.addHomescreenCard': 'Lägg till hemskärmskort',
-  'dashboard.organizer.homescreenEmptyTitle': 'Börja din hemskärm med något användbart',
-  'dashboard.organizer.homescreenEmptyDescription':
-    'Lägg till anteckningar, åtgärder, flöden, foton eller batteriöversikter och gör Hem till ett personligt kontrollcenter.',
-  'dashboard.organizer.startWithNote': 'Börja med en anteckning',
-  'dashboard.organizer.deviceLibraryTitle': 'Enhetsbibliotek',
-  'dashboard.organizer.deviceLibraryDescription':
-    'Bläddra bland allt du redan har och bestäm hur resten av dashboarden ska grupperas.',
-  'dashboard.organizer.deviceLibraryEmptyTitle': 'Inga synliga enheter ännu',
-  'dashboard.organizer.deviceLibraryEmptyDescription':
-    'Ta tillbaka enheter från den dolda listan eller anslut fler entiteter och ordna dem sedan runt dina hemskärmskort.',
-  'dashboard.organizer.stats.homescreenCards': 'Hemskärmskort',
-  'dashboard.organizer.stats.devices': 'Synliga enheter',
-  'dashboard.organizer.stats.rooms': 'Rum',
-  'dashboard.organizer.stats.hidden': 'Dolda enheter',
   'dashboard.homeOverview.eyebrow': 'Första blick',
   'dashboard.homeOverview.title': 'Se hemmets läge innan du rör någonting.',
   'dashboard.homeOverview.description':
@@ -290,6 +263,36 @@ export const svMessages = {
   'dashboard.homeOverview.stats.visibleDevices': 'Synliga enheter',
   'dashboard.homeOverview.stats.featuredCards': 'Utvalda kort',
   'dashboard.homeOverview.stats.hiddenDevices': 'Dolda enheter',
+  'dashboard.homePersonal.eyebrow': 'Personligt hem',
+  'dashboard.homePersonal.title': 'Gor Hem till din dashboard, inte var.',
+  'dashboard.homePersonal.description':
+    'Börja med en tom yta, dra in korten du faktiskt bryr dig om och växla mellan ett fritt bento-flöde och en sektionerad layout när du vill.',
+  'dashboard.homePersonal.switchToSections': 'Använd sektioner',
+  'dashboard.homePersonal.switchToFlow': 'Använd flödeslayout',
+  'dashboard.homePersonal.hideHero': 'Dölj hero',
+  'dashboard.homePersonal.showHero': 'Visa hero',
+  'dashboard.homePersonal.createWidget': 'Skapa widget',
+  'dashboard.homePersonal.stats.cards': 'Kort på Hem',
+  'dashboard.homePersonal.stats.available': 'Tillgängliga att placera',
+  'dashboard.homePersonal.stats.widgets': 'Sparade widgets',
+  'dashboard.homePersonal.stats.hidden': 'Dolda enheter',
+  'dashboard.homePersonal.mode.flow': 'Flytande bento',
+  'dashboard.homePersonal.mode.sectioned': 'Sektionerad bento',
+  'dashboard.homePersonal.canvasTitle': 'Hem-yta',
+  'dashboard.homePersonal.canvasSectioned':
+    'Skapa sektioner och släpp kort i varje block för att forma din egen startsida.',
+  'dashboard.homePersonal.canvasFlow':
+    'Håll Hem löst och flytande med ett sammanhängande bento-rutnät.',
+  'dashboard.homePersonal.addSection': 'Lägg till sektion',
+  'dashboard.homePersonal.noSections': 'Inga sektioner ännu',
+  'dashboard.homePersonal.noSectionsDescription':
+    'Skapa först en sektion och dra sedan in kort från biblioteket.',
+  'dashboard.homePersonal.libraryTitle': 'Kortbibliotek',
+  'dashboard.homePersonal.libraryDescription':
+    'Dra enhetskort och sparade widgets härifrån till Hem.',
+  'dashboard.homePersonal.libraryEmptyTitle': 'Allt finns redan på Hem',
+  'dashboard.homePersonal.libraryEmptyDescription':
+    'Ta bort något från ytan om du vill komponera om det.',
   'dashboard.zones.hero': 'Översikt',
   'dashboard.zones.actions': 'Snabbåtgärder',
   'dashboard.zones.status': 'Status',
@@ -637,7 +640,6 @@ export const svMessages = {
   'sidebar.locks': 'Lås',
   'sidebar.lights': 'Ljus',
   'sidebar.media': 'Media',
-  'sidebar.mock': 'Dashboard-byggare',
   'sidebar.settings': 'Inställningar',
   'sidebar.brandLogoAlt': 'Varumärkeslogotyp',
   'sections.security.title': 'Säkerhetskameror',
@@ -666,9 +668,6 @@ export const svMessages = {
   'sections.media.plural': 'spelare',
   'sections.common.entity': 'enhet',
   'sections.common.entities': 'enheter',
-  'sections.mock.title': 'Dashboard-byggare',
-  'sections.mock.description':
-    'Bygg din personliga dashboard här: lägg till hemskärmswidgets, forma helhetslayouten och organisera enhetsbiblioteket runt den.',
   'userDropdown.defaultUser': 'Användare',
   'userDropdown.defaultInitial': 'A',
   'userDropdown.openMenu': 'Öppna användarmenyn',

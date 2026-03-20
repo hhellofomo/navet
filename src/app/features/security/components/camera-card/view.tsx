@@ -4,8 +4,6 @@ import {
   CardSizeSelector,
   isCompactCardSize,
 } from '@/app/components/shared/card-size-selector';
-import type { ThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import type { ThemeType } from '@/app/hooks';
 
 interface CameraCardViewProps {
   id: string;
@@ -17,8 +15,6 @@ interface CameraCardViewProps {
   size: CardSize;
   onSizeChange: (id: string, size: CardSize) => void;
   isEditMode: boolean;
-  surface: ThemeSurfaceTokens;
-  theme: ThemeType;
   onRefresh: () => void;
   onTogglePower: () => void;
   onOpenSettings: () => void;
@@ -34,8 +30,6 @@ export function CameraCardView({
   size,
   onSizeChange,
   isEditMode,
-  surface,
-  theme: _theme,
   onRefresh,
   onTogglePower,
   onOpenSettings,
@@ -56,7 +50,7 @@ export function CameraCardView({
         /* Unavailable / no image placeholder */
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
           <Camera className="h-8 w-8 text-zinc-500" />
-          <span className={`text-xs ${surface.textMuted}`}>
+          <span className="text-xs text-zinc-500">
             {isUnavailable ? 'Unavailable' : 'No signal'}
           </span>
         </div>

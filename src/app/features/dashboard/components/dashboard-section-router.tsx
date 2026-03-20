@@ -10,7 +10,6 @@ import { AllViewGrid } from '../all-view-grid';
 import { DeviceGrid } from '../device-grid';
 import type { DashboardController } from '../hooks/use-dashboard-controller';
 import { DashboardLayout } from '../shell';
-import { AllDashboardOrganizer } from './all-dashboard-organizer';
 import { HomeDashboardOverview } from './home-dashboard-overview';
 
 const lazySections = () => import('@/app/components/layout/sections');
@@ -34,14 +33,11 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     activeRoom,
     activeSection,
     addableEntityIds,
-    allCustomCards,
-    allViewGrouping,
     cardOrders,
     cardSizes,
     changeRoom,
     customCards,
     deviceMap,
-    handleAddCard,
     handleDeleteCard,
     handleRemoveEntity,
     handleUpdateCard,
@@ -49,7 +45,6 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     isEditMode,
     lightDeviceMap,
     lightRooms,
-    onSetAllViewGrouping,
     onOpenAddCardDialog,
     onOpenAddEntityDialog,
     onToggleEditMode,
@@ -124,32 +119,6 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
         <MediaSection />
       </Suspense>
     );
-  } else if (activeSection === 'mock') {
-    sectionContent = (
-      <RenderProfiler id="DashboardBuilder">
-        <AllDashboardOrganizer
-          deviceMap={deviceMap}
-          rooms={rooms}
-          cardOrders={cardOrders}
-          isEditMode={isEditMode}
-          cardSizes={cardSizes}
-          updateCardSize={updateCardSize}
-          grouping={allViewGrouping}
-          customCards={allCustomCards}
-          hiddenEntityCount={hiddenEntityIds.length}
-          onDeleteCard={handleDeleteCard}
-          onUpdateCard={handleUpdateCard}
-          onRemoveEntity={handleRemoveEntity}
-          allowEntityRemoval
-          usesHideAction
-          onOpenAddCardDialog={onOpenAddCardDialog}
-          onOpenAddEntityDialog={addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
-          onQuickAddCard={handleAddCard}
-          onToggleEditMode={onToggleEditMode}
-          onGroupingChange={onSetAllViewGrouping}
-        />
-      </RenderProfiler>
-    );
   } else if (activeSection === 'settings') {
     sectionContent = (
       <Suspense fallback={<LoadingSpinner message={t('dashboard.shell.loadingSettings')} />}>
@@ -165,9 +134,9 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
           rooms={rooms}
           activeRoom={activeRoom}
           onRoomChange={changeRoom}
-          allViewGrouping={allViewGrouping}
+          allViewGrouping={controller.allViewGrouping}
           isEditMode={isEditMode}
-          onAllViewGroupingChange={onSetAllViewGrouping}
+          onAllViewGroupingChange={controller.onSetAllViewGrouping}
           onToggleEditMode={onToggleEditMode}
           onAddCard={onOpenAddCardDialog}
           onAddEntity={addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
@@ -183,15 +152,22 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
               isEditMode={isEditMode}
               hiddenEntityCount={hiddenEntityIds.length}
               allCustomCards={controller.allCustomCards}
-              cardZones={controller.cardZones}
-              updateCardZone={controller.updateCardZone}
+              homeLayout={controller.homeLayout}
+              addHomeCard={controller.addHomeCard}
+              removeHomeCard={controller.removeHomeCard}
+              moveHomeCard={controller.moveHomeCard}
+              setHomeLayoutMode={controller.setHomeLayoutMode}
+              setHomeShowHero={controller.setHomeShowHero}
+              addHomeSection={controller.addHomeSection}
+              addHomeColumnSection={controller.addHomeColumnSection}
+              renameHomeSection={controller.renameHomeSection}
+              removeHomeSection={controller.removeHomeSection}
               onOpenAddEntityDialog={
                 addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined
               }
-              onOpenBuilder={() => controller.setActiveSection('mock')}
-              onDeleteCard={handleDeleteCard}
+              onOpenAddCardDialog={controller.onOpenAddCardDialog}
               onUpdateCard={handleUpdateCard}
-              setActiveSection={controller.setActiveSection}
+              onToggleEditMode={controller.onToggleEditMode}
             />
           </RenderProfiler>
         ) : (
@@ -227,8 +203,7 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     activeSection === 'tasks' ||
     activeSection === 'locks' ||
     activeSection === 'lights' ||
-    activeSection === 'media' ||
-    activeSection === 'mock'
+    activeSection === 'media'
   ) {
     return dashboardContent;
   }
