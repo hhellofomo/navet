@@ -1,4 +1,4 @@
-import { startTransition, useCallback, useEffect, useState } from 'react';
+import { startTransition, useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
@@ -59,6 +59,7 @@ export type DashboardController = OnboardingController &
     handleUpdateCard: (cardId: string, data: Record<string, unknown>) => void;
     hiddenEntityIds: string[];
     homeLayout: ReturnType<typeof useHomeDashboardLayout>['layout'];
+    homeLayoutHydrated: boolean;
     addHomeCard: ReturnType<typeof useHomeDashboardLayout>['addCard'];
     removeHomeCard: ReturnType<typeof useHomeDashboardLayout>['removeCard'];
     moveHomeCard: ReturnType<typeof useHomeDashboardLayout>['moveCard'];
@@ -98,6 +99,7 @@ export function useDashboardController(): DashboardController {
   const allDevices = useDevices();
   const devices = useDashboardDevices(allDevices, hiddenEntityIds);
   const rooms = useRooms(devices);
+  const { isEditMode, toggleEditMode } = useEditMode();
 
   useEffect(() => {
     if (connected || !connecting) {
@@ -105,19 +107,44 @@ export function useDashboardController(): DashboardController {
     }
   }, [connected, connecting]);
 
+  useEffect(() => {
+    if (!isEditMode) {
+      return;
+    }
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isEditMode]);
+
   const { activeRoom, changeRoom } = useRoomNavigation('All');
   const { addCard, removeCard, updateCard, getCardsForRoom } = useCustomCards();
   const allCustomCards = getCardsForRoom('All');
-  const { isEditMode, toggleEditMode } = useEditMode();
   const { cardSizes, updateCardSize } = useCardState(devices);
   const { cardOrders } = useCardOrdering(devices, rooms, allCustomCards);
   const { cardZones, updateCardZone } = useCardZones();
   const { deviceMap } = useDeviceMap(devices);
   const { deviceMap: availableDeviceMap } = useDeviceMap(allDevices);
-  const homeLayoutController = useHomeDashboardLayout([
-    ...deviceMap.keys(),
-    ...allCustomCards.map((card) => card.id),
-  ]);
+  const homeLayoutValidIds = useMemo(
+    () => [...deviceMap.keys(), ...allCustomCards.map((card) => card.id)],
+    [deviceMap, allCustomCards]
+  );
+  const homeLayoutController = useHomeDashboardLayout(homeLayoutValidIds);
+  const homeLayoutHydrated = useMemo(() => {
+    if (homeLayoutController.layout.cardIds.length === 0) {
+      return true;
+    }
+
+    const validHomeIdSet = new Set(homeLayoutValidIds);
+    return homeLayoutController.layout.cardIds.every((cardId) => validHomeIdSet.has(cardId));
+  }, [homeLayoutController.layout.cardIds, homeLayoutValidIds]);
   const { addableEntityIds, allEntityIds, lightDeviceMap, lightRooms, orderedCardIds } =
     useDashboardDerivedState({
       activeRoom,
@@ -194,6 +221,7 @@ export function useDashboardController(): DashboardController {
     handleUpdateCard,
     hiddenEntityIds,
     homeLayout: homeLayoutController.layout,
+    homeLayoutHydrated,
     addHomeCard: homeLayoutController.addCard,
     removeHomeCard: homeLayoutController.removeCard,
     moveHomeCard: homeLayoutController.moveCard,

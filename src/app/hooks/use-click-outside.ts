@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { type RefObject, useEffect, useRef } from 'react';
 
 /**
  * Custom hook for detecting clicks outside of an element
@@ -12,8 +12,9 @@ import { useEffect, useRef } from 'react';
  */
 export function useClickOutside<T extends HTMLElement = HTMLElement>(
   callback: () => void,
-  enabled = true
-): React.RefObject<T | null> {
+  enabled = true,
+  ignoredRefs: Array<RefObject<HTMLElement | null>> = []
+): RefObject<T | null> {
   const ref = useRef<T>(null);
 
   useEffect(() => {
@@ -26,6 +27,10 @@ export function useClickOutside<T extends HTMLElement = HTMLElement>(
         return;
       }
 
+      if (ignoredRefs.some((ignoredRef) => ignoredRef.current?.contains(event.target as Node))) {
+        return;
+      }
+
       if (ref.current && !ref.current.contains(event.target as Node)) {
         callback();
       }
@@ -35,7 +40,7 @@ export function useClickOutside<T extends HTMLElement = HTMLElement>(
     return () => {
       document.removeEventListener('pointerdown', handleClick);
     };
-  }, [callback, enabled]);
+  }, [callback, enabled, ignoredRefs]);
 
   return ref;
 }

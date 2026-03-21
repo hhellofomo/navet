@@ -33,6 +33,7 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 - **4 Theme Modes** - Liquid Glass, Dark, Light, and Black
 - **Custom Accent Colors** - 8 built-in accents plus a custom accent color picker
 - **Multi-Language UI** - English, Swedish, German, French, and Spanish interface support with locale-aware date, time, and number formatting
+- **Dynamic Greeting** - Header greeting rotates on each session: time-of-day greetings (Good morning/afternoon/evening/night) with occasional casual variants (Hi, Hey, Welcome back), fully localized across all five languages
 - **Responsive Grid** - 2 columns (mobile) → 4 (`md`) → 6 (`xl`) → 8 (`2xl`)
 - **Adaptive Cards** - Extra-Small, Small, Medium, and Large card sizes
 

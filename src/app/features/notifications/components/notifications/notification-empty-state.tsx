@@ -1,20 +1,16 @@
 import { Bell } from 'lucide-react';
+import { InlineEmptyState } from '@/app/components/shared/inline-empty-state';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { DashboardEmptyState } from '@/app/features/dashboard/components/dashboard-empty-state';
-import { useI18n } from '@/app/hooks';
-import type { ThemeType } from '@/app/hooks/use-theme';
+import { useI18n, useTheme } from '@/app/hooks';
 
-interface NotificationEmptyStateProps {
-  theme: ThemeType;
-}
-
-export function NotificationEmptyState({ theme }: NotificationEmptyStateProps) {
+export function NotificationEmptyState() {
   const { t } = useI18n();
+  const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
 
   return (
     <div className="p-6">
-      <DashboardEmptyState
+      <InlineEmptyState
         title={t('notifications.empty.title')}
         description={t('notifications.empty.description')}
         surface={{
@@ -23,7 +19,6 @@ export function NotificationEmptyState({ theme }: NotificationEmptyStateProps) {
           panelMuted: surface.panel,
         }}
         icon={Bell}
-        compact
         className="mx-auto max-w-sm"
       />
     </div>

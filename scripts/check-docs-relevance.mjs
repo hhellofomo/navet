@@ -15,7 +15,11 @@ const stagedFiles = result.stdout
   .filter(Boolean);
 
 const hasDocsChange = stagedFiles.some(
-  (file) => file === 'README.md' || file === 'CONTRIBUTING.md' || file.startsWith('docs/')
+  (file) =>
+    file === 'README.md' ||
+    file === 'CONTRIBUTING.md' ||
+    file.startsWith('docs/') ||
+    file.startsWith('design-system/')
 );
 
 const docsSensitivePrefixes = [
@@ -42,7 +46,7 @@ if (needsDocsReview && !hasDocsChange) {
   console.error(
     'This commit changes user-facing settings, dashboard behavior, build workflow, or package commands without a staged docs update.'
   );
-  console.error('Stage an update to README.md, CONTRIBUTING.md, or docs/ before committing.');
+  console.error('Stage an update to README.md, CONTRIBUTING.md, docs/, or design-system/ before committing.');
   process.exit(1);
 }
 

@@ -134,12 +134,18 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
           rooms={rooms}
           activeRoom={activeRoom}
           onRoomChange={changeRoom}
-          allViewGrouping={controller.allViewGrouping}
+          allViewGrouping={activeRoom === 'All' ? undefined : controller.allViewGrouping}
           isEditMode={isEditMode}
-          onAllViewGroupingChange={controller.onSetAllViewGrouping}
+          onAllViewGroupingChange={
+            activeRoom === 'All' ? undefined : controller.onSetAllViewGrouping
+          }
           onToggleEditMode={onToggleEditMode}
-          onAddCard={onOpenAddCardDialog}
-          onAddEntity={addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
+          onAddCard={activeRoom === 'All' ? undefined : onOpenAddCardDialog}
+          onAddEntity={
+            activeRoom === 'All' || addableEntityIds.length === 0
+              ? undefined
+              : onOpenAddEntityDialog
+          }
           addEntityLabel={t('dashboard.addEntity.title')}
         />
 
@@ -191,22 +197,5 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     );
   }
 
-  const dashboardContent = <DashboardLayout>{sectionContent}</DashboardLayout>;
-
-  if (activeSection === 'settings') {
-    return dashboardContent;
-  }
-
-  if (
-    activeSection === 'security' ||
-    activeSection === 'energy' ||
-    activeSection === 'tasks' ||
-    activeSection === 'locks' ||
-    activeSection === 'lights' ||
-    activeSection === 'media'
-  ) {
-    return dashboardContent;
-  }
-
-  return dashboardContent;
+  return <DashboardLayout>{sectionContent}</DashboardLayout>;
 }

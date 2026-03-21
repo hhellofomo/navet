@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import { storage } from '@/app/utils/storage';
 
@@ -78,9 +78,11 @@ function rebalanceRowSections(sections: HomeDashboardSection[]): HomeDashboardSe
   }));
 }
 
-function partitionSectionsIntoRows(sections: HomeDashboardSection[]): HomeDashboardSection[][] {
-  const rows: HomeDashboardSection[][] = [];
-  let currentRow: HomeDashboardSection[] = [];
+export function partitionSectionRows<T extends { span: HomeDashboardSectionSpan }>(
+  sections: T[]
+): T[][] {
+  const rows: T[][] = [];
+  let currentRow: T[] = [];
   let currentWidth = 0;
 
   for (const section of sections) {
@@ -113,6 +115,10 @@ function partitionSectionsIntoRows(sections: HomeDashboardSection[]): HomeDashbo
 
 function findRowIndexBySectionId(rows: HomeDashboardSection[][], sectionId: string): number {
   return rows.findIndex((row) => row.some((section) => section.id === sectionId));
+}
+
+function getCardGroupKey(cardId: string, assignments: Record<string, string>) {
+  return assignments[cardId] ?? '__flow__';
 }
 
 function normalizeLayout(value: unknown): HomeDashboardLayoutState {
@@ -158,78 +164,66 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
   const [layout, setLayout] = useState<HomeDashboardLayoutState>(() =>
     normalizeLayout(storage.get(STORAGE_KEYS.homeDashboardLayout, DEFAULT_LAYOUT))
   );
-
-  useEffect(() => {
+  const persistLayout = useCallback((updater: SetStateAction<HomeDashboardLayoutState>) => {
     setLayout((previous) => {
-      const nextCardIds = previous.cardIds.filter((id) => validIdSet.has(id));
-      const validSectionIds = new Set(previous.sections.map((section) => section.id));
-      const nextAssignments = Object.fromEntries(
-        Object.entries(previous.cardSectionAssignments).filter(
-          ([cardId, sectionId]) => validIdSet.has(cardId) && validSectionIds.has(sectionId)
-        )
-      );
-
-      if (
-        nextCardIds.length === previous.cardIds.length &&
-        Object.keys(nextAssignments).length === Object.keys(previous.cardSectionAssignments).length
-      ) {
-        return previous;
-      }
-
-      return {
-        ...previous,
-        cardIds: nextCardIds,
-        cardSectionAssignments: nextAssignments,
-      };
+      const next = typeof updater === 'function' ? updater(previous) : updater;
+      storage.set(STORAGE_KEYS.homeDashboardLayout, next);
+      return next;
     });
-  }, [validIdSet]);
+  }, []);
 
   useEffect(() => {
     storage.set(STORAGE_KEYS.homeDashboardLayout, layout);
   }, [layout]);
 
-  const setMode = useCallback((mode: HomeLayoutMode) => {
-    setLayout((previous) => {
-      if (mode !== 'sectioned') {
-        return { ...previous, mode };
-      }
+  const setMode = useCallback(
+    (mode: HomeLayoutMode) => {
+      persistLayout((previous) => {
+        if (mode !== 'sectioned') {
+          return { ...previous, mode };
+        }
 
-      const sections =
-        previous.sections.length > 0
-          ? previous.sections
-          : [
-              {
-                id: createSectionId(),
-                title: `${SECTION_TITLE_PREFIX} 1`,
-                span: 8 as HomeDashboardSectionSpan,
-              },
-            ];
-      const firstSectionId = sections[0]?.id;
+        const sections =
+          previous.sections.length > 0
+            ? previous.sections
+            : [
+                {
+                  id: createSectionId(),
+                  title: `${SECTION_TITLE_PREFIX} 1`,
+                  span: 8 as HomeDashboardSectionSpan,
+                },
+              ];
+        const firstSectionId = sections[0]?.id;
 
-      return {
-        ...previous,
-        mode,
-        sections,
-        cardSectionAssignments: firstSectionId
-          ? Object.fromEntries(
-              previous.cardIds.map((cardId) => [
-                cardId,
-                previous.cardSectionAssignments[cardId] ?? firstSectionId,
-              ])
-            )
-          : previous.cardSectionAssignments,
-      };
-    });
-  }, []);
+        return {
+          ...previous,
+          mode,
+          sections,
+          cardSectionAssignments: firstSectionId
+            ? Object.fromEntries(
+                previous.cardIds.map((cardId) => [
+                  cardId,
+                  previous.cardSectionAssignments[cardId] ?? firstSectionId,
+                ])
+              )
+            : previous.cardSectionAssignments,
+        };
+      });
+    },
+    [persistLayout]
+  );
 
-  const setShowHero = useCallback((showHero: boolean) => {
-    setLayout((previous) => ({ ...previous, showHero }));
-  }, []);
+  const setShowHero = useCallback(
+    (showHero: boolean) => {
+      persistLayout((previous) => ({ ...previous, showHero }));
+    },
+    [persistLayout]
+  );
 
   const addSection = useCallback(() => {
     const sectionId = createSectionId();
 
-    setLayout((previous) => ({
+    persistLayout((previous) => ({
       ...previous,
       sections: [
         ...previous.sections,
@@ -242,88 +236,100 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
     }));
 
     return sectionId;
-  }, []);
+  }, [persistLayout]);
 
-  const addColumnSection = useCallback((targetSectionId?: string) => {
-    const sectionId = createSectionId();
+  const addColumnSection = useCallback(
+    (targetSectionId?: string) => {
+      const sectionId = createSectionId();
 
-    setLayout((previous) => {
-      const nextSection: HomeDashboardSection = {
-        id: sectionId,
-        title: `${SECTION_TITLE_PREFIX} ${previous.sections.length + 1}`,
-        span: 1,
-      };
-      const rows = partitionSectionsIntoRows(previous.sections);
+      persistLayout((previous) => {
+        const nextSection: HomeDashboardSection = {
+          id: sectionId,
+          title: `${SECTION_TITLE_PREFIX} ${previous.sections.length + 1}`,
+          span: 1,
+        };
+        const rows = partitionSectionRows(previous.sections);
 
-      if (rows.length === 0) {
+        if (rows.length === 0) {
+          return {
+            ...previous,
+            sections: [{ ...nextSection, span: 8 }],
+          };
+        }
+
+        const rowIndex = targetSectionId
+          ? findRowIndexBySectionId(rows, targetSectionId)
+          : rows.length - 1;
+        const targetRowIndex = rowIndex >= 0 ? rowIndex : rows.length - 1;
+        const nextRows = rows.map((row: HomeDashboardSection[]) => [...row]);
+        const targetRow = nextRows[targetRowIndex] ?? [];
+
+        if (targetRow.length >= MAX_SECTIONS_PER_ROW) {
+          nextRows.splice(targetRowIndex + 1, 0, [{ ...nextSection, span: 8 }]);
+        } else {
+          nextRows[targetRowIndex] = rebalanceRowSections([...targetRow, nextSection]);
+        }
+
         return {
           ...previous,
-          sections: [{ ...nextSection, span: 8 }],
+          sections: nextRows.flat(),
         };
-      }
+      });
 
-      const rowIndex = targetSectionId
-        ? findRowIndexBySectionId(rows, targetSectionId)
-        : rows.length - 1;
-      const targetRowIndex = rowIndex >= 0 ? rowIndex : rows.length - 1;
-      const nextRows = rows.map((row) => [...row]);
-      const targetRow = nextRows[targetRowIndex] ?? [];
+      return sectionId;
+    },
+    [persistLayout]
+  );
 
-      if (targetRow.length >= MAX_SECTIONS_PER_ROW) {
-        nextRows.splice(targetRowIndex + 1, 0, [{ ...nextSection, span: 8 }]);
-      } else {
-        nextRows[targetRowIndex] = rebalanceRowSections([...targetRow, nextSection]);
-      }
-
-      return {
+  const renameSection = useCallback(
+    (sectionId: string, title: string) => {
+      persistLayout((previous) => ({
         ...previous,
-        sections: nextRows.flat(),
-      };
-    });
+        sections: previous.sections.map((section) =>
+          section.id === sectionId ? { ...section, title } : section
+        ),
+      }));
+    },
+    [persistLayout]
+  );
 
-    return sectionId;
-  }, []);
+  const removeSection = useCallback(
+    (sectionId: string) => {
+      persistLayout((previous) => {
+        const rows = partitionSectionRows(previous.sections);
+        const rowIndex = findRowIndexBySectionId(rows, sectionId);
+        if (rowIndex < 0) {
+          return previous;
+        }
 
-  const renameSection = useCallback((sectionId: string, title: string) => {
-    setLayout((previous) => ({
-      ...previous,
-      sections: previous.sections.map((section) =>
-        section.id === sectionId ? { ...section, title } : section
-      ),
-    }));
-  }, []);
+        const nextRows = rows.map((row: HomeDashboardSection[]) => [...row]);
+        const targetRow = nextRows[rowIndex].filter(
+          (section: HomeDashboardSection) => section.id !== sectionId
+        );
+        nextRows[rowIndex] = targetRow.length > 0 ? rebalanceRowSections(targetRow) : [];
+        const remainingSections = nextRows.flat();
+        const fallbackSectionId =
+          targetRow[0]?.id ??
+          remainingSections.find((section: HomeDashboardSection) => section.id !== sectionId)?.id;
+        const nextAssignments = Object.fromEntries(
+          Object.entries(previous.cardSectionAssignments).flatMap(([cardId, assigned]) => {
+            if (assigned !== sectionId) {
+              return [[cardId, assigned]];
+            }
 
-  const removeSection = useCallback((sectionId: string) => {
-    setLayout((previous) => {
-      const rows = partitionSectionsIntoRows(previous.sections);
-      const rowIndex = findRowIndexBySectionId(rows, sectionId);
-      if (rowIndex < 0) {
-        return previous;
-      }
+            return fallbackSectionId ? [[cardId, fallbackSectionId]] : [];
+          })
+        );
 
-      const nextRows = rows.map((row) => [...row]);
-      const targetRow = nextRows[rowIndex].filter((section) => section.id !== sectionId);
-      nextRows[rowIndex] = targetRow.length > 0 ? rebalanceRowSections(targetRow) : [];
-      const remainingSections = nextRows.flat();
-      const fallbackSectionId =
-        targetRow[0]?.id ?? remainingSections.find((section) => section.id !== sectionId)?.id;
-      const nextAssignments = Object.fromEntries(
-        Object.entries(previous.cardSectionAssignments).flatMap(([cardId, assigned]) => {
-          if (assigned !== sectionId) {
-            return [[cardId, assigned]];
-          }
-
-          return fallbackSectionId ? [[cardId, fallbackSectionId]] : [];
-        })
-      );
-
-      return {
-        ...previous,
-        sections: remainingSections,
-        cardSectionAssignments: nextAssignments,
-      };
-    });
-  }, []);
+        return {
+          ...previous,
+          sections: remainingSections,
+          cardSectionAssignments: nextAssignments,
+        };
+      });
+    },
+    [persistLayout]
+  );
 
   const addCard = useCallback(
     (cardId: string, sectionId?: string) => {
@@ -331,7 +337,7 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
         return;
       }
 
-      setLayout((previous) => {
+      persistLayout((previous) => {
         const cardIds = previous.cardIds.includes(cardId)
           ? previous.cardIds
           : [...previous.cardIds, cardId];
@@ -346,54 +352,110 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
         };
       });
     },
-    [validIdSet]
+    [persistLayout, validIdSet]
   );
 
-  const removeCard = useCallback((cardId: string) => {
-    setLayout((previous) => {
-      const nextAssignments = { ...previous.cardSectionAssignments };
-      delete nextAssignments[cardId];
+  const removeCard = useCallback(
+    (cardId: string) => {
+      persistLayout((previous) => {
+        const nextAssignments = { ...previous.cardSectionAssignments };
+        delete nextAssignments[cardId];
 
-      return {
-        ...previous,
-        cardIds: previous.cardIds.filter((id) => id !== cardId),
-        cardSectionAssignments: nextAssignments,
-      };
-    });
-  }, []);
+        return {
+          ...previous,
+          cardIds: previous.cardIds.filter((id) => id !== cardId),
+          cardSectionAssignments: nextAssignments,
+        };
+      });
+    },
+    [persistLayout]
+  );
 
-  const moveCard = useCallback((activeId: string, overId: string | null, sectionId?: string) => {
-    setLayout((previous) => {
-      if (!previous.cardIds.includes(activeId)) {
-        return previous;
-      }
+  const moveCard = useCallback(
+    (activeId: string, overId: string | null, sectionId?: string) => {
+      persistLayout((previous) => {
+        if (!previous.cardIds.includes(activeId)) {
+          return previous;
+        }
 
-      const withoutActive = previous.cardIds.filter((id) => id !== activeId);
-      const nextCardIds = [...withoutActive];
-
-      if (!overId || !withoutActive.includes(overId)) {
-        nextCardIds.push(activeId);
-      } else {
-        nextCardIds.splice(withoutActive.indexOf(overId), 0, activeId);
-      }
-
-      return {
-        ...previous,
-        cardIds: nextCardIds,
-        cardSectionAssignments:
+        const nextAssignments =
           previous.mode === 'sectioned' && sectionId
             ? { ...previous.cardSectionAssignments, [activeId]: sectionId }
-            : previous.cardSectionAssignments,
-      };
-    });
-  }, []);
+            : previous.cardSectionAssignments;
+        const withoutActive = previous.cardIds.filter((id) => id !== activeId);
 
-  const assignCardToSection = useCallback((cardId: string, sectionId: string) => {
-    setLayout((previous) => ({
-      ...previous,
-      cardSectionAssignments: { ...previous.cardSectionAssignments, [cardId]: sectionId },
-    }));
-  }, []);
+        if (previous.mode !== 'sectioned') {
+          const nextCardIds = [...withoutActive];
+
+          if (!overId || !withoutActive.includes(overId)) {
+            nextCardIds.push(activeId);
+          } else {
+            nextCardIds.splice(withoutActive.indexOf(overId), 0, activeId);
+          }
+
+          return {
+            ...previous,
+            cardIds: nextCardIds,
+            cardSectionAssignments: nextAssignments,
+          };
+        }
+
+        const targetGroup = getCardGroupKey(activeId, nextAssignments);
+        const grouped = new Map<string, string[]>();
+
+        for (const cardId of withoutActive) {
+          const group = getCardGroupKey(cardId, nextAssignments);
+          const cards = grouped.get(group);
+          if (cards) {
+            cards.push(cardId);
+          } else {
+            grouped.set(group, [cardId]);
+          }
+        }
+
+        const targetCards = [...(grouped.get(targetGroup) ?? [])];
+        if (!overId || !targetCards.includes(overId)) {
+          targetCards.push(activeId);
+        } else {
+          targetCards.splice(targetCards.indexOf(overId), 0, activeId);
+        }
+        grouped.set(targetGroup, targetCards);
+
+        const nextCardIds = withoutActive.reduce<string[]>((result, originalCardId) => {
+          const group = getCardGroupKey(originalCardId, nextAssignments);
+          const remainingCards = grouped.get(group);
+          const nextCardId = remainingCards?.shift();
+
+          if (nextCardId) {
+            result.push(nextCardId);
+          }
+
+          return result;
+        }, []);
+
+        for (const remainingCards of grouped.values()) {
+          nextCardIds.push(...remainingCards);
+        }
+
+        return {
+          ...previous,
+          cardIds: nextCardIds,
+          cardSectionAssignments: nextAssignments,
+        };
+      });
+    },
+    [persistLayout]
+  );
+
+  const assignCardToSection = useCallback(
+    (cardId: string, sectionId: string) => {
+      persistLayout((previous) => ({
+        ...previous,
+        cardSectionAssignments: { ...previous.cardSectionAssignments, [cardId]: sectionId },
+      }));
+    },
+    [persistLayout]
+  );
 
   return {
     layout,

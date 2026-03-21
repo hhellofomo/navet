@@ -1,3 +1,4 @@
+import type { RefObject } from 'react';
 import { useClickOutside, useTheme } from '@/app/hooks';
 import { NotificationEmptyState } from './notification-empty-state';
 import { NotificationHeader } from './notification-header';
@@ -9,10 +10,11 @@ import { useNotifications } from './use-notifications';
 interface NotificationPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  triggerRefs?: Array<RefObject<HTMLElement | null>>;
 }
 
-export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
-  const panelRef = useClickOutside<HTMLDivElement>(onClose, isOpen);
+export function NotificationPanel({ isOpen, onClose, triggerRefs = [] }: NotificationPanelProps) {
+  const panelRef = useClickOutside<HTMLDivElement>(onClose, isOpen, triggerRefs);
   const { theme, primaryColor } = useTheme();
   const surface = getNotificationSurfaceTokens(theme);
   const {
@@ -47,7 +49,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
 
         <div className="max-h-[calc(min(78vh,42rem)-7.5rem)] overflow-y-auto md:max-h-[60vh]">
           {notifications.length === 0 ? (
-            <NotificationEmptyState theme={theme} />
+            <NotificationEmptyState />
           ) : (
             <div className={`divide-y ${surface.dividerClassName}`}>
               {notifications.map((notification) => (

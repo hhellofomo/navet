@@ -1,12 +1,12 @@
 import { Search, X } from 'lucide-react';
 import { memo, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { InlineEmptyState } from '@/app/components/shared/inline-empty-state';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
 import { useI18n, useTheme } from '@/app/hooks';
 import type { DeviceWithType } from '@/app/types/device.types';
 import { getDeviceRoomLabel } from '@/app/utils/device-location';
-import { DashboardEmptyState } from '../dashboard-empty-state';
 import { ENTITY_LIST_HEIGHT, ENTITY_LIST_OVERSCAN, ENTITY_ROW_HEIGHT } from './constants';
 import type { AddEntityDialogProps } from './types';
 
@@ -267,7 +267,7 @@ export function AddEntityDialog({
               </div>
             </div>
           ) : (
-            <DashboardEmptyState
+            <InlineEmptyState
               title={t('dashboard.addEntity.emptyTitle')}
               description={
                 visibleEntityIds
@@ -276,7 +276,6 @@ export function AddEntityDialog({
               }
               surface={surface}
               accentColor={accentColor}
-              compact
             />
           )}
         </div>

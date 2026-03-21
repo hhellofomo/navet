@@ -6,8 +6,13 @@ import { useDashboardController } from '../hooks/use-dashboard-controller';
 
 export function DashboardPage() {
   const controller = useDashboardController();
+  const isDashboardReady =
+    controller.devicesLoaded &&
+    (controller.activeSection !== 'home' ||
+      controller.activeRoom !== 'All' ||
+      controller.homeLayoutHydrated);
 
-  if (!controller.devicesLoaded) {
+  if (!isDashboardReady) {
     const message = controller.connecting
       ? 'Connecting to Home Assistant...'
       : 'Loading devices...';

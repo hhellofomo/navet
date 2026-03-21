@@ -1,21 +1,12 @@
-import {
-  type DragEndEvent,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
 import { useI18n } from '@/app/hooks';
 import type { DeviceWithType } from '@/app/types/device.types';
 import type { CustomCard } from '../stores/custom-cards-store';
-import type {
-  HomeDashboardLayoutState,
-  HomeDashboardSectionSpan,
-} from './use-home-dashboard-layout';
+import { useDashboardDragState } from './use-dashboard-drag-state';
+import type { HomeDashboardLayoutState } from './use-home-dashboard-layout';
+import { partitionSectionRows } from './use-home-dashboard-layout';
 
 export type LibraryCard = {
   id: string;
@@ -41,38 +32,6 @@ const widgetTypeLabels: Record<CustomCard['type'], string> = {
   button: 'Button widget',
 };
 
-const MAX_SECTIONS_PER_ROW = 4;
-
-function partitionSectionRows<T extends { span: HomeDashboardSectionSpan }>(sections: T[]): T[][] {
-  const rows: T[][] = [];
-  let currentRow: T[] = [];
-  let currentWidth = 0;
-
-  for (const section of sections) {
-    if (
-      currentRow.length > 0 &&
-      (currentWidth + section.span > 8 || currentRow.length >= MAX_SECTIONS_PER_ROW)
-    ) {
-      rows.push(currentRow);
-      currentRow = [];
-      currentWidth = 0;
-    }
-
-    currentRow.push(section);
-    currentWidth += section.span;
-
-    if (currentWidth >= 8) {
-      rows.push(currentRow);
-      currentRow = [];
-      currentWidth = 0;
-    }
-  }
-
-  if (currentRow.length > 0) rows.push(currentRow);
-
-  return rows;
-}
-
 interface UseHomeDashboardEditorParams {
   deviceMap: Map<string, DeviceWithType>;
   allCustomCards: CustomCard[];
@@ -95,7 +54,7 @@ export function useHomeDashboardEditor({
   addHomeSection,
 }: UseHomeDashboardEditorParams) {
   const { t } = useI18n();
-  const [activeDragCard, setActiveDragCard] = useState<string | null>(null);
+  const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const [libraryQuery, setLibraryQuery] = useState('');
 
   const allCards = useMemo(() => {
@@ -148,50 +107,31 @@ export function useHomeDashboardEditor({
 
   const sectionRows = useMemo(() => partitionSectionRows(sectionCards), [sectionCards]);
 
-  const flowCards = useMemo(
-    () =>
-      selectedIds.filter((id) => {
-        const assignedSectionId = homeLayout.cardSectionAssignments[id];
-        return !assignedSectionId || !sectionIds.has(assignedSectionId);
-      }),
-    [homeLayout.cardSectionAssignments, sectionIds, selectedIds]
-  );
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  );
-
-  const activeDragSize = useMemo<CardSize | null>(() => {
-    if (!activeDragCard) return null;
-    const entry = allCards.get(activeDragCard);
-    const resolvedSize = cardSizes[activeDragCard];
-    if (resolvedSize) return resolvedSize;
-    if (entry && 'size' in entry) return entry.size as CardSize;
-    return 'small';
-  }, [activeDragCard, allCards, cardSizes]);
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const activeMeta = event.active.data.current as DragMeta | undefined;
-    const overMeta = event.over?.data.current as DropMeta | undefined;
-
-    setActiveDragCard(null);
-
-    if (!activeMeta || !overMeta) return;
-
-    const targetSectionId = overMeta.sectionId;
-    const overCardId = overMeta.type === 'card' ? overMeta.cardId : null;
-
-    if (activeMeta.source === 'library') {
-      addHomeCard(activeMeta.cardId, targetSectionId);
-      moveHomeCard(activeMeta.cardId, overCardId, targetSectionId);
+  useEffect(() => {
+    if (homeLayout.mode !== 'sectioned') {
       return;
     }
 
-    if (activeMeta.cardId === overCardId) return;
+    const firstSectionId = homeLayout.sections[0]?.id ?? null;
+    const sectionIdSet = new Set(homeLayout.sections.map((section) => section.id));
 
-    moveHomeCard(activeMeta.cardId, overCardId, targetSectionId);
-  };
+    setActiveSectionId((previous) =>
+      previous && sectionIdSet.has(previous) ? previous : firstSectionId
+    );
+  }, [homeLayout.mode, homeLayout.sections]);
+
+  const flowCards = useMemo(() => {
+    if (homeLayout.mode !== 'sectioned') {
+      return selectedIds;
+    }
+
+    return selectedIds.filter((id) => {
+      const assignedSectionId = homeLayout.cardSectionAssignments[id];
+      return !assignedSectionId || !sectionIds.has(assignedSectionId);
+    });
+  }, [homeLayout.cardSectionAssignments, homeLayout.mode, sectionIds, selectedIds]);
+
+  const dragState = useDashboardDragState({ allCards, cardSizes, addHomeCard, moveHomeCard });
 
   const filteredLibraryCards = useMemo(() => {
     const normalizedQuery = libraryQuery.trim().toLowerCase();
@@ -210,8 +150,15 @@ export function useHomeDashboardEditor({
       addHomeCard(cardId);
       return;
     }
-    const firstSectionId = homeLayout.sections[0]?.id ?? addHomeSection();
-    addHomeCard(cardId, firstSectionId);
+
+    const targetSectionId =
+      (activeSectionId &&
+        homeLayout.sections.some((section) => section.id === activeSectionId) &&
+        activeSectionId) ||
+      homeLayout.sections[0]?.id ||
+      addHomeSection();
+
+    addHomeCard(cardId, targetSectionId);
   };
 
   const summaryItems = [
@@ -225,11 +172,9 @@ export function useHomeDashboardEditor({
     allCards,
     flowCards,
     sectionRows,
-    activeDragCard,
-    setActiveDragCard,
-    activeDragSize,
-    sensors,
-    handleDragEnd,
+    activeSectionId,
+    setActiveSectionId,
+    ...dragState,
     libraryCards,
     libraryQuery,
     setLibraryQuery,
