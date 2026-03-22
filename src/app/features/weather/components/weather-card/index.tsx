@@ -63,7 +63,7 @@ export const WeatherCard = memo(function WeatherCard({
   isEditMode: _isEditMode,
 }: WeatherCardProps) {
   const { theme } = useTheme();
-  const { formatDate, formatTime, t } = useI18n();
+  const { t } = useI18n();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const cardShell = getCardShellSurfaceTokens(theme);
   const surface = getThemeSurfaceTokens(theme);
@@ -72,12 +72,6 @@ export const WeatherCard = memo(function WeatherCard({
   const isSmall = isCompactCardSize(size);
   const isLarge = size === 'large';
   const visibleForecast = isLarge ? forecast : forecast.slice(0, 3);
-
-  // Get current date and time
-  const now = new Date();
-  const dayName = formatDate(now, { weekday: 'long' });
-  const time = formatTime(now, { hour: 'numeric', minute: '2-digit' }, true);
-  const dateTime = `${dayName}, ${time}`;
 
   // Theme-aware colors
   const textPrimary = surface.textPrimary;
@@ -108,7 +102,12 @@ export const WeatherCard = memo(function WeatherCard({
             setIsSettingsOpen(true);
           }}
         >
-          <div className="flex items-start justify-between">
+          <div className={`${isSmall ? 'gap-2' : 'gap-3'} flex items-start`}>
+            <div
+              className={`${isSmall ? 'h-8 w-8' : 'h-10 w-10'} rounded-full flex shrink-0 items-center justify-center ${iconBg}`}
+            >
+              <WeatherIcon condition={condition} className={`${isSmall ? 'h-4 w-4' : 'h-5 w-5'}`} />
+            </div>
             <div className="min-w-0 flex-1">
               <h3
                 className={`font-semibold ${textPrimary} truncate ${isSmall ? 'text-xs' : 'text-sm'}`}
@@ -118,12 +117,6 @@ export const WeatherCard = memo(function WeatherCard({
               <p className={`mt-0.5 truncate text-[10px] ${surface.textMuted}`}>
                 {t('weather.subtitle')}
               </p>
-              {!isSmall && <p className={`text-xs ${textSecondary}`}>{dateTime}</p>}
-            </div>
-            <div
-              className={`${isSmall ? 'h-8 w-8' : 'h-10 w-10'} rounded-full flex shrink-0 items-center justify-center ${iconBg}`}
-            >
-              <WeatherIcon condition={condition} className={`${isSmall ? 'h-4 w-4' : 'h-5 w-5'}`} />
             </div>
           </div>
         </button>

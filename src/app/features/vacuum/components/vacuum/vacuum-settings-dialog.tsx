@@ -1,6 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Home, Play } from 'lucide-react';
-import { DialogHeader } from '@/app/components/shared/device-editor';
+import { DialogHeader, DialogSectionRow } from '@/app/components/shared/device-editor';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
@@ -45,10 +45,10 @@ export function VacuumSettingsDialog({
               title={t('vacuum.settings.title', { name })}
               description={`${name} - ${room}`}
               isOn={theme !== 'light'}
-              trailing={
-                <EntityRoomSelector entityId={entityId} label={t('vacuum.settings.room')} compact />
-              }
             />
+            <DialogSectionRow label={t('vacuum.settings.room')}>
+              <EntityRoomSelector entityId={entityId} label={t('vacuum.settings.room')} compact />
+            </DialogSectionRow>
           </div>
 
           <div className="p-6 space-y-6">

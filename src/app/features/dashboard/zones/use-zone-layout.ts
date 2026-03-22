@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { DeviceWithType } from '@/app/types/device.types';
-import type { CustomCard } from '../stores/custom-cards-store';
+import { type CustomCard, HOME_WIDGET_ROOM } from '../stores/custom-cards-store';
 import { resolveCardZone } from './resolve-card-zone';
 import { ZONE_ORDERED, type ZoneName } from './zone-types';
 
@@ -13,7 +13,7 @@ export interface ZoneSection {
  * Partitions all home-screen cards into named zones.
  *
  * Device cards are bucketed by device type (or stored zone override).
- * Custom cards with `room === 'All'` are included, bucketed by card type
+ * Custom cards assigned to the home screen are included, bucketed by card type
  * (or stored zone override on the card or in cardZones).
  *
  * Only zones that contain at least one card are returned.
@@ -36,9 +36,9 @@ export function useZoneLayout(
       push(resolveCardZone(device.type, cardZones[id]), id);
     }
 
-    // Custom widget cards — only those assigned to the home screen (room === 'All')
+    // Custom widget cards — only those assigned to the home screen
     for (const card of customCards) {
-      if (card.room !== 'All') continue;
+      if (card.room !== 'All' && card.room !== HOME_WIDGET_ROOM) continue;
       push(resolveCardZone(card.type, card.zone ?? cardZones[card.id]), card.id);
     }
 

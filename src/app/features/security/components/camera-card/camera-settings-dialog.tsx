@@ -1,8 +1,11 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import type { HassEntity } from 'home-assistant-js-websocket';
-import { X } from 'lucide-react';
 import { memo, useCallback } from 'react';
-import { CustomScrollbar } from '@/app/components/shared/device-editor';
+import {
+  CustomScrollbar,
+  DialogHeader,
+  DialogSectionRow,
+} from '@/app/components/shared/device-editor';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { useI18n } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
@@ -177,32 +180,14 @@ export const CameraSettingsDialog = memo(function CameraSettingsDialog({
           <CustomScrollbar isOn>
             <div className="p-6">
               {/* Header */}
-              <div className="mb-6 flex items-start justify-between gap-4">
-                <div>
-                  <Dialog.Title className="text-lg font-bold text-white">
-                    {t('camera.settings.title')}
-                  </Dialog.Title>
-                  <Dialog.Description className="mt-0.5 text-sm text-white/50">
-                    {name} · {room}
-                  </Dialog.Description>
-                </div>
-                <div className="flex items-center gap-2">
-                  <EntityRoomSelector
-                    entityId={entityId}
-                    label={t('camera.settings.room')}
-                    compact
-                  />
-                  <Dialog.Close asChild>
-                    <button
-                      type="button"
-                      aria-label="Close"
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/60 transition-colors hover:bg-white/20 hover:text-white"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </Dialog.Close>
-                </div>
-              </div>
+              <DialogHeader
+                title={t('camera.settings.title')}
+                description={`${name} · ${room}`}
+                isOn
+              />
+              <DialogSectionRow label={t('camera.settings.room')}>
+                <EntityRoomSelector entityId={entityId} label={t('camera.settings.room')} compact />
+              </DialogSectionRow>
 
               {hasControls ? (
                 <div className="space-y-6">

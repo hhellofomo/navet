@@ -89,7 +89,7 @@ export function useLightCardController({
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [customColor, setCustomColor] = useState('#FFA500');
   const [isOpen, setIsOpen] = useState(false);
-  const [applyBrightnessPresetsToAll, setApplyBrightnessPresetsToAll] = useState(true);
+  const [applyBrightnessPresetsToAll, setApplyBrightnessPresetsToAll] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState(DEFAULT_LIGHT_ICON);
   const connection = useHomeAssistant(homeAssistantSelectors.connection);
   // Per-entity selector: only re-renders this card when its own entity changes.

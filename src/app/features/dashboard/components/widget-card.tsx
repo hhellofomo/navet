@@ -48,7 +48,7 @@ const ButtonWidget = lazy(async () => {
 interface WidgetCardProps {
   card: CustomCard;
   isEditMode: boolean;
-  onUpdate?: (cardId: string, data: Record<string, unknown>) => void;
+  onUpdate?: (cardId: string, updates: Partial<Omit<CustomCard, 'id' | 'createdAt'>>) => void;
 }
 
 function WidgetFallback() {
@@ -58,14 +58,22 @@ function WidgetFallback() {
 export function WidgetCard({ card, isEditMode, onUpdate }: WidgetCardProps) {
   const handleNoteChange = (note: string) => {
     if (onUpdate) {
-      onUpdate(card.id, { note });
+      onUpdate(card.id, { data: { ...card.data, note } });
     }
   };
 
   let widgetContent: React.ReactNode;
   switch (card.type) {
     case 'rss':
-      widgetContent = <RSSFeedCard cardId={card.id} inEditMode={isEditMode} size={card.size} />;
+      widgetContent = (
+        <RSSFeedCard
+          cardId={card.id}
+          inEditMode={isEditMode}
+          size={card.size}
+          room={card.room}
+          onRoomChange={onUpdate ? (room) => onUpdate(card.id, { room }) : undefined}
+        />
+      );
       break;
     case 'photo':
       widgetContent = (
@@ -73,7 +81,9 @@ export function WidgetCard({ card, isEditMode, onUpdate }: WidgetCardProps) {
           size={card.size}
           photoUrls={card.data?.photoUrls as string[] | undefined}
           onUpdateUrls={
-            onUpdate ? (urls) => onUpdate(card.id, { ...card.data, photoUrls: urls }) : undefined
+            onUpdate
+              ? (urls) => onUpdate(card.id, { data: { ...card.data, photoUrls: urls } })
+              : undefined
           }
           isEditMode={isEditMode}
         />
@@ -91,7 +101,9 @@ export function WidgetCard({ card, isEditMode, onUpdate }: WidgetCardProps) {
       widgetContent = (
         <ButtonWidget
           data={card.data as { label?: string; service?: string; entityId?: string } | undefined}
-          onUpdate={onUpdate ? (data) => onUpdate(card.id, { ...card.data, ...data }) : undefined}
+          onUpdate={
+            onUpdate ? (data) => onUpdate(card.id, { data: { ...card.data, ...data } }) : undefined
+          }
           isEditMode={isEditMode}
         />
       );

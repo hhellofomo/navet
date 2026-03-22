@@ -5,7 +5,7 @@ import { getDeviceEditorSurfaceTokens } from './device-editor-surface-tokens';
 
 interface DialogHeaderProps {
   title: string;
-  description: string;
+  description?: string;
   isOn: boolean;
   trailing?: ReactNode;
 }
@@ -19,21 +19,23 @@ export const DialogHeader = memo(function DialogHeader({
   const editorSurface = getDeviceEditorSurfaceTokens(isOn);
 
   return (
-    <div className="flex items-start justify-between mb-6">
+    <div className="mb-6 flex items-center justify-between">
       <div>
         <Dialog.Title
           className={`text-xl font-semibold transition-colors duration-500 ${editorSurface.titleClassName}`}
         >
           {title}
         </Dialog.Title>
-        <Dialog.Description
-          className={`mt-1 text-sm transition-colors duration-500 ${editorSurface.descriptionClassName}`}
-        >
-          {description}
-        </Dialog.Description>
+        {description ? (
+          <Dialog.Description
+            className={`mt-1 text-sm transition-colors duration-500 ${editorSurface.descriptionClassName}`}
+          >
+            {description}
+          </Dialog.Description>
+        ) : null}
       </div>
 
-      <div className="ml-4 flex items-start gap-2">
+      <div className="ml-4 flex items-center gap-2">
         {trailing}
 
         <Dialog.Close asChild>

@@ -7,7 +7,7 @@ This project includes components from [shadcn/ui](https://ui.shadcn.com/) used u
 
 ## Open Source Libraries
 
-- **React/Preact** - UI framework
+- **React** - UI framework
 - **Tailwind CSS** - Styling
 - **Radix UI** - Accessible components
 - **Zustand** - State management

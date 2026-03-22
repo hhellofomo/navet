@@ -1,5 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
+import { DialogHeader, DialogSectionRow } from '@/app/components/shared/device-editor';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
@@ -73,24 +74,10 @@ export function MediaDialog({
               : 'bg-gradient-to-br from-pink-900/95 to-purple-950/95 border-pink-700/20'
           }`}
         >
-          <div className="mb-6">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <Dialog.Title className={`text-xl font-semibold ${surface.textPrimary}`}>
-                  {title}
-                </Dialog.Title>
-                <Dialog.Description className={`text-sm mt-1 ${surface.textSecondary}`}>
-                  {artist}
-                </Dialog.Description>
-              </div>
-              <EntityRoomSelector
-                entityId={entityId}
-                label={t('media.room')}
-                compact
-                className="w-32"
-              />
-            </div>
-          </div>
+          <DialogHeader title={title} description={artist} isOn={theme !== 'light'} />
+          <DialogSectionRow label={t('common.room')}>
+            <EntityRoomSelector entityId={entityId} label={t('media.room')} compact />
+          </DialogSectionRow>
 
           <div className="space-y-6">
             {/* Album Art */}

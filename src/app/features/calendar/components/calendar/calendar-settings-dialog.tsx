@@ -1,6 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Check } from 'lucide-react';
-import { DialogHeader } from '@/app/components/shared/device-editor';
+import { DialogHeader, DialogSectionRow } from '@/app/components/shared/device-editor';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
@@ -57,11 +57,10 @@ export function CalendarSettingsDialog({
             description={t('calendar.settings.description', { title })}
             isOn={isOn}
           />
-
           {entityId ? (
-            <div className={`mb-4 rounded-2xl p-4 ${surface.subtleBg}`}>
-              <EntityRoomSelector entityId={entityId} label={t('calendar.settings.room')} />
-            </div>
+            <DialogSectionRow label={t('calendar.settings.room')}>
+              <EntityRoomSelector entityId={entityId} label={t('calendar.settings.room')} compact />
+            </DialogSectionRow>
           ) : null}
 
           <div className="mb-4">

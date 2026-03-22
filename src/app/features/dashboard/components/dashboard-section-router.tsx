@@ -153,6 +153,7 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
           <RenderProfiler id="HomeDashboardOverview">
             <HomeDashboardOverview
               deviceMap={deviceMap}
+              availableDeviceMap={controller.availableDeviceMap}
               cardSizes={cardSizes}
               updateCardSize={updateCardSize}
               isEditMode={isEditMode}
@@ -163,17 +164,14 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
               removeHomeCard={controller.removeHomeCard}
               moveHomeCard={controller.moveHomeCard}
               setHomeLayoutMode={controller.setHomeLayoutMode}
-              setHomeShowHero={controller.setHomeShowHero}
               addHomeSection={controller.addHomeSection}
               addHomeColumnSection={controller.addHomeColumnSection}
               renameHomeSection={controller.renameHomeSection}
               removeHomeSection={controller.removeHomeSection}
-              onOpenAddEntityDialog={
-                addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined
-              }
               onOpenAddCardDialog={controller.onOpenAddCardDialog}
               onUpdateCard={handleUpdateCard}
               onToggleEditMode={controller.onToggleEditMode}
+              onShowEntity={controller.handleAddEntity}
             />
           </RenderProfiler>
         ) : (

@@ -3,7 +3,7 @@ import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import type { Device, DeviceCollection } from '@/app/types/device.types';
 import { getDeviceRoomLabel } from '@/app/utils/device-location';
 import { storage } from '@/app/utils/storage';
-import type { CustomCard } from './use-custom-cards';
+import { type CustomCard, HOME_WIDGET_ROOM } from './use-custom-cards';
 
 export const useCardOrdering = (
   devices: DeviceCollection,
@@ -40,7 +40,10 @@ export const useCardOrdering = (
     const pairs = deviceIdRoomPairsRef.current;
     const orders: Record<string, string[]> = {};
     const orderedRooms = Array.from(
-      new Set([...rooms, ...safeCustomCards.map((card) => card.room)])
+      new Set([
+        ...rooms,
+        ...safeCustomCards.map((card) => card.room).filter((room) => room !== HOME_WIDGET_ROOM),
+      ])
     );
 
     orderedRooms.forEach((room) => {

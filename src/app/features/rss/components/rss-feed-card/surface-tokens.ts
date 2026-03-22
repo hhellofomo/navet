@@ -25,8 +25,8 @@ export function getRSSFeedCardSurfaceTokens(theme: ThemeType, primaryColor: Prim
       theme === 'light' ? '' : theme === 'glass' ? 'bg-white/[0.03] backdrop-blur-sm' : '',
     textSecondaryClassName: theme === 'light' ? 'text-gray-500' : surface.textMuted,
     dividerClassName:
-      theme === 'light' ? 'bg-gray-200' : theme === 'glass' ? 'bg-white/10' : 'bg-zinc-800',
-    hoverClassName: theme === 'light' ? 'hover:bg-gray-100/80' : surface.hoverBg,
+      theme === 'light' ? 'bg-gray-200/90' : theme === 'glass' ? 'bg-white/12' : 'bg-white/8',
+    hoverClassName: '',
     dotClassName: theme === 'light' ? 'text-gray-300' : 'text-white/40',
     excerptClassName: theme === 'light' ? 'text-gray-500' : 'text-white/70',
     readMoreClassName: theme === 'light' ? 'text-gray-600' : 'text-white/80',

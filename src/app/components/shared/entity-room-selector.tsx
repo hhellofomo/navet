@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react';
+import { ChevronDown, Home, Loader2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
@@ -48,10 +48,31 @@ export function EntityRoomSelector({
 
     return deviceRegistry.find((entry) => entry.id === entityEntry.device_id)?.area_id ?? '';
   }, [deviceRegistry, entityId, entityRegistry]);
+  const selectedAreaLabel = useMemo(() => {
+    if (!selectedAreaId) {
+      return t('common.noRoom');
+    }
+
+    return sortedAreas.find((area) => area.area_id === selectedAreaId)?.name ?? t('common.noRoom');
+  }, [selectedAreaId, sortedAreas, t]);
 
   const baseSelectClassName = compact
     ? `h-9 rounded-xl px-3 pr-8 text-xs ${surface.textPrimary}`
     : `h-10 rounded-xl px-3 pr-8 text-sm ${surface.textPrimary}`;
+  const handleChange = async (nextValue: string) => {
+    const nextAreaId = nextValue || null;
+    const nextRoomName =
+      sortedAreas.find((area) => area.area_id === nextAreaId)?.name ?? t('common.noRoom');
+    setIsSaving(true);
+    try {
+      await homeAssistantService.updateEntityArea(entityId, nextAreaId);
+      toast.success(t('entityRoomSelector.movedTo', { room: nextRoomName }));
+    } catch {
+      toast.error(t('entityRoomSelector.updateFailed'));
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className={`min-w-0 ${className}`}>
@@ -60,54 +81,72 @@ export function EntityRoomSelector({
       )}
 
       <div className="relative">
-        <select
-          aria-label={resolvedLabel}
-          value={selectedAreaId}
-          disabled={isSaving}
-          onChange={async (event) => {
-            const nextAreaId = event.target.value || null;
-            const nextRoomName =
-              sortedAreas.find((area) => area.area_id === nextAreaId)?.name ?? t('common.noRoom');
-            setIsSaving(true);
-            try {
-              await homeAssistantService.updateEntityArea(entityId, nextAreaId);
-              toast.success(t('entityRoomSelector.movedTo', { room: nextRoomName }));
-            } catch {
-              toast.error(t('entityRoomSelector.updateFailed'));
-            } finally {
-              setIsSaving(false);
-            }
-          }}
-          className={`w-full appearance-none border ${surface.border} ${surface.inputBg} ${baseSelectClassName} disabled:cursor-not-allowed disabled:opacity-60`}
-        >
-          <option value="">{t('common.noRoom')}</option>
-          {sortedAreas.map((area) => (
-            <option key={area.area_id} value={area.area_id}>
-              {area.name}
-            </option>
-          ))}
-        </select>
-
-        <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-          {isSaving ? (
-            <Loader2 className={`h-3.5 w-3.5 animate-spin ${surface.textSecondary}`} />
-          ) : (
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 20 20"
-              fill="none"
-              className={`h-4 w-4 ${surface.textSecondary}`}
+        {compact ? (
+          <>
+            <select
+              aria-label={resolvedLabel}
+              value={selectedAreaId}
+              disabled={isSaving}
+              onChange={(event) => void handleChange(event.target.value)}
+              className="absolute inset-0 z-10 w-full cursor-pointer appearance-none opacity-0 disabled:cursor-not-allowed"
             >
-              <path
-                d="M5 7.5 10 12.5 15 7.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          )}
-        </div>
+              <option value="">{t('common.noRoom')}</option>
+              {sortedAreas.map((area) => (
+                <option key={area.area_id} value={area.area_id}>
+                  {area.name}
+                </option>
+              ))}
+            </select>
+            <div
+              className={`inline-flex min-w-0 items-center gap-2 text-sm ${surface.textPrimary}`}
+            >
+              <Home className={`h-4 w-4 ${surface.textSecondary}`} />
+              <span className="max-w-[12rem] truncate font-medium">{selectedAreaLabel}</span>
+              {isSaving ? (
+                <Loader2 className={`h-4 w-4 animate-spin ${surface.textSecondary}`} />
+              ) : (
+                <ChevronDown className={`h-4 w-4 ${surface.textSecondary}`} />
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            <select
+              aria-label={resolvedLabel}
+              value={selectedAreaId}
+              disabled={isSaving}
+              onChange={(event) => void handleChange(event.target.value)}
+              className={`w-full appearance-none border ${surface.border} ${surface.inputBg} ${baseSelectClassName} disabled:cursor-not-allowed disabled:opacity-60`}
+            >
+              <option value="">{t('common.noRoom')}</option>
+              {sortedAreas.map((area) => (
+                <option key={area.area_id} value={area.area_id}>
+                  {area.name}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+              {isSaving ? (
+                <Loader2 className={`h-3.5 w-3.5 animate-spin ${surface.textSecondary}`} />
+              ) : (
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  className={`h-4 w-4 ${surface.textSecondary}`}
+                >
+                  <path
+                    d="M5 7.5 10 12.5 15 7.5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

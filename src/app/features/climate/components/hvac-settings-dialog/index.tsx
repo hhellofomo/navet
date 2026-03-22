@@ -1,7 +1,11 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Flame, Power, Snowflake, Wind } from 'lucide-react';
 import { memo } from 'react';
-import { CustomScrollbar, DialogHeader } from '@/app/components/shared/device-editor';
+import {
+  CustomScrollbar,
+  DialogHeader,
+  DialogSectionRow,
+} from '@/app/components/shared/device-editor';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { useI18n } from '@/app/hooks';
 import { getHVACSettingsDialogStyles } from './styles';
@@ -36,14 +40,14 @@ export const HVACSettingsDialog = memo(function HVACSettingsDialog({
                 title={t('climate.settings.title')}
                 description={`${name} - ${room}`}
                 isOn={isOn}
-                trailing={
-                  <EntityRoomSelector
-                    entityId={entityId}
-                    label={t('climate.settings.room')}
-                    compact
-                  />
-                }
               />
+              <DialogSectionRow label={t('climate.settings.room')}>
+                <EntityRoomSelector
+                  entityId={entityId}
+                  label={t('climate.settings.room')}
+                  compact
+                />
+              </DialogSectionRow>
 
               <div className="space-y-8">
                 {/* Temperature Display */}

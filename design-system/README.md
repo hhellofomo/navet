@@ -41,7 +41,7 @@ Design inspiration and visual direction:
 - Brand personality
 - Design evolution roadmap
 
-### [Features Documentation](./FEATURES.md) ✨ NEW
+### [Features Documentation](./FEATURES.md)
 Complete feature implementation guide:
 - Authentication system and login flow
 - Theme customization (4 modes, built-in accents, custom accent color, and visual quality tiers)
@@ -187,41 +187,18 @@ Use these values in your design tools (Figma, Sketch, etc.):
 - **Medium**: Single adjustable parameter (brightness, temperature, volume)
 - **Large**: Multiple parameters, complex controls, detailed status
 
-## 🔄 Version History
+## 🛠 Section Status
 
-- **v1.0** - Initial design system documentation
-- **v1.1** - Standardized icon sizing across all cards
-- **v1.2** - Added adaptive layout guidelines and best practices
-- **v1.3** - Added authentication system, theme customization, and navigation system
-- **v1.4** - Implemented settings section and empty states for all sections
-- **v1.5** - Auth/config moved to Zustand stores; sidebar updated to 64px icon-only layout; drag & drop card/room reordering shipped; typed HA service events; navigation store migrated to Zustand persist
-
-## 📖 How to Use This Documentation
-
-1. **New Team Members**: Start with [Moodboard](./MOODBOARD.md) for design vision
-2. **Building Components**: Reference [UI Guidelines](./UI-GUIDELINES.md) for patterns
-3. **Layout Questions**: Check [Layout Structure](./LAYOUT-STRUCTURE.md)
-4. **Design Reviews**: Use all three docs as evaluation criteria
-
-## 🤝 Contributing
-
-When proposing design changes:
-1. Ensure it aligns with iOS widget aesthetic
-2. Maintain consistency with existing patterns
-3. Document new patterns in appropriate section
-4. Update version history
-5. Test across all card sizes and breakpoints
-
-## 📬 Feedback & Questions
-
-This design system evolves based on real-world usage and feedback. Document learnings and improvements as you build.
+| Section | Status |
+|---|---|
+| Home | Live — dashboard builder with flow/sectioned layouts |
+| Security | Live — camera cards via HA `camera.*` entities |
+| Lights | Live — `AllViewGrid` with all light entities |
+| Media | Live — HA `media_player.*` entity cards |
+| Locks | Live — HA `lock.*` entity cards |
+| Tasks | Placeholder — not yet mapped to Navet card types |
+| Settings | Live |
 
 ---
 
-### Sidebar Section Status
-- **Media** and **Locks** now render live Home Assistant-backed cards in their dedicated section views
-- **Security** and **Tasks** still use placeholder section states until those domains are mapped into Navet card/device types
-
-**Design System Maintained By:** Development Team
-**Last Updated:** March 13, 2026
-**Status:** Living Document
+**Last Updated:** March 22, 2026

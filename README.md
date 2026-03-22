@@ -371,20 +371,9 @@ For technical documentation and developer guides, see [`/docs/README.md`](docs/R
 
 Found a bug or have an idea? [Open an issue](https://github.com/awesomestvi/navet/issues)!
 
-## 📸 Screenshots
-
-> Add screenshots here once deployed
-
 ## 🗺️ Roadmap
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for planned features and shipped history.
-
-## 🙏 Acknowledgments
-
-- Smart home community
-- Tailwind CSS team
-- Radix UI team
-- All contributors
 
 ## 💬 Contact
 

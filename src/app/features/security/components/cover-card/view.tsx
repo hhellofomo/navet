@@ -5,6 +5,7 @@ import type { HTMLAttributes } from 'react';
 import { CardActionRow } from '@/app/components/shared/card-action-row';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
+import { DialogHeader, DialogSectionRow } from '@/app/components/shared/device-editor';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
@@ -321,16 +322,14 @@ export function CoverCardView({
             <Dialog.Content
               className={`fixed top-1/2 left-1/2 z-50 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl border p-6 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in duration-200 ${securitySurface.dialogContentClassName}`}
             >
-              <Dialog.Title className="text-xl font-semibold text-white mb-2">
-                {t('cover.settings.deviceType')}
-              </Dialog.Title>
-              <Dialog.Description className="text-sm text-gray-300 mb-6">
-                {t('cover.settings.description', { name })}
-              </Dialog.Description>
-
-              <div className="mb-6">
-                <EntityRoomSelector entityId={entityId} label={t('common.room')} />
-              </div>
+              <DialogHeader
+                title={t('cover.settings.deviceType')}
+                description={t('cover.settings.description', { name })}
+                isOn
+              />
+              <DialogSectionRow label={t('common.room')}>
+                <EntityRoomSelector entityId={entityId} label={t('common.room')} compact />
+              </DialogSectionRow>
 
               <div className="grid grid-cols-2 gap-3 mb-6">
                 {(Object.keys(deviceClassConfig) as DeviceClass[]).map((type) => {

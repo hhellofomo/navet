@@ -1,7 +1,16 @@
-import { type PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from 'react';
+import {
+  type PointerEvent as ReactPointerEvent,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 const FLOATING_LIBRARY_WIDTH = 360;
 const FLOATING_LIBRARY_DOCK_GAP = 20;
+const FLOATING_LIBRARY_MIN_MARGIN = 8;
+const FLOATING_LIBRARY_MIN_TOP = 88;
+const FLOATING_LIBRARY_BOTTOM_OFFSET = 120;
 
 export interface UseLibraryPanelReturn {
   libraryPanelRef: React.RefObject<HTMLDivElement | null>;
@@ -20,6 +29,15 @@ export function useLibraryPanel(): UseLibraryPanelReturn {
   const [isLibraryVisible, setIsLibraryVisible] = useState(false);
   const [isLibraryCollapsed, setIsLibraryCollapsed] = useState(false);
   const [libraryPosition, setLibraryPosition] = useState({ x: 0, y: 0 });
+
+  useLayoutEffect(() => {
+    const panel = libraryPanelRef.current;
+    if (!panel || !isLibraryVisible || isLibraryCollapsed) {
+      return;
+    }
+
+    panel.style.transform = `translate(${libraryPosition.x}px, ${libraryPosition.y}px)`;
+  }, [isLibraryCollapsed, isLibraryVisible, libraryPosition]);
 
   useEffect(() => {
     const placePanel = () => {
@@ -41,6 +59,7 @@ export function useLibraryPanel(): UseLibraryPanelReturn {
 
     const panel = libraryPanelRef.current;
     if (!panel) return;
+    event.preventDefault();
 
     const rect = panel.getBoundingClientRect();
     dragOffsetRef.current = {
@@ -48,21 +67,48 @@ export function useLibraryPanel(): UseLibraryPanelReturn {
       y: event.clientY - rect.top,
     };
 
+    let lastX = rect.left;
+    let lastY = rect.top;
+    let nextX = rect.left;
+    let nextY = rect.top;
+    let frameId: number | null = null;
+    const previousUserSelect = document.body.style.userSelect;
+
+    panel.style.willChange = 'transform';
+    document.body.style.userSelect = 'none';
+
+    const flushTransform = () => {
+      panel.style.transform = `translate(${nextX}px, ${nextY}px)`;
+      frameId = null;
+    };
+
     const handlePointerMove = (moveEvent: PointerEvent) => {
-      const nextX = Math.min(
-        Math.max(8, moveEvent.clientX - dragOffsetRef.current.x),
-        window.innerWidth - rect.width - 8
+      nextX = Math.min(
+        Math.max(FLOATING_LIBRARY_MIN_MARGIN, moveEvent.clientX - dragOffsetRef.current.x),
+        window.innerWidth - rect.width - FLOATING_LIBRARY_MIN_MARGIN
       );
-      const nextY = Math.min(
-        Math.max(88, moveEvent.clientY - dragOffsetRef.current.y),
-        window.innerHeight - 120
+      nextY = Math.min(
+        Math.max(FLOATING_LIBRARY_MIN_TOP, moveEvent.clientY - dragOffsetRef.current.y),
+        window.innerHeight - FLOATING_LIBRARY_BOTTOM_OFFSET
       );
-      setLibraryPosition({ x: nextX, y: nextY });
+
+      if (frameId === null) {
+        frameId = window.requestAnimationFrame(flushTransform);
+      }
     };
 
     const handlePointerUp = () => {
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+        flushTransform();
+      }
+      panel.style.willChange = '';
+      document.body.style.userSelect = previousUserSelect;
+      lastX = nextX;
+      lastY = nextY;
+      setLibraryPosition({ x: lastX, y: lastY });
     };
 
     window.addEventListener('pointermove', handlePointerMove);

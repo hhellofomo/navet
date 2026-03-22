@@ -1,9 +1,9 @@
-import { type SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
+import { type SetStateAction, useCallback, useMemo, useState } from 'react';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import { storage } from '@/app/utils/storage';
 
 export type HomeLayoutMode = 'flow' | 'sectioned';
-export type HomeDashboardSectionSpan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+export type HomeDashboardSectionSpan = number;
 
 export interface HomeDashboardSection {
   id: string;
@@ -28,27 +28,22 @@ const DEFAULT_LAYOUT: HomeDashboardLayoutState = {
 };
 
 const SECTION_TITLE_PREFIX = 'Section';
+const MIN_SECTION_COLUMNS = 1;
 const TOTAL_SECTION_COLUMNS = 8;
 const MAX_SECTIONS_PER_ROW = 4;
+const FULL_ROW_SPAN = TOTAL_SECTION_COLUMNS;
+const CUSTOM_CARD_ID_PREFIX = 'custom-';
 
 function createSectionId() {
   return `home-section-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 function normalizeSectionSpan(span: unknown): HomeDashboardSectionSpan {
-  if (typeof span === 'number' && Number.isInteger(span) && span >= 1 && span <= 8) {
-    return span as HomeDashboardSectionSpan;
+  if (typeof span === 'number' && Number.isInteger(span)) {
+    return Math.min(TOTAL_SECTION_COLUMNS, Math.max(MIN_SECTION_COLUMNS, span));
   }
 
-  if (span === 'full') {
-    return 8;
-  }
-
-  if (span === 'half') {
-    return 4;
-  }
-
-  return 4;
+  return FULL_ROW_SPAN;
 }
 
 function buildBalancedSpans(
@@ -172,10 +167,6 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
     });
   }, []);
 
-  useEffect(() => {
-    storage.set(STORAGE_KEYS.homeDashboardLayout, layout);
-  }, [layout]);
-
   const setMode = useCallback(
     (mode: HomeLayoutMode) => {
       persistLayout((previous) => {
@@ -190,7 +181,7 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
                 {
                   id: createSectionId(),
                   title: `${SECTION_TITLE_PREFIX} 1`,
-                  span: 8 as HomeDashboardSectionSpan,
+                  span: FULL_ROW_SPAN,
                 },
               ];
         const firstSectionId = sections[0]?.id;
@@ -230,7 +221,7 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
         {
           id: sectionId,
           title: `${SECTION_TITLE_PREFIX} ${previous.sections.length + 1}`,
-          span: 8,
+          span: FULL_ROW_SPAN,
         },
       ],
     }));
@@ -246,14 +237,14 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
         const nextSection: HomeDashboardSection = {
           id: sectionId,
           title: `${SECTION_TITLE_PREFIX} ${previous.sections.length + 1}`,
-          span: 1,
+          span: MIN_SECTION_COLUMNS,
         };
         const rows = partitionSectionRows(previous.sections);
 
         if (rows.length === 0) {
           return {
             ...previous,
-            sections: [{ ...nextSection, span: 8 }],
+            sections: [{ ...nextSection, span: FULL_ROW_SPAN }],
           };
         }
 
@@ -265,7 +256,7 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
         const targetRow = nextRows[targetRowIndex] ?? [];
 
         if (targetRow.length >= MAX_SECTIONS_PER_ROW) {
-          nextRows.splice(targetRowIndex + 1, 0, [{ ...nextSection, span: 8 }]);
+          nextRows.splice(targetRowIndex + 1, 0, [{ ...nextSection, span: FULL_ROW_SPAN }]);
         } else {
           nextRows[targetRowIndex] = rebalanceRowSections([...targetRow, nextSection]);
         }
@@ -333,7 +324,7 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
 
   const addCard = useCallback(
     (cardId: string, sectionId?: string) => {
-      if (!validIdSet.has(cardId)) {
+      if (!validIdSet.has(cardId) && !cardId.startsWith(CUSTOM_CARD_ID_PREFIX)) {
         return;
       }
 
@@ -447,16 +438,6 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
     [persistLayout]
   );
 
-  const assignCardToSection = useCallback(
-    (cardId: string, sectionId: string) => {
-      persistLayout((previous) => ({
-        ...previous,
-        cardSectionAssignments: { ...previous.cardSectionAssignments, [cardId]: sectionId },
-      }));
-    },
-    [persistLayout]
-  );
-
   return {
     layout,
     setMode,
@@ -468,6 +449,5 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
     addCard,
     removeCard,
     moveCard,
-    assignCardToSection,
   };
 }

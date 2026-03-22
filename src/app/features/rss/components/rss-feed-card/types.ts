@@ -25,4 +25,6 @@ export interface RSSFeedCardProps {
   inEditMode?: boolean;
   size?: CardSize;
   onSizeChange?: (size: CardSize) => void;
+  room?: string;
+  onRoomChange?: (room: string) => void;
 }

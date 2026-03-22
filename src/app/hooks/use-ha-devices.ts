@@ -71,6 +71,9 @@ type CalendarEventsServiceEnvelope = CalendarEventsServicePayload & {
   result?: CalendarEventsServicePayload;
 };
 
+let cachedWeatherForecasts: Record<string, WeatherForecastEntry[]> = {};
+let cachedCalendarEvents: Record<string, CalendarServiceEvent[]> = {};
+
 async function fetchWeatherForecast(
   connection: Connection,
   entityId: string
@@ -134,6 +137,7 @@ function entityStructureEqual(prev: HassEntities | null, next: HassEntities | nu
 export const useHADevices = (): DeviceCollection => {
   const areas = useHomeAssistant(homeAssistantSelectors.areas);
   const connection = useHomeAssistant(homeAssistantSelectors.connection);
+  const config = useHomeAssistant(homeAssistantSelectors.config);
   const deviceRegistry = useHomeAssistant(homeAssistantSelectors.deviceRegistry);
   // Structural equality: DeviceCollection only rebuilds when entities are added/removed,
   // not on every state change. Per-card subscriptions handle live state updates.
@@ -157,12 +161,15 @@ export const useHADevices = (): DeviceCollection => {
       .sort((left, right) => left.localeCompare(right));
   }, [entities]);
   const [weatherForecasts, setWeatherForecasts] = useState<Record<string, WeatherForecastEntry[]>>(
-    {}
+    () => cachedWeatherForecasts
   );
-  const [calendarEvents, setCalendarEvents] = useState<Record<string, CalendarServiceEvent[]>>({});
+  const [calendarEvents, setCalendarEvents] = useState<Record<string, CalendarServiceEvent[]>>(
+    () => cachedCalendarEvents
+  );
 
   useEffect(() => {
     if (!connection || !primaryWeatherEntityId) {
+      cachedWeatherForecasts = {};
       setWeatherForecasts({});
       return;
     }
@@ -175,13 +182,16 @@ export const useHADevices = (): DeviceCollection => {
           return;
         }
 
-        setWeatherForecasts({ [primaryWeatherEntityId]: forecast });
+        const nextForecasts = { [primaryWeatherEntityId]: forecast };
+        cachedWeatherForecasts = nextForecasts;
+        setWeatherForecasts(nextForecasts);
       })
       .catch(() => {
         if (cancelled) {
           return;
         }
 
+        cachedWeatherForecasts = {};
         setWeatherForecasts({});
       });
 
@@ -192,6 +202,7 @@ export const useHADevices = (): DeviceCollection => {
 
   useEffect(() => {
     if (!connection || calendarEntityIds.length === 0) {
+      cachedCalendarEvents = {};
       setCalendarEvents({});
       return;
     }
@@ -208,7 +219,9 @@ export const useHADevices = (): DeviceCollection => {
         return;
       }
 
-      setCalendarEvents(Object.fromEntries(entries));
+      const nextCalendarEvents = Object.fromEntries(entries);
+      cachedCalendarEvents = nextCalendarEvents;
+      setCalendarEvents(nextCalendarEvents);
     });
 
     return () => {
@@ -839,13 +852,25 @@ export const useHADevices = (): DeviceCollection => {
 
           const sunriseSource = sunEntitySunrise ?? entity.attributes?.sunrise;
           const sunsetSource = sunEntitySunset ?? entity.attributes?.sunset;
+          const weatherLocation =
+            (typeof entity.attributes?.location === 'string' && entity.attributes.location) ||
+            (typeof entity.attributes?.city === 'string' && entity.attributes.city) ||
+            (typeof entity.attributes?.place === 'string' && entity.attributes.place) ||
+            (config &&
+            typeof config === 'object' &&
+            'location_name' in config &&
+            typeof config.location_name === 'string'
+              ? config.location_name
+              : undefined) ||
+            room ||
+            name;
 
           weather.push({
             id: entityId,
             name,
             room,
             size: 'large',
-            location: name,
+            location: weatherLocation,
             temperature:
               parseRoundedNumberish(entity.attributes?.temperature) ??
               parseRoundedNumberish(entity.attributes?.native_temperature) ??
@@ -909,6 +934,7 @@ export const useHADevices = (): DeviceCollection => {
   }, [
     areas,
     calendarEvents,
+    config,
     deviceRegistry,
     entities,
     entityRegistry,

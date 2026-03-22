@@ -112,35 +112,13 @@ This project adheres to a code of conduct. By participating, you are expected to
 ### React Components
 
 - Use functional components with hooks
-- Follow the component structure:
-  ```tsx
-  // 1. Imports
-  import { useState } from 'react';
-  
-  // 2. Types/Interfaces
-  interface ComponentProps {
-    prop: string;
-  }
-  
-  // 3. Component
-  export function Component({ prop }: ComponentProps) {
-    // 4. Hooks
-    const [state, setState] = useState();
-    
-    // 5. Handlers
-    const handleClick = () => {};
-    
-    // 6. Render
-    return <div />;
-  }
-  ```
+- Keep components focused on a single responsibility
+- Follow existing patterns and the architecture rules in `CLAUDE.md`
 
 ### Styling
 
 - Use Tailwind CSS utility classes
-- Follow the iOS-inspired design aesthetic
-- Maintain consistency with existing components
-- Use theme tokens from `/src/styles/theme.css`
+- Use `getThemeSurfaceTokens` for theme-aware surface decisions instead of inline `theme === ...` branches
 - Respect the spacing system (xs=4px, sm=8px, md=12px, lg=16px, xl=24px, xxl=32px)
 
 ### File Organization
@@ -303,43 +281,6 @@ Other solutions you've thought about.
 **Additional Context**
 Mockups, examples, or references.
 ```
-
-## 🎨 Design Guidelines
-
-### iOS-Inspired Aesthetic
-
-- Frosted glass effects with backdrop blur
-- Rounded corners (12px, 16px, 24px)
-- Smooth animations and transitions
-- San Francisco-inspired typography
-- Subtle shadows and depth
-
-### Accessibility
-
-- Ensure proper color contrast
-- Add ARIA labels where needed
-- Support keyboard navigation
-- Test with screen readers
-- Provide alternative text for images
-
-### Responsiveness
-
-- Mobile-first approach
-- Test on multiple screen sizes
-- Use responsive breakpoints
-- Ensure touch targets are large enough
-
-## 📚 Resources
-
-- [React Documentation](https://react.dev)
-- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Radix UI Documentation](https://www.radix-ui.com/docs)
-- [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/)
-
-## 🙏 Thank You!
-
-Your contributions make this project better! Whether it's code, documentation, bug reports, or feature ideas, every contribution is valued and appreciated.
 
 ## 📄 License
 
