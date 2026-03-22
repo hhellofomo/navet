@@ -6,7 +6,6 @@ import type { DeviceWithType } from '@/app/types/device.types';
 import type { CustomCard } from '../stores/custom-cards-store';
 import { useDashboardDragState } from './use-dashboard-drag-state';
 import type { HomeDashboardLayoutState } from './use-home-dashboard-layout';
-import { partitionSectionRows } from './use-home-dashboard-layout';
 
 export type LibraryCard = {
   id: string;
@@ -14,6 +13,10 @@ export type LibraryCard = {
   subtitle: string;
   meta: string;
   kind: 'device' | 'widget';
+};
+
+export type HomeEditorSection = HomeDashboardLayoutState['sections'][number] & {
+  cardIds: string[];
 };
 
 export type DragMeta =
@@ -104,7 +107,7 @@ export function useHomeDashboardEditor({
     [homeLayout.sections]
   );
 
-  const sectionCards = useMemo(
+  const sectionCards = useMemo<HomeEditorSection[]>(
     () =>
       homeLayout.sections.map((section) => ({
         ...section,
@@ -112,8 +115,6 @@ export function useHomeDashboardEditor({
       })),
     [homeLayout.cardSectionAssignments, homeLayout.sections, selectedIds]
   );
-
-  const sectionRows = useMemo(() => partitionSectionRows(sectionCards), [sectionCards]);
 
   useEffect(() => {
     if (homeLayout.mode !== 'sectioned') {
@@ -183,7 +184,7 @@ export function useHomeDashboardEditor({
   return {
     allCards,
     flowCards,
-    sectionRows,
+    sectionCards,
     activeSectionId,
     setActiveSectionId,
     ...dragState,

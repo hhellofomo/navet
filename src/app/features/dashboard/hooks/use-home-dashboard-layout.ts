@@ -9,6 +9,7 @@ export interface HomeDashboardSection {
   id: string;
   title: string;
   span: HomeDashboardSectionSpan;
+  stackUnder?: string;
 }
 
 export interface HomeDashboardLayoutState {
@@ -131,6 +132,7 @@ function normalizeLayout(value: unknown): HomeDashboardLayoutState {
         .map((section) => ({
           ...section,
           span: normalizeSectionSpan(section.span),
+          stackUnder: typeof section.stackUnder === 'string' ? section.stackUnder : undefined,
         }))
     : [];
 
@@ -152,6 +154,72 @@ function normalizeLayout(value: unknown): HomeDashboardLayoutState {
           )
         : {},
   };
+}
+
+function getTopLevelSections(sections: HomeDashboardSection[]) {
+  const sectionIds = new Set(sections.map((section) => section.id));
+  return sections.filter((section) => !section.stackUnder || !sectionIds.has(section.stackUnder));
+}
+
+function getSectionBlock(
+  sections: HomeDashboardSection[],
+  sectionId: string
+): HomeDashboardSection[] {
+  const block: HomeDashboardSection[] = [];
+  const descendantsByParent = new Map<string, HomeDashboardSection[]>();
+
+  for (const section of sections) {
+    if (!section.stackUnder) {
+      continue;
+    }
+
+    const children = descendantsByParent.get(section.stackUnder);
+    if (children) {
+      children.push(section);
+    } else {
+      descendantsByParent.set(section.stackUnder, [section]);
+    }
+  }
+
+  const appendSection = (targetId: string) => {
+    const section = sections.find((candidate) => candidate.id === targetId);
+    if (!section) {
+      return;
+    }
+
+    block.push(section);
+    for (const child of descendantsByParent.get(targetId) ?? []) {
+      appendSection(child.id);
+    }
+  };
+
+  appendSection(sectionId);
+  return block;
+}
+
+function mergeTopLevelSections(
+  previousSections: HomeDashboardSection[],
+  nextTopLevelSections: HomeDashboardSection[]
+) {
+  const previousTopLevelIds = new Set(
+    getTopLevelSections(previousSections).map((section) => section.id)
+  );
+  const blocks = new Map<string, HomeDashboardSection[]>();
+
+  for (const topLevelSection of getTopLevelSections(previousSections)) {
+    blocks.set(topLevelSection.id, getSectionBlock(previousSections, topLevelSection.id));
+  }
+
+  return nextTopLevelSections.flatMap((section) => {
+    if (!previousTopLevelIds.has(section.id)) {
+      return [section];
+    }
+
+    const block = blocks.get(section.id) ?? [section];
+    return block.map((entry) =>
+      entry.id === section.id ? { ...entry, span: section.span } : entry
+    );
+  });
 }
 
 export function useHomeDashboardLayout(validCardIds: string[]) {
@@ -239,7 +307,8 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
           title: `${SECTION_TITLE_PREFIX} ${previous.sections.length + 1}`,
           span: MIN_SECTION_COLUMNS,
         };
-        const rows = partitionSectionRows(previous.sections);
+        const topLevelSections = getTopLevelSections(previous.sections);
+        const rows = partitionSectionRows(topLevelSections);
 
         if (rows.length === 0) {
           return {
@@ -261,9 +330,46 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
           nextRows[targetRowIndex] = rebalanceRowSections([...targetRow, nextSection]);
         }
 
+        const nextTopLevelSections = nextRows.flat();
+
         return {
           ...previous,
-          sections: nextRows.flat(),
+          sections: mergeTopLevelSections(previous.sections, nextTopLevelSections),
+        };
+      });
+
+      return sectionId;
+    },
+    [persistLayout]
+  );
+
+  const addSectionBelow = useCallback(
+    (targetSectionId: string) => {
+      const sectionId = createSectionId();
+
+      persistLayout((previous) => {
+        const targetSection = previous.sections.find((section) => section.id === targetSectionId);
+        if (!targetSection) {
+          return previous;
+        }
+
+        const nextSection: HomeDashboardSection = {
+          id: sectionId,
+          title: `${SECTION_TITLE_PREFIX} ${previous.sections.length + 1}`,
+          span: targetSection.span,
+          stackUnder: targetSection.id,
+        };
+        const targetIndex = previous.sections.findIndex(
+          (section) => section.id === targetSectionId
+        );
+
+        return {
+          ...previous,
+          sections: [
+            ...previous.sections.slice(0, targetIndex + 1),
+            nextSection,
+            ...previous.sections.slice(targetIndex + 1),
+          ],
         };
       });
 
@@ -287,21 +393,41 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
   const removeSection = useCallback(
     (sectionId: string) => {
       persistLayout((previous) => {
-        const rows = partitionSectionRows(previous.sections);
+        const rows = partitionSectionRows(getTopLevelSections(previous.sections));
         const rowIndex = findRowIndexBySectionId(rows, sectionId);
-        if (rowIndex < 0) {
+        const targetSection = previous.sections.find((section) => section.id === sectionId);
+        if (!targetSection) {
           return previous;
         }
+        const fallbackStackUnder = targetSection.stackUnder;
+        const strippedSections = previous.sections
+          .filter((section) => section.id !== sectionId)
+          .map((section) =>
+            section.stackUnder === sectionId
+              ? { ...section, stackUnder: fallbackStackUnder }
+              : section
+          );
+        const isTopLevelSection = !targetSection.stackUnder;
+        const topLevelSections = getTopLevelSections(strippedSections);
+        const nextRows = isTopLevelSection
+          ? rows.map((row: HomeDashboardSection[]) => [...row])
+          : partitionSectionRows(topLevelSections);
 
-        const nextRows = rows.map((row: HomeDashboardSection[]) => [...row]);
-        const targetRow = nextRows[rowIndex].filter(
-          (section: HomeDashboardSection) => section.id !== sectionId
+        if (isTopLevelSection && rowIndex >= 0) {
+          const targetRow = nextRows[rowIndex].filter(
+            (section: HomeDashboardSection) => section.id !== sectionId
+          );
+          nextRows[rowIndex] = targetRow.length > 0 ? rebalanceRowSections(targetRow) : [];
+        }
+
+        const rebalancedTopLevelSections = isTopLevelSection ? nextRows.flat() : topLevelSections;
+        const remainingSections = mergeTopLevelSections(
+          strippedSections,
+          rebalancedTopLevelSections
         );
-        nextRows[rowIndex] = targetRow.length > 0 ? rebalanceRowSections(targetRow) : [];
-        const remainingSections = nextRows.flat();
-        const fallbackSectionId =
-          targetRow[0]?.id ??
-          remainingSections.find((section: HomeDashboardSection) => section.id !== sectionId)?.id;
+        const fallbackSectionId = remainingSections.find(
+          (section: HomeDashboardSection) => section.id !== sectionId
+        )?.id;
         const nextAssignments = Object.fromEntries(
           Object.entries(previous.cardSectionAssignments).flatMap(([cardId, assigned]) => {
             if (assigned !== sectionId) {
@@ -444,6 +570,7 @@ export function useHomeDashboardLayout(validCardIds: string[]) {
     setShowHero,
     addSection,
     addColumnSection,
+    addSectionBelow,
     renameSection,
     removeSection,
     addCard,

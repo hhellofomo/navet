@@ -502,4 +502,14 @@
   [data-draggable-card="true"][data-size-selector-open="true"] {
     animation: none;
   }
+
+  /* Media card — scrolling marquee for long track/artist titles */
+  @keyframes media-track-marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
 }

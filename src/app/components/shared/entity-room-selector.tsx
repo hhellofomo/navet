@@ -1,5 +1,5 @@
 import { ChevronDown, Home, Loader2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
@@ -13,7 +13,7 @@ interface EntityRoomSelectorProps {
   className?: string;
 }
 
-export function EntityRoomSelector({
+export const EntityRoomSelector = memo(function EntityRoomSelector({
   entityId,
   label,
   compact = false,
@@ -150,4 +150,4 @@ export function EntityRoomSelector({
       </div>
     </div>
   );
-}
+});
