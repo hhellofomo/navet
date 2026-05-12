@@ -251,7 +251,7 @@ export function PhotoFrameWidget({
             </DropdownMenuContent>
           </DropdownMenu>
         ) : null}
-        <div className="relative flex-1 overflow-hidden rounded-[28px] group">
+        <div className="group relative flex-1 overflow-hidden rounded-[inherit]">
           {hasCustomPhotos ? (
             <img
               src={currentPhotoUrl}

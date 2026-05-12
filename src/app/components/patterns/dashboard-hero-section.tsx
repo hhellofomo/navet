@@ -24,7 +24,8 @@ export function DashboardHeroSection({
   return (
     <SurfacePanel
       className={`${surface.border} ${surface.panel} ${surface.cardShadow}`}
-      padding="lg"
+      contentClassName="px-4 py-3 md:p-6"
+      padding="none"
       radius="panel"
     >
       <div
@@ -38,26 +39,30 @@ export function DashboardHeroSection({
       />
 
       <div
-        className={`relative grid gap-6 ${
-          aside ? 'xl:grid-cols-[minmax(0,1.35fr)_22rem] xl:items-start' : ''
+        className={`relative grid gap-4 md:gap-6 ${
+          aside ? 'md:gap-5 xl:grid-cols-[minmax(0,1.35fr)_22rem] xl:items-start' : ''
         }`}
       >
         <div>
           {eyebrow ? eyebrow : null}
           <h1
-            className={`mt-4 max-w-3xl text-2xl font-semibold tracking-tight md:text-4xl ${surface.textPrimary}`}
+            className={`mt-1.5 max-w-3xl text-[1.5rem] leading-[1.12] font-semibold tracking-tight md:mt-4 md:text-4xl md:leading-tight ${surface.textPrimary}`}
           >
             {title}
           </h1>
           {description ? (
-            <p className={`mt-3 max-w-2xl text-sm leading-6 md:text-base ${surface.textSecondary}`}>
+            <p
+              className={`mt-2 hidden max-w-2xl text-sm leading-6 md:mt-3 md:block md:text-base ${surface.textSecondary}`}
+            >
               {description}
             </p>
           ) : null}
-          {actions ? <div className="mt-6 flex flex-wrap items-center gap-2">{actions}</div> : null}
+          {actions ? (
+            <div className="mt-3 flex flex-wrap items-center gap-2 md:mt-6">{actions}</div>
+          ) : null}
         </div>
 
-        {aside ? <div>{aside}</div> : null}
+        {aside ? <div className="hidden md:block">{aside}</div> : null}
       </div>
     </SurfacePanel>
   );
