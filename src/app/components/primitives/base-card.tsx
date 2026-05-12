@@ -131,13 +131,11 @@ function getBaseCardSurfaceTokens({
 
   return {
     borderClassName:
-      surfaceVariant === 'muted'
-        ? 'border border-[rgba(82,82,91,0.68)]'
-        : 'border border-[rgba(113,113,122,0.62)]',
+      surfaceVariant === 'muted' ? 'border border-zinc-700/60' : 'border border-zinc-700/70',
     backgroundClassName:
       surfaceVariant === 'muted'
-        ? 'bg-[linear-gradient(180deg,rgba(39,39,42,0.96),rgba(24,24,27,0.98)_44%,rgba(9,9,11,1)_100%)]'
-        : 'bg-[linear-gradient(180deg,rgba(39,39,42,0.94),rgba(24,24,27,0.98)_36%,rgba(9,9,11,1)_100%)]',
+        ? 'bg-[linear-gradient(135deg,rgb(24,24,27)_0%,rgb(12,12,14)_100%)]'
+        : 'bg-[linear-gradient(135deg,rgb(24,24,27)_0%,rgb(9,9,11)_100%)]',
     readableBackgroundColor: surfaceVariant === 'muted' ? '#09090b' : '#18181b',
   };
 }

@@ -180,10 +180,10 @@ const getInactiveThemeTone = (themeType: ThemeType) => {
   }
 
   return {
-    gradient: 'from-gray-800 to-gray-900',
-    border: 'border-gray-700',
-    iconBg: 'bg-gray-600',
-    accent: 'text-gray-400',
+    gradient: 'from-zinc-800 to-zinc-900',
+    border: 'border-zinc-700',
+    iconBg: 'bg-zinc-600',
+    accent: 'text-zinc-400',
     glow: 'transparent',
   };
 };
@@ -233,7 +233,12 @@ export const generateThemeColors = (
         },
       },
       switch: {
-        on: accentSolidTone,
+        on: {
+          ...accentSolidTone,
+          border: accentSoftTone.border,
+          iconBg: accentSoftTone.iconBg,
+          glow: accentSoftTone.glow,
+        },
         off: inactiveTone,
       },
       cover: {

@@ -3,7 +3,6 @@ import type { CSSProperties } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { BaseCard, Button, Text, Textarea } from '@/app/components/primitives';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { getCustomCardTintSurface } from '@/app/components/shared/theme/custom-card-tint-surface';
 import { navetTypographyTokens } from '@/app/components/system/tokens';
 import { useI18n, useTheme } from '@/app/hooks';
 
@@ -15,14 +14,9 @@ interface NoteWidgetProps {
   onTintColorChange?: (color: string) => void;
 }
 
-export function NoteWidget({
-  initialNote = '',
-  onNoteChange,
-  tintColor,
-}: Omit<NoteWidgetProps, 'size'>) {
+export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetProps, 'size'>) {
   const { theme, accentColor } = useTheme();
   const { t } = useI18n();
-  const tintSurface = getCustomCardTintSurface(theme, tintColor);
   const emptyNote = t('widgets.note.emptyState');
   const [note, setNote] = useState(initialNote);
   const [isEditing, setIsEditing] = useState(false);
@@ -132,41 +126,14 @@ export function NoteWidget({
     theme === 'glass'
       ? 'focus-visible:ring-[rgba(148,163,184,0.28)]'
       : 'focus-visible:ring-white/35';
-  const contentSheenStyle =
-    theme === 'light'
-      ? undefined
-      : ({
-          background:
-            theme === 'black'
-              ? 'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 18%, transparent 42%)'
-              : 'linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.018) 18%, transparent 42%)',
-        } satisfies CSSProperties | undefined);
-
   return (
     <BaseCard
       size="large"
       fullBleed
       className="transition-all duration-500"
       contentClassName="h-full"
-      style={tintSurface.panelStyle}
-      overlay={
-        <>
-          {tintSurface.glowStyle ? (
-            <div className="pointer-events-none absolute inset-0" style={tintSurface.glowStyle} />
-          ) : null}
-          {tintSurface.overlayClassName ? (
-            <div
-              className={`pointer-events-none absolute inset-0 ${tintSurface.overlayClassName}`}
-            />
-          ) : null}
-        </>
-      }
     >
       <div className="relative flex h-full flex-col overflow-hidden rounded-[inherit]">
-        <div
-          className="pointer-events-none absolute inset-0 rounded-[inherit]"
-          style={contentSheenStyle}
-        />
         <div
           className="pointer-events-none absolute inset-y-0 left-3 w-3"
           style={binderHolesStyle}

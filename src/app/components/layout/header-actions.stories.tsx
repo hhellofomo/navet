@@ -7,8 +7,8 @@ function HeaderActionsDesktopPreview({ children }: { children: ReactNode }) {
   return <div className="flex justify-end p-8">{children}</div>;
 }
 
-function HeaderDesktopActionsStory() {
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+function HeaderDesktopActionsStory({ defaultOpen = false }: { defaultOpen?: boolean }) {
+  const [isNotificationOpen, setIsNotificationOpen] = useState(defaultOpen);
   const desktopNotificationButtonRef = useRef<HTMLButtonElement | null>(null);
   const mobileNotificationButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -35,9 +35,17 @@ const meta = {
   title: 'App Shell/Header/Header Actions',
   component: HeaderDesktopActionsStory,
   tags: ['autodocs'],
+  args: {
+    defaultOpen: false,
+  },
   parameters: {
     layout: 'fullscreen',
-    docs: { description: {} },
+    docs: {
+      description: {
+        component:
+          'Desktop header actions, including the bell-triggered notifications panel. Review with the panel open to confirm it renders inline under the bell instead of from a detached root mount.',
+      },
+    },
   },
 } satisfies Meta<typeof HeaderDesktopActionsStory>;
 
@@ -58,3 +66,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Desktop: Story = {};
+
+export const DesktopWithNotificationsOpen: Story = {
+  args: {
+    defaultOpen: true,
+  },
+};

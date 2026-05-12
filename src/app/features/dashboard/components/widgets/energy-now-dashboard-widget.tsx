@@ -24,10 +24,7 @@ import {
   CustomScrollbar,
 } from '@/app/components/shared/device-editor';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
-import {
-  getCustomCardTintSurface,
-  withTintAlpha,
-} from '@/app/components/shared/theme/custom-card-tint-surface';
+import { getCustomCardTintSurface } from '@/app/components/shared/theme/custom-card-tint-surface';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { HOME_WIDGET_ROOM } from '@/app/features/dashboard/stores/custom-cards-store';
 import { useEnergyUsageSensorOptions } from '@/app/features/energy';
@@ -304,11 +301,7 @@ export const EnergyNowDashboardCardView = memo(function EnergyNowDashboardCardVi
       size={size}
       fullBleed
       className="transition-all duration-500"
-      style={
-        tintSurface.panelStyle ?? {
-          borderColor: withTintAlpha(accentColor, theme === 'light' ? 0.2 : 0.28),
-        }
-      }
+      style={tintSurface.panelStyle}
       frameClassName="overflow-hidden"
       overlay={
         <>
@@ -324,15 +317,14 @@ export const EnergyNowDashboardCardView = memo(function EnergyNowDashboardCardVi
       }
       contentClassName="h-full"
     >
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            theme === 'light'
-              ? `radial-gradient(circle at 50% 100%, ${accentColor}16 0%, transparent 55%), linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.03) 100%)`
-              : `radial-gradient(circle at 50% 100%, ${accentColor}18 0%, transparent 52%), linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)`,
-        }}
-      />
+      {theme === 'light' ? (
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `radial-gradient(circle at 50% 100%, ${accentColor}16 0%, transparent 55%), linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.03) 100%)`,
+          }}
+        />
+      ) : null}
 
       <div className={`absolute inset-x-0 ${isSmall ? 'bottom-0 top-16' : 'bottom-0 top-20'}`}>
         {hasSparklineData ? (

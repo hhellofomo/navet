@@ -21,11 +21,18 @@ Custom widgets let users place non-entity cards on the dashboard and keep their 
 ### Core Behavior
 
 - Widgets are stored locally in browser storage (`ha-dashboard-custom-cards`)
+- Widgets persist through the shared dashboard custom-card store for both the home section and the energy section
 - RSS widget feed configuration is stored on the widget card itself so exports/imports keep provider selection and article count
 - Direct RSS URLs are fetched through the same-origin `/__navet_rss_proxy__` path; Docker and add-on nginx load those feeds through the embedded njs runtime (no browser CORS, no separate Node sidecar)
 - Widgets support edit-mode move/resize/delete flows
 - Widget sizing is template-specific (not one global size list)
-- Widgets can be assigned to rooms and participate in home layout sections
+- Widgets can be assigned to rooms and participate in the home overview zone layout
+
+Room assignment details:
+
+- `__home__` is the sentinel room used for widgets that belong to the home overview canvas
+- `__energy__` is the sentinel room used for widgets that belong to the energy section's custom-widget band
+- Home widgets may also persist an optional `zone` override (`hero`, `actions`, `status`, `analytics`)
 
 ## Supported Sizes by Widget
 
@@ -109,6 +116,7 @@ Store responsibilities:
 - persist cards
 - add/remove/update cards
 - normalize invalid migrated sizes
+- preserve home-zone overrides and shared room sentinels used by the home and energy sections
 - migrate legacy widget types (`news` -> `rss`)
 - drop removed legacy custom-card types (`weather`, `calendar`, `presence`, `sparkline`) during migration
 
@@ -136,6 +144,9 @@ interface CustomCard {
   createdAt: number;
 }
 ```
+
+`room` is not limited to Home Assistant room names. The dashboard also uses sentinel values such as
+`__home__` and `__energy__` for section-level widget bands.
 
 ## Legacy Notes
 

@@ -115,7 +115,7 @@ Section routing and lazy loading are coordinated by
 
 ### Section ownership
 
-- `home`: room-driven dashboard overview, editable sectioned/flow canvas, and home widgets
+- `home`: room-driven dashboard overview, editable zone-based home canvas, and home widgets
 - `energy`: energy dashboard, setup wizard, drilldown flow, and energy-only custom widget band
 - `security`: camera-first section built on the shared device-section shell
 - `tasks`: Home Assistant automation/task summaries grouped into sections
@@ -160,6 +160,14 @@ Current `CardType` values for dashboard/section widgets:
 Home-widget implementations currently live under
 [`src/app/features/dashboard/components/widgets/`](/Users/vishal/Development/Github/Navet/Navet/src/app/features/dashboard/components/widgets).
 
+The widget store also uses special room sentinels:
+
+- `__home__` for widgets attached to the home overview
+- `__energy__` for widgets attached to the energy section band
+
+Home widgets may additionally persist zone overrides via
+[`src/app/features/dashboard/zones/`](/Users/vishal/Development/Github/Navet/Navet/src/app/features/dashboard/zones).
+
 ### Room sourcing
 
 Home-room navigation is assembled from two sources:
@@ -169,6 +177,21 @@ Home-room navigation is assembled from two sources:
 
 This keeps the room list stable when registry-backed area names exist while still surfacing devices
 whose room can only be inferred from entity metadata.
+
+### Home overview zones
+
+The `All` home view is grouped into four named zones:
+
+- `hero`
+- `actions`
+- `status`
+- `analytics`
+
+Default placement and fallback resolution live in:
+
+- [`src/app/features/dashboard/zones/zone-types.ts`](/Users/vishal/Development/Github/Navet/Navet/src/app/features/dashboard/zones/zone-types.ts)
+- [`src/app/features/dashboard/zones/resolve-card-zone.ts`](/Users/vishal/Development/Github/Navet/Navet/src/app/features/dashboard/zones/resolve-card-zone.ts)
+- [`src/app/features/dashboard/zones/use-zone-layout.ts`](/Users/vishal/Development/Github/Navet/Navet/src/app/features/dashboard/zones/use-zone-layout.ts)
 
 ## Feature Ownership Highlights
 
@@ -245,6 +268,7 @@ whose room can only be inferred from entity metadata.
 - `primitives/`: low-level reusable UI such as shared buttons, card shells, header parts, and compact text
 - `patterns/`: composed shared structures
 - `system/`: curated export and token-story surface
+- `ui-kit/`: canonical shared import surface for stories and stable shared consumers
 - `shared/`: app-specific shared UI and compatibility shims
 - `layout/`: app-shell and section-level composition
 - `ui/`: wrappers around library primitives and dropdown/dialog infrastructure

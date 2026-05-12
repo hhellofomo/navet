@@ -1,4 +1,4 @@
-import { type RefObject, useState } from 'react';
+import { type RefObject, useEffect, useState } from 'react';
 import { SheetSurface } from '@/app/components/primitives';
 import {
   AlertDialog,
@@ -33,10 +33,11 @@ interface NotificationPanelProps {
 
 export function NotificationPanel({ isOpen, onClose, triggerRefs = [] }: NotificationPanelProps) {
   const [showClearAllConfirm, setShowClearAllConfirm] = useState(false);
+  const [isClearingAll, setIsClearingAll] = useState(false);
   const isMobile = useMediaQuery('(max-width: 767px)');
   const panelRef = useClickOutside<HTMLDivElement>(
     onClose,
-    isOpen && !showClearAllConfirm && !isMobile,
+    isOpen && !showClearAllConfirm && !isClearingAll && !isMobile,
     triggerRefs
   );
   const { t } = useI18n();
@@ -56,6 +57,26 @@ export function NotificationPanel({ isOpen, onClose, triggerRefs = [] }: Notific
   const regularNotifications = notifications.filter(
     (notification) => notification.source !== 'update'
   );
+
+  useEffect(() => {
+    if (!isOpen) {
+      setShowClearAllConfirm(false);
+      setIsClearingAll(false);
+    }
+  }, [isOpen]);
+
+  const handleConfirmClearAll = async () => {
+    setIsClearingAll(true);
+
+    try {
+      await clearAll();
+      setShowClearAllConfirm(false);
+      onClose();
+    } finally {
+      setIsClearingAll(false);
+    }
+  };
+
   const desktopPanelClassName = `absolute right-0 top-0 z-auto flex w-96 max-h-[60vh] flex-col overflow-hidden rounded-2xl ${surface.panelClassName}`;
   const formatRelativeTimestamp = (date: Date) =>
     formatTimestamp(date, {
@@ -154,12 +175,12 @@ export function NotificationPanel({ isOpen, onClose, triggerRefs = [] }: Notific
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogCancel disabled={isClearingAll}>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                clearAll();
-                setShowClearAllConfirm(false);
+                void handleConfirmClearAll();
               }}
+              disabled={isClearingAll}
             >
               {t('notifications.confirmClearAll.action')}
             </AlertDialogAction>

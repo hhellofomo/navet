@@ -103,7 +103,8 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: '',
+        component:
+          'Shared card shell primitive. In dark theme, the default inactive shell should match inactive entity-card chrome rather than page-panel glass surfaces.',
       },
     },
   },
@@ -126,6 +127,26 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const DarkInactiveShell: Story = {
+  args: {
+    size: 'medium',
+    title: 'Over the sink',
+    subtitle: 'Light',
+    children: <BaseCardStoryContent />,
+  },
+  parameters: {
+    globals: {
+      theme: 'dark',
+    },
+    docs: {
+      description: {
+        story:
+          'Review this in dark theme to verify the default BaseCard shell matches the inactive light-card surface family: zinc border, dark inactive gradient, and no extra glossy overlay.',
+      },
+    },
+  },
+};
 
 export const LightTheme: Story = {
   parameters: {

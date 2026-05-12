@@ -39,6 +39,17 @@ function ThemeSurfaceTokensShowcase() {
 
                   <div className="mt-3 space-y-3">
                     <div
+                      className={`flex items-center justify-between gap-3 rounded-full border px-3 py-2 backdrop-blur-xl ${surface.border} ${surface.panel} ${surface.textPrimary}`}
+                    >
+                      <span className="text-[11px] font-medium uppercase tracking-[0.16em]">
+                        Shallow surface
+                      </span>
+                      <span className={`text-[11px] ${surface.textMuted}`}>
+                        settings / toolbar case
+                      </span>
+                    </div>
+
+                    <div
                       className={`rounded-xl border p-3 ${surface.border} ${surface.panelMuted}`}
                     >
                       <p
@@ -103,6 +114,7 @@ const meta = {
           '',
           'What this page covers:',
           '- Shared panel/text/border token mapping under `high`, `medium`, and `low` effects quality.',
+          '- Short pill-like surfaces so compact chrome regressions are visible during review.',
           '- Input and icon-well treatments in the same token set as shell chrome and hover states.',
           '',
           'Usage notes:',
@@ -111,6 +123,8 @@ const meta = {
           '',
           'Review expectations:',
           '- Verify text contrast and panel readability across all theme/effects combinations.',
+          '- Verify compact dark surfaces stay flat rather than reading as cylindrical.',
+          '- Verify glass remains the luminous surface family while dark stays in the flatter inactive-card direction.',
           '- Verify low-effects mode still feels coherent rather than visually degraded.',
         ].join('\n'),
       },
