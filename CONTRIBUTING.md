@@ -46,7 +46,6 @@ This project adheres to a code of conduct. By participating, you are expected to
 4. **Install dependencies**
    ```bash
    pnpm install
-   pnpm setup:hooks
    ```
 
 5. **Start development server**
@@ -197,19 +196,21 @@ refactor(lighting): share light card surface tokens
 
 ### Pre-commit Hooks
 
-Navet uses a repo-local pre-commit hook in `.githooks/pre-commit`.
+Navet uses Husky hooks in `.husky/`. `pnpm install` runs the `prepare` script and installs them automatically.
 
-After `pnpm install`, run:
+The current hook split is:
 
-```bash
-pnpm setup:hooks
-```
-
-The hook currently enforces:
-
+- `commit-msg`
+  - enforces the Conventional Commit format: `type(scope): summary`
+- `pre-commit`
+  - `pnpm check:lockfile` to keep `package.json` and `pnpm-lock.yaml` in sync
 - `pnpm check` for Biome lint/format issues
 - `pnpm check:stories` for Storybook title conventions, primitive/pattern story coverage, and colocated story ownership
-- A docs relevance check that blocks commits touching settings, dashboard behavior, or build/deploy workflow without a staged update to `README.md`, `CONTRIBUTING.md`, or `docs/`
+- `pnpm check:ui-kit` for shared UI boundary rules
+- `pre-push`
+  - `pnpm typecheck`
+  - `pnpm test`
+
 If TypeScript errors block a commit, fix the errors instead of updating or relying on a baseline file.
 
 ## 📤 Submitting Changes
