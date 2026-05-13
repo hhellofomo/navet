@@ -1,16 +1,11 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import * as Slider from '@radix-ui/react-slider';
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import type { HTMLAttributes, ReactNode } from 'react';
-import { CardActionRow } from '@/app/components/patterns/card-action-row';
+import type { HTMLAttributes } from 'react';
 import { BaseCard } from '@/app/components/primitives';
 import { CardMetric } from '@/app/components/primitives/card-metric';
 import { CardMetricActionLayout } from '@/app/components/primitives/card-metric-action-layout';
 import { DialogShell } from '@/app/components/primitives/dialog-shell';
 import { EntityCardHeader } from '@/app/components/primitives/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/primitives/entity-card-header-icon';
-import { RoundControlButton } from '@/app/components/primitives/round-control-button';
-import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { DialogHeader } from '@/app/components/shared/device-editor';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
@@ -18,6 +13,9 @@ import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-sh
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { type ThemeType, useI18n } from '@/app/hooks';
 import { getSecurityCardSurfaceTokens } from '../security-card-surface-tokens';
+import { CoverActionRow } from './cover-action-row';
+import { CoverPresetChips } from './cover-preset-chips';
+import { CoverWindowVisualization } from './cover-window-visualization';
 import type { CoverIconButtonProps, DeviceClass, DeviceClassConfig } from './types';
 
 type CoverColorSet = {
@@ -27,15 +25,6 @@ type CoverColorSet = {
   accent: string;
   glow: string;
 };
-
-function CoverPauseIcon() {
-  return (
-    <span className="inline-flex h-3.5 items-center justify-center gap-0.75" aria-hidden="true">
-      <span className="h-3 w-0.5 rounded-full bg-current" />
-      <span className="h-3 w-0.5 rounded-full bg-current" />
-    </span>
-  );
-}
 
 interface CoverCardViewProps {
   entityId: string;
@@ -479,243 +468,5 @@ function LargeCoverLayout({
         />
       </div>
     </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Action row — Open / Stop / Close buttons + settings. Shared across all sizes.
-// ---------------------------------------------------------------------------
-
-function CoverActionRow({
-  theme,
-  size,
-  position,
-  settingsButtonProps,
-  onOpen,
-  onStop,
-  onClose,
-}: {
-  theme: ThemeType;
-  size: 'small' | 'medium';
-  position: number;
-  settingsButtonProps: CoverIconButtonProps;
-  onOpen: () => void;
-  onStop: () => void;
-  onClose: () => void;
-}) {
-  const { t } = useI18n();
-  const gap = size === 'small' ? 'gap-1.5' : 'gap-2.5';
-
-  return (
-    <CardActionRow
-      theme={theme}
-      size={size}
-      leftContent={
-        <div className={`flex items-center ${gap}`}>
-          <CoverControlButton theme={theme} size={size} label={t('cover.open')} onClick={onOpen}>
-            <ChevronUp className="h-3.5 w-3.5" />
-          </CoverControlButton>
-          <CoverControlButton theme={theme} size={size} label={t('cover.stop')} onClick={onStop}>
-            <CoverPauseIcon />
-          </CoverControlButton>
-          <CoverControlButton theme={theme} size={size} label={t('cover.close')} onClick={onClose}>
-            <ChevronDown className="h-3.5 w-3.5" />
-          </CoverControlButton>
-        </div>
-      }
-      rightContent={
-        <CardSettingsActionButton
-          {...settingsButtonProps}
-          theme={theme}
-          size={size}
-          variant="soft"
-          tone={position > 0 ? 'default' : 'muted'}
-        />
-      }
-    />
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Window visualization (large card only) — blind descends from a cassette
-// housing at the top of a window frame. Height of blind = (100 - position)%.
-// ---------------------------------------------------------------------------
-
-function CoverWindowVisualization({
-  position,
-  theme,
-  ariaLabel,
-  onSetPosition,
-}: {
-  position: number;
-  theme: ThemeType;
-  ariaLabel: string;
-  onSetPosition: (newPosition: number) => void;
-}) {
-  const blindCoverage = Math.max(0, Math.min(1, (100 - position) / 100));
-  const isLight = theme === 'light';
-  const cassetteH = 12;
-  const slatCount = 11;
-
-  return (
-    <Slider.Root
-      orientation="vertical"
-      value={[100 - position]}
-      min={0}
-      max={100}
-      step={1}
-      inverted
-      onValueChange={(values) => {
-        const v = values[0];
-        if (typeof v === 'number') onSetPosition(100 - v);
-      }}
-      className="relative flex h-full min-h-52 w-full max-w-40 touch-none select-none items-center justify-center"
-      aria-label={ariaLabel}
-      onPointerDown={(e) => e.stopPropagation()}
-      onClick={(e) => e.stopPropagation()}
-    >
-      {/* Window frame */}
-      <div
-        className={`absolute inset-0 overflow-hidden rounded-2xl border ${
-          isLight ? 'border-slate-300/70 bg-sky-50/60' : 'border-white/14 bg-black/22'
-        }`}
-      >
-        {/* Cassette housing */}
-        <div
-          className={`absolute inset-x-0 top-0 rounded-t-2xl border-b ${
-            isLight ? 'border-slate-300/50 bg-slate-200/80' : 'border-white/10 bg-white/16'
-          }`}
-          style={{ height: cassetteH }}
-        />
-
-        {/* Cavity below cassette */}
-        <div className="absolute inset-x-0 bottom-0" style={{ top: cassetteH }}>
-          {/* Sky gradient */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: isLight
-                ? 'linear-gradient(180deg, rgba(186,230,253,0.28) 0%, rgba(224,242,254,0.08) 100%)'
-                : 'linear-gradient(180deg, rgba(147,197,253,0.07) 0%, rgba(255,255,255,0.02) 100%)',
-            }}
-          />
-
-          {/* Blind material */}
-          {blindCoverage > 0.01 && (
-            <div
-              className="absolute inset-x-0 top-0 overflow-hidden"
-              style={{ height: `${blindCoverage * 100}%` }}
-            >
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: isLight
-                    ? 'linear-gradient(180deg, rgba(248,250,252,0.97) 0%, rgba(218,226,238,0.93) 100%)'
-                    : 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.11) 100%)',
-                }}
-              />
-              {Array.from({ length: slatCount }, (_, i) => (
-                <div
-                  key={i}
-                  className={`pointer-events-none absolute inset-x-0 border-b ${
-                    isLight ? 'border-slate-300/55' : 'border-white/10'
-                  }`}
-                  style={{ top: `${((i + 1) / (slatCount + 1)) * 100}%` }}
-                />
-              ))}
-              <div
-                className={`absolute inset-x-1.5 bottom-0 h-2 rounded-[3px] border ${
-                  isLight ? 'border-slate-300/80 bg-slate-300/70' : 'border-white/18 bg-white/30'
-                }`}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Position badge */}
-        <div className="absolute bottom-2 right-2 rounded-full bg-black/50 px-2.5 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
-          {position}%
-        </div>
-      </div>
-
-      <Slider.Track className="absolute inset-0 h-full w-full cursor-ns-resize opacity-0" />
-      <Slider.Thumb
-        className="absolute h-0.5 w-full opacity-0 outline-none"
-        aria-label={ariaLabel}
-      />
-    </Slider.Root>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Preset position chips (large card only).
-// ---------------------------------------------------------------------------
-
-function CoverPresetChips({
-  position,
-  theme,
-  onSetPosition,
-}: {
-  position: number;
-  theme: ThemeType;
-  onSetPosition: (pos: number) => void;
-}) {
-  const isLight = theme === 'light';
-  return (
-    <div className="flex gap-2">
-      {([0, 25, 50, 75, 100] as const).map((preset) => {
-        const isActive = Math.abs(position - preset) < 8;
-        return (
-          <button
-            key={preset}
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onSetPosition(preset);
-            }}
-            className={`flex-1 rounded-xl px-2 py-2 text-xs font-medium transition-colors ${
-              isActive
-                ? isLight
-                  ? 'bg-indigo-100 text-indigo-700'
-                  : 'bg-indigo-500/28 text-indigo-300'
-                : isLight
-                  ? 'bg-white/60 text-slate-500 hover:bg-white/80 hover:text-slate-700'
-                  : 'bg-white/8 text-white/72 hover:bg-white/12 hover:text-white/88'
-            }`}
-          >
-            {preset}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-function CoverControlButton({
-  theme,
-  size,
-  label,
-  onClick,
-  children,
-}: {
-  theme: ThemeType;
-  size: CardSize | 'large';
-  label: string;
-  onClick: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <RoundControlButton
-      theme={theme}
-      size={size}
-      variant="soft"
-      onClick={(event) => {
-        event.stopPropagation();
-        onClick();
-      }}
-      title={label}
-    >
-      {children}
-    </RoundControlButton>
   );
 }

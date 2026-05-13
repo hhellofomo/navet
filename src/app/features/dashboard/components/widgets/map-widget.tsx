@@ -1,16 +1,7 @@
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
 import { MapPin, Settings2 } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
-import {
-  AttributionControl,
-  Circle,
-  MapContainer,
-  Marker,
-  Popup,
-  TileLayer,
-  useMap,
-} from 'react-leaflet';
+import { AttributionControl, Circle, MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import { BaseCard, customCardDialogShellProps, DialogShell } from '@/app/components/primitives';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { CustomCardTintPicker, DialogHeader } from '@/app/components/shared/device-editor';
@@ -25,25 +16,15 @@ import {
 } from '@/app/components/shared/theme/map-widget-surface-tokens';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { CARTO_DARK_TILE_URL, CARTO_LIGHT_TILE_URL, MAP_ATTRIBUTION_HTML } from '@/app/constants';
 import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 import { useAuth } from '@/app/stores/auth-store';
-import type { HomeAssistantStore } from '@/app/stores/home-assistant-store';
 import { authSelectors } from '@/app/stores/selectors';
 import { resolveHomeAssistantProxyUrl } from '@/app/utils/home-assistant-url';
+import { BoundsFitter } from './map-bounds-fitter';
+import { buildMarkerIcon } from './map-marker-icon';
+import { mapMarkersEqual, selectMapMarkersFromHa } from './map-markers';
+import { getTileUrl, TILE_ATTRIBUTION } from './map-tiles';
 import { getDashboardWidgetSurfaceTokens } from './widget-surface-tokens';
-
-// ── types ──────────────────────────────────────────────────────────────────
-
-interface MapMarker {
-  id: string;
-  name: string;
-  latitude: number;
-  longitude: number;
-  entityPicture?: string;
-  state: string;
-  gpsAccuracy?: number;
-}
 
 export interface MapWidgetProps {
   size?: CardSize;
@@ -57,180 +38,6 @@ interface MapSettingsDialogProps {
   onOpenChange: (open: boolean) => void;
   tintColor?: string;
   onTintColorChange?: (color: string) => void;
-}
-
-function normalizeMarkerName(value: string | undefined) {
-  return value?.trim().toLowerCase() ?? '';
-}
-
-function getFirstName(value: string | undefined) {
-  const normalized = normalizeMarkerName(value);
-  return normalized.split(/\s+/)[0] ?? '';
-}
-
-function readEntityPicture(attributes: Record<string, unknown>) {
-  return (
-    (typeof attributes.entity_picture === 'string' && attributes.entity_picture) ||
-    (typeof attributes.entity_picture_local === 'string' && attributes.entity_picture_local) ||
-    undefined
-  );
-}
-
-// ── selector ───────────────────────────────────────────────────────────────
-
-export function selectMapMarkersFromHa(store: HomeAssistantStore): MapMarker[] {
-  const { entities } = store;
-  if (!entities) return [];
-
-  const personPicturesByName = new Map<string, string>();
-  const personPicturesByFirstName = new Map<string, string>();
-  const markers: MapMarker[] = [];
-
-  for (const [id, entity] of Object.entries(entities)) {
-    const attrs = entity.attributes as Record<string, unknown>;
-    if (id.startsWith('person.')) {
-      const entityPicture = readEntityPicture(attrs);
-      const friendlyName =
-        typeof attrs.friendly_name === 'string' ? attrs.friendly_name : id.replace(/_/g, ' ');
-      const normalizedName = normalizeMarkerName(friendlyName);
-      const firstName = getFirstName(friendlyName);
-
-      if (entityPicture && normalizedName) {
-        personPicturesByName.set(normalizedName, entityPicture);
-      }
-
-      if (entityPicture && firstName && !personPicturesByFirstName.has(firstName)) {
-        personPicturesByFirstName.set(firstName, entityPicture);
-      }
-    }
-
-    if (!id.startsWith('person.') && !id.startsWith('device_tracker.')) {
-      continue;
-    }
-
-    const lat = attrs.latitude;
-    const lon = attrs.longitude;
-    if (typeof lat !== 'number' || typeof lon !== 'number') {
-      continue;
-    }
-
-    const markerName = (attrs.friendly_name as string | undefined) ?? id.replace(/_/g, ' ');
-    markers.push({
-      id,
-      name: markerName,
-      latitude: lat,
-      longitude: lon,
-      entityPicture: readEntityPicture(attrs),
-      state: entity.state,
-      gpsAccuracy: attrs.gps_accuracy as number | undefined,
-    });
-  }
-
-  return markers.map((marker) => {
-    if (marker.entityPicture) {
-      return marker;
-    }
-
-    const normalizedMarkerName = normalizeMarkerName(marker.name);
-    const markerFirstName = getFirstName(marker.name);
-    return {
-      ...marker,
-      entityPicture:
-        personPicturesByName.get(normalizedMarkerName) ??
-        personPicturesByFirstName.get(markerFirstName),
-    };
-  });
-}
-
-export function mapMarkersEqual(a: MapMarker[], b: MapMarker[]): boolean {
-  if (a === b) return true;
-  if (a.length !== b.length) return false;
-  return a.every(
-    (m, i) =>
-      m.id === b[i].id &&
-      m.latitude === b[i].latitude &&
-      m.longitude === b[i].longitude &&
-      m.state === b[i].state &&
-      m.gpsAccuracy === b[i].gpsAccuracy &&
-      m.entityPicture === b[i].entityPicture
-  );
-}
-
-// ── tile URLs ──────────────────────────────────────────────────────────────
-
-function getTileUrl(theme: string): string {
-  return theme === 'light' ? CARTO_LIGHT_TILE_URL : CARTO_DARK_TILE_URL;
-}
-
-const TILE_ATTRIBUTION = MAP_ATTRIBUTION_HTML;
-
-// ── custom marker icon ─────────────────────────────────────────────────────
-
-function buildMarkerIcon(marker: MapMarker, accentHex: string): L.DivIcon {
-  const size = 36;
-  const initials = marker.name
-    .split(' ')
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() ?? '')
-    .join('');
-
-  const inner = marker.entityPicture
-    ? `<img src="${marker.entityPicture}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
-    : `<span style="font-size:12px;font-weight:700;color:#fff;line-height:1;">${initials}</span>`;
-
-  const isHome = marker.state === 'home';
-  const borderColor = isHome ? accentHex : 'rgba(255,255,255,0.35)';
-
-  const html = `
-    <div style="
-      width:${size}px;height:${size}px;border-radius:50%;
-      border:2.5px solid ${borderColor};
-      background:${marker.entityPicture ? 'transparent' : 'rgba(30,30,40,0.85)'};
-      display:flex;align-items:center;justify-content:center;
-      overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.45);
-      backdrop-filter:blur(4px);
-    ">${inner}</div>
-    <div style="
-      width:6px;height:6px;border-radius:50%;
-      background:${isHome ? accentHex : 'rgba(255,255,255,0.45)'};
-      margin:-2px auto 0;box-shadow:0 1px 4px rgba(0,0,0,0.4);
-    "></div>`;
-
-  return L.divIcon({
-    html,
-    className: '',
-    iconSize: [size, size + 8],
-    iconAnchor: [size / 2, size + 8],
-    popupAnchor: [0, -(size + 8)],
-  });
-}
-
-// ── bounds fitter ──────────────────────────────────────────────────────────
-
-function BoundsFitter({ markers }: { markers: MapMarker[] }) {
-  const map = useMap();
-
-  useEffect(() => {
-    const frameId = window.requestAnimationFrame(() => {
-      map.invalidateSize(false);
-
-      if (markers.length === 0) {
-        return;
-      }
-
-      if (markers.length === 1) {
-        map.setView([markers[0].latitude, markers[0].longitude], 13, { animate: false });
-        return;
-      }
-
-      const bounds = L.latLngBounds(markers.map((m) => [m.latitude, m.longitude]));
-      map.fitBounds(bounds, { padding: [32, 32], animate: false, maxZoom: 15 });
-    });
-
-    return () => window.cancelAnimationFrame(frameId);
-  }, [map, markers]);
-
-  return null;
 }
 
 function MapSettingsDialog({
@@ -271,8 +78,6 @@ function MapSettingsDialog({
     </DialogShell>
   );
 }
-
-// ── widget ─────────────────────────────────────────────────────────────────
 
 export const MapWidget = memo(function MapWidget({
   size = 'large',
@@ -317,7 +122,6 @@ export const MapWidget = memo(function MapWidget({
     [authConfig?.url, markers]
   );
 
-  // Stable default center (BoundsFitter overrides on mount)
   const defaultCenter = useMemo<[number, number]>(() => [20, 0], []);
 
   useEffect(() => {

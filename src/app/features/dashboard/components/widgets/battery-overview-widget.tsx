@@ -1,5 +1,5 @@
 import { Battery, Palette, Sliders } from 'lucide-react';
-import { memo, useEffect, useId, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import {
   CardDialogHeader,
   CardDialogSection,
@@ -33,7 +33,7 @@ import {
   haBatterySensorRowsEqual,
   selectBatterySensorRowsFromHa,
 } from '@/app/hooks/ha-battery-sensor-rows';
-import { BATTERY_LEVEL_COLORS, BATTERY_LEVEL_THRESHOLDS } from './battery-constants';
+import { BatteryList, getLevelColor } from './battery-list';
 import { getDashboardWidgetSurfaceTokens } from './widget-surface-tokens';
 
 export interface BatteryOverviewWidgetData {
@@ -48,54 +48,6 @@ interface BatteryOverviewWidgetProps {
   isEditMode?: boolean;
   room?: string;
   onRoomChange?: (room: string) => void;
-}
-
-interface BatteryLevelIconProps {
-  level: number;
-  color: string;
-  className?: string;
-}
-
-function BatteryLevelIcon({ level, color, className }: BatteryLevelIconProps) {
-  const clampedLevel = Math.max(0, Math.min(100, level));
-  const fillWidth = (clampedLevel / 100) * 11;
-  const maskId = useId();
-
-  return (
-    <svg
-      viewBox="0 0 20 20"
-      aria-hidden="true"
-      className={className}
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect x="2.25" y="5" width="14.5" height="10" rx="2.25" stroke={color} strokeWidth="1.5" />
-      <rect x="17.25" y="8" width="1.75" height="4" rx="0.75" fill={color} />
-      <defs>
-        <clipPath id={maskId}>
-          <rect x="4" y="6.75" width={fillWidth} height="6.5" rx="1.1" />
-        </clipPath>
-      </defs>
-      <rect
-        x="4"
-        y="6.75"
-        width="11"
-        height="6.5"
-        rx="1.1"
-        fill={color}
-        opacity={clampedLevel <= 20 ? 0.28 : 0.18}
-      />
-      <rect
-        x="4"
-        y="6.75"
-        width="11"
-        height="6.5"
-        rx="1.1"
-        fill={color}
-        clipPath={`url(#${maskId})`}
-      />
-    </svg>
-  );
 }
 
 function getSelectedEntityIds(value: unknown): string[] | undefined {
@@ -350,12 +302,6 @@ export const BatteryOverviewWidget = memo(function BatteryOverviewWidget({
         ? 'rgba(255,255,255,0.05)'
         : 'rgba(255,255,255,0.08)');
 
-  const getLevelColor = (level: number) => {
-    if (level <= BATTERY_LEVEL_THRESHOLDS.CRITICAL) return BATTERY_LEVEL_COLORS.critical;
-    if (level <= BATTERY_LEVEL_THRESHOLDS.LOW) return BATTERY_LEVEL_COLORS.low;
-    return accentHex;
-  };
-
   useEffect(() => {
     if (!isEditMode) {
       setIsSettingsOpen(false);
@@ -418,48 +364,14 @@ export const BatteryOverviewWidget = memo(function BatteryOverviewWidget({
             subtitleClassName={surface.textMuted}
             leading={<EntityCardHeaderIcon IconComponent={Battery} isActive size={chromeSize} />}
           />
-          {filteredBatteries.length === 0 ? (
-            <div className={`flex flex-1 items-center justify-center text-sm ${surface.textMuted}`}>
-              {emptyStateLabel}
-            </div>
-          ) : (
-            <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
-              <ul className="mt-auto min-w-0 space-y-1.5">
-                {filteredBatteries.map((device) => (
-                  <li key={device.id} className="flex min-w-0 items-center gap-2">
-                    <BatteryLevelIcon
-                      level={device.level}
-                      color={getLevelColor(device.level)}
-                      className="h-3.5 w-3.5 shrink-0"
-                    />
-                    <span className={`min-w-0 flex-1 truncate text-xs ${surface.textSecondary}`}>
-                      {device.name}
-                    </span>
-                    {!isCompact && (
-                      <div
-                        className="h-1.5 w-16 shrink-0 overflow-hidden rounded-full"
-                        style={{ background: subtleFill }}
-                      >
-                        <div
-                          className="h-full rounded-full transition-all"
-                          style={{
-                            width: `${device.level}%`,
-                            backgroundColor: getLevelColor(device.level),
-                          }}
-                        />
-                      </div>
-                    )}
-                    <span
-                      className="w-10 shrink-0 text-right text-xs font-medium tabular-nums"
-                      style={{ color: getLevelColor(device.level) }}
-                    >
-                      {device.level}%
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <BatteryList
+            devices={filteredBatteries}
+            isCompact={isCompact}
+            subtleFill={subtleFill}
+            textSecondary={surface.textSecondary}
+            emptyStateLabel={emptyStateLabel}
+            getLevelColor={(level) => getLevelColor(level, accentHex)}
+          />
         </div>
       </BaseCard>
       <BatterySettingsDialog

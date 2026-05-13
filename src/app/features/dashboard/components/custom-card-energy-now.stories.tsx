@@ -1,33 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { type CardSize, getCardSizeOverlayStyle } from '@/app/components/shared/card-size-selector';
 import { getStoryDocsDescription } from '@/app/storybook/story-docs';
-import { getMockEnergyOverview } from '../../energy/data/mock-energy-dashboard';
-import { EnergyNowDashboardCardView } from './widgets/energy-now-dashboard-widget';
+import { EnergyNowDashboardWidget } from './widgets/energy-now-dashboard-widget';
 
 type EnergyNowStoryArgs = {
   size: Extract<CardSize, 'small' | 'medium' | 'large'>;
-  trend?: Array<{ label: string; value: number; secondaryValue?: number }>;
 };
 
-const overview = getMockEnergyOverview('live');
-const storyTrend = [
-  { label: '-45m', value: 9.2, secondaryValue: 6.8 },
-  { label: '-30m', value: 9.9, secondaryValue: 7.1 },
-  { label: '-15m', value: 10.8, secondaryValue: 7.5 },
-  { label: 'Now', value: 11.7, secondaryValue: 7.8 },
-];
-
-function EnergyNowStoryFrame({ size, trend = storyTrend }: EnergyNowStoryArgs) {
+function EnergyNowStoryFrame({ size }: EnergyNowStoryArgs) {
   return (
     <div style={getCardSizeOverlayStyle(size)}>
-      <EnergyNowDashboardCardView
-        title="Energy today"
-        currentLoadW={overview.totals.currentLoadW}
-        todayUsageKWh={56.5}
-        trend={trend}
-        accentColor="#22d3ee"
-        size={size}
-      />
+      <EnergyNowDashboardWidget data={{ selectedSourceId: 'sensor.home_energy_now' }} size={size} />
     </div>
   );
 }
@@ -96,6 +79,5 @@ export const Large: Story = {
 export const EmptyState: Story = {
   args: {
     size: 'medium',
-    trend: [{ label: 'Now', value: 11.7, secondaryValue: 7.8 }],
   },
 };

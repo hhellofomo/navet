@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { Button } from '@/app/components/primitives/button';
+import type { ThemeType } from '@/app/hooks/use-theme';
 import { getStoryDocsDescription } from '@/app/storybook/story-docs';
 import { SettingsDialogStoryFrame } from '@/app/storybook/story-frames';
 import { EnergyNowSettingsDialog } from './energy-now-dashboard-widget';
@@ -10,6 +11,7 @@ function EnergyNowSettingsDialogStory() {
   const [selectedSourceId, setSelectedSourceId] = useState('sensor.home_energy_now');
   const [roomValue, setRoomValue] = useState('__home__');
   const [tintColor, setTintColor] = useState<string | undefined>('#f97316');
+  const theme: ThemeType = 'glass';
 
   return (
     <SettingsDialogStoryFrame parentCardClassName="bg-[linear-gradient(180deg,rgba(249,115,22,0.18),rgba(15,23,42,0.28))]">
@@ -33,6 +35,7 @@ function EnergyNowSettingsDialogStory() {
         onRoomChange={setRoomValue}
         tintColor={tintColor}
         onTintColorChange={setTintColor}
+        theme={theme}
         options={[
           {
             id: 'sensor.home_energy_now',

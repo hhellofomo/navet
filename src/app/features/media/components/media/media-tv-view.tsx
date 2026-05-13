@@ -1,39 +1,19 @@
-import {
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronUp,
-  Gamepad2,
-  House,
-  Menu,
-  Minus,
-  Pause,
-  Play,
-  Plus,
-  Tv2,
-  Undo2,
-  Volume2,
-  VolumeX,
-} from 'lucide-react';
-import { type CSSProperties, type ReactNode, useState } from 'react';
+import { Gamepad2, Tv2 } from 'lucide-react';
+import { type CSSProperties, useState } from 'react';
 import { CardActionRow } from '@/app/components/patterns/card-action-row';
 import { EntityCardHeader } from '@/app/components/primitives/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/primitives/entity-card-header-icon';
-import { RoundControlButton } from '@/app/components/primitives/round-control-button';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { getCardReadableTextTokens } from '@/app/components/shared/theme/card-readable-text-tokens';
 import { getMediaTVViewSurfaceTokens } from '@/app/components/shared/theme/media-tv-view-surface-tokens';
-import { getMediaControlSurfaceTokens } from '@/app/components/shared/theme/media-widget-surface-tokens';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/app/components/ui/dropdown-menu';
 import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import type { TvRemoteAction } from '../../tv-remote-commands';
+import { getTvDpadLayout, TvDpad } from './tv-dpad';
+import { TvSourceSelector } from './tv-source-selector';
+import { TvTransportControls } from './tv-transport-controls';
+import { TvChannelControls, TvVolumeControls } from './tv-volume-controls';
 
 interface MediaTvViewProps {
   size: CardSize;
@@ -54,210 +34,6 @@ interface MediaTvViewProps {
   onSelectSource: (source: string) => void;
   onRemoteCommand: (action: TvRemoteAction) => void;
   onOpenDialog: () => void;
-}
-
-/** Default D-pad (104×104) — compact through medium horizontal */
-const TV_DPAD_LAYOUT_DEFAULT = {
-  shell: 'h-[104px] w-[104px] rounded-[22px]',
-  outerInset: 'inset-0',
-  innerInset: 'inset-[27px]',
-  buttonSize: 'small' as const,
-  centerSize: 'medium' as const,
-  edgeInset: 0,
-  centerClassName: 'h-9 w-9',
-  crosshairMarginPx: 32,
-  edgeIconClassName: 'h-4 w-4',
-  centerOkTextClassName: '!text-xs !font-semibold',
-} as const;
-
-/** Larger D-pad for large / extra-large TV tiles */
-const TV_DPAD_LAYOUT_LARGE_CARD = {
-  shell: 'h-[136px] w-[136px] rounded-[28px]',
-  outerInset: 'inset-0',
-  innerInset: 'inset-[35px]',
-  buttonSize: 'large' as const,
-  centerSize: 'large' as const,
-  edgeInset: 0,
-  centerClassName: 'h-11 w-11',
-  crosshairMarginPx: 42,
-  edgeIconClassName: 'h-5 w-5',
-  centerOkTextClassName: '!text-xs !font-semibold',
-} as const;
-
-type TvDpadLayoutConfig = typeof TV_DPAD_LAYOUT_DEFAULT | typeof TV_DPAD_LAYOUT_LARGE_CARD;
-
-function getTvDpadLayout(size: CardSize): TvDpadLayoutConfig {
-  if (size === 'large' || size === 'extra-large') {
-    return TV_DPAD_LAYOUT_LARGE_CARD;
-  }
-  return TV_DPAD_LAYOUT_DEFAULT;
-}
-
-interface TvControlButtonProps {
-  theme: ThemeType;
-  size?: CardSize | 'large';
-  label: string;
-  disabled?: boolean;
-  style?: CSSProperties;
-  className?: string;
-  iconClassName?: string;
-  onPress: () => void;
-  children: ReactNode;
-}
-
-function TvControlButton({
-  theme,
-  size = 'small',
-  label,
-  disabled = false,
-  style,
-  className = '',
-  iconClassName = '',
-  onPress,
-  children,
-}: TvControlButtonProps) {
-  return (
-    <RoundControlButton
-      theme={theme}
-      size={size}
-      variant="neutral"
-      aria-label={label}
-      disabled={disabled}
-      onClick={(event) => {
-        event.stopPropagation();
-        onPress();
-      }}
-      className={`border backdrop-blur-xl transition-colors disabled:opacity-40 ${className}`}
-      iconClassName={iconClassName}
-      style={style}
-    >
-      {children}
-    </RoundControlButton>
-  );
-}
-
-function TvDpad({
-  theme,
-  remoteAvailable,
-  style,
-  shellStyle,
-  layout,
-  onRemoteCommand,
-}: {
-  theme: ThemeType;
-  remoteAvailable: boolean;
-  style: CSSProperties;
-  shellStyle: CSSProperties;
-  layout: TvDpadLayoutConfig;
-  onRemoteCommand: (action: TvRemoteAction) => void;
-}) {
-  const d = layout;
-  const mediaControlSurface = getMediaControlSurfaceTokens(theme);
-
-  const iconClassName = mediaControlSurface.iconClassName;
-  const disabled = !remoteAvailable;
-  const crosshairStyle = {
-    backgroundColor: mediaControlSurface.crosshairBg,
-  };
-
-  return (
-    <div className={`relative shrink-0 ${d.shell}`}>
-      <div
-        className={`pointer-events-none absolute ${d.outerInset} rounded-full border`}
-        style={shellStyle}
-      />
-      <div
-        className={`pointer-events-none absolute ${d.innerInset} rounded-full border`}
-        style={shellStyle}
-      />
-      <div
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[58%] w-[58%] -translate-x-1/2 -translate-y-1/2 rounded-full border"
-        style={{
-          borderColor: mediaControlSurface.buttonBorder.replace('0.1', '0.05'),
-        }}
-      />
-
-      <div className="absolute inset-0">
-        <TvControlButton
-          theme={theme}
-          size={d.buttonSize}
-          label="Up"
-          disabled={disabled}
-          className="absolute left-1/2 -translate-x-1/2"
-          style={{ ...style, top: d.edgeInset }}
-          iconClassName={iconClassName}
-          onPress={() => onRemoteCommand('up')}
-        >
-          <ChevronUp className={d.edgeIconClassName} />
-        </TvControlButton>
-        <TvControlButton
-          theme={theme}
-          size={d.buttonSize}
-          label="Left"
-          disabled={disabled}
-          style={{ ...style, left: d.edgeInset }}
-          className="absolute top-1/2 -translate-y-1/2"
-          iconClassName={iconClassName}
-          onPress={() => onRemoteCommand('left')}
-        >
-          <ChevronLeft className={d.edgeIconClassName} />
-        </TvControlButton>
-        <TvControlButton
-          theme={theme}
-          size={d.buttonSize}
-          label="Right"
-          disabled={disabled}
-          style={{ ...style, right: d.edgeInset }}
-          className="absolute top-1/2 -translate-y-1/2"
-          iconClassName={iconClassName}
-          onPress={() => onRemoteCommand('right')}
-        >
-          <ChevronRight className={d.edgeIconClassName} />
-        </TvControlButton>
-        <TvControlButton
-          theme={theme}
-          size={d.buttonSize}
-          label="Down"
-          disabled={disabled}
-          style={{ ...style, bottom: d.edgeInset }}
-          className="absolute left-1/2 -translate-x-1/2"
-          iconClassName={iconClassName}
-          onPress={() => onRemoteCommand('down')}
-        >
-          <ChevronDown className={d.edgeIconClassName} />
-        </TvControlButton>
-        <TvControlButton
-          theme={theme}
-          size={d.centerSize}
-          label="Select"
-          disabled={disabled}
-          style={style}
-          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${d.centerClassName}`}
-          iconClassName={`${iconClassName} ${d.centerOkTextClassName}`}
-          onPress={() => onRemoteCommand('select')}
-        >
-          OK
-        </TvControlButton>
-      </div>
-
-      <div
-        className="pointer-events-none absolute left-1/2 top-1/2 w-px -translate-x-1/2 -translate-y-1/2"
-        style={{
-          ...crosshairStyle,
-          opacity: 0.4,
-          height: `calc(100% - ${d.crosshairMarginPx}px)`,
-        }}
-      />
-      <div
-        className="pointer-events-none absolute left-1/2 top-1/2 h-px -translate-x-1/2 -translate-y-1/2"
-        style={{
-          ...crosshairStyle,
-          opacity: 0.4,
-          width: `calc(100% - ${d.crosshairMarginPx}px)`,
-        }}
-      />
-    </div>
-  );
 }
 
 export function MediaTvView({
@@ -291,7 +67,9 @@ export function MediaTvView({
   const isCompact = isCompactCardSize(size);
   const isSmallTvCard = size === 'small';
   const isMediumVerticalTv = size === 'medium-vertical';
-  const tvDpadLayout = getTvDpadLayout(size);
+  const tvDpadLayout = getTvDpadLayout(
+    size as 'small' | 'medium' | 'medium-vertical' | 'large' | 'extra-large'
+  );
   const [dpadOpen, setDpadOpen] = useState(false);
   /** 6px standard gap between TV control buttons */
   const tvControlClusterGap = 'gap-1.5';
@@ -299,65 +77,11 @@ export function MediaTvView({
   const tvIconClass = isSmallTvCard ? 'h-3 w-3' : 'h-3.5 w-3.5';
   const tvCardActionRowSize = isSmallTvCard ? 'small' : 'medium';
   const iconClassName = tvSurface.iconClassName;
-  const sourceLabel =
-    source &&
-    source.trim().length > 0 &&
-    source !== t('media.nothingPlaying') &&
-    source !== t('media.nothingPlayingDescription')
-      ? source
-      : 'Source';
   const separatorColor = tvSurface.separatorColor;
 
   const controlStyle: CSSProperties = tvSurface.controlStyle;
   const panelStyle: CSSProperties = tvSurface.panelStyle;
   const navShellStyle: CSSProperties = tvSurface.navShellStyle;
-
-  const updateVolume = (nextVolume: number) => {
-    onVolumeInteractionStart();
-    onVolumeChange(nextVolume);
-    onVolumeInteractionEnd();
-  };
-
-  const handleVolumeUp = () => updateVolume(Math.min(100, volume + 10));
-  const handleVolumeDown = () => updateVolume(Math.max(0, volume - 10));
-
-  const sourceDropdown = (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          onClick={(event) => event.stopPropagation()}
-          className={`flex h-8 min-w-0 max-w-32 items-center rounded-full border backdrop-blur-xl ${
-            isSmallTvCard ? 'gap-1 px-2.5' : 'gap-1.5 px-3'
-          }`}
-          style={panelStyle}
-        >
-          <span
-            className="min-w-0 truncate text-xs font-medium"
-            style={{ color: tvTextTokens.titleColor }}
-          >
-            {sourceLabel}
-          </span>
-          <ChevronDown className="h-3 w-3 shrink-0" style={{ color: tvTextTokens.subtitleColor }} />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        className="min-w-44 rounded-xl border border-white/12 bg-zinc-950/96 text-white backdrop-blur-xl"
-        onClick={(event) => event.stopPropagation()}
-      >
-        {sourceList.length > 0 ? (
-          sourceList.map((entry) => (
-            <DropdownMenuItem key={entry} onClick={() => onSelectSource(entry)}>
-              {entry}
-            </DropdownMenuItem>
-          ))
-        ) : (
-          <DropdownMenuItem disabled>{sourceLabel}</DropdownMenuItem>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
 
   const tvSettingsButton = (
     <CardSettingsActionButton
@@ -372,165 +96,82 @@ export function MediaTvView({
   );
 
   const tvDpadToggleButton = isSmallTvCard ? (
-    <TvControlButton
-      theme={theme}
-      size="small"
-      label={dpadOpen ? t('media.tv.hideDpad') : t('media.tv.showDpad')}
+    <button
+      type="button"
+      onClick={(event) => {
+        event.stopPropagation();
+        setDpadOpen((open) => !open);
+      }}
+      className={`rounded-full border backdrop-blur-xl transition-colors ${
+        dpadOpen ? 'ring-1 ring-fuchsia-400/35' : ''
+      }`}
       style={controlStyle}
-      iconClassName={iconClassName}
-      className={dpadOpen ? 'ring-1 ring-fuchsia-400/35' : ''}
-      onPress={() => setDpadOpen((open) => !open)}
     >
-      <Gamepad2 className={tvIconClass} />
-    </TvControlButton>
+      <Gamepad2 className={`${tvIconClass} p-0.5`} />
+    </button>
   ) : null;
 
-  const transportActionButtons = (
+  const utilityControls = (
     <>
-      <TvControlButton
+      <TvVolumeControls
         theme={theme}
-        size="small"
-        label="Menu"
-        disabled={!remoteAvailable}
-        style={controlStyle}
+        isMuted={isMuted}
+        volume={volume}
+        controlStyle={controlStyle}
         iconClassName={iconClassName}
-        onPress={() => onRemoteCommand('menu')}
-      >
-        <Menu className={tvIconClass} />
-      </TvControlButton>
-      <TvControlButton
+        tvIconClass={tvIconClass}
+        tvControlClusterGap={tvControlClusterGap}
+        onToggleMute={onToggleMute}
+        onVolumeChange={onVolumeChange}
+        onVolumeInteractionStart={onVolumeInteractionStart}
+        onVolumeInteractionEnd={onVolumeInteractionEnd}
+      />
+      {!isSmallTvCard ? (
+        <div className="h-6 w-px shrink-0" style={{ backgroundColor: separatorColor }} />
+      ) : null}
+      <TvChannelControls
         theme={theme}
-        size="small"
-        label="Home"
-        disabled={!remoteAvailable}
-        style={controlStyle}
+        remoteAvailable={remoteAvailable}
+        controlStyle={controlStyle}
         iconClassName={iconClassName}
-        onPress={() => onRemoteCommand('home')}
-      >
-        <House className={tvIconClass} />
-      </TvControlButton>
-      <TvControlButton
-        theme={theme}
-        size="small"
-        label="Back"
-        disabled={!remoteAvailable}
-        style={controlStyle}
-        iconClassName={iconClassName}
-        onPress={() => onRemoteCommand('back')}
-      >
-        <Undo2 className={tvIconClass} />
-      </TvControlButton>
-      <TvControlButton
-        theme={theme}
-        size="small"
-        label={isPlaying ? t('media.pausePlayback') : t('media.resumePlayback')}
-        style={controlStyle}
-        iconClassName={iconClassName}
-        onPress={onTogglePlay}
-      >
-        {isPlaying ? (
-          <Pause className={tvIconClass} fill="currentColor" />
-        ) : (
-          <Play className={tvIconClass} fill="currentColor" />
-        )}
-      </TvControlButton>
+        tvIconClass={tvIconClass}
+        tvControlClusterGap={tvControlClusterGap}
+        onRemoteCommand={onRemoteCommand}
+      />
     </>
   );
 
-  const quickRow = (
-    <CardActionRow
-      theme={theme}
-      size={tvCardActionRowSize}
-      leftContent={transportActionButtons}
-      rightContent={
-        <div className={`flex items-center ${tvControlClusterGap}`}>
-          {sourceDropdown}
-          {tvSettingsButton}
-        </div>
-      }
-    />
-  );
-
-  const volumeButtons = (
-    <div className={`flex min-w-0 items-center ${tvControlClusterGap}`}>
-      <TvControlButton
-        theme={theme}
-        size="small"
-        label="Volume down"
-        style={controlStyle}
-        iconClassName={iconClassName}
-        onPress={handleVolumeDown}
-      >
-        <Minus className={tvIconClass} />
-      </TvControlButton>
-      <TvControlButton
-        theme={theme}
-        size="small"
-        label={isMuted ? t('media.unmuteVolume') : t('media.muteVolume')}
-        style={controlStyle}
-        iconClassName={iconClassName}
-        onPress={onToggleMute}
-      >
-        {isMuted ? <VolumeX className={tvIconClass} /> : <Volume2 className={tvIconClass} />}
-      </TvControlButton>
-      <TvControlButton
-        theme={theme}
-        size="small"
-        label="Volume up"
-        style={controlStyle}
-        iconClassName={iconClassName}
-        onPress={handleVolumeUp}
-      >
-        <Plus className={tvIconClass} />
-      </TvControlButton>
+  const utilityControlsVertical = (
+    <div className={`flex flex-col ${tvSectionStackGap}`}>
+      <div className="flex items-center justify-center">
+        <TvVolumeControls
+          theme={theme}
+          isMuted={isMuted}
+          volume={volume}
+          controlStyle={controlStyle}
+          iconClassName={iconClassName}
+          tvIconClass={tvIconClass}
+          tvControlClusterGap={tvControlClusterGap}
+          onToggleMute={onToggleMute}
+          onVolumeChange={onVolumeChange}
+          onVolumeInteractionStart={onVolumeInteractionStart}
+          onVolumeInteractionEnd={onVolumeInteractionEnd}
+        />
+      </div>
+      <div className="h-px w-full" style={{ backgroundColor: separatorColor }} />
+      <div className="flex items-center justify-center">
+        <TvChannelControls
+          theme={theme}
+          remoteAvailable={remoteAvailable}
+          controlStyle={controlStyle}
+          iconClassName={iconClassName}
+          tvIconClass={tvIconClass}
+          tvControlClusterGap={tvControlClusterGap}
+          onRemoteCommand={onRemoteCommand}
+        />
+      </div>
     </div>
   );
-
-  const channelButtons = (
-    <div
-      className={`flex min-w-0 items-center ${tvControlClusterGap} ${!remoteAvailable ? 'opacity-70' : ''}`}
-    >
-      <TvControlButton
-        theme={theme}
-        size="small"
-        label="Channel down"
-        disabled={!remoteAvailable}
-        style={controlStyle}
-        iconClassName={iconClassName}
-        onPress={() => onRemoteCommand('channelDown')}
-      >
-        <ChevronDown className={tvIconClass} />
-      </TvControlButton>
-      <TvControlButton
-        theme={theme}
-        size="small"
-        label="Channel up"
-        disabled={!remoteAvailable}
-        style={controlStyle}
-        iconClassName={iconClassName}
-        onPress={() => onRemoteCommand('channelUp')}
-      >
-        <ChevronUp className={tvIconClass} />
-      </TvControlButton>
-    </div>
-  );
-
-  const utilityControls =
-    size === 'medium-vertical' ? (
-      <div className={`flex flex-col ${tvSectionStackGap}`}>
-        <div className="flex items-center justify-center">{volumeButtons}</div>
-        <div className="h-px w-full" style={{ backgroundColor: separatorColor }} />
-        <div className="flex items-center justify-center">{channelButtons}</div>
-      </div>
-    ) : (
-      <div className={`flex min-w-0 items-center justify-start ${tvControlClusterGap}`}>
-        {volumeButtons}
-        {!isSmallTvCard ? (
-          <div className="h-6 w-px shrink-0" style={{ backgroundColor: separatorColor }} />
-        ) : null}
-        {channelButtons}
-      </div>
-    );
 
   const header = (
     <EntityCardHeader
@@ -553,6 +194,44 @@ export function MediaTvView({
     />
   );
 
+  const sourceSelector = (
+    <TvSourceSelector
+      source={source}
+      sourceList={sourceList}
+      isSmallTvCard={isSmallTvCard}
+      panelStyle={panelStyle}
+      tvTextTokens={tvTextTokens}
+      onSelectSource={onSelectSource}
+    />
+  );
+
+  const transportControls = (
+    <TvTransportControls
+      theme={theme}
+      isPlaying={isPlaying}
+      remoteAvailable={remoteAvailable}
+      controlStyle={controlStyle}
+      iconClassName={iconClassName}
+      tvIconClass={tvIconClass}
+      onRemoteCommand={onRemoteCommand}
+      onTogglePlay={onTogglePlay}
+    />
+  );
+
+  const quickRow = (
+    <CardActionRow
+      theme={theme}
+      size={tvCardActionRowSize}
+      leftContent={transportControls}
+      rightContent={
+        <div className={`flex items-center ${tvControlClusterGap}`}>
+          {sourceSelector}
+          {tvSettingsButton}
+        </div>
+      }
+    />
+  );
+
   const renderDpadOverlay = () => (
     <div className="pointer-events-none absolute right-0 top-0 z-20 flex justify-end">
       <div className="pointer-events-auto">
@@ -568,7 +247,6 @@ export function MediaTvView({
     </div>
   );
 
-  /** D-pad in document flow (no absolute overlay); align with parent `justify-*`. */
   const renderDpadInline = () => (
     <TvDpad
       theme={theme}
@@ -578,10 +256,6 @@ export function MediaTvView({
       layout={tvDpadLayout}
       onRemoteCommand={onRemoteCommand}
     />
-  );
-
-  const renderBottomActionRow = () => (
-    <div className={isSmallTvCard ? 'pt-2' : 'pt-3'}>{quickRow}</div>
   );
 
   if (isCompact) {
@@ -608,16 +282,16 @@ export function MediaTvView({
             </>
           ) : (
             <div className={`mt-auto flex flex-col ${tvSectionStackGap}`}>
-              {utilityControls}
+              {size === 'medium-vertical' ? utilityControlsVertical : utilityControls}
               {isSmallTvCard ? (
                 <>
                   <div className={`flex min-w-0 flex-wrap items-center ${tvControlClusterGap}`}>
-                    {transportActionButtons}
+                    {transportControls}
                   </div>
                   <div className="relative flex w-full min-w-0 items-center justify-between">
                     <div className="relative z-10 shrink-0">{tvDpadToggleButton}</div>
                     <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 flex -translate-x-1/2 -translate-y-1/2 justify-center">
-                      <div className="pointer-events-auto min-w-0 max-w-32">{sourceDropdown}</div>
+                      <div className="pointer-events-auto min-w-0 max-w-32">{sourceSelector}</div>
                     </div>
                     <div className="relative z-10 shrink-0">{tvSettingsButton}</div>
                   </div>
@@ -639,16 +313,16 @@ export function MediaTvView({
         <div className="relative flex min-h-0 flex-1 flex-col gap-5">
           <div className="flex min-h-0 flex-1 items-end justify-center">{renderDpadInline()}</div>
           <div className={`flex flex-col ${tvSectionStackGap}`}>
-            {utilityControls}
+            {utilityControlsVertical}
             <div
               className={`mt-3 flex flex-wrap items-center justify-center ${tvControlClusterGap}`}
             >
-              {transportActionButtons}
+              {transportControls}
             </div>
             <div
               className={`mt-3 flex w-full min-w-0 items-center justify-center ${tvControlClusterGap}`}
             >
-              <div className="min-w-0 max-w-36">{sourceDropdown}</div>
+              <div className="min-w-0 max-w-36">{sourceSelector}</div>
               <div className="shrink-0">{tvSettingsButton}</div>
             </div>
           </div>
@@ -683,7 +357,7 @@ export function MediaTvView({
           <div className="mt-auto flex flex-col gap-3">{utilityControls}</div>
         </div>
       </div>
-      {renderBottomActionRow()}
+      <div className={isSmallTvCard ? 'pt-2' : 'pt-3'}>{quickRow}</div>
     </div>
   );
 }
