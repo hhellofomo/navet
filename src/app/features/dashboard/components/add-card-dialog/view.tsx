@@ -9,6 +9,7 @@ import {
   TabTrigger,
 } from '@/app/components/primitives';
 import { type CardSize, getCardSizeRatio } from '@/app/components/shared/card-size-selector';
+import { getAddCardDialogSurfaceTokens } from '@/app/components/shared/theme/add-card-dialog-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { type ThemeType, useI18n } from '@/app/hooks';
 import { type DashboardLibraryCard, DashboardLibraryList } from '../dashboard-library-list';
@@ -69,16 +70,17 @@ export function AddCardDialogView({
   if (!open) return null;
 
   const surface = getThemeSurfaceTokens(theme);
+  const dialogSurface = getAddCardDialogSurfaceTokens(theme);
   const textColor = surface.textPrimary;
   const mutedColor = surface.textSecondary;
   const borderColor = surface.border;
   const cardBg = surface.panelMuted;
   const hoverBg = surface.hoverBg;
   const accent = getColorValue(primaryColor);
-  const inactiveIconBg = theme === 'light' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.05)';
-  const inactiveIconColor = theme === 'light' ? '#374151' : 'rgba(255, 255, 255, 0.78)';
-  const sizePreviewTileBg = theme === 'light' ? 'rgba(15,23,42,0.04)' : 'rgba(255,255,255,0.03)';
-  const inactiveSizeSwatchBg = theme === 'light' ? '#d1d5db' : 'rgba(255, 255, 255, 0.2)';
+  const inactiveIconBg = dialogSurface.inactiveIconBg;
+  const inactiveIconColor = dialogSurface.inactiveIconColor;
+  const sizePreviewTileBg = dialogSurface.sizePreviewTileBg;
+  const inactiveSizeSwatchBg = dialogSurface.inactiveSizeSwatchBg;
   const cardsTabActive = activeTab === 'cards';
   const cardsSummary = hasLibraryQuery
     ? t('dashboard.addCard.librarySummary.matching', { count: libraryCount })

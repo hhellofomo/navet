@@ -145,7 +145,7 @@ export const LightCard = memo(function LightCard({
             data-ambient-light-bleed="true"
             aria-hidden="true"
             className={`pointer-events-none absolute -inset-full z-0 blur-3xl transition-all duration-500 ${
-              theme === 'light' ? 'opacity-40' : 'opacity-20'
+              theme !== 'light' ? 'opacity-20' : 'opacity-40'
             }`}
             style={{
               background: `radial-gradient(circle, ${surfaceTokens.glowColor || 'transparent'} 0%, transparent 70%)`,

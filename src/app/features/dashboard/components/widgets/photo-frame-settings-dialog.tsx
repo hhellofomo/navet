@@ -90,7 +90,7 @@ export function PhotoFrameSettingsDialog({
     background: 'transparent',
   };
   const placeholderClassName =
-    theme === 'light' ? 'placeholder:text-gray-600' : 'placeholder:text-white/72';
+    theme !== 'light' ? 'placeholder:text-white/72' : 'placeholder:text-gray-600';
   const handleAdd = () => {
     const trimmed = inputValue.trim();
     if (!trimmed) return;

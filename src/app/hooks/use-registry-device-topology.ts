@@ -1,6 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import { shallow } from 'zustand/shallow';
 import type { HomeAssistantEntityRegistryEntry } from '@/app/services/home-assistant.service';
 import type { HomeAssistantStore } from '@/app/stores/home-assistant-store';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { useHomeAssistant } from './use-home-assistant';
 
 const EMPTY_IDS: string[] = [];
@@ -147,4 +149,33 @@ export function useEntityRoomRegistryContext(entityId: string): EntityRoomRegist
   );
 
   return useHomeAssistant(selector, entityRoomRegistryContextEqual);
+}
+
+/**
+ * Hook to resolve registry maps for room/area lookups
+ * Used by device mapping hooks to determine entity locations
+ */
+export function useRegistryRoomResolver() {
+  const areas = useHomeAssistant(homeAssistantSelectors.areas, shallow);
+  const deviceRegistry = useHomeAssistant(homeAssistantSelectors.deviceRegistry, shallow);
+  const entityRegistry = useHomeAssistant(homeAssistantSelectors.entityRegistry, shallow);
+
+  const areaMap = useMemo(() => new Map(areas.map((area) => [area.area_id, area.name])), [areas]);
+  const entityRegistryMap = useMemo(
+    () => new Map(entityRegistry.map((registryEntry) => [registryEntry.entity_id, registryEntry])),
+    [entityRegistry]
+  );
+  const deviceRegistryMap = useMemo(
+    () => new Map(deviceRegistry.map((device) => [device.id, device])),
+    [deviceRegistry]
+  );
+
+  return {
+    areaMap,
+    areas,
+    deviceRegistry,
+    deviceRegistryMap,
+    entityRegistry,
+    entityRegistryMap,
+  };
 }

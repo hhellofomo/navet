@@ -56,8 +56,11 @@ export const SensorCard = memo(function SensorCard({
   // Theme-aware colors
   const textPrimary = surface.textPrimary;
   const textSecondary = surface.textSubtle;
-  const accentColor =
-    theme === 'light' ? 'text-teal-700' : isGlass ? 'text-teal-200' : 'text-teal-400';
+  const accentColor = isGlass
+    ? 'text-teal-200'
+    : theme === 'light'
+      ? 'text-teal-700'
+      : 'text-teal-400';
   return (
     <BaseCard
       size={size}

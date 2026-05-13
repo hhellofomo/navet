@@ -20,7 +20,7 @@ export const EnergyBatteryDevicesWidget = memo(function EnergyBatteryDevicesWidg
   const { t } = useI18n();
   const { theme, accentColor } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
-  const progressTrackClassName = theme === 'light' ? 'bg-slate-200/80' : surface.subtleBg;
+  const progressTrackClassName = theme !== 'light' ? surface.subtleBg : 'bg-slate-200/80';
 
   const getLevelColor = (level: number) => {
     if (level <= 20) return '#ef4444';

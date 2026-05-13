@@ -1,29 +1,14 @@
-import type {
-  Auth,
-  Connection,
-  HassConfig,
-  HassEntities,
-  HassUser,
-} from 'home-assistant-js-websocket';
-import {
-  callService as callHassService,
-  createConnection,
-  createLongLivedTokenAuth,
-  ERR_CANNOT_CONNECT,
-  ERR_CONNECTION_LOST,
-  ERR_HASS_HOST_REQUIRED,
-  ERR_INVALID_AUTH,
-  ERR_INVALID_HTTPS_TO_HTTP,
-  getAuth,
-  getUser,
-  subscribeConfig,
-  subscribeEntities,
-} from 'home-assistant-js-websocket';
+import type { Connection, HassConfig, HassEntities, HassUser } from 'home-assistant-js-websocket';
 
-export interface HomeAssistantConfiguration {
-  hassUrl?: string;
-  token?: string;
-}
+import HAConnectionService, {
+  type HAConnectionEventMap,
+  type HAConnectionEventType,
+  type HomeAssistantConfiguration,
+} from './ha-connection.service';
+import HAEntityService from './ha-entity-service';
+import HARegistryService from './ha-registry.service';
+
+export type { HAConnectionEventMap, HAConnectionEventType, HomeAssistantConfiguration };
 
 export interface HomeAssistantAreaRegistryEntry {
   area_id: string;
@@ -66,12 +51,6 @@ export interface HomeAssistantAutomationConfig {
   config: Record<string, unknown>;
 }
 
-interface CallServiceTarget {
-  entity_id?: string | string[];
-  area_id?: string | string[];
-  device_id?: string | string[];
-}
-
 export interface HAServiceEventMap {
   entities: HassEntities;
   config: HassConfig;
@@ -85,227 +64,27 @@ export interface HAServiceEventMap {
 
 export type HAServiceEventType = keyof HAServiceEventMap;
 
+/**
+ * HomeAssistantService facade - orchestrates connection, registry, and entity services.
+ * Maintains backward compatibility with existing code while improving separation of concerns.
+ */
 class HomeAssistantService {
-  private connection: Connection | null = null;
-  private config: HassConfig | null = null;
-  private entities: HassEntities | null = null;
-  private user: HassUser | null = null;
-  private areas: HomeAssistantAreaRegistryEntry[] = [];
-  private deviceRegistry: HomeAssistantDeviceRegistryEntry[] = [];
-  private entityRegistry: HomeAssistantEntityRegistryEntry[] = [];
-  private connected: boolean = false;
-  private listeners: {
-    [K in HAServiceEventType]?: Array<(data: HAServiceEventMap[K]) => void>;
-  } = {};
-  private registryLoadInProgress = false;
-  private pendingRegistryLoad = false;
-  private activeConfiguration: HomeAssistantConfiguration | null = null;
-  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
-  private reconnectAttempt = 0;
-  private manuallyDisconnected = false;
-  private connecting = false;
+  private connectionService: HAConnectionService;
+  private registryService: HARegistryService;
+  private entityService: HAEntityService;
+
+  constructor() {
+    this.connectionService = new HAConnectionService();
+    this.registryService = new HARegistryService(() => this.connectionService.getConnection());
+    this.entityService = new HAEntityService(() => this.connectionService.getConnection());
+  }
 
   /**
    * Authenticate and establish connection to Home Assistant
    */
   async authenticate(configuration: HomeAssistantConfiguration): Promise<void> {
-    if (!configuration?.hassUrl) {
-      throw new Error('Home Assistant URL is required');
-    }
-
-    this.activeConfiguration = configuration;
-    this.manuallyDisconnected = false;
-    this.clearReconnectTimer();
-
-    if (this.connecting) {
-      return;
-    }
-
-    let auth: Auth | undefined;
-
-    try {
-      this.connecting = true;
-
-      if (this.connection) {
-        this.connection.close();
-        this.connection = null;
-      }
-
-      // Long-lived access token
-      if (configuration?.token) {
-        auth = createLongLivedTokenAuth(configuration.hassUrl, configuration.token);
-      } else {
-        // Default auth flow
-        auth = await getAuth({ hassUrl: configuration.hassUrl });
-        if (auth.expired) await auth.refreshAccessToken();
-      }
-
-      // Create connection
-      this.connection = await createConnection({ auth });
-      this.connected = true;
-      this.reconnectAttempt = 0;
-      this.user = await getUser(this.connection);
-
-      await this.loadRegistries();
-
-      // Subscribe to entities
-      subscribeEntities(this.connection, (entities) => {
-        this.entities = entities;
-        this.notifyListeners('entities', entities);
-      });
-
-      // Subscribe to config
-      subscribeConfig(this.connection, (config) => {
-        this.config = config;
-        this.notifyListeners('config', config);
-      });
-
-      // Connection events
-      this.connection.addEventListener('ready', () => {
-        this.clearReconnectTimer();
-        this.reconnectAttempt = 0;
-        this.connected = true;
-        this.notifyListeners('connection', {
-          connected: true,
-          connection: this.connection,
-          reconnecting: false,
-        });
-      });
-
-      this.connection.addEventListener('disconnected', () => {
-        this.connected = false;
-        this.notifyListeners('connection', {
-          connected: false,
-          connection: this.connection,
-          reconnecting: !this.manuallyDisconnected && Boolean(this.activeConfiguration),
-        });
-        this.scheduleReconnect();
-      });
-
-      this.connection.addEventListener('reconnect-error', () => {
-        this.connected = false;
-        this.notifyListeners('connection', {
-          connected: false,
-          connection: this.connection,
-          reconnecting: !this.manuallyDisconnected && Boolean(this.activeConfiguration),
-        });
-        this.scheduleReconnect();
-      });
-
-      // Clear auth query string if present
-      if (location.search.includes('auth_callback=1')) {
-        history.replaceState(null, '', location.pathname);
-      }
-    } catch (error) {
-      this.handleError(error);
-    } finally {
-      this.connecting = false;
-    }
-  }
-
-  private clearReconnectTimer() {
-    if (this.reconnectTimer !== null) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
-    }
-  }
-
-  private scheduleReconnect() {
-    if (this.manuallyDisconnected || !this.activeConfiguration || this.reconnectTimer !== null) {
-      return;
-    }
-
-    const delayMs = Math.min(30000, 2000 * 2 ** Math.min(this.reconnectAttempt, 4));
-    this.reconnectTimer = setTimeout(() => {
-      this.reconnectTimer = null;
-      this.reconnectAttempt += 1;
-      void this.authenticate(this.activeConfiguration as HomeAssistantConfiguration).catch(() => {
-        this.scheduleReconnect();
-      });
-    }, delayMs);
-  }
-
-  private async loadRegistries(): Promise<void> {
-    if (!this.connection) {
-      return;
-    }
-
-    if (this.registryLoadInProgress) {
-      this.pendingRegistryLoad = true;
-      return;
-    }
-
-    this.registryLoadInProgress = true;
-    this.pendingRegistryLoad = false;
-
-    try {
-      const [areas, devices, entities] = await Promise.all([
-        this.connection.sendMessagePromise({
-          type: 'config/area_registry/list',
-        }) as Promise<HomeAssistantAreaRegistryEntry[]>,
-        this.connection.sendMessagePromise({
-          type: 'config/device_registry/list',
-        }) as Promise<HomeAssistantDeviceRegistryEntry[]>,
-        this.connection.sendMessagePromise({
-          type: 'config/entity_registry/list',
-        }) as Promise<HomeAssistantEntityRegistryEntry[]>,
-      ]);
-
-      this.areas = areas;
-      this.deviceRegistry = devices;
-      this.entityRegistry = entities;
-      this.notifyListeners('registries', { areas, devices, entities });
-    } catch (error) {
-      console.error('[HomeAssistantService] Failed to load registries:', error);
-      this.areas = [];
-      this.deviceRegistry = [];
-      this.entityRegistry = [];
-      this.notifyListeners('registries', {
-        areas: [],
-        devices: [],
-        entities: [],
-      });
-    } finally {
-      this.registryLoadInProgress = false;
-      if (this.pendingRegistryLoad) {
-        void this.loadRegistries();
-      }
-    }
-  }
-
-  /**
-   * Handle connection errors, translating numeric error codes to messages
-   */
-  private handleError(error: unknown): never {
-    const errorMessages: Record<number, string> = {
-      [ERR_INVALID_AUTH]:
-        'Invalid authentication token. Please check your long-lived access token.',
-      [ERR_CANNOT_CONNECT]:
-        'Cannot connect to Home Assistant. Check the URL and ensure it is reachable.',
-      [ERR_CONNECTION_LOST]: 'Connection to Home Assistant was lost.',
-      [ERR_HASS_HOST_REQUIRED]: 'Home Assistant host URL is required.',
-      [ERR_INVALID_HTTPS_TO_HTTP]: 'Cannot connect to an HTTP server from an HTTPS page.',
-    };
-
-    if (typeof error === 'number' && error in errorMessages) {
-      throw new Error(errorMessages[error]);
-    }
-
-    throw error;
-  }
-
-  /**
-   * Notify all listeners of a specific event with its typed data
-   */
-  private notifyListeners<K extends HAServiceEventType>(
-    event: K,
-    data: HAServiceEventMap[K]
-  ): void {
-    const handlers = this.listeners[event];
-    if (!handlers) return;
-    for (const handler of handlers) {
-      handler(data);
-    }
+    await this.connectionService.authenticate(configuration);
+    await this.registryService.loadRegistries();
   }
 
   /**
@@ -316,282 +95,124 @@ class HomeAssistantService {
     event: K,
     callback: (data: HAServiceEventMap[K]) => void
   ): () => void {
-    if (!this.listeners[event]) this.listeners[event] = [];
-    (this.listeners[event] as Array<(data: HAServiceEventMap[K]) => void>).push(callback);
+    // Forward to connection service for connection-related events
+    if (event === 'connection' || event === 'config' || event === 'entities') {
+      return this.connectionService.addListener(event, callback);
+    }
 
-    return () => {
-      const handlers = this.listeners[event] as
-        | Array<(data: HAServiceEventMap[K]) => void>
-        | undefined;
-      if (!handlers) return;
-      const index = handlers.indexOf(callback);
-      if (index !== -1) handlers.splice(index, 1);
-    };
+    // For registry events, we need to wrap the listener
+    if (event === 'registries') {
+      const registriesCallback = callback as (data: HAServiceEventMap['registries']) => void;
+      return this.connectionService.addListener('connection', () => {
+        // Trigger registry load on connection
+        void this.registryService.loadRegistries().then(() => {
+          registriesCallback({
+            areas: this.registryService.getAreas(),
+            devices: this.registryService.getDeviceRegistry(),
+            entities: this.registryService.getEntityRegistry(),
+          });
+        });
+      });
+    }
+
+    return () => {};
   }
 
   /**
    * Get current connection status
    */
   isConnected(): boolean {
-    return this.connected;
+    return this.connectionService.isConnected();
   }
 
   /**
    * Get Home Assistant configuration
    */
   getConfig(): HassConfig | null {
-    return this.config;
+    return this.connectionService.getConfig();
   }
 
   /**
    * Get Home Assistant entities
    */
   getEntities(): HassEntities | null {
-    return this.entities;
+    return this.connectionService.getEntities();
   }
 
-  getAreas(): HomeAssistantAreaRegistryEntry[] {
-    return this.areas;
-  }
-
+  /**
+   * Get Home Assistant user
+   */
   getUser(): HassUser | null {
-    return this.user;
-  }
-
-  getDeviceRegistry(): HomeAssistantDeviceRegistryEntry[] {
-    return this.deviceRegistry;
-  }
-
-  getEntityRegistry(): HomeAssistantEntityRegistryEntry[] {
-    return this.entityRegistry;
+    return this.connectionService.getUser();
   }
 
   /**
    * Get connection object
    */
   getConnection(): Connection | null {
-    return this.connection;
-  }
-
-  async browseMediaSource(mediaContentId: string): Promise<HomeAssistantMediaSourceItem> {
-    if (!this.connection) {
-      throw new Error('Home Assistant is not connected');
-    }
-
-    return this.connection.sendMessagePromise({
-      type: 'media_source/browse_media',
-      media_content_id: mediaContentId,
-    }) as Promise<HomeAssistantMediaSourceItem>;
-  }
-
-  async resolveMediaSource(mediaContentId: string): Promise<HomeAssistantResolvedMediaSource> {
-    if (!this.connection) {
-      throw new Error('Home Assistant is not connected');
-    }
-
-    return this.connection.sendMessagePromise({
-      type: 'media_source/resolve_media',
-      media_content_id: mediaContentId,
-    }) as Promise<HomeAssistantResolvedMediaSource>;
-  }
-
-  async getAutomationConfig(entityId: string): Promise<HomeAssistantAutomationConfig> {
-    if (!this.connection) {
-      throw new Error('Home Assistant is not connected');
-    }
-
-    return this.connection.sendMessagePromise({
-      type: 'automation/config',
-      entity_id: entityId,
-    }) as Promise<HomeAssistantAutomationConfig>;
+    return this.connectionService.getConnection();
   }
 
   /**
-   * Call a Home Assistant service over the active websocket connection.
+   * Get Home Assistant areas
+   */
+  getAreas(): HomeAssistantAreaRegistryEntry[] {
+    return this.registryService.getAreas();
+  }
+
+  /**
+   * Get device registry
+   */
+  getDeviceRegistry(): HomeAssistantDeviceRegistryEntry[] {
+    return this.registryService.getDeviceRegistry();
+  }
+
+  /**
+   * Get entity registry
+   */
+  getEntityRegistry(): HomeAssistantEntityRegistryEntry[] {
+    return this.registryService.getEntityRegistry();
+  }
+
+  /**
+   * Update entity area assignment
+   */
+  async updateEntityArea(entityId: string, areaId: string | null): Promise<void> {
+    await this.registryService.updateEntityArea(entityId, areaId);
+  }
+
+  /**
+   * Call an arbitrary Home Assistant service over the active websocket connection.
    */
   async callService(
     domain: string,
     service: string,
     serviceData: Record<string, unknown> = {},
-    target?: CallServiceTarget
-  ): Promise<void> {
-    if (!this.connection) {
-      throw new Error('Home Assistant is not connected');
-    }
-
-    const normalizedServiceData = { ...serviceData };
-
-    // Keep entity_id in service data for broader compatibility with integrations and older setups.
-    if (target?.entity_id && normalizedServiceData.entity_id === undefined) {
-      normalizedServiceData.entity_id = target.entity_id;
-    }
-    if (target?.area_id && normalizedServiceData.area_id === undefined) {
-      normalizedServiceData.area_id = target.area_id;
-    }
-    if (target?.device_id && normalizedServiceData.device_id === undefined) {
-      normalizedServiceData.device_id = target.device_id;
-    }
-
-    await callHassService(this.connection, domain, service, normalizedServiceData, target);
-  }
-
-  async updateEntityArea(
-    entityId: string,
-    areaId: string | null,
-    options?: {
-      deviceId?: string | null;
-      entityAreaId?: string | null;
+    target?: {
+      entity_id?: string | string[];
+      area_id?: string | string[];
+      device_id?: string | string[];
     }
   ): Promise<void> {
-    if (!this.connection) {
-      throw new Error('Home Assistant is not connected');
-    }
-
-    const entityEntry = this.entityRegistry.find((entry) => entry.entity_id === entityId);
-    const deviceId = options?.deviceId ?? entityEntry?.device_id;
-    const entityAreaId = options?.entityAreaId ?? entityEntry?.area_id;
-    const tryEntityUpdate = async () => {
-      try {
-        await this.connection?.sendMessagePromise({
-          type: 'config/entity_registry/update',
-          entity_id: entityId,
-          area_id: areaId,
-        });
-      } catch (error) {
-        throw new Error(`entity registry update failed: ${this.getUnknownErrorMessage(error)}`);
-      }
-    };
-    const tryDeviceUpdate = async () => {
-      if (!deviceId) {
-        throw new Error(`No device registry entry found for ${entityId}`);
-      }
-
-      try {
-        await this.connection?.sendMessagePromise({
-          type: 'config/device_registry/update',
-          device_id: deviceId,
-          area_id: areaId,
-        });
-      } catch (error) {
-        throw new Error(`device registry update failed: ${this.getUnknownErrorMessage(error)}`);
-      }
-    };
-
-    // Prefer updating whichever registry currently owns the room assignment, then fall back.
-    if (entityAreaId) {
-      try {
-        await tryEntityUpdate();
-      } catch (entityError) {
-        try {
-          await tryDeviceUpdate();
-        } catch (deviceError) {
-          throw new Error(
-            `entity-first update failed: ${this.getUnknownErrorMessage(entityError)}; fallback device update failed: ${this.getUnknownErrorMessage(deviceError)}`
-          );
-        }
-      }
-    } else if (deviceId) {
-      try {
-        await tryDeviceUpdate();
-      } catch (deviceError) {
-        try {
-          await tryEntityUpdate();
-        } catch (entityError) {
-          throw new Error(
-            `device-first update failed: ${this.getUnknownErrorMessage(deviceError)}; fallback entity update failed: ${this.getUnknownErrorMessage(entityError)}`
-          );
-        }
-      }
-    } else {
-      await tryEntityUpdate();
-    }
-
-    await this.loadRegistries();
-  }
-
-  async createArea(name: string): Promise<HomeAssistantAreaRegistryEntry> {
-    if (!this.connection) {
-      throw new Error('Home Assistant is not connected');
-    }
-
-    const trimmedName = name.trim();
-    if (!trimmedName) {
-      throw new Error('Room name is required');
-    }
-
-    const existingArea = this.areas.find(
-      (area) => area.name.localeCompare(trimmedName, undefined, { sensitivity: 'accent' }) === 0
-    );
-    if (existingArea) {
-      return existingArea;
-    }
-
-    let createdArea: HomeAssistantAreaRegistryEntry;
-    try {
-      createdArea = (await this.connection.sendMessagePromise({
-        type: 'config/area_registry/create',
-        name: trimmedName,
-      })) as HomeAssistantAreaRegistryEntry;
-    } catch (error) {
-      throw new Error(`area registry create failed: ${this.getUnknownErrorMessage(error)}`);
-    }
-
-    await this.loadRegistries();
-    return createdArea;
-  }
-
-  async deleteArea(areaId: string): Promise<void> {
-    if (!this.connection) {
-      throw new Error('Home Assistant is not connected');
-    }
-
-    try {
-      await this.connection.sendMessagePromise({
-        type: 'config/area_registry/delete',
-        area_id: areaId,
-      });
-    } catch (error) {
-      throw new Error(`area registry delete failed: ${this.getUnknownErrorMessage(error)}`);
-    }
-
-    await this.loadRegistries();
-  }
-
-  private getUnknownErrorMessage(error: unknown): string {
-    if (error instanceof Error && error.message.trim().length > 0) {
-      return error.message;
-    }
-
-    if (typeof error === 'string' && error.trim().length > 0) {
-      return error;
-    }
-
-    if (error && typeof error === 'object') {
-      const message =
-        'message' in error && typeof error.message === 'string' ? error.message : null;
-      const code = 'code' in error ? String(error.code) : null;
-
-      if (message && code) {
-        return `${message} (${code})`;
-      }
-
-      if (message) {
-        return message;
-      }
-
-      try {
-        return JSON.stringify(error);
-      } catch (stringifyError) {
-        console.error('[HomeAssistantService] Failed to stringify error:', stringifyError);
-        return 'unknown error';
-      }
-    }
-
-    return 'unknown error';
+    await this.connectionService.callService(domain, service, serviceData, target);
   }
 
   /**
-   * Update a light entity using Home Assistant light services.
+   * Create a new area
+   */
+  async createArea(name: string): Promise<HomeAssistantAreaRegistryEntry> {
+    return await this.registryService.createArea(name);
+  }
+
+  /**
+   * Delete an area
+   */
+  async deleteArea(areaId: string): Promise<void> {
+    await this.registryService.deleteArea(areaId);
+  }
+
+  /**
+   * Update a light entity
    */
   async updateLight(
     entityId: string,
@@ -604,173 +225,136 @@ class HomeAssistantService {
       xyColor?: [number, number];
     }
   ): Promise<void> {
-    const { state = 'on', brightnessPct, kelvin, rgbColor, hsColor, xyColor } = options;
-
-    if (state === 'off') {
-      await this.callService('light', 'turn_off', {}, { entity_id: entityId });
-      return;
-    }
-
-    const serviceData: Record<string, unknown> = {};
-    if (typeof brightnessPct === 'number') {
-      serviceData.brightness_pct = Math.max(1, Math.min(100, Math.round(brightnessPct)));
-    }
-    if (typeof kelvin === 'number') {
-      serviceData.color_temp_kelvin = Math.max(2000, Math.min(6500, Math.round(kelvin)));
-    }
-    if (rgbColor) {
-      serviceData.rgb_color = rgbColor;
-    }
-    if (hsColor) {
-      serviceData.hs_color = [
-        Math.max(0, Math.min(360, hsColor[0])),
-        Math.max(0, Math.min(100, hsColor[1])),
-      ];
-    }
-    if (xyColor) {
-      serviceData.xy_color = [
-        Math.max(0, Math.min(1, xyColor[0])),
-        Math.max(0, Math.min(1, xyColor[1])),
-      ];
-    }
-
-    await this.callService('light', 'turn_on', serviceData, { entity_id: entityId });
+    await this.entityService.updateLight(entityId, options);
   }
 
   /**
-   * Update a switch entity using Home Assistant switch services.
+   * Update a switch entity
    */
   async updateSwitch(entityId: string, state: 'on' | 'off'): Promise<void> {
-    await this.callService(
-      'switch',
-      state === 'on' ? 'turn_on' : 'turn_off',
-      {},
-      { entity_id: entityId }
-    );
+    await this.entityService.updateSwitch(entityId, state);
   }
 
+  /**
+   * Update a lock entity
+   */
   async updateLock(entityId: string, state: 'locked' | 'unlocked'): Promise<void> {
-    await this.callService(
-      'lock',
-      state === 'locked' ? 'lock' : 'unlock',
-      {},
-      { entity_id: entityId }
-    );
+    await this.entityService.updateLock(entityId, state);
   }
 
+  /**
+   * Set climate temperature
+   */
   async setClimateTemperature(entityId: string, temperature: number): Promise<void> {
-    await this.callService('climate', 'set_temperature', { temperature }, { entity_id: entityId });
+    await this.entityService.setClimateTemperature(entityId, temperature);
   }
 
+  /**
+   * Update media player playback
+   */
   async updateMediaPlayerPlayback(
     entityId: string,
     action: 'toggle' | 'play' | 'pause' | 'previous' | 'next'
   ): Promise<void> {
-    const service =
-      action === 'toggle'
-        ? 'media_play_pause'
-        : action === 'play'
-          ? 'media_play'
-          : action === 'pause'
-            ? 'media_pause'
-            : action === 'previous'
-              ? 'media_previous_track'
-              : 'media_next_track';
-
-    await this.callService('media_player', service, {}, { entity_id: entityId });
-  }
-
-  async setMediaPlayerVolume(entityId: string, volumePct: number): Promise<void> {
-    const volumeLevel = Math.max(0, Math.min(1, volumePct / 100));
-    await this.callService(
-      'media_player',
-      'volume_set',
-      { volume_level: volumeLevel },
-      { entity_id: entityId }
-    );
-  }
-
-  async setMediaPlayerMute(entityId: string, isMuted: boolean): Promise<void> {
-    await this.callService(
-      'media_player',
-      'volume_mute',
-      { is_volume_muted: isMuted },
-      { entity_id: entityId }
-    );
-  }
-
-  async updateMediaPlayerPower(entityId: string, state: 'on' | 'off'): Promise<void> {
-    await this.callService(
-      'media_player',
-      state === 'on' ? 'turn_on' : 'turn_off',
-      {},
-      { entity_id: entityId }
-    );
-  }
-
-  async selectMediaPlayerSource(entityId: string, source: string): Promise<void> {
-    await this.callService('media_player', 'select_source', { source }, { entity_id: entityId });
-  }
-
-  async sendRemoteCommand(entityId: string, command: string | string[]): Promise<void> {
-    await this.callService('remote', 'send_command', { command }, { entity_id: entityId });
-  }
-
-  async setMediaPlayerShuffle(entityId: string, shuffle: boolean): Promise<void> {
-    await this.callService('media_player', 'shuffle_set', { shuffle }, { entity_id: entityId });
-  }
-
-  async setMediaPlayerRepeat(entityId: string, repeat: 'off' | 'one' | 'all'): Promise<void> {
-    await this.callService('media_player', 'repeat_set', { repeat }, { entity_id: entityId });
-  }
-
-  async joinMediaPlayers(entityId: string, memberEntityIds: string[]): Promise<void> {
-    await this.callService(
-      'media_player',
-      'join',
-      { group_members: memberEntityIds },
-      { entity_id: entityId }
-    );
-  }
-
-  async unjoinMediaPlayer(entityId: string): Promise<void> {
-    await this.callService('media_player', 'unjoin', {}, { entity_id: entityId });
+    await this.entityService.updateMediaPlayerPlayback(entityId, action);
   }
 
   /**
-   * Turn a camera entity on or off.
+   * Set media player volume
+   */
+  async setMediaPlayerVolume(entityId: string, volumePct: number): Promise<void> {
+    await this.entityService.setMediaPlayerVolume(entityId, volumePct);
+  }
+
+  /**
+   * Set media player mute
+   */
+  async setMediaPlayerMute(entityId: string, isMuted: boolean): Promise<void> {
+    await this.entityService.setMediaPlayerMute(entityId, isMuted);
+  }
+
+  /**
+   * Update media player power
+   */
+  async updateMediaPlayerPower(entityId: string, state: 'on' | 'off'): Promise<void> {
+    await this.entityService.updateMediaPlayerPower(entityId, state);
+  }
+
+  /**
+   * Select media player source
+   */
+  async selectMediaPlayerSource(entityId: string, source: string): Promise<void> {
+    await this.entityService.selectMediaPlayerSource(entityId, source);
+  }
+
+  /**
+   * Send remote command
+   */
+  async sendRemoteCommand(entityId: string, command: string | string[]): Promise<void> {
+    await this.entityService.sendRemoteCommand(entityId, command);
+  }
+
+  /**
+   * Set media player shuffle
+   */
+  async setMediaPlayerShuffle(entityId: string, shuffle: boolean): Promise<void> {
+    await this.entityService.setMediaPlayerShuffle(entityId, shuffle);
+  }
+
+  /**
+   * Set media player repeat
+   */
+  async setMediaPlayerRepeat(entityId: string, repeat: 'off' | 'one' | 'all'): Promise<void> {
+    await this.entityService.setMediaPlayerRepeat(entityId, repeat);
+  }
+
+  /**
+   * Join media players
+   */
+  async joinMediaPlayers(entityId: string, memberEntityIds: string[]): Promise<void> {
+    await this.entityService.joinMediaPlayers(entityId, memberEntityIds);
+  }
+
+  /**
+   * Unjoin media player
+   */
+  async unjoinMediaPlayer(entityId: string): Promise<void> {
+    await this.entityService.unjoinMediaPlayer(entityId);
+  }
+
+  /**
+   * Update camera
    */
   async updateCamera(entityId: string, state: 'on' | 'off'): Promise<void> {
-    await this.callService(
-      'camera',
-      state === 'on' ? 'turn_on' : 'turn_off',
-      {},
-      { entity_id: entityId }
-    );
+    await this.entityService.updateCamera(entityId, state);
   }
 
   /**
-   * Close the connection
+   * Browse media source
+   */
+  async browseMediaSource(mediaContentId: string): Promise<HomeAssistantMediaSourceItem> {
+    return await this.entityService.browseMediaSource(mediaContentId);
+  }
+
+  /**
+   * Resolve media source
+   */
+  async resolveMediaSource(mediaContentId: string): Promise<HomeAssistantResolvedMediaSource> {
+    return await this.entityService.resolveMediaSource(mediaContentId);
+  }
+
+  /**
+   * Get automation config
+   */
+  async getAutomationConfig(entityId: string): Promise<HomeAssistantAutomationConfig> {
+    return await this.entityService.getAutomationConfig(entityId);
+  }
+
+  /**
+   * Disconnect from Home Assistant
    */
   disconnect(): void {
-    this.manuallyDisconnected = true;
-    this.activeConfiguration = null;
-    this.clearReconnectTimer();
-
-    if (this.connection) {
-      this.connection.close();
-      this.connection = null;
-      this.connected = false;
-      this.user = null;
-      this.areas = [];
-      this.deviceRegistry = [];
-      this.entityRegistry = [];
-      this.notifyListeners('connection', {
-        connected: false,
-        connection: null,
-        reconnecting: false,
-      });
-    }
+    this.connectionService.disconnect();
   }
 }
 

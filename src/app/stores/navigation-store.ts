@@ -45,6 +45,7 @@ interface NavigationState {
   applyNavigationState: (state: { currentRoom: string; activeSection: Section }) => void;
   setCurrentRoom: (room: string) => void;
   setActiveSection: (section: Section) => void;
+  syncActiveSectionFromLocation: (section: Section) => void;
 }
 
 const initialSection = (): Section =>
@@ -74,6 +75,7 @@ export const useNavigationStore = create<NavigationState>()(
           };
         });
       },
+      syncActiveSectionFromLocation: (activeSection) => set({ activeSection }),
     }),
     {
       name: 'ha-dashboard-navigation',
@@ -109,7 +111,8 @@ export function startNavigationStoreSync() {
   }
 
   const handlePopState = () => {
-    useNavigationStore.setState({ activeSection: pathToSection(window.location.pathname) });
+    const section = pathToSection(window.location.pathname);
+    useNavigationStore.getState().syncActiveSectionFromLocation(section);
   };
 
   window.addEventListener('popstate', handlePopState);

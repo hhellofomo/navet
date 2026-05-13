@@ -93,13 +93,13 @@ export const DeviceGrid = memo(function DeviceGrid({
       {visibleCards.map((item) => {
         if (item.type === 'device') {
           const device = deviceMap.get(item.id);
-          if (!device) return null;
+          if (!device?.id) return null;
 
           const size = cardSizes[device.id] || (device.size as CardSize);
 
           return (
             <DashboardCardItem
-              key={device.id}
+              key={`device-${device.id}`}
               id={device.id}
               device={device}
               size={size}
@@ -113,11 +113,13 @@ export const DeviceGrid = memo(function DeviceGrid({
         }
 
         const { card } = item;
+        if (!card?.id) return null;
+
         const size = cardSizes[card.id] || card.size;
 
         return (
           <DashboardCardItem
-            key={card.id}
+            key={`card-${card.id}`}
             id={card.id}
             card={card}
             size={size}

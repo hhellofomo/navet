@@ -387,8 +387,6 @@ const defaultDashboard: EnergyDashboardModel = {
       icon: 'battery',
       value: 78,
       unit: '%',
-      todayValue: 5.4,
-      todayUnit: 'kWh',
       status: 'active',
     },
     {
@@ -574,10 +572,6 @@ export const energyDashboardScenarios: EnergyDashboardScenario[] = [
   }),
   makeScenario('battery-charging', 'Battery charging', (dashboard) => {
     dashboard.mode = 'normal';
-    const batteryNode = findDashboardNode(dashboard, 'battery');
-    if (batteryNode) {
-      batteryNode.todayValue = 8.6;
-    }
     dashboard.summary[3] = {
       ...dashboard.summary[3],
       value: '78',

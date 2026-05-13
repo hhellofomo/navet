@@ -5,6 +5,8 @@ const inventory = [
     group: 'Primitives',
     entries: [
       ['Button', '@/app/ui-kit/primitives'],
+      ['CardSettingsDialog', '@/app/ui-kit/primitives'],
+      ['CardShell', '@/app/ui-kit/primitives'],
       ['Input', '@/app/ui-kit/primitives'],
       ['Tabs', '@/app/ui-kit/primitives'],
       ['ModalSurface', '@/app/ui-kit/primitives'],

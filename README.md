@@ -150,9 +150,11 @@ Cross-feature UI lives under [`src/app/components/`](src/app/components/):
 - Current store files include `auth-store`, `config-store`, `edit-mode-store`, `error-store`,
   `home-assistant-store`, `navigation-store`, `search-store`, `settings-store`, and `theme-store`
 - Shared subscriptions should go through [`src/app/stores/selectors.ts`](src/app/stores/selectors.ts)
-- Home Assistant integration flows through
+- Home Assistant integration is exposed through the
   [`src/app/services/home-assistant.service.ts`](src/app/services/home-assistant.service.ts)
-- The service emits typed updates for entities, registries, config, and connection state
+  facade and split underneath into `ha-connection.service.ts`, `ha-entity-service.ts`, and
+  `ha-registry.service.ts`
+- The facade emits typed updates for entities, registries, config, and connection state
 - React Context is reserved for infrastructure concerns such as i18n rather than shared app state
 
 See [docs/technical/REACT_ZUSTAND.md](docs/technical/REACT_ZUSTAND.md) for the state-management contract.
@@ -171,9 +173,10 @@ See [docs/technical/REACT_ZUSTAND.md](docs/technical/REACT_ZUSTAND.md) for the s
 | [`src/app/components/layout/device-section-layout.tsx`](src/app/components/layout/device-section-layout.tsx) | Shared shell for domain-specific entity sections |
 | [`src/app/components/shared/theme/`](src/app/components/shared/theme/) | Theme, surface, readable-text, and card-state helpers |
 | [`src/app/hooks/use-ha-devices.ts`](src/app/hooks/use-ha-devices.ts) | Home Assistant entity-to-device mapping |
+| [`src/app/services/`](src/app/services/) | Home Assistant facade plus connection, entity, and registry services |
 | [`src/app/storybook/story-frames.tsx`](src/app/storybook/story-frames.tsx) | Shared Storybook frame helpers |
 | [`src/app/storybook/story-docs.ts`](src/app/storybook/story-docs.ts) | Shared Storybook docs descriptions |
-| [`src/app/ui-kit/`](src/app/ui-kit/) | Canonical shared UI import surface for stories and shared consumers |
+| [`src/app/ui-kit/`](src/app/ui-kit/) | Canonical shared UI import surface for docs, stories, and stable shared consumers |
 
 ## Setup
 

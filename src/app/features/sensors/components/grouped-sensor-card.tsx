@@ -55,7 +55,7 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
   // Size-specific styling with intelligent layout adaptation
   const isSmall = isCompactCardSize(size);
   const isMedium = size === 'medium';
-  const colors = theme === 'light' ? lightColorMap[accentColor] : darkColorMap[accentColor];
+  const colors = theme !== 'light' ? darkColorMap[accentColor] : lightColorMap[accentColor];
   const shell = getAccentCardShellTokens(theme, accentColor);
   const textPrimary = surface.textPrimary;
   const textSecondary = surface.textSubtle;

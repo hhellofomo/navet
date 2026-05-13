@@ -41,7 +41,7 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
     <div className={cardShell.sheenOverlayClassName} />
   ) : null;
   const lightOverlay =
-    controller.theme === 'light' ? <div className="absolute inset-0 bg-white/58" /> : null;
+    controller.theme !== 'light' ? null : <div className="absolute inset-0 bg-white/58" />;
   const tintOverlay = tintSurface.overlayClassName ? (
     <div className={`absolute inset-0 ${tintSurface.overlayClassName}`} />
   ) : null;

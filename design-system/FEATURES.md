@@ -84,7 +84,13 @@ and should be preferred over full-store subscriptions.
 ### Home Assistant flow
 
 [`src/app/services/home-assistant.service.ts`](/Users/vishal/Development/Github/Navet/Navet/src/app/services/home-assistant.service.ts)
-emits typed updates for:
+is the public Home Assistant facade. It composes:
+
+- [`src/app/services/ha-connection.service.ts`](/Users/vishal/Development/Github/Navet/Navet/src/app/services/ha-connection.service.ts)
+- [`src/app/services/ha-entity-service.ts`](/Users/vishal/Development/Github/Navet/Navet/src/app/services/ha-entity-service.ts)
+- [`src/app/services/ha-registry.service.ts`](/Users/vishal/Development/Github/Navet/Navet/src/app/services/ha-registry.service.ts)
+
+The facade emits typed updates for:
 
 - entities
 - config
@@ -268,7 +274,7 @@ Default placement and fallback resolution live in:
 - `primitives/`: low-level reusable UI such as shared buttons, card shells, header parts, and compact text
 - `patterns/`: composed shared structures
 - `system/`: curated export and token-story surface
-- `ui-kit/`: canonical shared import surface for stories and stable shared consumers
+- `ui-kit/`: canonical shared import surface for docs, stories, and stable shared consumers
 - `shared/`: app-specific shared UI and compatibility shims
 - `layout/`: app-shell and section-level composition
 - `ui/`: wrappers around library primitives and dropdown/dialog infrastructure

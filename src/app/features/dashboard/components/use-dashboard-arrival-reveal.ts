@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { DASHBOARD_ARRIVAL_COMPLETE_DELAY, DASHBOARD_ARRIVAL_REVEAL_DELAY } from '@/app/constants';
 import { useI18n, useTheme } from '@/app/hooks';
 import { settingsSelectors } from '@/app/stores/selectors';
 import { useSettingsStore } from '@/app/stores/settings-store';
@@ -29,7 +30,7 @@ export function useDashboardArrivalReveal(
     }
 
     setPhase('baking');
-    const timeoutId = window.setTimeout(() => setPhase('revealed'), 3200);
+    const timeoutId = window.setTimeout(() => setPhase('revealed'), DASHBOARD_ARRIVAL_REVEAL_DELAY);
     return () => window.clearTimeout(timeoutId);
   }, [open]);
 
@@ -38,7 +39,7 @@ export function useDashboardArrivalReveal(
       return;
     }
 
-    const timeoutId = window.setTimeout(onComplete, 900);
+    const timeoutId = window.setTimeout(onComplete, DASHBOARD_ARRIVAL_COMPLETE_DELAY);
     return () => window.clearTimeout(timeoutId);
   }, [onComplete, phase]);
 

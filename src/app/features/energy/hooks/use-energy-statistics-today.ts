@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
+import { ENERGY_STATISTICS_REFRESH_INTERVAL } from '@/app/constants';
 import { useHomeAssistant } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { getEnergyStatisticsToday } from '../services/energy-statistics-service';
 import type { EnergySourceConfig } from '../types/energy.types';
 
-const REFRESH_MS = 5 * 60 * 1000;
+const REFRESH_MS = ENERGY_STATISTICS_REFRESH_INTERVAL;
 
 /**
  * Polls HA statistics for today's kWh delta for all configured energy entities.

@@ -1,6 +1,7 @@
 import { AlertTriangle, Info, Siren } from 'lucide-react';
 import { memo } from 'react';
 import { Text } from '@/app/components/primitives';
+import { getEnergyInsightSurfaceTokens } from '@/app/components/shared/theme/energy-widget-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import type { EnergyInsight, EnergyWhatChanged } from '../../types/energy.types';
@@ -23,21 +24,6 @@ function getSeverityIcon(severity: EnergyInsightCardProps['severity']) {
   return Info;
 }
 
-function getSeverityColor(
-  severity: EnergyInsightCardProps['severity'],
-  theme: ReturnType<typeof useTheme>['theme']
-) {
-  if (severity === 'critical') {
-    return theme === 'light' ? 'text-red-600' : 'text-red-300';
-  }
-
-  if (severity === 'warning') {
-    return theme === 'light' ? 'text-orange-600' : 'text-orange-300';
-  }
-
-  return theme === 'light' ? 'text-sky-700' : 'text-sky-300';
-}
-
 export const EnergyInsightCard = memo(function EnergyInsightCard({
   title,
   description,
@@ -45,8 +31,14 @@ export const EnergyInsightCard = memo(function EnergyInsightCard({
 }: EnergyInsightCardProps) {
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
+  const insightSurface = getEnergyInsightSurfaceTokens(theme);
   const Icon = getSeverityIcon(severity);
-  const severityColor = getSeverityColor(severity, theme);
+  const severityColor =
+    severity === 'critical'
+      ? insightSurface.criticalColor
+      : severity === 'warning'
+        ? insightSurface.warningColor
+        : insightSurface.infoColor;
 
   return (
     <div className={`rounded-[24px] border p-4 ${surface.border} ${surface.panelMuted}`}>

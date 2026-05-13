@@ -74,6 +74,84 @@ describe('buildEnergyDashboardModel', () => {
       getEnergyModeSummary(dashboard.mode, overview, dashboard.totals.renewableSharePct)
     ).toContain('Grid import');
   });
+
+  it('does not expose instantaneous battery power as a today energy metric', () => {
+    const overview = getMockEnergyOverview('today');
+    overview.totals.batteryPowerW = -1450;
+
+    const dashboard = buildEnergyDashboardModel({
+      overview,
+      range: 'today',
+      trend: overview.trend,
+      periodTotals: { today: 24.8, week: 166.5, month: 707.2 },
+      sourceConfig: {
+        batterySocEntityId: 'sensor.battery_soc',
+        batteryPowerEntityId: 'sensor.battery_power',
+        devices: [],
+      },
+    });
+
+    const batteryNode = dashboard.nodes.find((node) => node.id === 'battery');
+    expect(batteryNode).toBeDefined();
+    expect(batteryNode?.todayValue).toBeUndefined();
+    expect(batteryNode?.todayUnit).toBeUndefined();
+  });
+
+  it('keeps mode summaries stable for normal, eco, and peak modes', () => {
+    const normalOverview = getMockEnergyOverview('today');
+    normalOverview.totals.importW = 700;
+    normalOverview.totals.solarW = 1200;
+    normalOverview.totals.currentLoadW = 4200;
+
+    const ecoOverview = getMockEnergyOverview('today');
+    ecoOverview.totals.importW = 300;
+    ecoOverview.totals.solarW = 3600;
+    ecoOverview.totals.currentLoadW = 4200;
+
+    const peakOverview = getMockEnergyOverview('today');
+    peakOverview.totals.importW = 2400;
+
+    const normalDashboard = buildEnergyDashboardModel({
+      overview: normalOverview,
+      range: 'today',
+      trend: normalOverview.trend,
+      periodTotals: { today: 24.8, week: 166.5, month: 707.2 },
+      sourceConfig: { devices: [] },
+    });
+    const ecoDashboard = buildEnergyDashboardModel({
+      overview: ecoOverview,
+      range: 'today',
+      trend: ecoOverview.trend,
+      periodTotals: { today: 24.8, week: 166.5, month: 707.2 },
+      sourceConfig: { solarPowerEntityId: 'sensor.solar_power', devices: [] },
+    });
+    const peakDashboard = buildEnergyDashboardModel({
+      overview: peakOverview,
+      range: 'today',
+      trend: peakOverview.trend,
+      periodTotals: { today: 24.8, week: 166.5, month: 707.2 },
+      sourceConfig: { gridImportPowerEntityId: 'sensor.grid_import_power', devices: [] },
+    });
+
+    expect(normalDashboard.mode).toBe('normal');
+    expect(
+      getEnergyModeSummary(
+        normalDashboard.mode,
+        normalOverview,
+        normalDashboard.totals.renewableSharePct
+      )
+    ).toBe('The home is balanced between local generation, storage, and grid supply.');
+
+    expect(ecoDashboard.mode).toBe('eco');
+    expect(
+      getEnergyModeSummary(ecoDashboard.mode, ecoOverview, ecoDashboard.totals.renewableSharePct)
+    ).toContain("today's supply");
+
+    expect(peakDashboard.mode).toBe('peak');
+    expect(
+      getEnergyModeSummary(peakDashboard.mode, peakOverview, peakDashboard.totals.renewableSharePct)
+    ).toContain('Grid import');
+  });
 });
 
 describe('shouldUseStaticEnergyBeams', () => {

@@ -19,8 +19,13 @@ import {
   getCustomCardTintSurface,
   normalizeCustomCardTint,
 } from '@/app/components/shared/theme/custom-card-tint-surface';
+import {
+  getMapControlSurfaceTokens,
+  getMapWidgetSurfaceTokens,
+} from '@/app/components/shared/theme/map-widget-surface-tokens';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { CARTO_DARK_TILE_URL, CARTO_LIGHT_TILE_URL, MAP_ATTRIBUTION_HTML } from '@/app/constants';
 import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 import { useAuth } from '@/app/stores/auth-store';
 import type { HomeAssistantStore } from '@/app/stores/home-assistant-store';
@@ -154,13 +159,10 @@ export function mapMarkersEqual(a: MapMarker[], b: MapMarker[]): boolean {
 // ── tile URLs ──────────────────────────────────────────────────────────────
 
 function getTileUrl(theme: string): string {
-  return theme === 'light'
-    ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+  return theme === 'light' ? CARTO_LIGHT_TILE_URL : CARTO_DARK_TILE_URL;
 }
 
-const TILE_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+const TILE_ATTRIBUTION = MAP_ATTRIBUTION_HTML;
 
 // ── custom marker icon ─────────────────────────────────────────────────────
 
@@ -288,6 +290,9 @@ export const MapWidget = memo(function MapWidget({
   const tileUrl = getTileUrl(theme);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const isSmallCard = size === 'small';
+  const mapWidgetSurface = getMapWidgetSurfaceTokens(theme);
+  const mapControlSurface = getMapControlSurfaceTokens(theme, baseSurface, cardShell);
+  const settingsButtonClassName = mapControlSurface.settingsButtonClassName;
   const mapFrameStyle = useMemo(
     () => ({
       borderColor:
@@ -299,19 +304,6 @@ export const MapWidget = memo(function MapWidget({
     [surface.panelStyle]
   );
   const mapInnerStyle = useMemo(() => surface.panelStyle, [surface.panelStyle]);
-  const emptyStateIconClassName = theme === 'light' ? 'text-slate-400' : baseSurface.textMuted;
-  const attributionClassName =
-    theme === 'light'
-      ? `${baseSurface.border} ${baseSurface.panel} ${cardShell.backdropClassName} ${baseSurface.textMuted}`
-      : theme === 'glass'
-        ? 'border-white/10 bg-slate-950/68 text-white/60 backdrop-blur-xl'
-        : theme === 'black'
-          ? 'border-white/8 bg-black/72 text-zinc-500'
-          : 'border-zinc-800 bg-zinc-950/78 text-zinc-500';
-  const smallAttributionClassName = isSmallCard
-    ? 'bottom-1.5 left-1.5 rounded-[10px] rounded-bl-[16px] px-1.5 py-1 text-[9px] leading-none whitespace-nowrap'
-    : '';
-  const settingsButtonClassName = `${baseSurface.border} ${baseSurface.panel} ${cardShell.backdropClassName} ${baseSurface.textSecondary}`;
 
   const markers = useHomeAssistant(selectMapMarkersFromHa, mapMarkersEqual);
   const resolvedMarkers = useMemo(
@@ -354,7 +346,7 @@ export const MapWidget = memo(function MapWidget({
           <div
             className={`absolute inset-0 flex flex-col items-center justify-center gap-2 ${baseSurface.panel} ${cardShell.backdropClassName}`}
           >
-            <MapPin className={`h-8 w-8 ${emptyStateIconClassName}`} />
+            <MapPin className={`h-8 w-8 ${mapControlSurface.emptyStateIconClassName}`} />
             <span className={`text-xs ${baseSurface.textMuted}`}>
               {t('widgets.map.noTrackers')}
             </span>
@@ -417,21 +409,16 @@ export const MapWidget = memo(function MapWidget({
             className={`pointer-events-none absolute inset-0 z-[351] ${baseSurface.lightOverlay}`}
           />
         ) : null}
-        {resolvedMarkers.length > 0 ? (
+        {resolvedMarkers.length > 0 && mapWidgetSurface.lightOverlayBg ? (
           <div
             className="pointer-events-none absolute inset-0 z-[352]"
-            style={{
-              background:
-                theme === 'light'
-                  ? 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 18%, rgba(255,255,255,0.03) 45%, rgba(248,250,252,0.12) 100%)'
-                  : 'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 18%, rgba(255,255,255,0.015) 45%, rgba(2,6,16,0.10) 100%)',
-            }}
+            style={{ background: mapWidgetSurface.lightOverlayBg }}
           />
         ) : null}
 
         {isSmallCard ? (
           <div
-            className={`pointer-events-auto absolute z-[450] border ${smallAttributionClassName} ${attributionClassName}`}
+            className={`pointer-events-auto absolute z-[450] border ${mapControlSurface.smallAttributionClassName} ${mapControlSurface.attributionClassName}`}
           >
             <a
               href="https://www.openstreetmap.org/copyright"
@@ -484,12 +471,8 @@ export const MapWidget = memo(function MapWidget({
         }
 
         .dashboard-map-widget .leaflet-tile-pane {
-          opacity: ${theme === 'light' ? '0.94' : '0.9'};
-          filter: ${
-            theme === 'light'
-              ? 'saturate(0.88) contrast(0.94) brightness(1.03)'
-              : 'saturate(0.82) contrast(0.94) brightness(0.94)'
-          };
+          opacity: ${mapWidgetSurface.tileOpacity};
+          filter: ${mapWidgetSurface.tileFilter};
         }
 
         .dashboard-map-widget .leaflet-control-attribution {
@@ -498,33 +481,9 @@ export const MapWidget = memo(function MapWidget({
           padding: 3px 8px;
           font-size: 10px;
           line-height: 1.15;
-          background: ${
-            theme === 'light'
-              ? 'rgba(255,255,255,0.9)'
-              : theme === 'glass'
-                ? 'rgba(2, 6, 16, 0.68)'
-                : theme === 'black'
-                  ? 'rgba(0, 0, 0, 0.72)'
-                  : 'rgba(9, 9, 11, 0.78)'
-          };
-          color: ${
-            theme === 'light'
-              ? 'rgb(100 116 139)'
-              : theme === 'glass'
-                ? 'rgba(255,255,255,0.6)'
-                : theme === 'black'
-                  ? 'rgb(113 113 122)'
-                  : 'rgb(113 113 122)'
-          };
-          border: 1px solid ${
-            theme === 'light'
-              ? 'rgba(203,213,225,0.8)'
-              : theme === 'glass'
-                ? 'rgba(255,255,255,0.1)'
-                : theme === 'black'
-                  ? 'rgba(255,255,255,0.08)'
-                  : 'rgba(39,39,42,1)'
-          };
+          background: ${mapWidgetSurface.attributionBg};
+          color: ${mapWidgetSurface.attributionText};
+          border: 1px solid ${mapWidgetSurface.attributionBorder};
           backdrop-filter: ${theme === 'light' ? 'none' : 'blur(16px)'};
         }
 
@@ -534,14 +493,10 @@ export const MapWidget = memo(function MapWidget({
 
         .dashboard-map-widget .leaflet-popup-content-wrapper,
         .dashboard-map-widget .leaflet-popup-tip {
-          background: ${theme === 'light' ? 'rgba(255,255,255,0.94)' : 'rgba(11,18,32,0.88)'};
-          color: ${theme === 'light' ? 'rgb(15 23 42)' : 'rgba(255,255,255,0.92)'};
-          border: 1px solid ${theme === 'light' ? 'rgba(148,163,184,0.28)' : 'rgba(255,255,255,0.14)'};
-          box-shadow: ${
-            theme === 'light'
-              ? '0 20px 36px -24px rgba(15,23,42,0.22)'
-              : '0 18px 34px -24px rgba(2,8,20,0.72)'
-          };
+          background: ${mapWidgetSurface.popupBg};
+          color: ${mapWidgetSurface.popupText};
+          border: 1px solid ${mapWidgetSurface.popupBorder};
+          box-shadow: ${mapWidgetSurface.popupShadow};
           backdrop-filter: blur(16px);
         }
       `}</style>

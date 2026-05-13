@@ -23,6 +23,8 @@ import { RoundControlButton } from '@/app/components/primitives/round-control-bu
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { getCardReadableTextTokens } from '@/app/components/shared/theme/card-readable-text-tokens';
+import { getMediaTVViewSurfaceTokens } from '@/app/components/shared/theme/media-tv-view-surface-tokens';
+import { getMediaControlSurfaceTokens } from '@/app/components/shared/theme/media-widget-surface-tokens';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -150,11 +152,12 @@ function TvDpad({
   onRemoteCommand: (action: TvRemoteAction) => void;
 }) {
   const d = layout;
+  const mediaControlSurface = getMediaControlSurfaceTokens(theme);
 
-  const iconClassName = theme === 'light' ? '!text-slate-800' : '!text-white/90';
+  const iconClassName = mediaControlSurface.iconClassName;
   const disabled = !remoteAvailable;
   const crosshairStyle = {
-    backgroundColor: theme === 'light' ? 'rgba(15,23,42,0.08)' : 'rgba(255,255,255,0.06)',
+    backgroundColor: mediaControlSurface.crosshairBg,
   };
 
   return (
@@ -170,7 +173,7 @@ function TvDpad({
       <div
         className="pointer-events-none absolute left-1/2 top-1/2 h-[58%] w-[58%] -translate-x-1/2 -translate-y-1/2 rounded-full border"
         style={{
-          borderColor: theme === 'light' ? 'rgba(15,23,42,0.05)' : 'rgba(255,255,255,0.05)',
+          borderColor: mediaControlSurface.buttonBorder.replace('0.1', '0.05'),
         }}
       />
 
@@ -278,25 +281,12 @@ export function MediaTvView({
   onOpenDialog,
 }: MediaTvViewProps) {
   const { t } = useI18n();
+  const tvSurface = getMediaTVViewSurfaceTokens(theme, isOn);
   const tvTextTokens = getCardReadableTextTokens({
     theme,
     tone: isOn ? 'pink' : 'neutral',
-    baseColor: isOn ? '#d946ef' : '#64748b',
-    backgroundColor: isOn
-      ? theme === 'light'
-        ? '#fdf4ff'
-        : theme === 'glass'
-          ? '#3b2448'
-          : theme === 'black'
-            ? '#14040f'
-            : '#2a1038'
-      : theme === 'light'
-        ? '#f8fafc'
-        : theme === 'glass'
-          ? '#334155'
-          : theme === 'black'
-            ? '#000000'
-            : '#18181b',
+    baseColor: tvSurface.tvBaseColor,
+    backgroundColor: tvSurface.tvBackgroundColor,
   });
   const isCompact = isCompactCardSize(size);
   const isSmallTvCard = size === 'small';
@@ -308,7 +298,7 @@ export function MediaTvView({
   const tvSectionStackGap = isSmallTvCard || isMediumVerticalTv ? 'gap-2' : 'gap-3';
   const tvIconClass = isSmallTvCard ? 'h-3 w-3' : 'h-3.5 w-3.5';
   const tvCardActionRowSize = isSmallTvCard ? 'small' : 'medium';
-  const iconClassName = theme === 'light' ? '!text-slate-800' : '!text-white/90';
+  const iconClassName = tvSurface.iconClassName;
   const sourceLabel =
     source &&
     source.trim().length > 0 &&
@@ -316,46 +306,11 @@ export function MediaTvView({
     source !== t('media.nothingPlayingDescription')
       ? source
       : 'Source';
-  const separatorColor = theme === 'light' ? 'rgba(15,23,42,0.08)' : 'rgba(255,255,255,0.08)';
+  const separatorColor = tvSurface.separatorColor;
 
-  const controlStyle: CSSProperties =
-    theme === 'light'
-      ? {
-          backgroundColor: 'rgba(255,255,255,0.7)',
-          borderColor: 'rgba(15,23,42,0.08)',
-          boxShadow: '0 10px 24px -18px rgba(15,23,42,0.28), inset 0 1px 0 rgba(255,255,255,0.86)',
-        }
-      : {
-          backgroundColor: isOn ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)',
-          borderColor: isOn ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.09)',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
-        };
-  const panelStyle: CSSProperties =
-    theme === 'light'
-      ? {
-          backgroundColor: 'rgba(255,255,255,0.56)',
-          borderColor: 'rgba(15,23,42,0.07)',
-          boxShadow: '0 14px 36px -28px rgba(15,23,42,0.24), inset 0 1px 0 rgba(255,255,255,0.86)',
-        }
-      : {
-          backgroundColor: isOn ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.04)',
-          borderColor: isOn ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.08)',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
-        };
-  const navShellStyle: CSSProperties =
-    theme === 'light'
-      ? {
-          background:
-            'linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(248,250,252,0.5) 100%)',
-          borderColor: 'rgba(15,23,42,0.08)',
-          boxShadow: '0 18px 36px -28px rgba(15,23,42,0.22), inset 0 1px 0 rgba(255,255,255,0.92)',
-        }
-      : {
-          background:
-            'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%)',
-          borderColor: 'rgba(255,255,255,0.12)',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
-        };
+  const controlStyle: CSSProperties = tvSurface.controlStyle;
+  const panelStyle: CSSProperties = tvSurface.panelStyle;
+  const navShellStyle: CSSProperties = tvSurface.navShellStyle;
 
   const updateVolume = (nextVolume: number) => {
     onVolumeInteractionStart();

@@ -63,7 +63,8 @@ export function DashboardOverlays({ controller }: DashboardOverlaysProps) {
       }))
       .sort(
         (left, right) =>
-          left.subtitle.localeCompare(right.subtitle) || left.title.localeCompare(right.title)
+          (left.subtitle ?? '').localeCompare(right.subtitle ?? '') ||
+          (left.title ?? '').localeCompare(right.title ?? '')
       );
   }, [
     activeRoom,
