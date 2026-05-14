@@ -1,6 +1,7 @@
 import { ChevronDown, Loader2 } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { navetTypographyTokens } from '@/app/components/system/tokens';
 import { useTheme } from '@/app/hooks';
 
 interface RoomEyebrowProps {
@@ -30,7 +31,7 @@ export function RoomEyebrow({
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const textClassName = forceDark ? 'text-white/72' : surface.textMuted;
-  const sharedClassName = `inline-flex items-center gap-1.5 rounded-full px-0 py-0.5 text-xs font-semibold uppercase tracking-[0.18em] ${textClassName} ${className}`;
+  const sharedClassName = `inline-flex items-center gap-1.5 rounded-full px-0 py-0.5 ${navetTypographyTokens.eyebrow} ${textClassName} ${className}`;
   const content = (
     <>
       {room}

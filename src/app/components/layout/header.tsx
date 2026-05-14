@@ -1,5 +1,5 @@
-import { CalendarDays, Clock3, SlidersHorizontal } from 'lucide-react';
-import { memo } from 'react';
+import { Bell, CalendarDays, Check, Clock3, Edit3, Menu } from 'lucide-react';
+import { memo, useMemo } from 'react';
 import { AppReleaseBadge } from '@/app/components/shared/app-release-badge';
 import { NotificationPanel } from '@/app/features/notifications';
 import { useMediaQuery } from '@/app/hooks';
@@ -7,7 +7,8 @@ import { HeaderDesktopActions } from './header-actions';
 import { HeaderSearchInput } from './header-search-input';
 import type { MobileHeaderEditActions } from './mobile-header-actions';
 import { MobileHeaderCommandSheet } from './mobile-header-command-sheet';
-import { MobileRoomDropdown, type MobileRoomNavigation } from './mobile-room-dropdown';
+import { getMobileHeaderActionAvailability } from './mobile-layout-helpers';
+import type { MobileRoomNavigation } from './mobile-room-dropdown';
 import { type HeaderController, useHeaderController } from './use-header-controller';
 import { UserDropdown } from './user-dropdown';
 
@@ -20,12 +21,20 @@ interface HeaderProps {
 function HeaderView({
   controller,
   mobileEditActions,
-  mobileRoomNavigation,
-}: HeaderProps & { controller: HeaderController }) {
+}: Omit<HeaderProps, 'controller'> & { controller: HeaderController }) {
   const isMobileViewport = useMediaQuery('(max-width: 767px)');
+  const mobileAvailability = useMemo(
+    () => getMobileHeaderActionAvailability(mobileEditActions),
+    [mobileEditActions]
+  );
+  const hasOverflowUtilities = Boolean(
+    !mobileAvailability?.isEditMode &&
+      (mobileAvailability?.hasEditUtilities || mobileAvailability?.showAllViewGrouping)
+  );
   const {
     activeColorValue,
     avatarUrl,
+    border,
     closeNotifications,
     desktopNotificationButtonRef,
     dividerColor,
@@ -58,7 +67,21 @@ function HeaderView({
   return (
     <>
       <div className="flex items-center gap-2 md:hidden">
-        <UserDropdown avatarUrl={avatarUrl} variant="mobile" />
+        {hasOverflowUtilities ? (
+          <button
+            type="button"
+            onClick={openMobileUtility}
+            className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${hoverBg} transition-colors`}
+            aria-label={t('common.moreActions')}
+            aria-expanded={isMobileUtilityOpen}
+          >
+            <span
+              className={`flex h-8 w-8 items-center justify-center rounded-full border ${border} ${inputBg}`}
+            >
+              <Menu className={`h-[1.125rem] w-[1.125rem] ${textSecondary}`} />
+            </span>
+          </button>
+        ) : null}
         <div className="min-w-0 flex-1">
           <h1 className={`truncate text-[1rem] leading-none font-semibold ${textPrimary}`}>
             {t(greetingKey, { name: firstName })}
@@ -73,25 +96,51 @@ function HeaderView({
             <span className="shrink-0">{formattedTime}</span>
           </div>
         </div>
-        {mobileRoomNavigation ? (
-          <MobileRoomDropdown navigation={mobileRoomNavigation} compact />
+        {mobileAvailability ? (
+          <button
+            type="button"
+            onClick={mobileAvailability.onToggleEditMode}
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${hoverBg} transition-colors ${
+              mobileAvailability.isEditMode ? 'text-white' : textSecondary
+            }`}
+            aria-label={
+              mobileAvailability.isEditMode
+                ? t('dashboard.roomNav.doneEditing')
+                : t('dashboard.roomNav.customize')
+            }
+            style={
+              mobileAvailability.isEditMode
+                ? {
+                    backgroundColor: activeColorValue,
+                    boxShadow: `0 14px 28px -18px ${activeColorValue}`,
+                  }
+                : undefined
+            }
+          >
+            {mobileAvailability.isEditMode ? (
+              <Check className="h-[1.05rem] w-[1.05rem]" />
+            ) : (
+              <Edit3 className="h-[1.05rem] w-[1.05rem]" />
+            )}
+          </button>
         ) : null}
         <button
           ref={mobileNotificationButtonRef}
           type="button"
-          onClick={openMobileUtility}
-          className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-[22px] ${hoverBg} transition-colors`}
-          aria-label={t('common.moreActions')}
-          aria-expanded={isMobileUtilityOpen}
+          onClick={openNotifications}
+          className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${hoverBg} transition-colors`}
+          aria-label={t('notifications.title')}
+          aria-expanded={isNotificationOpen}
         >
-          <SlidersHorizontal className={`h-[1.125rem] w-[1.125rem] ${textSecondary}`} />
+          <Bell className={`h-[1.05rem] w-[1.05rem] ${textSecondary}`} />
           {unreadCount > 0 ? (
             <span
-              className="absolute right-1 top-1 h-2 w-2 rounded-full"
+              className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full"
               style={{ backgroundColor: activeColorValue }}
             />
           ) : null}
         </button>
+        <UserDropdown avatarUrl={avatarUrl} variant="mobile" />
       </div>
 
       <div className="hidden md:flex md:flex-row md:items-center md:justify-between md:gap-4">
@@ -173,45 +222,20 @@ function HeaderView({
         actions={mobileEditActions}
         isOpen={isMobileUtilityOpen}
         onOpenChange={setIsMobileUtilityOpen}
-        onOpenNotifications={openNotifications}
       />
     </>
   );
 }
 
-function HeaderWithController({
-  mobileEditActions,
-  mobileRoomNavigation,
-}: Omit<HeaderProps, 'controller'>) {
+function HeaderWithController({ mobileEditActions }: Omit<HeaderProps, 'controller'>) {
   const controller = useHeaderController();
-  return (
-    <HeaderView
-      controller={controller}
-      mobileEditActions={mobileEditActions}
-      mobileRoomNavigation={mobileRoomNavigation}
-    />
-  );
+  return <HeaderView controller={controller} mobileEditActions={mobileEditActions} />;
 }
 
-export const Header = memo(function Header({
-  controller,
-  mobileEditActions,
-  mobileRoomNavigation,
-}: HeaderProps) {
+export const Header = memo(function Header({ controller, mobileEditActions }: HeaderProps) {
   if (controller) {
-    return (
-      <HeaderView
-        controller={controller}
-        mobileEditActions={mobileEditActions}
-        mobileRoomNavigation={mobileRoomNavigation}
-      />
-    );
+    return <HeaderView controller={controller} mobileEditActions={mobileEditActions} />;
   }
 
-  return (
-    <HeaderWithController
-      mobileEditActions={mobileEditActions}
-      mobileRoomNavigation={mobileRoomNavigation}
-    />
-  );
+  return <HeaderWithController mobileEditActions={mobileEditActions} />;
 });

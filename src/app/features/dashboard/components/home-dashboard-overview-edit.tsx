@@ -142,13 +142,13 @@ export default function HomeDashboardOverviewEdit({
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="space-y-4 md:space-y-6">
+      <div className="flex flex-col gap-4 md:gap-6">
         <DashboardHeroSection
           accentColor={accentColor}
           surface={surface}
           eyebrow={
             <div
-              className={`text-xs font-semibold uppercase tracking-[0.2em] ${surface.textMuted}`}
+              className={`text-[11px] font-semibold uppercase tracking-[0.18em] md:text-xs md:tracking-[0.2em] ${surface.textMuted}`}
             >
               {t('dashboard.homePersonal.eyebrow')}
             </div>
@@ -287,7 +287,7 @@ export default function HomeDashboardOverviewEdit({
               </div>
             </div>
 
-            <div className="mt-4 space-y-6 md:mt-6">
+            <div className="mt-4 space-y-4 md:mt-6 md:space-y-6">
               {homeLayout.mode === 'sectioned' ? (
                 homeLayout.sections.length > 0 ? (
                   <SectionCanvasGrid

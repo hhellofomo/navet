@@ -1,6 +1,7 @@
 import { Palette, Sliders, Star } from 'lucide-react';
 import { memo, useState } from 'react';
 import {
+  CardDialogBody,
   CardDialogHeader,
   CardDialogTabList,
   CardDialogTabTrigger,
@@ -111,8 +112,8 @@ export const LightSettingsDialog = memo(function LightSettingsDialog({
       overlayClassName={`animate-in fade-in ${surface.dialogBackdrop}`}
       contentClassName={`fixed top-1/2 left-1/2 z-50 h-auto max-h-[85vh] w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-3xl border shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in duration-200 ${gradientClassName}`}
     >
-      <CustomScrollbar isOn={isOn}>
-        <div className="p-6">
+      <CustomScrollbar isOn={isOn} className="max-sm:min-h-0 max-sm:flex-1">
+        <CardDialogBody>
           <CardDialogHeader title={name} description={entityType} entityId={entityId} />
 
           <Tabs value={activeTab} defaultValue="controls" onValueChange={setActiveTab}>
@@ -201,7 +202,7 @@ export const LightSettingsDialog = memo(function LightSettingsDialog({
           </Tabs>
 
           <DialogDoneFooter label={t('common.done')} />
-        </div>
+        </CardDialogBody>
       </CustomScrollbar>
     </DialogShell>
   );

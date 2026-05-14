@@ -1,3 +1,5 @@
+import { ALL_ROOMS_ID } from '@/app/constants/rooms';
+
 export function getVisibleRoomNavRooms(rooms: string[]): string[] {
-  return ['All', ...rooms];
+  return [ALL_ROOMS_ID, ...rooms];
 }

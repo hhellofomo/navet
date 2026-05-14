@@ -45,7 +45,7 @@ export function ColumnCanvas({
   return (
     <div
       ref={setDraggableNodeRef}
-      className={`relative space-y-3 ${isPreviewHidden ? 'opacity-0' : isDragging ? 'opacity-60' : ''}`}
+      className={`relative space-y-4 ${isPreviewHidden ? 'opacity-0' : isDragging ? 'opacity-60' : ''}`}
       style={isDragging ? undefined : getDndTransformStyle(transform, undefined)}
     >
       <div
@@ -71,7 +71,7 @@ export function ColumnCanvas({
         </div>
       </div>
       <div
-        className={`space-y-4 rounded-[30px] px-0 py-1 transition-[border-color,box-shadow,background-color] ${
+        className={`space-y-4 rounded-[30px] px-0 py-0 md:py-1 transition-[border-color,box-shadow,background-color] ${
           isOver && isColumnDrag ? surface.panel : surface.panelMuted
         }`}
         style={{

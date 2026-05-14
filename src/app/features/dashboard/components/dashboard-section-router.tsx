@@ -7,6 +7,7 @@ import { DashboardEmptyState } from '@/app/components/patterns';
 import { LoadingSpinner } from '@/app/components/primitives/loading-spinner';
 import { RenderProfiler } from '@/app/components/shared/render-profiler';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { ENERGY_WIDGET_ROOM, isAllRooms } from '@/app/constants/rooms';
 import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import type { DeviceWithType } from '@/app/types/device.types';
@@ -14,7 +15,6 @@ import { AllViewGrid } from '../all-view-grid';
 import { DeviceGrid } from '../device-grid';
 import type { DashboardController } from '../hooks/use-dashboard-controller';
 import { DashboardLayout } from '../shell';
-import { ENERGY_WIDGET_ROOM } from '../stores/custom-cards-store';
 import { HomeDashboardOverview } from './home-dashboard-overview';
 
 const SecuritySection = lazy(async () => {
@@ -235,22 +235,22 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
           roomItemCounts={controller.roomItemCounts}
           activeRoom={activeRoom}
           onRoomChange={changeRoom}
-          allViewGrouping={activeRoom === 'All' ? controller.allViewGrouping : undefined}
+          allViewGrouping={isAllRooms(activeRoom) ? controller.allViewGrouping : undefined}
           isEditMode={isEditMode}
           onRoomOrderChange={controller.onSetRoomOrder}
           onAllViewGroupingChange={
-            activeRoom === 'All' ? controller.onSetAllViewGrouping : undefined
+            isAllRooms(activeRoom) ? controller.onSetAllViewGrouping : undefined
           }
           onToggleEditMode={onToggleEditMode}
           onAddEntity={
-            activeRoom === 'All' || addableEntityIds.length === 0
+            isAllRooms(activeRoom) || addableEntityIds.length === 0
               ? undefined
               : onOpenAddEntityDialog
           }
           addEntityLabel={t('dashboard.addEntity.title')}
         />
 
-        {activeRoom === 'All' ? (
+        {isAllRooms(activeRoom) ? (
           <RenderProfiler id="HomeDashboardOverview">
             <HomeDashboardOverview
               deviceMap={controller.availableDeviceMap}
@@ -311,7 +311,9 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
         isEditMode,
         onToggleEditMode,
         onAddEntity:
-          activeRoom === 'All' || addableEntityIds.length === 0 ? undefined : onOpenAddEntityDialog,
+          isAllRooms(activeRoom) || addableEntityIds.length === 0
+            ? undefined
+            : onOpenAddEntityDialog,
         addEntityLabel: t('dashboard.addEntity.title'),
         reorderRooms:
           manageableRooms.length > 0
@@ -323,8 +325,10 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
                 onRoomOrderChange: controller.onSetRoomOrder,
               }
             : undefined,
-        allViewGrouping: activeRoom === 'All' ? controller.allViewGrouping : undefined,
-        onAllViewGroupingChange: activeRoom === 'All' ? controller.onSetAllViewGrouping : undefined,
+        allViewGrouping: isAllRooms(activeRoom) ? controller.allViewGrouping : undefined,
+        onAllViewGroupingChange: isAllRooms(activeRoom)
+          ? controller.onSetAllViewGrouping
+          : undefined,
       }}
       mobileRoomNavigation={{ activeRoom, onRoomChange: changeRoom, rooms }}
     >

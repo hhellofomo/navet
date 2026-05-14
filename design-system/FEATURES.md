@@ -142,6 +142,7 @@ The dashboard feature owns:
 - room ordering
 - card ordering
 - dashboard-specific persisted layout state
+- home overview layout state
 - sectioned and flow layout behavior
 
 Important paths:
@@ -150,6 +151,7 @@ Important paths:
 - [`src/app/features/dashboard/hooks/`](/Users/vishal/Development/Github/Navet/Navet/src/app/features/dashboard/hooks)
 - [`src/app/features/dashboard/stores/custom-cards-store.ts`](/Users/vishal/Development/Github/Navet/Navet/src/app/features/dashboard/stores/custom-cards-store.ts)
 - [`src/app/features/dashboard/stores/dashboard-entities-store.ts`](/Users/vishal/Development/Github/Navet/Navet/src/app/features/dashboard/stores/dashboard-entities-store.ts)
+- [`src/app/features/dashboard/stores/home-dashboard-layout-store.ts`](/Users/vishal/Development/Github/Navet/Navet/src/app/features/dashboard/stores/home-dashboard-layout-store.ts)
 
 ### Current custom widgets
 
@@ -312,6 +314,7 @@ Vitest is the preferred path for:
 Current co-located `__tests__/` directories:
 
 - `src/app/components/layout/__tests__/`
+- `src/app/components/shared/theme/__tests__/`
 - `src/app/components/system/tokens/__tests__/`
 - `src/app/features/calendar/components/calendar/__tests__/`
 - `src/app/features/dashboard/components/__tests__/`
@@ -321,9 +324,11 @@ Current co-located `__tests__/` directories:
 - `src/app/features/energy/utils/__tests__/`
 - `src/app/features/lighting/components/light-card/__tests__/`
 - `src/app/features/media/components/media-card/__tests__/`
+- `src/app/features/media/components/media/__tests__/`
 - `src/app/features/rss/components/rss-feed-card/__tests__/`
 - `src/app/features/tasks/components/__tests__/`
 - `src/app/features/tasks/utils/__tests__/`
+- `src/app/features/vacuum/components/vacuum/__tests__/`
 - `src/app/hooks/__tests__/`
 - `src/app/stores/__tests__/`
 - `src/app/utils/__tests__/`

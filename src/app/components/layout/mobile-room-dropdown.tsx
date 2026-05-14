@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/app/components/ui/dropdown-menu';
+import { getDashboardRoomLabel } from '@/app/constants/rooms';
 import { useI18n, useTheme } from '@/app/hooks';
 import { getVisibleRoomNavRooms } from './room-nav.utils';
 
@@ -31,7 +32,7 @@ export const MobileRoomDropdown = memo(function MobileRoomDropdown({
   const surface = getThemeSurfaceTokens(theme);
   const allLabel = t('dashboard.roomNav.all');
   const visibleRooms = getVisibleRoomNavRooms(navigation.rooms);
-  const activeLabel = navigation.activeRoom === 'All' ? allLabel : navigation.activeRoom;
+  const activeLabel = getDashboardRoomLabel(navigation.activeRoom, allLabel);
   const triggerWidthClassName = compact ? 'max-w-[42vw]' : 'max-w-[68vw]';
 
   return (
@@ -41,7 +42,7 @@ export const MobileRoomDropdown = memo(function MobileRoomDropdown({
           variant="secondary"
           size={compact ? 'compact' : 'small'}
           trailing={<ChevronDown className="h-4 w-4 shrink-0 text-current/72" />}
-          className={`${triggerWidthClassName} justify-start backdrop-blur-xl`}
+          className={`${triggerWidthClassName} h-9 rounded-full justify-start backdrop-blur-xl px-3`}
           aria-label={t('dashboard.roomNav.openRooms')}
         >
           <span
@@ -53,7 +54,7 @@ export const MobileRoomDropdown = memo(function MobileRoomDropdown({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={8} className="w-64 md:hidden">
         {visibleRooms.map((room) => {
-          const label = room === 'All' ? allLabel : room;
+          const label = getDashboardRoomLabel(room, allLabel);
 
           return (
             <DropdownMenuItem

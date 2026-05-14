@@ -1,4 +1,4 @@
-import { Bell, Check, Edit3, GripVertical, LayoutGrid, Lightbulb } from 'lucide-react';
+import { GripVertical, LayoutGrid, Lightbulb, type LucideIcon } from 'lucide-react';
 import { memo, useMemo, useState } from 'react';
 import { Button, SheetSurface } from '@/app/components/primitives';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
@@ -16,7 +16,6 @@ interface MobileHeaderCommandSheetProps {
   actions?: MobileHeaderEditActions;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onOpenNotifications: () => void;
 }
 
 export const MobileHeaderCommandSheet = memo(function MobileHeaderCommandSheet({
@@ -24,7 +23,6 @@ export const MobileHeaderCommandSheet = memo(function MobileHeaderCommandSheet({
   actions,
   isOpen,
   onOpenChange,
-  onOpenNotifications,
 }: MobileHeaderCommandSheetProps) {
   const { theme, primaryColor } = useTheme();
   const { t } = controller;
@@ -39,16 +37,6 @@ export const MobileHeaderCommandSheet = memo(function MobileHeaderCommandSheet({
     { label: t('dashboard.roomNav.grouping.none'), value: 'none' },
   ];
 
-  const openNotifications = () => {
-    onOpenChange(false);
-    onOpenNotifications();
-  };
-
-  const toggleEditMode = () => {
-    availability?.onToggleEditMode();
-    onOpenChange(false);
-  };
-
   const openReorderDialog = () => {
     onOpenChange(false);
     setIsReorderDialogOpen(true);
@@ -58,11 +46,6 @@ export const MobileHeaderCommandSheet = memo(function MobileHeaderCommandSheet({
     availability?.onAddEntity?.();
     onOpenChange(false);
   };
-
-  const notificationLabel =
-    controller.unreadCount > 0
-      ? `${t('notifications.title')} · ${controller.unreadCount}`
-      : t('notifications.title');
 
   return (
     <>
@@ -85,75 +68,12 @@ export const MobileHeaderCommandSheet = memo(function MobileHeaderCommandSheet({
                 {t('common.moreActions')}
               </p>
               <p className={`mt-1 text-base font-semibold ${surface.textPrimary}`}>
-                {availability?.isEditMode
-                  ? t('dashboard.roomNav.doneEditing')
-                  : t('dashboard.roomNav.customize')}
+                {availability?.isEditMode ? t('common.moreActions') : t('common.moreActions')}
               </p>
             </div>
-            {controller.unreadCount > 0 ? (
-              <div
-                className="inline-flex min-w-[2.25rem] items-center justify-center rounded-full px-2 py-1 text-xs font-semibold text-white"
-                style={{ backgroundColor: accentColor }}
-              >
-                {controller.unreadCount}
-              </div>
-            ) : null}
           </div>
 
-          {availability ? (
-            <button
-              type="button"
-              onClick={toggleEditMode}
-              className={cn(
-                'flex w-full items-center justify-between gap-3 rounded-[24px] border px-4 py-4 text-left transition-colors',
-                availability.isEditMode
-                  ? 'border-transparent text-white shadow-[0_18px_36px_-24px_rgba(0,0,0,0.45)]'
-                  : `${surface.border} ${surface.hoverBg} ${surface.textPrimary}`
-              )}
-              style={availability.isEditMode ? { backgroundColor: accentColor } : undefined}
-            >
-              <span className="flex min-w-0 items-center gap-3">
-                <span
-                  className={cn(
-                    'flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px]',
-                    availability.isEditMode ? 'bg-white/16' : surface.subtleBg
-                  )}
-                >
-                  {availability.isEditMode ? (
-                    <Check className="h-5 w-5 text-white" />
-                  ) : (
-                    <Edit3 className={`h-5 w-5 ${surface.textSecondary}`} />
-                  )}
-                </span>
-                <span className="min-w-0">
-                  <span className="block truncate text-sm font-semibold">
-                    {availability.isEditMode
-                      ? t('dashboard.roomNav.doneEditing')
-                      : t('dashboard.roomNav.customize')}
-                  </span>
-                  <span
-                    className={cn(
-                      'mt-0.5 block text-xs',
-                      availability.isEditMode ? 'text-white/74' : surface.textSecondary
-                    )}
-                  >
-                    {availability.isEditMode
-                      ? t('dashboard.roomNav.reorderDialog.description')
-                      : t('common.moreActions')}
-                  </span>
-                </span>
-              </span>
-            </button>
-          ) : null}
-
           <div className="space-y-2">
-            <MobileHeaderSheetAction
-              icon={Bell}
-              label={t('notifications.title')}
-              detail={notificationLabel}
-              onClick={openNotifications}
-            />
-
             {availability?.isEditMode && availability.onAddEntity ? (
               <MobileHeaderSheetAction
                 icon={Lightbulb}
@@ -232,7 +152,7 @@ function MobileHeaderSheetAction({
   onClick,
 }: {
   detail: string;
-  icon: typeof Bell;
+  icon: LucideIcon;
   label: string;
   onClick: () => void;
 }) {

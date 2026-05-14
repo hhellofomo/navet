@@ -31,12 +31,19 @@ interface DialogShellProps {
   contentClassName: string;
   contentAriaDescribedBy?: string;
   disableOpenAutoFocus?: boolean;
+  mobileCoverSheet?: boolean;
   contentStyle?: CSSProperties;
   contentGlowClassName?: string;
   contentGlowStyle?: CSSProperties;
   contentOverlayClassName?: string | null;
   children: ReactNode;
 }
+
+const mobileCoverSheetClassName = [
+  'max-sm:!top-auto max-sm:!right-2 max-sm:!bottom-2 max-sm:!left-2',
+  'max-sm:!mx-0 max-sm:!max-h-[calc(100dvh-1rem)] max-sm:!w-auto max-sm:!max-w-none',
+  'max-sm:!translate-x-0 max-sm:!translate-y-0 max-sm:!rounded-[30px]',
+].join(' ');
 
 export function DialogShell({
   isOpen,
@@ -45,6 +52,7 @@ export function DialogShell({
   contentClassName,
   contentAriaDescribedBy,
   disableOpenAutoFocus = false,
+  mobileCoverSheet = true,
   contentStyle,
   contentGlowClassName,
   contentGlowStyle,
@@ -54,13 +62,14 @@ export function DialogShell({
   const hasDecoratedContent = Boolean(
     contentGlowClassName || contentGlowStyle || contentOverlayClassName
   );
+  const bodyClassName = mobileCoverSheet ? 'min-h-0' : '';
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className={`fixed inset-0 z-50 ${overlayClassName}`} />
         <Dialog.Content
-          className={contentClassName}
+          className={`${contentClassName} ${mobileCoverSheet ? mobileCoverSheetClassName : ''}`}
           style={contentStyle}
           aria-describedby={contentAriaDescribedBy}
           onOpenAutoFocus={
@@ -71,6 +80,16 @@ export function DialogShell({
               : undefined
           }
         >
+          {mobileCoverSheet ? (
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="relative z-[3] mx-auto mt-3 mb-1 hidden h-5 w-16 touch-none items-center justify-center max-sm:flex"
+              aria-label="Close dialog"
+            >
+              <span className="h-1.5 w-12 rounded-full bg-white/20" aria-hidden="true" />
+            </button>
+          ) : null}
           {contentGlowClassName || contentGlowStyle ? (
             <div
               className={`absolute inset-0 ${contentGlowClassName ?? ''}`}
@@ -80,7 +99,13 @@ export function DialogShell({
           {contentOverlayClassName ? (
             <div className={`pointer-events-none absolute inset-0 ${contentOverlayClassName}`} />
           ) : null}
-          {hasDecoratedContent ? <div className="relative z-[2]">{children}</div> : children}
+          {hasDecoratedContent ? (
+            <div className={`relative z-[2] ${bodyClassName}`}>{children}</div>
+          ) : mobileCoverSheet ? (
+            <div className={bodyClassName}>{children}</div>
+          ) : (
+            children
+          )}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -260,19 +285,12 @@ export function customCardDialogShellProps(
       resolvedDecoration?.glowStyle ||
       resolvedDecoration?.overlayClassName
   );
-  const centeredContentStyle: CSSProperties = {
-    position: 'fixed',
-    top: '50%',
-    left: '50%',
-    translate: '-50% -50%',
-  };
-
   if (!hasDecoration) {
     return {
       contentClassName:
         fallbackContentClassName ??
         settingsDialogContentClass(surface, { maxWidth, height, overflow, padding, animate }),
-      contentStyle: centeredContentStyle,
+      contentStyle: undefined,
       contentGlowClassName: undefined,
       contentGlowStyle: undefined,
       contentOverlayClassName: undefined,
@@ -302,7 +320,6 @@ export function customCardDialogShellProps(
             .filter(Boolean)
             .join(' '),
     contentStyle: {
-      ...centeredContentStyle,
       ...resolvedDecoration?.panelStyle,
     },
     contentGlowClassName: resolvedDecoration?.glowClassName,

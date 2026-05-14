@@ -1,6 +1,7 @@
 export type { AllViewGrouping } from './all-view-grid';
 export { DashboardCardItem } from './components/dashboard-card-item';
 export { DashboardHeroSection } from './components/dashboard-hero-section';
+export { useDashboardWidgetRoomOptions } from './components/widgets/use-widget-room-options';
 export { getDashboardWidgetSurfaceTokens } from './components/widgets/widget-surface-tokens';
 export { DashboardPage } from './page';
 export { DashboardLayout } from './shell';

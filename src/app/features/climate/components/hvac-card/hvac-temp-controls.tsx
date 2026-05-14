@@ -12,6 +12,15 @@ interface HVACTempControlsProps {
   onTempCommit?: (temp: number) => void;
   isOn: boolean;
   size?: CardSize;
+  minTemp?: number;
+  maxTemp?: number;
+  step?: number;
+}
+
+function snapTemperature(value: number, minTemp: number, maxTemp: number, step: number) {
+  const safeStep = step > 0 ? step : 0.5;
+  const snappedValue = Math.round((value - minTemp) / safeStep) * safeStep + minTemp;
+  return Number(Math.min(maxTemp, Math.max(minTemp, snappedValue)).toFixed(3));
 }
 
 export const HVACTempControls = memo(function HVACTempControls({
@@ -20,6 +29,9 @@ export const HVACTempControls = memo(function HVACTempControls({
   onTempCommit,
   isOn,
   size = 'medium',
+  minTemp = 16,
+  maxTemp = 30,
+  step = 0.5,
 }: HVACTempControlsProps) {
   const { theme } = useTheme();
   const { t } = useI18n();
@@ -36,7 +48,7 @@ export const HVACTempControls = memo(function HVACTempControls({
         variant="soft"
         onClick={(e) => {
           e.stopPropagation();
-          const nextTemp = Math.max(16, targetTemp - 0.5);
+          const nextTemp = snapTemperature(targetTemp - step, minTemp, maxTemp, step);
           (onTempCommit ?? onTempChange)(nextTemp);
         }}
         aria-label={t('climate.decreaseTemperature')}
@@ -51,7 +63,7 @@ export const HVACTempControls = memo(function HVACTempControls({
         variant="soft"
         onClick={(e) => {
           e.stopPropagation();
-          const nextTemp = Math.min(30, targetTemp + 0.5);
+          const nextTemp = snapTemperature(targetTemp + step, minTemp, maxTemp, step);
           (onTempCommit ?? onTempChange)(nextTemp);
         }}
         aria-label={t('climate.increaseTemperature')}

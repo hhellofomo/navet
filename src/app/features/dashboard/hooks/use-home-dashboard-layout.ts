@@ -1,7 +1,13 @@
-import { type SetStateAction, useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { STORAGE_KEYS } from '@/app/constants/storage-keys';
-import { storage } from '@/app/utils/storage';
+import {
+  DEFAULT_HOME_DASHBOARD_LAYOUT,
+  type HomeDashboardLayoutState,
+  type HomeDashboardSection,
+  type HomeLayoutMode,
+  useHomeDashboardLayoutStore,
+} from '../stores/home-dashboard-layout-store';
 import {
   getBottomRow,
   getSectionCardMinColumns,
@@ -16,33 +22,16 @@ import {
   type SectionLayoutItem,
   sortSectionLayout,
 } from '../utils/layout-engine';
-import { normalizeLayout } from '../utils/layout-migration';
 
-export type HomeLayoutMode = 'flow' | 'sectioned';
-export type HomeDashboardSectionSpan = number;
-
-export interface HomeDashboardSection extends SectionLayoutItem {
-  span: HomeDashboardSectionSpan;
-}
-
-export interface HomeDashboardLayoutState {
-  mode: HomeLayoutMode;
-  showHero: boolean;
-  cardIds: string[];
-  sections: HomeDashboardSection[];
-  cardSectionAssignments: Record<string, string>;
-}
+export type {
+  HomeDashboardLayoutState,
+  HomeDashboardSection,
+  HomeDashboardSectionSpan,
+  HomeLayoutMode,
+} from '../stores/home-dashboard-layout-store';
 
 const SECTION_TITLE_PREFIX = 'Section';
 const CUSTOM_CARD_ID_PREFIX = 'custom-';
-
-const DEFAULT_LAYOUT: HomeDashboardLayoutState = {
-  mode: 'flow',
-  showHero: true,
-  cardIds: [],
-  sections: [],
-  cardSectionAssignments: {},
-};
 
 function createSectionId() {
   return `home-section-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -75,26 +64,25 @@ export function useHomeDashboardLayout(
   cardSizes: Record<string, CardSize>
 ) {
   const validIdSet = useMemo(() => new Set(validCardIds), [validCardIds]);
-  const [layout, setLayout] = useState<HomeDashboardLayoutState>(() => {
-    const normalized = normalizeLayout(
-      storage.get(STORAGE_KEYS.homeDashboardLayout, DEFAULT_LAYOUT)
-    );
-    return {
-      mode: normalized.mode,
-      showHero: normalized.showHero,
-      cardIds: normalized.cardIds,
-      sections: normalized.sections.map(toHomeSection),
-      cardSectionAssignments: normalized.cardSectionAssignments,
-    };
-  });
+  const layout = useHomeDashboardLayoutStore(
+    useShallow((state) => ({
+      mode: state.mode,
+      showHero: state.showHero,
+      cardIds: state.cardIds,
+      sections: state.sections,
+      cardSectionAssignments: state.cardSectionAssignments,
+    }))
+  );
+  const updateLayout = useHomeDashboardLayoutStore((state) => state.updateLayout);
 
-  const persistLayout = useCallback((updater: SetStateAction<HomeDashboardLayoutState>) => {
-    setLayout((previous) => {
-      const next = typeof updater === 'function' ? updater(previous) : updater;
-      storage.set(STORAGE_KEYS.homeDashboardLayout, next);
-      return next;
-    });
-  }, []);
+  const persistLayout = useCallback(
+    (
+      updater:
+        | HomeDashboardLayoutState
+        | ((previous: HomeDashboardLayoutState) => HomeDashboardLayoutState)
+    ) => updateLayout(updater),
+    [updateLayout]
+  );
 
   const setMode = useCallback(
     (mode: HomeLayoutMode) => {
@@ -340,7 +328,7 @@ export function useHomeDashboardLayout(
   );
 
   const resetLayout = useCallback(() => {
-    persistLayout(DEFAULT_LAYOUT);
+    persistLayout(DEFAULT_HOME_DASHBOARD_LAYOUT);
   }, [persistLayout]);
 
   const addCard = useCallback(

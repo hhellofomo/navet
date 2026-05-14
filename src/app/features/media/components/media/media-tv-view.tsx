@@ -10,6 +10,7 @@ import { getMediaTVViewSurfaceTokens } from '@/app/components/shared/theme/media
 import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import type { TvRemoteAction } from '../../tv-remote-commands';
+import { TvControlButton } from './tv-control-button';
 import { getTvDpadLayout, TvDpad } from './tv-dpad';
 import { TvSourceSelector } from './tv-source-selector';
 import { TvTransportControls } from './tv-transport-controls';
@@ -96,23 +97,21 @@ export function MediaTvView({
   );
 
   const tvDpadToggleButton = isSmallTvCard ? (
-    <button
-      type="button"
-      onClick={(event) => {
-        event.stopPropagation();
-        setDpadOpen((open) => !open);
-      }}
-      className={`rounded-full border backdrop-blur-xl transition-colors ${
-        dpadOpen ? 'ring-1 ring-fuchsia-400/35' : ''
-      }`}
+    <TvControlButton
+      theme={theme}
+      size="small"
+      label={dpadOpen ? t('media.tv.hideDpad') : t('media.tv.showDpad')}
       style={controlStyle}
+      iconClassName={iconClassName}
+      className={dpadOpen ? 'ring-1 ring-fuchsia-400/35' : ''}
+      onPress={() => setDpadOpen((open) => !open)}
     >
-      <Gamepad2 className={`${tvIconClass} p-0.5`} />
-    </button>
+      <Gamepad2 className={tvIconClass} />
+    </TvControlButton>
   ) : null;
 
   const utilityControls = (
-    <>
+    <div className={`flex min-w-0 items-center justify-start ${tvControlClusterGap}`}>
       <TvVolumeControls
         theme={theme}
         isMuted={isMuted}
@@ -138,7 +137,7 @@ export function MediaTvView({
         tvControlClusterGap={tvControlClusterGap}
         onRemoteCommand={onRemoteCommand}
       />
-    </>
+    </div>
   );
 
   const utilityControlsVertical = (

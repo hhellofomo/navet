@@ -2,6 +2,15 @@ import type { HassEntity } from 'home-assistant-js-websocket';
 import type { VacuumDevice } from '../../types/device.types';
 import { parseNumberish } from '../ha-entity-utils';
 
+function readFirst(attrs: HassEntity['attributes'], keys: string[]): unknown {
+  for (const key of keys) {
+    const value = attrs?.[key];
+    if (value !== undefined && value !== null && value !== '') return value;
+  }
+
+  return undefined;
+}
+
 export function mapVacuumDevice(
   entityId: string,
   entity: HassEntity,
@@ -17,6 +26,26 @@ export function mapVacuumDevice(
     parseNumberish(entity.attributes?.cleaning_time) ??
     parseNumberish(entity.attributes?.clean_time) ??
     parseNumberish(entity.attributes?.cleaning_duration);
+  const nextCleaning = readFirst(entity.attributes, [
+    'next_cleaning',
+    'next_clean',
+    'scheduled_start',
+    'next_run',
+  ]);
+  const waterLevel = readFirst(entity.attributes, [
+    'water_level',
+    'water_tank_level',
+    'mop_water_level',
+    'tank_level',
+  ]);
+  const binLevel = readFirst(entity.attributes, [
+    'bin_level',
+    'dustbin_level',
+    'dust_bin_level',
+    'dust_level',
+    'bin_space',
+    'bin_fullness',
+  ]);
 
   const normalizedStatus: VacuumDevice['status'] =
     entity.state === 'cleaning'
@@ -44,5 +73,9 @@ export function mapVacuumDevice(
       typeof cleaningTimeMinutes === 'number'
         ? `${Math.max(0, Math.round(cleaningTimeMinutes))} min`
         : undefined,
+    nextCleaning: typeof nextCleaning === 'string' ? nextCleaning : undefined,
+    waterLevel:
+      typeof waterLevel === 'string' || typeof waterLevel === 'number' ? waterLevel : undefined,
+    binLevel: typeof binLevel === 'string' || typeof binLevel === 'number' ? binLevel : undefined,
   };
 }

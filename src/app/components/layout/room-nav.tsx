@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/app/components/ui/dropdown-menu';
 import { cn } from '@/app/components/ui/utils';
+import { isAllRooms } from '@/app/constants/rooms';
 import type { AllViewGrouping } from '@/app/features/dashboard';
 import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
@@ -77,7 +78,7 @@ export const RoomNav = memo(function RoomNav({
   const hoverBg = surface.hoverBg;
   const dividerClass =
     theme === 'light' ? 'bg-slate-300/90' : theme === 'black' ? 'bg-white/30' : 'bg-white/14';
-  const showAllViewGrouping = activeRoom === 'All' && onAllViewGroupingChange;
+  const showAllViewGrouping = isAllRooms(activeRoom) && onAllViewGroupingChange;
   const canReorderRooms = isEditMode && Boolean(onRoomOrderChange) && manageableRooms.length > 0;
   const hasEditMenus = Boolean(
     canReorderRooms || (isEditMode && showAllViewGrouping) || (isEditMode && onAddEntity)
@@ -284,7 +285,7 @@ const RoomNavItem = memo(function RoomNavItem({
         activeRoom === room ? activeClassName : inactiveClassName
       }`}
     >
-      {room === 'All' ? allLabel : room}
+      {isAllRooms(room) ? allLabel : room}
     </InteractivePill>
   );
 });

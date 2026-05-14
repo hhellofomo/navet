@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
+import { isAllRooms } from '@/app/constants/rooms';
 
 export function useAvailableRooms(
   areas: Array<{ area_id: string; name: string }>,
   discoveredRooms: string[]
 ) {
   const areaRooms = useMemo(
-    () => areas.map((area) => area.name).filter((name) => name && name !== 'All'),
+    () => areas.map((area) => area.name).filter((name) => name && !isAllRooms(name)),
     [areas]
   );
 

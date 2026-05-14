@@ -1,6 +1,6 @@
 # Navet
 
-Navet is a smart home dashboard PWA built on React 19 + TypeScript 6 + Zustand 5 + Tailwind CSS 4.2.
+Navet is a smart home dashboard PWA built on React 19 + TypeScript 6 + Zustand 5 + Tailwind CSS 4.3.
 Connects to Home Assistant over WebSocket.
 
 ---
@@ -37,7 +37,7 @@ If a commit or hook is blocked by TypeScript errors, fix the type errors instead
 |---|---|
 | Framework | React 19, TypeScript 6 (strict) |
 | Build | Vite 8, pnpm |
-| Styling | Tailwind CSS 4.2, Radix UI |
+| Styling | Tailwind CSS 4.3, Radix UI |
 | State | Zustand 5 (all shared state) |
 | HA Integration | home-assistant-js-websocket |
 | Linting / Format | Biome 2 |
@@ -58,7 +58,7 @@ src/app/
     shared/        # App-specific shared UI + compatibility shims
     figma/         # Design integration components
   stores/          # All Zustand stores (auth, config, HA, settings, theme, navigation …)
-  contexts/        # React Context — infrastructure only (i18n, loading, error boundary)
+  pwa/             # PWA update state and install/update support
   services/        # HomeAssistantService — WebSocket + HA API
   hooks/           # Shared hook modules (useHomeAssistant, useDeviceMap, useCardState …)
   session/         # Config serialization helpers
@@ -220,7 +220,7 @@ copy all service state on every event.
 - Tailwind CSS 4 only — no inline style objects except for dynamic numeric values
   (e.g. `style={{ width: `${pct}%` }}`).
 - Glass aesthetic: `backdrop-blur-xl`, `bg-white/5–10`, `border border-white/10–20`.
-- 4 themes: `glass` (default), `dark`, `light`, `contrast` — applied via `data-theme` on `<html>`. The `contrast` theme is labelled "Black" in the UI.
+- 4 themes: `glass` (default), `dark`, `light`, `black` — applied via `data-theme` on `<html>`. Persisted legacy `contrast` values are normalized to `black`.
 
 ---
 

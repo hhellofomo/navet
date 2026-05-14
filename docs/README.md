@@ -102,4 +102,4 @@ Use these directories when docs need to be checked against the live implementati
 This index intentionally focuses on active docs. Some older topic documents may still need a deeper
 staleness audit, especially if they describe features that have evolved faster than the docs.
 
-Last updated: May 13, 2026
+Last updated: May 14, 2026

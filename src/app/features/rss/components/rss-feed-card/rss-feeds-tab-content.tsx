@@ -48,7 +48,7 @@ export function RSSFeedsTabContent({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-sm:space-y-3">
       {homeAssistantProviders.length > 0 && (
         <RSSProviderGroup
           title={t('rss.settings.availableHomeAssistantFeeds')}
@@ -109,8 +109,8 @@ function RSSProviderGroup({
   t: TranslateFn;
 }) {
   return (
-    <DialogSectionRow label={title}>
-      <div className="space-y-2">
+    <DialogSectionRow label={title} className="max-sm:mb-0">
+      <div className="min-w-0 max-w-full space-y-2 max-sm:space-y-1.5">
         {providers.map((provider) => {
           const isSelected = selectedProviderIds.includes(provider.id);
           const secondaryLabel =
@@ -127,15 +127,27 @@ function RSSProviderGroup({
               key={provider.id}
               checked={isSelected}
               onCheckedChange={() => onToggleProvider(provider.id)}
-              label={<span style={{ color: textPrimaryColor }}>{provider.name}</span>}
-              description={<span style={{ color: textSecondaryColor }}>{secondaryLabel}</span>}
-              rowClassName={`items-center px-4 ${surface.surface.border}`}
+              label={
+                <span className="block min-w-0 truncate" style={{ color: textPrimaryColor }}>
+                  {provider.name}
+                </span>
+              }
+              description={
+                <span
+                  className="block min-w-0 w-full overflow-hidden text-ellipsis whitespace-nowrap"
+                  style={{ color: textSecondaryColor }}
+                >
+                  {secondaryLabel}
+                </span>
+              }
+              className="min-w-0 max-w-full overflow-hidden max-sm:gap-2"
+              rowClassName={`w-full min-w-0 max-w-full items-center overflow-hidden px-4 max-sm:px-3 max-sm:py-2.5 ${surface.surface.border}`}
               labelClassName="truncate"
-              descriptionClassName="truncate"
+              descriptionClassName="min-w-0 max-w-full overflow-hidden"
               checkboxPaletteColor={accentColorValue}
               selectedStyle={rowStyle}
               unselectedStyle={rowStyle}
-              action={
+              trailing={
                 isRemovable ? (
                   <InteractivePill
                     active={false}
@@ -144,6 +156,7 @@ function RSSProviderGroup({
                     className="shrink-0 min-h-8 w-8 px-0"
                     onClick={(event) => {
                       event.preventDefault();
+                      event.stopPropagation();
                       onRemoveProvider?.(provider.id);
                     }}
                     style={{

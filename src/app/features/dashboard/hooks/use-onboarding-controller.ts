@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
+import { ALL_ROOMS_ID } from '@/app/constants/rooms';
 import { useI18n, useNavigation } from '@/app/hooks';
 import { importDashboardConfigFromFile } from '@/app/utils/dashboard-config';
 import { useDashboardEntitiesStore } from '../stores/dashboard-entities-store';
@@ -50,14 +51,14 @@ export function useOnboardingController({
 
   const handleChooseAllEntities = useCallback(() => {
     setActiveSection('home');
-    changeRoom('All');
+    changeRoom(ALL_ROOMS_ID);
     setDashboardArrivalVariant('all');
     setOnboardingTransition('all');
   }, [changeRoom, setActiveSection]);
 
   const handleChooseBlankDashboard = useCallback(() => {
     setActiveSection('home');
-    changeRoom('All');
+    changeRoom(ALL_ROOMS_ID);
     setDashboardArrivalVariant('blank');
     setOnboardingTransition('blank');
   }, [changeRoom, setActiveSection]);
@@ -83,7 +84,7 @@ export function useOnboardingController({
       try {
         await importDashboardConfigFromFile(file);
         setActiveSection('home');
-        changeRoom('All');
+        changeRoom(ALL_ROOMS_ID);
         setDashboardArrivalVariant('import');
         setOnboardingTransition('import');
         toast.success(t('dashboard.feedback.configRestored'));

@@ -29,8 +29,11 @@ const meta = {
     status: 'cleaning',
     battery: 74,
     cleaningProgress: 42,
-    cleanedArea: '42 m2',
+    cleanedArea: '42 m²',
     cleaningTime: '38 min',
+    nextCleaning: 'Tomorrow 09:00',
+    waterLevel: 68,
+    binLevel: 34,
     size: 'medium',
     isEditMode: false,
   },
@@ -77,6 +80,9 @@ export const Charging: Story = {
   args: {
     status: 'docked',
     battery: 82,
+    nextCleaning: 'Fri 10:30',
+    waterLevel: 72,
+    binLevel: 28,
     size: 'medium',
   },
 };
@@ -85,7 +91,48 @@ export const FullyCharged: Story = {
   args: {
     status: 'docked',
     battery: 100,
+    nextCleaning: 'Sat 08:00',
+    waterLevel: 100,
+    binLevel: 12,
     size: 'medium',
+  },
+};
+
+export const LowBattery: Story = {
+  args: {
+    status: 'idle',
+    battery: 18,
+    cleaningProgress: 0,
+    nextCleaning: 'Tonight 21:00',
+    waterLevel: 46,
+    binLevel: 41,
+    size: 'medium',
+  },
+};
+
+export const MissingLevels: Story = {
+  args: {
+    status: 'docked',
+    battery: 63,
+    cleaningProgress: 0,
+    nextCleaning: undefined,
+    waterLevel: undefined,
+    binLevel: undefined,
+    size: 'medium',
+  },
+};
+
+export const NeedsAttention: Story = {
+  args: {
+    status: 'paused',
+    battery: 56,
+    cleaningProgress: 64,
+    cleanedArea: '51 m²',
+    cleaningTime: '46 min',
+    nextCleaning: 'Today 18:00',
+    waterLevel: 9,
+    binLevel: 92,
+    size: 'large',
   },
 };
 

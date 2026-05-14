@@ -1,6 +1,7 @@
 import { Bolt, Palette, Sliders } from 'lucide-react';
 import { useState } from 'react';
 import {
+  CardDialogBody,
   CardDialogChoicePill,
   CardDialogDoneFooter,
   CardDialogHeader,
@@ -105,7 +106,7 @@ export function EnergyNowSettingsDialog({
       contentOverlayClassName={dialogShell.contentOverlayClassName}
     >
       <CustomScrollbar isOn={theme !== 'light'}>
-        <div className="p-6">
+        <CardDialogBody>
           <CardDialogHeader
             title={t('widgets.energyNow.settings.title')}
             showRoomSelector={false}
@@ -130,7 +131,7 @@ export function EnergyNowSettingsDialog({
                 icon={Sliders}
                 onClick={() => setActiveTab('controls')}
               >
-                Controls
+                {t('common.controls')}
               </CardDialogTabTrigger>
               {onTintColorChange ? (
                 <CardDialogTabTrigger
@@ -138,7 +139,7 @@ export function EnergyNowSettingsDialog({
                   icon={Palette}
                   onClick={() => setActiveTab('card')}
                 >
-                  Customize
+                  {t('common.customize')}
                 </CardDialogTabTrigger>
               ) : null}
             </CardDialogTabList>
@@ -222,7 +223,7 @@ export function EnergyNowSettingsDialog({
           </Tabs>
 
           <CardDialogDoneFooter label={t('common.done')} />
-        </div>
+        </CardDialogBody>
       </CustomScrollbar>
     </DialogShell>
   );

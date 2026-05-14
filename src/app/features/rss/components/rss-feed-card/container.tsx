@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { shallow } from 'zustand/shallow';
 import { isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
-import { HOME_WIDGET_ROOM } from '@/app/features/dashboard';
+import { useDashboardWidgetRoomOptions } from '@/app/features/dashboard';
 import { useAreaRooms, useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 import type { HomeAssistantStore } from '@/app/stores/home-assistant-store';
 import { RSSFeedSettingsDialog } from './settings-dialog';
@@ -124,12 +124,7 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
     }
   };
 
-  const roomValue = room === 'All' || !room ? HOME_WIDGET_ROOM : room;
-  const roomLabel = roomValue === HOME_WIDGET_ROOM ? t('dashboard.roomNav.all') : roomValue;
-  const roomOptions = [
-    { label: t('dashboard.roomNav.all'), value: HOME_WIDGET_ROOM },
-    ...rooms.map((entry) => ({ label: entry, value: entry })),
-  ];
+  const { roomValue, roomLabel, roomOptions } = useDashboardWidgetRoomOptions(room, rooms);
 
   return (
     <>

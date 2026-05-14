@@ -8,6 +8,7 @@ import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import type { MediaEntityTypeKey } from '../media-card/get-media-entity-type-key';
 import { MediaArtworkSurface } from './media-artwork-surface';
+import { getMediaDisplayVolume } from './media-card-style-utils';
 import { MediaEntityHeader } from './media-entity-header';
 import { MediaMarqueeText } from './media-marquee-text';
 import { MediaVisualizerButton } from './media-visualizer-button';
@@ -62,7 +63,7 @@ export function MediaMediumVerticalView({
   const { t } = useI18n();
   const { containerRef, isVolumeMode, registerVolumeInteraction, toggleVolumeMode } =
     useMediaVolumeMode();
-  const displayVolume = Math.max(0, Math.min(100, isMuted ? 0 : volume));
+  const displayVolume = getMediaDisplayVolume(volume, isMuted);
   const stateSurface = getCardStateSurfaceTokens(theme, isActive);
   const palette = useMediaArtworkColors(artwork, theme, entityId, `${title}::${artist}`);
   const textTokens = getCardReadableTextTokens({

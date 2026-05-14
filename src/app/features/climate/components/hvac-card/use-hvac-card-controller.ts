@@ -13,6 +13,7 @@ import {
   useServiceActionHandler,
   useTheme,
 } from '@/app/hooks';
+import { parseNumberish } from '@/app/hooks/ha-entity-utils';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 import type { HomeAssistantStore } from '@/app/stores/home-assistant-store';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
@@ -30,6 +31,27 @@ export type HVACCardController = ReturnType<typeof useHVACCardController>;
 // Stable empty references so the selector and useMemo don't create new objects
 // when there are no siblings, which would break shallow equality.
 const EMPTY_SIBLING_RECORD: Record<string, HassEntity | undefined> = {};
+const DEFAULT_MIN_TEMP = 16;
+const DEFAULT_MAX_TEMP = 30;
+const DEFAULT_TEMP_STEP = 0.5;
+
+function resolveClimateTemperatureRange(liveEntity: HassEntity | undefined) {
+  const attrs = liveEntity?.attributes;
+  const minTemp = parseNumberish(attrs?.min_temp) ?? DEFAULT_MIN_TEMP;
+  const maxTemp = parseNumberish(attrs?.max_temp) ?? DEFAULT_MAX_TEMP;
+  const step = parseNumberish(attrs?.target_temp_step) ?? DEFAULT_TEMP_STEP;
+
+  return {
+    minTemp,
+    maxTemp,
+    step: step > 0 ? step : DEFAULT_TEMP_STEP,
+  };
+}
+
+function snapClimateTemperature(value: number, minTemp: number, maxTemp: number, step: number) {
+  const snappedValue = Math.round((value - minTemp) / step) * step + minTemp;
+  return Number(Math.min(maxTemp, Math.max(minTemp, snappedValue)).toFixed(3));
+}
 
 export function useHVACCardController({
   id,
@@ -63,6 +85,7 @@ export function useHVACCardController({
   const { colors, theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
+  const temperatureRange = useMemo(() => resolveClimateTemperatureRange(liveEntity), [liveEntity]);
   const { siblingIds: siblingEntityIds } = useHvacRegistryDeviceTopology(id);
   const pendingTargetTempRef = useRef<number | null>(null);
   const targetTempSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -122,12 +145,17 @@ export function useHVACCardController({
 
   const updateTargetTemp = useCallback(
     (nextTemp: number, immediate = false) => {
-      const normalizedTemp = Number(nextTemp.toFixed(1));
+      const normalizedTemp = snapClimateTemperature(
+        nextTemp,
+        temperatureRange.minTemp,
+        temperatureRange.maxTemp,
+        temperatureRange.step
+      );
       setTargetTemp(normalizedTemp);
       schedulePendingTargetTemp(normalizedTemp);
       queueTargetTempSync(normalizedTemp, immediate);
     },
-    [queueTargetTempSync, schedulePendingTargetTemp]
+    [queueTargetTempSync, schedulePendingTargetTemp, temperatureRange]
   );
 
   useHvacEntitySync({
@@ -226,6 +254,8 @@ export function useHVACCardController({
     isSettingsOpen,
     isSmall,
     lightOverlay,
+    maxTemp: temperatureRange.maxTemp,
+    minTemp: temperatureRange.minTemp,
     mode,
     visualMode,
     secondaryTextColor,
@@ -235,6 +265,7 @@ export function useHVACCardController({
     setMode,
     setTargetTemp: (nextTemp: number) => updateTargetTemp(nextTemp),
     commitTargetTemp: (nextTemp: number) => updateTargetTemp(nextTemp, true),
+    step: temperatureRange.step,
     targetTemp,
     textColor,
     theme,

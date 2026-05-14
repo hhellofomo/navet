@@ -1,4 +1,5 @@
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
+import { ALL_ROOMS_ID } from '@/app/constants/rooms';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import { useCustomCardsStore, useDashboardEntitiesStore } from '@/app/features/dashboard';
 import { useLightPresetStore } from '@/app/features/lighting';
@@ -263,7 +264,7 @@ export const importDashboardConfig = (value: unknown) => {
   });
 
   useNavigationStore.getState().applyNavigationState({
-    currentRoom: (navigation.currentRoom as string | undefined) ?? 'All',
+    currentRoom: (navigation.currentRoom as string | undefined) ?? ALL_ROOMS_ID,
     activeSection: isSection(navigation.activeSection) ? navigation.activeSection : 'home',
   });
 

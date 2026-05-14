@@ -41,7 +41,7 @@ export function SettingsSectionShell({
       className={`rounded-[28px] border ${styles.borderColor} ${styles.cardBg} md:rounded-4xl`}
     >
       <div className="px-4 py-5 md:px-8 md:py-8">
-        <div className="flex items-start gap-3 md:gap-4">
+        <div className="flex flex-col items-start gap-3 md:flex-row md:gap-4">
           <div
             className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border ${styles.borderColor} ${styles.iconBg} md:h-11 md:w-11`}
           >
@@ -100,7 +100,9 @@ export function SettingsHero({ navItems, styles }: SettingsHeroProps) {
       accentColor={styles.accentColor}
       surface={surface}
       eyebrow={
-        <p className={`text-xs font-semibold uppercase tracking-[0.24em] ${styles.subtleColor}`}>
+        <p
+          className={`text-[11px] font-semibold uppercase tracking-[0.2em] md:text-xs md:tracking-[0.24em] ${styles.subtleColor}`}
+        >
           {t('settings.hero.eyebrow')}
         </p>
       }

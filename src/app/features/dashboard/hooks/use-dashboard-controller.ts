@@ -1,5 +1,6 @@
 import { startTransition, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { ALL_ROOMS_ID, HOME_WIDGET_ROOM, isAllRooms } from '@/app/constants/rooms';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import {
   useCardState,
@@ -16,7 +17,7 @@ import { useDevices, useRooms } from '@/app/hooks/use-devices';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import type { DeviceWithType } from '@/app/types/device.types';
 import type { AllViewGrouping } from '../all-view-grid';
-import { HOME_WIDGET_ROOM, useCustomCardsStore } from '../stores/custom-cards-store';
+import { useCustomCardsStore } from '../stores/custom-cards-store';
 import { useAvailableRooms } from './use-available-rooms';
 import { useCardOrdering } from './use-card-ordering';
 import { useCardZones } from './use-card-zones';
@@ -58,7 +59,7 @@ export function useDashboardController(): DashboardController {
   const { availableRooms } = useAvailableRooms(areas, discoveredRooms);
   const rooms = usePersistedRoomOrder(availableRooms, roomOrder);
 
-  const { activeRoom, changeRoom } = useRoomNavigation('All');
+  const { activeRoom, changeRoom } = useRoomNavigation(ALL_ROOMS_ID);
 
   useDashboardRoomNavigation(activeRoom, rooms, changeRoom, hassEntitiesHydrated, devicesLoaded);
   useDashboardDevicesLoaded({ connected, connecting, setDevicesLoaded });
@@ -69,11 +70,11 @@ export function useDashboardController(): DashboardController {
   const dialogs = useDashboardDialogs();
   const allCards = useCustomCardsStore((state) => state.cards);
   const allCustomCards = useMemo(
-    () => allCards.filter((card) => card.room === 'All' || card.room === HOME_WIDGET_ROOM),
+    () => allCards.filter((card) => isAllRooms(card.room) || card.room === HOME_WIDGET_ROOM),
     [allCards]
   );
   const customCards = useMemo(
-    () => allCards.filter((card) => card.room === activeRoom || card.room === 'All'),
+    () => allCards.filter((card) => card.room === activeRoom || isAllRooms(card.room)),
     [allCards, activeRoom]
   );
   const { cardSizes, updateCardSize } = useCardState(devices);

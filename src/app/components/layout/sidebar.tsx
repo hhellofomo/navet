@@ -1,4 +1,4 @@
-import { Compass, Search, X } from 'lucide-react';
+import { Check, ChevronDown, Compass, DoorOpen, Search, X } from 'lucide-react';
 import { memo, type RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { HeaderSearchInput } from '@/app/components/layout/header-search-input';
@@ -8,11 +8,19 @@ import { InteractivePill } from '@/app/components/primitives/interactive-pill';
 import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { getInteractivePillStyles } from '@/app/components/shared/theme/interactive-pill-styles';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/app/components/ui/dropdown-menu';
+import { getDashboardRoomLabel, isAllRooms } from '@/app/constants/rooms';
 import { useI18n, useMediaQuery, useTheme } from '@/app/hooks';
 import { useNavigationStore, useSettingsStore } from '@/app/stores';
 import { resolveEffectsQuality } from '@/app/utils/effects-quality';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import type { MobileRoomNavigation } from './mobile-room-dropdown';
+import { getVisibleRoomNavRooms } from './room-nav.utils';
 import {
   getOrderedSectionNavigationItems,
   getSectionNavigationItems,
@@ -135,6 +143,10 @@ export const Sidebar = memo(function Sidebar({
       })),
     [setActiveSection, t]
   );
+  const visibleMobileRooms = useMemo(
+    () => (mobileRoomNavigation ? getVisibleRoomNavRooms(mobileRoomNavigation.rooms) : []),
+    [mobileRoomNavigation]
+  );
   const searchAccessoryBackground = undefined;
   const mobileDockShadow = isGlass
     ? isHighEffects
@@ -143,9 +155,9 @@ export const Sidebar = memo(function Sidebar({
     : isLight
       ? '0 16px 32px -26px rgba(15,23,42,0.18)'
       : '0 18px 36px -28px rgba(0,0,0,0.58)';
-  const mobileSearchFieldBg = isLight ? resolvedInputBg : 'bg-white/92';
-  const mobileSearchFieldText = isLight ? resolvedTextPrimary : 'text-slate-950';
-  const mobileSearchFieldIcon = 'text-slate-500';
+  const mobileSearchFieldBg = resolvedInputBg;
+  const mobileSearchFieldText = resolvedTextPrimary;
+  const mobileSearchFieldIcon = resolvedTextSecondary;
   const getMobileTabPill = (isActive: boolean) =>
     getInteractivePillStyles({
       intent: 'navigation',
@@ -252,16 +264,86 @@ export const Sidebar = memo(function Sidebar({
               ) : null}
 
               <div className="relative flex min-h-12.5 items-stretch gap-1 px-0.75 py-0.75">
-                {dockItems.map((item) => (
-                  <MobileDockButton
-                    key={item.section}
-                    icon={item.icon}
-                    isActive={activeSection === item.section}
-                    label={item.label}
-                    onClick={item.onClick}
-                    pill={getMobileTabPill(activeSection === item.section)}
-                  />
-                ))}
+                {dockItems.map((item) => {
+                  const isActive = activeSection === item.section;
+                  const activeHomeRoomNavigation =
+                    item.section === 'home' && isActive ? mobileRoomNavigation : undefined;
+                  const showHomeRoomDropdown = Boolean(activeHomeRoomNavigation);
+                  const activeHomeLabel =
+                    activeHomeRoomNavigation?.activeRoom &&
+                    !isAllRooms(activeHomeRoomNavigation.activeRoom)
+                      ? activeHomeRoomNavigation.activeRoom
+                      : item.label;
+                  const ActiveHomeIcon =
+                    activeHomeRoomNavigation?.activeRoom &&
+                    !isAllRooms(activeHomeRoomNavigation.activeRoom)
+                      ? DoorOpen
+                      : item.icon;
+
+                  return showHomeRoomDropdown ? (
+                    <div
+                      key={item.section}
+                      className={`relative min-h-11 min-w-[5.1rem] shrink-0 rounded-[20px] transition-all ${getMobileTabPill(true).className}`}
+                      style={getMobileTabPill(true).style}
+                    >
+                      <button
+                        type="button"
+                        onClick={item.onClick}
+                        aria-current="page"
+                        aria-label={activeHomeLabel}
+                        className="flex h-full w-full flex-col items-center justify-center gap-1 px-2 py-1.5 pr-7"
+                      >
+                        <ActiveHomeIcon className="h-[0.94rem] w-[0.94rem] shrink-0" />
+                        <span className="max-w-full truncate px-0.5 text-[11px] leading-none tracking-[-0.01em] font-semibold">
+                          {activeHomeLabel}
+                        </span>
+                      </button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            type="button"
+                            aria-label={t('dashboard.roomNav.openRooms')}
+                            className="absolute right-1 top-1/2 flex h-8 w-6 -translate-y-1/2 items-center justify-center rounded-[14px] bg-black/10"
+                          >
+                            <ChevronDown className="h-3.5 w-3.5" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="start"
+                          side="top"
+                          sideOffset={10}
+                          className="w-56 md:hidden"
+                        >
+                          {visibleMobileRooms.map((room) => {
+                            const label = getDashboardRoomLabel(room, t('dashboard.roomNav.all'));
+
+                            return (
+                              <DropdownMenuItem
+                                key={room}
+                                className={surface.textPrimary}
+                                onSelect={() => activeHomeRoomNavigation?.onRoomChange(room)}
+                              >
+                                <span className="min-w-0 flex-1 truncate">{label}</span>
+                                {activeHomeRoomNavigation?.activeRoom === room ? (
+                                  <Check className="h-4 w-4" style={{ color: activeColorValue }} />
+                                ) : null}
+                              </DropdownMenuItem>
+                            );
+                          })}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  ) : (
+                    <MobileDockButton
+                      key={item.section}
+                      icon={item.icon}
+                      isActive={isActive}
+                      label={item.label}
+                      onClick={item.onClick}
+                      pill={getMobileTabPill(isActive)}
+                    />
+                  );
+                })}
 
                 <MobileDockButton
                   icon={Compass}

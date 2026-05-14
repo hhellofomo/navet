@@ -140,8 +140,8 @@ For private Home Assistant development:
 
 1. Update files in this repo
 2. Bump `addons/navet/config.yaml` version
-3. Push to `main`
-4. Wait for `.github/workflows/publish-addon.yml` to publish the matching add-on image tag
+3. Trigger `.github/workflows/publish-addon.yml` manually
+4. Wait for it to publish the matching add-on image tag
 5. Refresh the add-on repository in Home Assistant
 6. Rebuild or reinstall the add-on
 
@@ -181,9 +181,13 @@ The current add-on still expects explicit Home Assistant connection details. It 
 
 The CI workflow runs on pushes to `main` and on pull requests. It currently:
 
-1. Installs dependencies with `pnpm`
+1. Installs dependencies with the pinned `pnpm`
 2. Runs `pnpm check`
-3. Runs `pnpm build`
+3. Runs `pnpm check:stories`
+4. Runs `pnpm check:ui-kit`
+5. Runs `pnpm typecheck`
+6. Runs `pnpm test`
+7. Runs `pnpm build`
 
 ## Recommended Private Workflow
 

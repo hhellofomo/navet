@@ -9,6 +9,7 @@ import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import { isMediaPlayerProxyUrl } from '@/app/utils/home-assistant-url';
 import type { MediaEntityTypeKey } from '../media-card/get-media-entity-type-key';
+import { getMediaDisplayVolume } from './media-card-style-utils';
 import { MediaEntityHeader } from './media-entity-header';
 import { MediaFallbackArtwork } from './media-fallback-artwork';
 import { MediaMarqueeText } from './media-marquee-text';
@@ -82,7 +83,7 @@ export function MediaSmallView({
     };
   }, [artwork]);
 
-  const displayVolume = Math.max(0, Math.min(100, isMuted ? 0 : volume));
+  const displayVolume = getMediaDisplayVolume(volume, isMuted);
   const stateSurface = getCardStateSurfaceTokens(theme, isActive);
   const iconTone = stateSurface.primaryTextClassName;
   const subtitleTone = stateSurface.secondaryTextClassName;

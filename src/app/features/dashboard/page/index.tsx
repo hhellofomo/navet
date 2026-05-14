@@ -1,4 +1,5 @@
 import { LoadingSpinner } from '@/app/components/primitives/loading-spinner';
+import { isAllRooms } from '@/app/constants/rooms';
 import { useI18n } from '@/app/hooks';
 import { DashboardArrivalReveal } from '../components/dashboard-arrival-reveal';
 import { DashboardOverlays } from '../components/dashboard-overlays';
@@ -11,7 +12,7 @@ export function DashboardPage() {
   const isDashboardReady =
     controller.devicesLoaded &&
     (controller.activeSection !== 'home' ||
-      controller.activeRoom !== 'All' ||
+      !isAllRooms(controller.activeRoom) ||
       controller.homeLayoutHydrated);
 
   if (!isDashboardReady) {

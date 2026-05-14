@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { ALL_ROOMS_ID, isAllRooms } from '@/app/constants/rooms';
 
 export function useDashboardRoomNavigation(
   activeRoom: string,
@@ -10,7 +11,7 @@ export function useDashboardRoomNavigation(
   const previousRoomsRef = useRef<string[]>(rooms);
 
   useEffect(() => {
-    if (activeRoom === 'All' || rooms.includes(activeRoom)) {
+    if (isAllRooms(activeRoom) || rooms.includes(activeRoom)) {
       previousRoomsRef.current = rooms;
       return;
     }
@@ -19,7 +20,7 @@ export function useDashboardRoomNavigation(
       if (!hassEntitiesHydrated || !devicesLoaded) {
         return;
       }
-      changeRoom('All');
+      changeRoom(ALL_ROOMS_ID);
       previousRoomsRef.current = rooms;
       return;
     }
@@ -37,7 +38,7 @@ export function useDashboardRoomNavigation(
             .find((room) => room !== activeRoom && rooms.includes(room)))
         : undefined) ??
       rooms[0] ??
-      'All';
+      ALL_ROOMS_ID;
 
     changeRoom(nextRoom);
     previousRoomsRef.current = rooms;

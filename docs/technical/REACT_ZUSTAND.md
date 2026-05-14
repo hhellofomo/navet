@@ -136,9 +136,12 @@ export const useMyStore = create<MyState>()(
 );
 ```
 
-All persisted stores (`settings-store`, `theme-store`, `navigation-store`, `edit-mode-store`,
-`dashboard-entities-store`) implement a `merge` function that validates or normalizes values
-before rehydrating. Never add a persisted store without a `merge` function.
+Persisted stores should validate or normalize persisted values before rehydrating. Most persisted
+stores implement this with a `merge` function (`settings-store`, `theme-store`, `navigation-store`,
+`edit-mode-store`, `dashboard-entities-store`, `home-dashboard-layout-store`,
+`energy-dashboard-store`, and `light-memory-store`). A small number of feature stores normalize in
+their own action or migration paths (`custom-cards-store`, `light-preset-store`); do not add new
+persisted stores without an explicit validation or migration strategy.
 
 Never use the manual `subscribe` + `localStorage.setItem` pattern.
 

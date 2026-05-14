@@ -58,7 +58,7 @@ Planned and in-progress features. Check off items as they ship. Add new ideas to
 
 ## Shipped
 
-- [x] **Zone-based Home screen layout** — Home view organises all devices into Overview, Quick Actions, Status, and Analytics zone bands; per-card zone overrides persist to localStorage and YAML export; `hero` card size (6×3) available for weather, calendars, photo, and RSS in the Overview zone; responsive 12-column grid via CSS custom property aligned with Tailwind breakpoints
+- [x] **Zone-based Home screen layout** — Home view organises all devices into `hero`, `actions`, `status`, and `analytics` zone bands; per-card zone overrides persist through dashboard layout state and YAML export; `extra-large` cards use a 3 logical column x 2 row footprint for large hero-style cards; responsive grids derive rendered spans from the shared card-size registry
 - [x] **Custom accent color picker** — custom color input alongside 8 built-in accent presets in Settings → Appearance
 - [x] **Widget settings** — RSS Feed, Quick Note, and Photo Frame widgets support post-creation configuration (feed URLs, note content, photo URLs)
 - [x] **Configuration UI with setup wizard** — in-app onboarding and login screen
@@ -97,5 +97,5 @@ Planned and in-progress features. Check off items as they ship. Add new ideas to
 - [x] **Camera card** — snapshot display for `camera.*` entities via HA camera proxy; manual refresh; unavailable placeholder; dark card with name/room overlay
 - [x] **Section resize actions** — −/+ buttons resize by rendered-column units at the current breakpoint; the row neighbor compensates automatically and stacked descendant sections in the same column update together; controls appear only when two or more sections share the same row
 - [x] **Media player grouping controls** — media cards support attaching and detaching compatible players in a speaker group directly from the dialog (`join` / `unjoin`)
-- [x] **Home section creation (sectioned layout)** — Home Dashboard Builder supports adding, renaming, and removing user-defined sections in `sectioned` mode
+- [x] **Home section creation (sectioned layout)** — Home layout edit mode supports adding, renaming, and removing user-defined sections in `sectioned` mode
 - [x] **Map card** — custom widget showing all `person.*` and `device_tracker.*` entities with GPS on an interactive Leaflet map; circular avatar markers with entity pictures or initials; GPS accuracy circles; home/away border accent; dark and light CartoDB tile variants follow the active theme; added from the card library like other widgets

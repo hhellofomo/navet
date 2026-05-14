@@ -1,6 +1,7 @@
 import { Palette, Sliders } from 'lucide-react';
 import { useState } from 'react';
 import {
+  CardDialogBody,
   CardDialogHeader,
   CardDialogSection,
   CardDialogTabList,
@@ -80,7 +81,7 @@ export function WeatherSettingsDialog({
       contentOverlayClassName={dialogShell.contentOverlayClassName}
     >
       <CustomScrollbar isOn={isOn}>
-        <div className="p-6">
+        <CardDialogBody>
           <CardDialogHeader title={title} description={entityType} entityId={entityId} />
 
           <Tabs value={activeTab} defaultValue="controls" onValueChange={setActiveTab}>
@@ -151,7 +152,7 @@ export function WeatherSettingsDialog({
           </Tabs>
 
           <DialogDoneFooter label={t('common.done')} />
-        </div>
+        </CardDialogBody>
       </CustomScrollbar>
     </DialogShell>
   );

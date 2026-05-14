@@ -8,6 +8,7 @@ import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import { isMediaPlayerProxyUrl } from '@/app/utils/home-assistant-url';
 import type { MediaEntityTypeKey } from '../media-card/get-media-entity-type-key';
+import { getMediaDisplayVolume, getMediaProgressPercent } from './media-card-style-utils';
 import { MediaEntityHeader } from './media-entity-header';
 import { MediaFallbackArtwork } from './media-fallback-artwork';
 import { formatMediaTime } from './media-time';
@@ -73,7 +74,7 @@ export function MediaLargeView({
   });
   const iconTone = stateSurface.primaryTextClassName;
   const subtitleTone = stateSurface.secondaryTextClassName;
-  const displayVolume = Math.max(0, Math.min(100, isMuted ? 0 : volume));
+  const displayVolume = getMediaDisplayVolume(volume, isMuted);
   const elapsedLabel = formatMediaTime(Math.max(0, elapsedSeconds));
   const durationLabel = formatMediaTime(Math.max(durationSeconds, elapsedSeconds));
   const controlSizes = getCardActionControlSizes('small');
@@ -237,7 +238,7 @@ export function MediaLargeView({
                   ...trackFillStyle,
                   width:
                     durationSeconds > 0
-                      ? `${Math.max(0, Math.min(100, (elapsedSeconds / durationSeconds) * 100))}%`
+                      ? `${getMediaProgressPercent(elapsedSeconds, durationSeconds)}%`
                       : '0%',
                 }}
               />

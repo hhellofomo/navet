@@ -91,8 +91,12 @@ export const HVACCardLargeLayout = memo(function HVACCardLargeLayout({
                 <HVACTempControls
                   targetTemp={controller.targetTemp}
                   onTempChange={controller.setTargetTemp}
+                  onTempCommit={controller.commitTargetTemp}
                   isOn={controller.isOn}
                   size="medium"
+                  minTemp={controller.minTemp}
+                  maxTemp={controller.maxTemp}
+                  step={controller.step}
                 />
                 <HVACModeControls
                   mode={controller.visualMode}

@@ -34,6 +34,7 @@ function SortableHomeCard({
         isPreviewHidden ? 'opacity-0' : isDragging ? 'opacity-40' : ''
       }`}
       data-card-id={cardId}
+      data-card-drag-surface="true"
     >
       <div
         className={

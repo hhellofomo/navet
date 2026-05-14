@@ -11,6 +11,7 @@ import {
 import { type CardSize, getCardSizeRatio } from '@/app/components/shared/card-size-selector';
 import { getAddCardDialogSurfaceTokens } from '@/app/components/shared/theme/add-card-dialog-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { isAllRooms } from '@/app/constants/rooms';
 import { type ThemeType, useI18n } from '@/app/hooks';
 import { type DashboardLibraryCard, DashboardLibraryList } from '../dashboard-library-list';
 import type { CardTemplate, CardType } from './types';
@@ -77,8 +78,6 @@ export function AddCardDialogView({
   const cardBg = surface.panelMuted;
   const hoverBg = surface.hoverBg;
   const accent = getColorValue(primaryColor);
-  const inactiveIconBg = dialogSurface.inactiveIconBg;
-  const inactiveIconColor = dialogSurface.inactiveIconColor;
   const sizePreviewTileBg = dialogSurface.sizePreviewTileBg;
   const inactiveSizeSwatchBg = dialogSurface.inactiveSizeSwatchBg;
   const cardsTabActive = activeTab === 'cards';
@@ -105,29 +104,35 @@ export function AddCardDialogView({
         defaultValue={showCardsTab ? 'cards' : 'widgets'}
         onValueChange={(value) => setActiveTab(value as 'cards' | 'widgets')}
       >
-        <div className="sticky top-0 z-10 border-b border-white/10 bg-inherit/95 px-5 pb-4 pt-5 backdrop-blur-xl">
+        <div className="sticky top-0 z-10 border-b border-white/10 bg-inherit/95 px-4 pb-3 pt-2 backdrop-blur-xl sm:px-5 sm:pb-4 sm:pt-5">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <div className={`mb-2 text-xs font-medium tracking-[0.14em] ${surface.textMuted}`}>
+              <div
+                className={`mb-1 text-[0.7rem] font-semibold uppercase tracking-[0.18em] ${surface.textMuted}`}
+              >
                 {cardsTabActive
                   ? t('dashboard.addCard.header.library')
                   : t('dashboard.addCard.header.widgets')}
               </div>
-              <Dialog.Title className={`text-[1.625rem] font-semibold leading-none ${textColor}`}>
+              <Dialog.Title
+                className={`text-base font-semibold leading-tight sm:text-2xl sm:leading-none ${textColor}`}
+              >
                 {t('dashboard.addCard.title')}
               </Dialog.Title>
-              <Dialog.Description className={`mt-2 max-w-[32rem] text-sm leading-6 ${mutedColor}`}>
+              <Dialog.Description
+                className={`mt-0.5 max-w-[32rem] text-xs leading-5 sm:mt-2 sm:text-sm sm:leading-6 ${mutedColor}`}
+              >
                 {cardsTabActive
                   ? t('dashboard.addCard.libraryDescription')
                   : t('dashboard.addCard.description', {
-                      room: currentRoom === 'All' ? t('dashboard.addCard.allRooms') : currentRoom,
+                      room: isAllRooms(currentRoom) ? t('dashboard.addCard.allRooms') : currentRoom,
                     })}
               </Dialog.Description>
             </div>
             <button
               type="button"
               onClick={onClose}
-              className={`mt-1 flex h-9 w-9 items-center justify-center rounded-full border transition-colors ${hoverBg}`}
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[18px] border transition-colors ${hoverBg}`}
               style={{
                 borderColor: 'rgba(255,255,255,0.08)',
                 backgroundColor: 'rgba(255,255,255,0.04)',
@@ -138,23 +143,25 @@ export function AddCardDialogView({
           </div>
 
           {showCardsTab ? (
-            <TabList variant="segmented" className="mt-5 grid-cols-2">
+            <TabList variant="segmented" size="compact" className="mt-3 grid-cols-2 sm:mt-5">
               <TabTrigger
                 value="cards"
-                className="h-auto gap-0 flex-col items-start justify-start rounded-[18px] px-4 py-2.5 text-left"
+                size="compact"
+                className="justify-start rounded-[16px] text-left sm:h-auto sm:flex-col sm:items-start sm:rounded-[18px] sm:px-4 sm:py-2.5"
               >
                 <span className="flex items-center gap-2">
                   <Layers2 className="h-4 w-4" />
                   <span className="text-sm font-semibold">{t('dashboard.addCard.tab.cards')}</span>
                 </span>
-                <span className="mt-0.5 text-xs opacity-80">
+                <span className="mt-0.5 hidden text-xs opacity-80 sm:block">
                   {t('dashboard.addCard.tab.cardsHint')}
                 </span>
               </TabTrigger>
 
               <TabTrigger
                 value="widgets"
-                className="h-auto gap-0 flex-col items-start justify-start rounded-[18px] px-4 py-2.5 text-left"
+                size="compact"
+                className="justify-start rounded-[16px] text-left sm:h-auto sm:flex-col sm:items-start sm:rounded-[18px] sm:px-4 sm:py-2.5"
               >
                 <span className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4" />
@@ -162,7 +169,7 @@ export function AddCardDialogView({
                     {t('dashboard.addCard.tab.widgets')}
                   </span>
                 </span>
-                <span className="mt-0.5 text-xs opacity-80">
+                <span className="mt-0.5 hidden text-xs opacity-80 sm:block">
                   {t('dashboard.addCard.tab.widgetsHint')}
                 </span>
               </TabTrigger>
@@ -170,10 +177,10 @@ export function AddCardDialogView({
           ) : null}
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5 sm:py-5">
           <TabPanel value="cards" className="space-y-4">
             <div
-              className={`rounded-[24px] border p-3 ${borderColor}`}
+              className={`rounded-[22px] border p-2.5 sm:rounded-[24px] sm:p-3 ${borderColor}`}
               style={{ backgroundColor: 'rgba(255,255,255,0.025)' }}
             >
               <Input
@@ -186,9 +193,11 @@ export function AddCardDialogView({
                 inputClassName={`${borderColor} ${cardBg} ${textColor}`}
                 style={{ caretColor: accent }}
               />
-              <div className={`mt-3 flex items-center justify-between px-1 text-xs ${mutedColor}`}>
+              <div
+                className={`mt-2.5 flex items-center justify-between px-1 text-xs ${mutedColor}`}
+              >
                 <span>{cardsSummary}</span>
-                <span>{t('dashboard.addCard.libraryHint.tapToAdd')}</span>
+                <span className="max-sm:hidden">{t('dashboard.addCard.libraryHint.tapToAdd')}</span>
               </div>
             </div>
 
@@ -201,12 +210,15 @@ export function AddCardDialogView({
             />
           </TabPanel>
 
-          <TabPanel value="widgets" className="space-y-6">
+          <TabPanel
+            value="widgets"
+            className="space-y-6 max-sm:max-h-[24rem] max-sm:overflow-y-auto"
+          >
             <div>
               <h3 className={`mb-3 text-sm font-medium ${textColor}`}>
                 {t('dashboard.addCard.chooseType')}
               </h3>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                 {cardTemplates.map((template) => (
                   <button
                     type="button"
@@ -215,35 +227,37 @@ export function AddCardDialogView({
                       setSelectedType(template.id);
                       setSelectedSize(template.defaultSize);
                     }}
-                    className={`flex items-start rounded-[22px] border p-4 text-left transition-all ${
+                    className={`flex w-full items-center gap-3.5 rounded-[18px] border px-3.5 py-3 text-left transition-colors ${
                       selectedType === template.id
                         ? 'border-current'
-                        : `border-transparent ${cardBg} ${hoverBg}`
+                        : `${borderColor} ${cardBg} ${hoverBg}`
                     }`}
                     style={{
-                      borderColor: selectedType === template.id ? accent : 'rgba(255,255,255,0.05)',
+                      borderColor: selectedType === template.id ? accent : undefined,
                       backgroundColor: selectedType === template.id ? `${accent}10` : undefined,
                     }}
                   >
-                    <div className="flex items-start gap-3">
-                      <div
-                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"
-                        style={{
-                          backgroundColor:
-                            selectedType === template.id ? `${accent}22` : inactiveIconBg,
-                          color: selectedType === template.id ? accent : inactiveIconColor,
-                        }}
+                    <div
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                      style={{
+                        backgroundColor:
+                          selectedType === template.id ? `${accent}22` : 'rgba(255,255,255,0.06)',
+                        color: selectedType === template.id ? accent : undefined,
+                      }}
+                    >
+                      <span
+                        className={`${selectedType === template.id ? '' : mutedColor} [&_svg]:h-4 [&_svg]:w-4`}
                       >
                         {template.icon}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <h4 className={`mb-1 text-sm font-semibold ${textColor}`}>
-                          {t(template.nameKey)}
-                        </h4>
-                        <p className={`text-xs leading-5 ${mutedColor}`}>
-                          {t(template.descriptionKey)}
-                        </p>
-                      </div>
+                      </span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className={`truncate text-sm font-semibold ${textColor}`}>
+                        {t(template.nameKey)}
+                      </h4>
+                      <p className={`mt-1.5 truncate text-xs ${mutedColor}`}>
+                        {t(template.descriptionKey)}
+                      </p>
                     </div>
                   </button>
                 ))}

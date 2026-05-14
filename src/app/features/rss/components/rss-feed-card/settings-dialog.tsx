@@ -1,16 +1,15 @@
 import { Palette, Plus, Sliders } from 'lucide-react';
 import { type CSSProperties, useState } from 'react';
 import { toast } from 'sonner';
-import { CardDialogHeader, CardDialogTabList } from '@/app/components/patterns';
+import { CardDialogBody, CardDialogHeader, CardDialogTabList } from '@/app/components/patterns';
 import {
   Button,
   customCardDialogShellProps,
-  DialogFooter,
   DialogShell,
   InteractivePill,
 } from '@/app/components/primitives';
 import { TabPanel, Tabs } from '@/app/components/primitives/tabs';
-import { CompactRoomSelector, CustomScrollbar } from '@/app/components/shared/device-editor';
+import { CompactRoomSelector } from '@/app/components/shared/device-editor';
 import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import {
   getCustomCardTintSurface,
@@ -178,11 +177,12 @@ export function RSSFeedSettingsDialog({
       contentGlowStyle={dialogShell.contentGlowStyle}
       contentOverlayClassName={dialogShell.contentOverlayClassName}
     >
-      <CustomScrollbar isOn={theme !== 'light'}>
-        <div className="p-6">
+      <div className="h-full overflow-x-hidden overflow-y-auto overscroll-contain [-ms-overflow-style:none] [scrollbar-width:none] max-sm:max-h-[calc(100dvh-3rem)] [&::-webkit-scrollbar]:hidden">
+        <CardDialogBody>
           <CardDialogHeader
             title={title}
             description={t('rss.settings.title')}
+            className="max-sm:mb-3"
             eyebrow={
               <CompactRoomSelector
                 value={roomValue}
@@ -198,7 +198,7 @@ export function RSSFeedSettingsDialog({
             defaultValue={hasProviders ? 'feeds' : 'setup'}
             onValueChange={setActiveTab}
           >
-            <CardDialogTabList>
+            <CardDialogTabList className="max-sm:flex max-sm:flex-wrap max-sm:gap-1.5">
               <InteractivePill
                 active={activeTab === 'feeds'}
                 size="compact"
@@ -242,11 +242,11 @@ export function RSSFeedSettingsDialog({
                 })}
                 onClick={() => setActiveTab('card')}
               >
-                Customize
+                {t('common.customize')}
               </InteractivePill>
             </CardDialogTabList>
 
-            <TabPanel value="feeds" className="mt-5 space-y-4">
+            <TabPanel value="feeds" className="mt-5 space-y-4 max-sm:mt-3">
               <RSSFeedsTabContent
                 hasProviders={hasProviders}
                 homeAssistantProviders={homeAssistantProviders}
@@ -263,7 +263,7 @@ export function RSSFeedSettingsDialog({
               />
             </TabPanel>
 
-            <TabPanel value="setup" className="mt-5 space-y-4">
+            <TabPanel value="setup" className="mt-5 space-y-4 max-sm:mt-3">
               <RSSSetupTabContent
                 providerName={providerName}
                 providerUrl={providerUrl}
@@ -282,7 +282,7 @@ export function RSSFeedSettingsDialog({
               />
             </TabPanel>
 
-            <TabPanel value="card" className="mt-5 space-y-4">
+            <TabPanel value="card" className="mt-5 space-y-4 max-sm:mt-3">
               <RSSCardTabContent
                 tintColor={tintColor}
                 onTintColorChange={onTintColorChange}
@@ -292,13 +292,13 @@ export function RSSFeedSettingsDialog({
             </TabPanel>
           </Tabs>
 
-          <DialogFooter>
+          <div className="mt-6 flex justify-end max-sm:mt-3">
             <Button variant="soft" size="small" onClick={() => handleOpenChange(false)}>
               {doneLabel}
             </Button>
-          </DialogFooter>
-        </div>
-      </CustomScrollbar>
+          </div>
+        </CardDialogBody>
+      </div>
     </DialogShell>
   );
 }
