@@ -3,6 +3,7 @@ import { Text } from '@/app/components/primitives';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import type { EnergyConsumer } from '../../types/energy.types';
+import { formatEnergyPercent, formatEnergyValue } from '../../utils/energy-formatters';
 import { EnergyWidgetShell } from '../energy-widget-shell';
 
 interface TopConsumersListProps {
@@ -38,15 +39,15 @@ export const TopConsumersList = memo(function TopConsumersList({
                 </div>
                 <Text tone="muted" className="mt-1 text-sm">
                   {(consumer.room ?? 'Unassigned').trim()} ·{' '}
-                  {(consumer.shareOfLoad * 100).toFixed(0)}% of live load
+                  {formatEnergyPercent(consumer.shareOfLoad * 100)}% of live load
                 </Text>
               </div>
               <div className="text-right">
                 <div className={`text-sm font-semibold ${surface.textPrimary}`}>
-                  {(consumer.powerW / 1000).toFixed(1)} kW
+                  {formatEnergyValue(consumer.powerW / 1000)} kW
                 </div>
                 <Text tone="muted" className="mt-1 text-sm">
-                  {consumer.energyKWh.toFixed(1)} kWh today
+                  {formatEnergyValue(consumer.energyKWh)} kWh today
                 </Text>
               </div>
             </div>

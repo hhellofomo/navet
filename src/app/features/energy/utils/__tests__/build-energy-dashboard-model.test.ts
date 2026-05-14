@@ -6,6 +6,11 @@ import {
   normalizeEnergyRange,
   shouldUseStaticEnergyBeams,
 } from '../build-energy-dashboard-model';
+import {
+  formatEnergyNodeValue,
+  formatEnergyPercent,
+  formatEnergyValue,
+} from '../energy-formatters';
 
 describe('buildEnergyDashboardModel', () => {
   it('maps legacy ranges to current range ids', () => {
@@ -173,5 +178,15 @@ describe('shouldUseStaticEnergyBeams', () => {
         prefersReducedMotion: false,
       })
     ).toBe(true);
+  });
+});
+
+describe('energy formatters', () => {
+  it('formats energy values with consistent precision by purpose', () => {
+    expect(formatEnergyValue(1.24)).toBe('1.2');
+    expect(formatEnergyValue(1.25)).toBe('1.3');
+    expect(formatEnergyPercent(42.6)).toBe('43');
+    expect(formatEnergyNodeValue(99.4, '%')).toBe('99');
+    expect(formatEnergyNodeValue(2.04, 'kW')).toBe('2.0');
   });
 });

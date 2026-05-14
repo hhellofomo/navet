@@ -10,6 +10,7 @@ export {
   formatDaylight,
   formatEntityType,
   formatMediaEntityType,
+  formatMetricNumber,
   formatSensorValue,
   getMetricLabel,
   getName,

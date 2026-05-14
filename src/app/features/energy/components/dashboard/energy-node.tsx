@@ -4,6 +4,7 @@ import { Text } from '@/app/components/primitives';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import type { EnergyDashboardNode, EnergyFlowSourceType } from '../../types/energy.types';
+import { formatEnergyNodeValue } from '../../utils/energy-formatters';
 
 interface EnergyNodeProps {
   node: EnergyDashboardNode;
@@ -72,12 +73,12 @@ export const EnergyNode = memo(function EnergyNode({
         </div>
         <div className={`mt-3 text-sm font-semibold ${surface.textPrimary}`}>{node.label}</div>
         <div className={`mt-1 text-2xl font-semibold tracking-tight ${surface.textPrimary}`}>
-          {node.value.toFixed(node.unit === '%' ? 0 : 1)}
+          {formatEnergyNodeValue(node.value, node.unit)}
           <span className="ml-1 text-sm font-medium">{node.unit}</span>
         </div>
         {node.todayValue !== undefined ? (
           <Text tone="muted" className="mt-1 text-xs">
-            Today {node.todayValue.toFixed(node.todayUnit === '%' ? 0 : 1)} {node.todayUnit}
+            Today {formatEnergyNodeValue(node.todayValue, node.todayUnit)} {node.todayUnit}
           </Text>
         ) : null}
       </div>

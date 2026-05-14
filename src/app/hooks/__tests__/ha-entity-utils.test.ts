@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatCalendarTime, formatClock } from '../ha-entity-utils';
+import { formatCalendarTime, formatClock, formatMetricNumber } from '../ha-entity-utils';
 
 describe('ha-entity-utils time formatting', () => {
   it('formats calendar times in 24-hour mode when requested', () => {
@@ -19,5 +19,12 @@ describe('ha-entity-utils time formatting', () => {
 
     expect(formatClock(rawValue, 'en-US', true)).toMatch(/^\d{1,2}:\d{2}$/);
     expect(formatClock(rawValue, 'en-US', false)).toMatch(/^\d{1,2}:\d{2}\s?[AP]M$/);
+  });
+});
+
+describe('ha-entity-utils metric formatting', () => {
+  it('formats whole numbers without decimals and fractional numbers with one decimal', () => {
+    expect(formatMetricNumber(12)).toBe('12');
+    expect(formatMetricNumber(12.34)).toBe('12.3');
   });
 });

@@ -4,6 +4,11 @@ import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surfa
 import { useTheme } from '@/app/hooks';
 import { ENERGY_SOURCE_ACCENTS } from '../../data/energy-constants';
 import type { EnergyConsumer, EnergyDashboardNode, EnergyFlow } from '../../types/energy.types';
+import {
+  formatEnergyNodeValue,
+  formatEnergyPercent,
+  formatEnergyValue,
+} from '../../utils/energy-formatters';
 import { EnergyBeam } from './energy-beam';
 import { EnergyNode } from './energy-node';
 
@@ -101,7 +106,7 @@ export const EnergyFlowMap = memo(function EnergyFlowMap({
               id: consumer.id,
               label: consumer.name,
               powerKw: consumer.powerW / 1000,
-              shareLabel: `${Math.round(consumer.shareOfLoad * 100)}%`,
+              shareLabel: `${formatEnergyPercent(consumer.shareOfLoad * 100)}%`,
             };
           }),
         84,
@@ -234,12 +239,12 @@ export const EnergyFlowMap = memo(function EnergyFlowMap({
             </div>
             <div className={`text-base font-semibold ${surface.textPrimary}`}>{node.label}</div>
             <div className={`mt-2 text-2xl font-semibold tracking-tight ${surface.textPrimary}`}>
-              {node.value.toFixed(node.unit === '%' ? 0 : 1)}
+              {formatEnergyNodeValue(node.value, node.unit)}
               <span className="ml-1 text-base font-medium">{node.unit}</span>
             </div>
             {node.todayValue !== undefined ? (
               <div className={`mt-1 text-sm ${surface.textMuted}`}>
-                Today {node.todayValue.toFixed(node.todayUnit === '%' ? 0 : 1)} {node.todayUnit}
+                Today {formatEnergyNodeValue(node.todayValue, node.todayUnit)} {node.todayUnit}
               </div>
             ) : null}
           </div>
@@ -279,7 +284,7 @@ export const EnergyFlowMap = memo(function EnergyFlowMap({
             </div>
             <div className="mt-1 flex items-center justify-between gap-3">
               <div className={`text-sm ${surface.textSecondary}`}>
-                {consumer.powerKw.toFixed(1)} kW
+                {formatEnergyValue(consumer.powerKw)} kW
               </div>
               <div className={`text-xs ${surface.textMuted}`}>{consumer.shareLabel}</div>
             </div>
@@ -300,7 +305,7 @@ export const EnergyFlowMap = memo(function EnergyFlowMap({
               {exportNode.label}
             </div>
             <div className={`mt-1 text-sm ${surface.textSecondary}`}>
-              {exportNode.valueKw.toFixed(1)} kW export
+              {formatEnergyValue(exportNode.valueKw)} kW export
             </div>
           </div>
         ) : null}

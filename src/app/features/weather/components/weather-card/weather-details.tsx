@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import { CaptionValue } from '@/app/components/ui/caption-value';
 import { useI18n } from '@/app/hooks';
+import { formatMetricNumber } from '@/app/hooks/ha-entity-utils';
 import type { WeatherMetricId } from '@/app/stores/settings-store';
 
 interface WeatherDetailsProps {
@@ -52,8 +53,6 @@ export function WeatherDetails({
 }: WeatherDetailsProps) {
   const { t } = useI18n();
   const precipitationValue = `${precipitation}${precipitationUnit ? ` ${precipitationUnit}` : ''}`;
-  const formatMetricNumber = (value: number) =>
-    Number.isInteger(value) ? `${value}` : value.toFixed(1);
   const metricsById: Partial<Record<WeatherMetricId, { caption: string; value: string }>> = {
     precipitation: {
       caption: t('weather.precipitation'),

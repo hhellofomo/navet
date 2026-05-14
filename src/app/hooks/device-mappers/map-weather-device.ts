@@ -4,6 +4,7 @@ import type { WeatherDevice } from '../../types/device.types';
 import {
   formatClock,
   formatDaylight,
+  formatMetricNumber,
   parseNumberish,
   parseRoundedNumberish,
 } from '../ha-entity-utils';
@@ -18,10 +19,6 @@ interface WeatherContext {
   config?: Record<string, unknown> | null;
   weatherForecastMode: 'weekly' | 'hourly';
   storedForecasts?: { daily: WeatherForecastEntry[]; hourly: WeatherForecastEntry[] };
-}
-
-function formatWeatherValue(value: number): string {
-  return Number.isInteger(value) ? `${value}` : value.toFixed(1);
 }
 
 export function mapWeatherDevice(
@@ -191,7 +188,7 @@ export function mapWeatherDevice(
           })
         : tomorrowPrecipitationAmount !== null
           ? t('weather.precipitationTomorrow', {
-              amount: formatWeatherValue(tomorrowPrecipitationAmount),
+              amount: formatMetricNumber(tomorrowPrecipitationAmount),
               unit: precipitationUnit,
             })
           : '',

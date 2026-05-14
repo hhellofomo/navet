@@ -5,6 +5,7 @@ import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-sh
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
+import type { ThemeMode } from '@/app/stores/theme-store';
 import { MediaLargeView } from '../media/media-large-view';
 import { MediaMediumVerticalView } from '../media/media-medium-vertical-view';
 import { MediaMediumView } from '../media/media-medium-view';
@@ -17,6 +18,44 @@ const MediaDialog = lazy(async () => {
   const module = await import('../media/media-dialog');
   return { default: module.MediaDialog };
 });
+
+function getActiveTvShellBg(theme: ThemeMode) {
+  if (theme === 'light') {
+    return 'bg-gradient-to-br from-violet-50 via-fuchsia-50 to-white';
+  }
+
+  if (theme === 'glass') {
+    return 'bg-gradient-to-br from-fuchsia-500/12 via-violet-500/10 to-white/6';
+  }
+
+  if (theme === 'black') {
+    return 'bg-gradient-to-br from-fuchsia-950/45 via-black to-black';
+  }
+
+  return 'bg-gradient-to-br from-violet-950/90 via-fuchsia-950/75 to-zinc-950';
+}
+
+function getActiveTvShellBorder(theme: ThemeMode) {
+  if (theme === 'light') {
+    return 'border-fuchsia-200/80';
+  }
+
+  if (theme === 'glass') {
+    return 'border-fuchsia-400/20';
+  }
+
+  if (theme === 'black') {
+    return 'border-fuchsia-500/35';
+  }
+
+  return 'border-fuchsia-500/25';
+}
+
+function getActiveTvGlowClassName(theme: ThemeMode) {
+  return theme === 'light'
+    ? 'bg-[radial-gradient(circle_at_top_right,rgba(217,70,239,0.12),transparent_42%),radial-gradient(circle_at_bottom_left,rgba(139,92,246,0.1),transparent_48%)]'
+    : 'bg-[radial-gradient(circle_at_top_right,rgba(217,70,239,0.18),transparent_36%),radial-gradient(circle_at_bottom_left,rgba(139,92,246,0.14),transparent_44%)]';
+}
 
 interface MediaCardProps {
   id: string;
@@ -140,27 +179,14 @@ export const MediaCard = memo(function MediaCard({
   const isLarge = mediaSize === 'large';
   const isTv = deviceClass?.toLowerCase() === 'tv';
   const tvRemoteAvailable = simulateTvRemote === true ? true : remoteAvailable;
-  const isLight = theme === 'light';
   const isGlass = theme === 'glass';
   const hasArtwork = Boolean(resolvedAlbumArt);
   const isActiveTv = isTv && !isOff;
   const inactiveShellBorder = colors.media.off.border;
   const cardBorder = hasArtwork ? 'border-transparent' : surface.border;
   const cardShadow = '';
-  const activeTvShellBg = isLight
-    ? 'bg-gradient-to-br from-violet-50 via-fuchsia-50 to-white'
-    : isGlass
-      ? 'bg-gradient-to-br from-fuchsia-500/12 via-violet-500/10 to-white/6'
-      : theme === 'black'
-        ? 'bg-gradient-to-br from-fuchsia-950/45 via-black to-black'
-        : 'bg-gradient-to-br from-violet-950/90 via-fuchsia-950/75 to-zinc-950';
-  const activeTvShellBorder = isLight
-    ? 'border-fuchsia-200/80'
-    : isGlass
-      ? 'border-fuchsia-400/20'
-      : theme === 'black'
-        ? 'border-fuchsia-500/35'
-        : 'border-fuchsia-500/25';
+  const activeTvShellBg = getActiveTvShellBg(theme);
+  const activeTvShellBorder = getActiveTvShellBorder(theme);
   const shellBg = isOff
     ? ''
     : isActiveTv
@@ -168,10 +194,10 @@ export const MediaCard = memo(function MediaCard({
       : hasArtwork
         ? isGlass
           ? 'bg-transparent'
-          : isLight
+          : theme === 'light'
             ? 'bg-white'
             : 'bg-zinc-950'
-        : isLight
+        : theme === 'light'
           ? ''
           : isGlass
             ? ''
@@ -179,11 +205,31 @@ export const MediaCard = memo(function MediaCard({
   const shellBorder = isOff ? inactiveShellBorder : isActiveTv ? activeTvShellBorder : cardBorder;
   const shellBlur = hasArtwork && !isOff ? '' : cardShell.backdropClassName;
   const shellOverlayClassName = isOff ? null : stateSurface.overlayClassName;
-  const tvOnGlowClassName = isActiveTv
-    ? isLight
-      ? 'bg-[radial-gradient(circle_at_top_right,rgba(217,70,239,0.12),transparent_42%),radial-gradient(circle_at_bottom_left,rgba(139,92,246,0.1),transparent_48%)]'
-      : 'bg-[radial-gradient(circle_at_top_right,rgba(217,70,239,0.18),transparent_36%),radial-gradient(circle_at_bottom_left,rgba(139,92,246,0.14),transparent_44%)]'
-    : null;
+  const tvOnGlowClassName = isActiveTv ? getActiveTvGlowClassName(theme) : null;
+  const mediaIdentityProps = {
+    entityId: id,
+    artwork: resolvedAlbumArt,
+    onArtworkError: handleArtworkError,
+    entityName: name,
+    entityTypeKey: mediaEntityTypeKey,
+    title: displayTitle,
+    artist: displayArtist,
+    isActive: !isOff,
+    isPlaying,
+    volume,
+    isMuted,
+    theme,
+  };
+  const mediaControlProps = {
+    onOpenDialog: openDialog,
+    onToggleMute: toggleMute,
+    onPrevious: handlePrevious,
+    onTogglePlay: togglePlay,
+    onNext: handleNext,
+    onVolumeChange: handleVolumeChange,
+    onVolumeInteractionStart: startVolumeInteraction,
+    onVolumeInteractionEnd: endVolumeInteraction,
+  };
   const handleCardActivate = isTv ? toggleTvPower : openDialog;
   const interactiveShellProps = isEditMode
     ? {}
@@ -241,100 +287,22 @@ export const MediaCard = memo(function MediaCard({
               onOpenDialog={openDialog}
             />
           ) : isSmall ? (
-            <MediaSmallView
-              entityId={id}
-              artwork={resolvedAlbumArt}
-              onArtworkError={handleArtworkError}
-              entityName={name}
-              entityTypeKey={mediaEntityTypeKey}
-              title={displayTitle}
-              artist={displayArtist}
-              isActive={!isOff}
-              isPlaying={isPlaying}
-              volume={volume}
-              isMuted={isMuted}
-              theme={theme}
-              onToggleMute={toggleMute}
-              onPrevious={handlePrevious}
-              onTogglePlay={togglePlay}
-              onNext={handleNext}
-              onVolumeChange={handleVolumeChange}
-              onVolumeInteractionStart={startVolumeInteraction}
-              onVolumeInteractionEnd={endVolumeInteraction}
-              onOpenDialog={openDialog}
-            />
+            <MediaSmallView {...mediaIdentityProps} {...mediaControlProps} />
           ) : isMedium ? (
             <MediaMediumView
-              entityId={id}
-              artwork={resolvedAlbumArt}
-              onArtworkError={handleArtworkError}
-              entityName={name}
-              entityTypeKey={mediaEntityTypeKey}
-              title={displayTitle}
-              artist={displayArtist}
-              isActive={!isOff}
-              isPlaying={isPlaying}
-              volume={volume}
-              isMuted={isMuted}
+              {...mediaIdentityProps}
+              {...mediaControlProps}
               elapsedSeconds={elapsedSeconds}
               durationSeconds={durationSeconds}
-              theme={theme}
-              onOpenDialog={openDialog}
-              onToggleMute={toggleMute}
-              onPrevious={handlePrevious}
-              onTogglePlay={togglePlay}
-              onNext={handleNext}
-              onVolumeChange={handleVolumeChange}
-              onVolumeInteractionStart={startVolumeInteraction}
-              onVolumeInteractionEnd={endVolumeInteraction}
             />
           ) : isMediumVertical ? (
-            <MediaMediumVerticalView
-              entityId={id}
-              artwork={resolvedAlbumArt}
-              onArtworkError={handleArtworkError}
-              entityName={name}
-              entityTypeKey={mediaEntityTypeKey}
-              title={displayTitle}
-              artist={displayArtist}
-              isActive={!isOff}
-              isPlaying={isPlaying}
-              volume={volume}
-              isMuted={isMuted}
-              theme={theme}
-              onOpenDialog={openDialog}
-              onToggleMute={toggleMute}
-              onPrevious={handlePrevious}
-              onTogglePlay={togglePlay}
-              onNext={handleNext}
-              onVolumeChange={handleVolumeChange}
-              onVolumeInteractionStart={startVolumeInteraction}
-              onVolumeInteractionEnd={endVolumeInteraction}
-            />
+            <MediaMediumVerticalView {...mediaIdentityProps} {...mediaControlProps} />
           ) : isLarge ? (
             <MediaLargeView
-              entityId={id}
-              artwork={resolvedAlbumArt}
-              onArtworkError={handleArtworkError}
-              title={displayTitle}
-              artist={displayArtist}
-              entityName={name}
-              entityTypeKey={mediaEntityTypeKey}
-              isActive={!isOff}
-              isPlaying={isPlaying}
-              volume={volume}
-              isMuted={isMuted}
+              {...mediaIdentityProps}
+              {...mediaControlProps}
               elapsedSeconds={elapsedSeconds}
               durationSeconds={durationSeconds}
-              theme={theme}
-              onOpenDialog={openDialog}
-              onPrevious={handlePrevious}
-              onTogglePlay={togglePlay}
-              onNext={handleNext}
-              onToggleMute={toggleMute}
-              onVolumeChange={handleVolumeChange}
-              onVolumeInteractionStart={startVolumeInteraction}
-              onVolumeInteractionEnd={endVolumeInteraction}
             />
           ) : null}
         </div>
