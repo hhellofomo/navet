@@ -97,6 +97,7 @@ export function AddCardDialogView({
       }}
       overlayClassName={surface.dialogBackdrop}
       contentClassName={`${surface.panel} fixed left-1/2 top-1/2 z-50 flex w-[min(calc(100vw-2rem),38rem)] max-h-[min(84vh,46rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-[28px] border ${borderColor}`}
+      bodyClassName="flex min-h-0 flex-1 flex-col"
       contentStyle={{ boxShadow: '0 24px 80px rgba(0, 0, 0, 0.36)' }}
     >
       <Tabs
@@ -312,7 +313,7 @@ export function AddCardDialogView({
           </TabPanel>
         </div>
 
-        <TabPanel value="widgets">
+        <TabPanel value="widgets" className="shrink-0">
           <div className="border-t border-white/10 px-5 py-4">
             <div className="flex items-center justify-end">
               <button

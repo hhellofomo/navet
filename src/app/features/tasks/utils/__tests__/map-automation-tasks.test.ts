@@ -31,6 +31,9 @@ describe('mapAutomationTasks', () => {
         enabled: true,
         state: 'on',
         lastTriggered: undefined,
+        description: undefined,
+        mode: undefined,
+        currentRuns: undefined,
       },
     ]);
   });

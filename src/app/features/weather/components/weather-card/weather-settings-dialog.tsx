@@ -2,10 +2,12 @@ import { Palette, Sliders } from 'lucide-react';
 import { useState } from 'react';
 import {
   CardDialogBody,
+  CardDialogChoicePill,
   CardDialogHeader,
   CardDialogSection,
   CardDialogTabList,
   CardDialogTabTrigger,
+  SelectableCheckboxRow,
 } from '@/app/components/patterns';
 import {
   customCardDialogShellProps,
@@ -23,7 +25,7 @@ import {
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
-import type { WeatherForecastMode } from '@/app/stores/settings-store';
+import type { WeatherForecastMode, WeatherMetricId } from '@/app/stores/settings-store';
 import { getEntityTypeLabel } from '@/app/utils/entity-type-label';
 
 interface WeatherSettingsDialogProps {
@@ -34,8 +36,27 @@ interface WeatherSettingsDialogProps {
   title: string;
   forecastMode: WeatherForecastMode;
   onForecastModeChange: (mode: WeatherForecastMode) => void;
+  metricIds: WeatherMetricId[];
+  onMetricIdsChange: (metricIds: WeatherMetricId[]) => void;
+  availableMetricIds: WeatherMetricId[];
   tintColor?: string;
   onTintColorChange?: (color: string) => void;
+}
+
+const WEATHER_METRIC_OPTIONS: WeatherMetricId[] = [
+  'precipitation',
+  'humidity',
+  'wind',
+  'feelsLike',
+  'windGust',
+  'pressure',
+  'uvIndex',
+  'cloudCover',
+];
+const MAX_WEATHER_METRICS = 5;
+
+function getWeatherMetricLabelKey(metricId: WeatherMetricId) {
+  return `weather.metric.${metricId}` as const;
 }
 
 export function WeatherSettingsDialog({
@@ -46,6 +67,9 @@ export function WeatherSettingsDialog({
   title,
   forecastMode,
   onForecastModeChange,
+  metricIds,
+  onMetricIdsChange,
+  availableMetricIds,
   tintColor,
   onTintColorChange,
 }: WeatherSettingsDialogProps) {
@@ -67,12 +91,37 @@ export function WeatherSettingsDialog({
   });
   const sectionStyle = getInheritedDialogSectionStyle(theme, tintColor, '#3b82f6');
   const [activeTab, setActiveTab] = useState('controls');
+  const availableMetricIdSet = new Set(availableMetricIds);
+  const metricOptions = WEATHER_METRIC_OPTIONS.filter((metricId) =>
+    availableMetricIdSet.has(metricId)
+  );
+  const selectedAvailableMetricIds = metricIds.filter((metricId) =>
+    availableMetricIdSet.has(metricId)
+  );
+  const handleMetricChange = (metricId: WeatherMetricId, checked: boolean) => {
+    if (checked) {
+      if (
+        selectedAvailableMetricIds.includes(metricId) ||
+        selectedAvailableMetricIds.length >= MAX_WEATHER_METRICS
+      ) {
+        return;
+      }
+
+      onMetricIdsChange([...selectedAvailableMetricIds, metricId]);
+      return;
+    }
+
+    if (selectedAvailableMetricIds.length <= 1) {
+      return;
+    }
+
+    onMetricIdsChange(selectedAvailableMetricIds.filter((id) => id !== metricId));
+  };
 
   return (
     <DialogShell
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      disableOpenAutoFocus
       overlayClassName={surface.dialogBackdrop}
       contentClassName={dialogShell.contentClassName}
       contentStyle={dialogShell.contentStyle}
@@ -106,33 +155,46 @@ export function WeatherSettingsDialog({
 
             <TabPanel value="controls" className="mt-5">
               <CardDialogSection label={t('weather.settings.forecast')} className="mb-4">
-                <div className="grid grid-cols-2 gap-2">
-                  {(['hourly', 'weekly'] as const).map((option) => {
-                    const isSelected = forecastMode === option;
+                <div className="inline-flex items-center gap-1">
+                  {(['hourly', 'weekly'] as const).map((option) => (
+                    <CardDialogChoicePill
+                      key={option}
+                      active={forecastMode === option}
+                      onClick={() => onForecastModeChange(option)}
+                    >
+                      {option === 'hourly'
+                        ? t('weather.settings.hourly')
+                        : t('weather.settings.weekly')}
+                    </CardDialogChoicePill>
+                  ))}
+                </div>
+              </CardDialogSection>
+
+              <CardDialogSection label={t('weather.settings.metrics')}>
+                <div className="space-y-2">
+                  {metricOptions.map((metricId) => {
+                    const checked = selectedAvailableMetricIds.includes(metricId);
+                    const disabled =
+                      !checked && selectedAvailableMetricIds.length >= MAX_WEATHER_METRICS;
 
                     return (
-                      <button
-                        type="button"
-                        key={option}
-                        onClick={() => onForecastModeChange(option)}
-                        className={`rounded-2xl border px-4 py-3 text-sm font-medium transition-colors ${
-                          isSelected
-                            ? 'text-white'
-                            : `${surface.border} ${surface.textPrimary} ${surface.hoverBg}`
-                        }`}
-                        style={
-                          isSelected
-                            ? {
-                                backgroundColor: activeAccentColor,
-                                borderColor: activeAccentColor,
-                              }
-                            : sectionStyle
-                        }
-                      >
-                        {option === 'hourly'
-                          ? t('weather.settings.hourly')
-                          : t('weather.settings.weekly')}
-                      </button>
+                      <SelectableCheckboxRow
+                        key={metricId}
+                        checked={checked}
+                        disabled={disabled}
+                        onCheckedChange={(nextChecked) => handleMetricChange(metricId, nextChecked)}
+                        label={t(getWeatherMetricLabelKey(metricId))}
+                        description={disabled ? t('weather.settings.metricsLimit') : undefined}
+                        checkboxAppearance="secondary"
+                        checkboxPaletteColor={activeAccentColor}
+                        rowClassName={`${surface.border} ${surface.textPrimary} ${surface.hoverBg}`}
+                        descriptionClassName={surface.textMuted}
+                        selectedStyle={{
+                          ...sectionStyle,
+                          borderColor: `${activeAccentColor}80`,
+                        }}
+                        unselectedStyle={sectionStyle}
+                      />
                     );
                   })}
                 </div>

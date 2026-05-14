@@ -166,6 +166,13 @@ function addSensorMetric(
     return;
   }
 
+  if (
+    normalizedMetric.label === 'Energy' &&
+    isNonDisplaySwitchEnergyMetric(entityId, entity, friendlyName)
+  ) {
+    return;
+  }
+
   upsertDeviceMetric(metricState, {
     ...normalizedMetric,
     icon: inferMetricIcon(
@@ -176,6 +183,21 @@ function addSensorMetric(
     category: 'measurement',
   });
   indexes.switchMetricsByDeviceId.set(deviceId, metricState);
+}
+
+function isNonDisplaySwitchEnergyMetric(
+  entityId: string,
+  entity: HassEntity,
+  friendlyName: string
+) {
+  const stateClass =
+    typeof entity.attributes?.state_class === 'string'
+      ? entity.attributes.state_class.toLowerCase()
+      : '';
+  const searchText = `${entityId} ${friendlyName}`.toLowerCase();
+  const isDailyEnergy = /\b(today|daily|day)\b/.test(searchText);
+
+  return stateClass === 'total_increasing' && !isDailyEnergy;
 }
 
 function addConfigMetric(
@@ -203,6 +225,10 @@ function addConfigMetric(
     return;
   }
 
+  if (isNonDisplayConfigMetricValue(parsedValue)) {
+    return;
+  }
+
   upsertDeviceMetric(metricState, {
     label,
     value: parsedValue,
@@ -211,6 +237,19 @@ function addConfigMetric(
     category: 'configuration',
   });
   indexes.switchMetricsByDeviceId.set(deviceId, metricState);
+}
+
+function isNonDisplayConfigMetricValue(value: string | number) {
+  if (typeof value === 'number') {
+    return false;
+  }
+
+  return ['none', 'previousvalue', 'unknown', 'unavailable'].includes(
+    value
+      .trim()
+      .replace(/[\s_-]/g, '')
+      .toLowerCase()
+  );
 }
 
 function trackPrimarySwitch(

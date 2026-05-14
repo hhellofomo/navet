@@ -47,7 +47,7 @@ Planned and in-progress features. Check off items as they ship. Add new ideas to
 
 ### Smart Home
 
-- [ ] **Automations management** — view, trigger, and edit Home Assistant automations
+- [ ] **Automations management** — view, trigger, enable, and disable Home Assistant automations
 - [ ] **Light group card** — control a group of lights as one unit (brightness, color, on/off)
 - [ ] **Alarm panel card** — arm, disarm, and show state of `alarm_control_panel.*` entities
 - [ ] **Timer card** — start, pause, and cancel Home Assistant timers from the dashboard

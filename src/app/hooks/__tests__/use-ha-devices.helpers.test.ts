@@ -71,6 +71,71 @@ describe('use-ha-devices helpers', () => {
     );
   });
 
+  it('skips config metrics with non-display placeholder values', () => {
+    const entities: HassEntities = {
+      'switch.pax_calima_boostmode': createEntity('switch.pax_calima_boostmode', 'on', {
+        friendly_name: 'Pax Calima BoostMode',
+      }),
+      'select.pax_calima_power_on_behaviour': createEntity(
+        'select.pax_calima_power_on_behaviour',
+        'PreviousValue',
+        {
+          friendly_name: 'Pax Calima Power-on behaviour',
+        }
+      ),
+    };
+
+    const entityRegistryMap = createRegistryMap([
+      { entity_id: 'switch.pax_calima_boostmode', device_id: 'device-pax-calima' },
+      {
+        entity_id: 'select.pax_calima_power_on_behaviour',
+        device_id: 'device-pax-calima',
+        entity_category: 'config',
+      },
+    ]);
+
+    const indexes = buildDeviceIndexes(entities, entityRegistryMap);
+
+    expect(indexes.switchMetricsByDeviceId.get('device-pax-calima')).toBeUndefined();
+  });
+
+  it('skips cumulative total energy sensors for switch card metrics', () => {
+    const entities: HassEntities = {
+      'switch.garden_lights_switch': createEntity('switch.garden_lights_switch', 'on', {
+        friendly_name: 'Garden Mains',
+      }),
+      'sensor.garden_mains_total_energy': createEntity(
+        'sensor.garden_mains_total_energy',
+        '0.092',
+        {
+          friendly_name: 'Garden Mains Total energy',
+          device_class: 'energy',
+          state_class: 'total_increasing',
+          unit_of_measurement: 'kWh',
+        }
+      ),
+      'sensor.garden_mains_energy_today': createEntity('sensor.garden_mains_energy_today', '1.4', {
+        friendly_name: 'Garden Mains Energy today',
+        device_class: 'energy',
+        state_class: 'total_increasing',
+        unit_of_measurement: 'kWh',
+      }),
+    };
+
+    const entityRegistryMap = createRegistryMap([
+      { entity_id: 'switch.garden_lights_switch', device_id: 'device-garden-mains' },
+      { entity_id: 'sensor.garden_mains_total_energy', device_id: 'device-garden-mains' },
+      { entity_id: 'sensor.garden_mains_energy_today', device_id: 'device-garden-mains' },
+    ]);
+
+    const indexes = buildDeviceIndexes(entities, entityRegistryMap);
+    const metrics = indexes.switchMetricsByDeviceId.get('device-garden-mains');
+
+    expect(metrics).toEqual([
+      expect.objectContaining({ label: 'Energy', value: 1.4, unit: 'kWh' }),
+    ]);
+  });
+
   it('keeps primary switch selection deterministic for helper-like switches', () => {
     const entities: HassEntities = {
       'switch.bedroom_boost': createEntity('switch.bedroom_boost', 'off', {

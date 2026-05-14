@@ -197,7 +197,7 @@ export const HVACCard = memo(function HVACCard({
                   onTargetTempChange={controller.setTargetTemp}
                   onTargetTempCommit={controller.commitTargetTemp}
                   variant="docked-card-small"
-                  className="pointer-events-auto absolute right-[-1.9rem] top-[36%] z-[2] -translate-y-1/2"
+                  className="pointer-events-auto absolute right-[-1.9rem] top-1/2 z-[2] -translate-y-1/2"
                 />
                 <HVACCardSmallLayout
                   controller={controller}
@@ -221,7 +221,7 @@ export const HVACCard = memo(function HVACCard({
                   onTargetTempChange={controller.setTargetTemp}
                   onTargetTempCommit={controller.commitTargetTemp}
                   variant="docked-card-small"
-                  className="pointer-events-auto absolute right-[-0.25rem] top-[36%] z-[2] -translate-y-1/2"
+                  className="pointer-events-auto absolute right-[-0.25rem] top-1/2 z-[2] -translate-y-1/2"
                 />
                 <HVACCardMediumLayout
                   controller={controller}
@@ -245,7 +245,7 @@ export const HVACCard = memo(function HVACCard({
                   onTargetTempChange={controller.setTargetTemp}
                   onTargetTempCommit={controller.commitTargetTemp}
                   variant="docked-card"
-                  className="pointer-events-auto absolute right-[-3.4rem] top-[38%] z-[2] -translate-y-1/2"
+                  className="pointer-events-auto absolute right-[-3.4rem] top-1/2 z-[2] -translate-y-1/2"
                 />
                 <HVACCardLargeLayout
                   controller={controller}

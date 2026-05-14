@@ -45,11 +45,17 @@ export interface ClimateDevice extends BaseDevice {
 export interface WeatherDevice extends BaseDevice {
   room: string;
   temperature: number;
+  feelsLikeTemperature?: number;
   location: string;
   condition: string;
   humidity: number;
   windSpeed: number;
+  windSpeedUnit?: string;
+  windGustSpeed?: number;
   pressure: number;
+  pressureUnit?: string;
+  uvIndex?: number;
+  cloudCoverage?: number;
   precipitation: number;
   precipitationUnit: string;
   sunrise: string;

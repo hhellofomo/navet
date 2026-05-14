@@ -9,6 +9,7 @@ export interface DashboardHeroSectionProps {
   title: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
+  actionsClassName?: string;
   aside?: ReactNode;
 }
 
@@ -19,6 +20,7 @@ export function DashboardHeroSection({
   title,
   description,
   actions,
+  actionsClassName = '',
   aside,
 }: DashboardHeroSectionProps) {
   return (
@@ -58,7 +60,9 @@ export function DashboardHeroSection({
             </p>
           ) : null}
           {actions ? (
-            <div className="mt-3 flex flex-wrap items-center gap-2 md:mt-6">{actions}</div>
+            <div className={`mt-3 flex flex-wrap items-center gap-2 md:mt-6 ${actionsClassName}`}>
+              {actions}
+            </div>
           ) : null}
         </div>
 

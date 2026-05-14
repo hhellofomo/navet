@@ -140,16 +140,45 @@ export function mapWeatherDevice(
       parseRoundedNumberish(entity.attributes?.temperature) ??
       parseRoundedNumberish(entity.attributes?.native_temperature) ??
       0,
+    feelsLikeTemperature:
+      parseRoundedNumberish(entity.attributes?.apparent_temperature) ??
+      parseRoundedNumberish(entity.attributes?.native_apparent_temperature) ??
+      undefined,
     condition: entity.state,
     humidity: parseNumberish(entity.attributes?.humidity) ?? 0,
     windSpeed:
       parseNumberish(entity.attributes?.wind_speed) ??
       parseNumberish(entity.attributes?.native_wind_speed) ??
       0,
+    windSpeedUnit:
+      (typeof entity.attributes?.wind_speed_unit === 'string' &&
+        entity.attributes.wind_speed_unit) ||
+      (typeof entity.attributes?.native_wind_speed_unit === 'string' &&
+        entity.attributes.native_wind_speed_unit) ||
+      'km/h',
+    windGustSpeed:
+      parseNumberish(entity.attributes?.wind_gust_speed) ??
+      parseNumberish(entity.attributes?.native_wind_gust_speed) ??
+      parseNumberish(entity.attributes?.wind_gust) ??
+      undefined,
     pressure:
       parseNumberish(entity.attributes?.pressure) ??
       parseNumberish(entity.attributes?.native_pressure) ??
       0,
+    pressureUnit:
+      (typeof entity.attributes?.pressure_unit === 'string' && entity.attributes.pressure_unit) ||
+      (typeof entity.attributes?.native_pressure_unit === 'string' &&
+        entity.attributes.native_pressure_unit) ||
+      'hPa',
+    uvIndex:
+      parseNumberish(entity.attributes?.uv_index) ??
+      parseNumberish(entity.attributes?.uv) ??
+      undefined,
+    cloudCoverage:
+      parseNumberish(entity.attributes?.cloud_coverage) ??
+      parseNumberish(entity.attributes?.cloudiness) ??
+      parseNumberish(entity.attributes?.clouds) ??
+      undefined,
     precipitation: precipitationValue,
     precipitationUnit,
     sunrise: formatClock(sunriseSource, locale, use24HourTime),

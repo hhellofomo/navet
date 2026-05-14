@@ -1,4 +1,4 @@
-import { Bolt } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { memo } from 'react';
 import { BaseCard, CardMetric } from '@/app/components/primitives';
 import { EntityCardHeader } from '@/app/components/primitives/entity-card-header';
@@ -126,7 +126,7 @@ export const EnergyNowCardView = memo(function EnergyNowDashboardCardView({
               subtitleClassName={stateSurface.mutedTextClassName}
               leading={
                 <EntityCardHeaderIcon
-                  IconComponent={Bolt}
+                  IconComponent={Zap}
                   isActive
                   size={headerSize}
                   baseColor={accentColor}

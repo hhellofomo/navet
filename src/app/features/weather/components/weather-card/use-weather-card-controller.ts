@@ -33,6 +33,7 @@ export function useWeatherCardController({
     {}
   );
   const selectedForecastMode = useSettingsStore(settingsSelectors.weatherForecastMode);
+  const selectedMetricIds = useSettingsStore(settingsSelectors.weatherMetricIds);
   const updateSettings = useSettingsStore(settingsSelectors.updateSettings);
 
   const cardShell = getCardShellSurfaceTokens(theme);
@@ -97,6 +98,7 @@ export function useWeatherCardController({
     interaction,
     cityName,
     selectedForecastMode,
+    selectedMetricIds,
     updateSettings,
     setTintColor,
   };

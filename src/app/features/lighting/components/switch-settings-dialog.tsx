@@ -3,6 +3,7 @@ import { memo, useCallback, useState } from 'react';
 import {
   CardDialogBody,
   CardDialogHeader,
+  CardDialogSection,
   CardDialogTabList,
   CardDialogTabTrigger,
   SelectableCheckboxRow,
@@ -16,7 +17,12 @@ import {
   IconPicker,
 } from '@/app/components/shared/device-editor';
 import {
+  getInheritedDialogSectionStyle,
+  normalizeCustomCardTint,
+} from '@/app/components/shared/theme/custom-card-tint-surface';
+import {
   getAccentDialogSurface,
+  getThemeColorValue,
   resolvePrimaryColorToken,
 } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
@@ -35,9 +41,9 @@ interface SwitchSettingsDialogProps {
   isOn: boolean;
   metricSectionTitle: string;
   metricSectionDescription: string;
+  metricLimit: number;
   availableMetrics: DeviceMetric[];
   selectedMetricLabels: string[];
-  formatMetricValue: (metric: DeviceMetric) => string | null;
   getMetricLabel: (metric: DeviceMetric) => string;
   onMetricToggle: (label: string) => void;
   selectedIcon: string;
@@ -56,9 +62,9 @@ export const SwitchSettingsDialog = memo(function SwitchSettingsDialog({
   isOn,
   metricSectionTitle,
   metricSectionDescription,
+  metricLimit,
   availableMetrics,
   selectedMetricLabels,
-  formatMetricValue,
   getMetricLabel,
   onMetricToggle,
   selectedIcon,
@@ -77,6 +83,8 @@ export const SwitchSettingsDialog = memo(function SwitchSettingsDialog({
   );
 
   const activeDialogColors = getAccentDialogSurface(resolvePrimaryColorToken(primaryColor));
+  const activeAccentColor = normalizeCustomCardTint(tintColor) ?? getThemeColorValue(primaryColor);
+  const sectionStyle = getInheritedDialogSectionStyle(theme, tintColor, activeAccentColor);
   const gradientClassName = isOn
     ? `bg-linear-to-br ${activeDialogColors.from} ${activeDialogColors.to} ${activeDialogColors.border}`
     : 'bg-linear-to-br from-gray-900/95 to-gray-950/95 border-gray-500/10';
@@ -145,42 +153,40 @@ export const SwitchSettingsDialog = memo(function SwitchSettingsDialog({
 
             <TabPanel value="metrics" className="mt-5 space-y-6">
               {hasMetrics ? (
-                <DialogSectionRow
-                  label={metricSectionTitle}
-                  helperText={metricSectionDescription}
-                  labelClassName="mb-1 text-white"
-                  helperTextClassName="mb-3 text-white/78"
-                >
+                <CardDialogSection label={metricSectionTitle}>
                   <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
                     {availableMetrics.map((metric) => {
                       const isSelected = selectedMetricLabels.includes(metric.label);
+                      const isDisabled = !isSelected && selectedMetricLabels.length >= metricLimit;
 
                       return (
                         <SelectableCheckboxRow
                           key={`dialog-${metric.label}`}
                           checked={isSelected}
-                          onCheckedChange={() => onMetricToggle(metric.label)}
-                          label={
-                            <span className="block text-xs leading-5 text-white/80">
-                              {getMetricLabel(metric)}
-                            </span>
-                          }
-                          description={
-                            <span className="block text-xs leading-5 font-medium text-white">
-                              {formatMetricValue(metric) ?? '--'}
-                            </span>
-                          }
-                          rowClassName="border-transparent bg-white/5 hover:bg-white/10"
-                          selectedClassName="border-white/25 bg-white/14"
-                          labelClassName="text-white/80"
-                          descriptionClassName="text-white"
+                          disabled={isDisabled}
+                          onCheckedChange={(nextChecked) => {
+                            if (nextChecked === isSelected) {
+                              return;
+                            }
+
+                            onMetricToggle(metric.label);
+                          }}
+                          label={getMetricLabel(metric)}
+                          description={isDisabled ? metricSectionDescription : undefined}
                           checkboxAppearance="secondary"
-                          checkboxPaletteColor="#ffffff"
+                          checkboxPaletteColor={activeAccentColor}
+                          rowClassName={`${surface.border} ${surface.textPrimary} ${surface.hoverBg}`}
+                          descriptionClassName={surface.textMuted}
+                          selectedStyle={{
+                            ...sectionStyle,
+                            borderColor: `${activeAccentColor}80`,
+                          }}
+                          unselectedStyle={sectionStyle}
                         />
                       );
                     })}
                   </div>
-                </DialogSectionRow>
+                </CardDialogSection>
               ) : null}
             </TabPanel>
 

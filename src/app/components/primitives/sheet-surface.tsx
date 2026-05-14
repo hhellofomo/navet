@@ -1,11 +1,9 @@
-import * as Dialog from '@radix-ui/react-dialog';
 import {
   type CSSProperties,
   type ReactNode,
   type PointerEvent as ReactPointerEvent,
   useCallback,
   useEffect,
-  useId,
   useRef,
   useState,
 } from 'react';
@@ -46,7 +44,6 @@ export function SheetSurface({
   contentGlowClassName,
 }: SheetSurfaceProps) {
   const { theme } = useTheme();
-  const descriptionId = useId();
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const dragStartYRef = useRef(0);
@@ -98,6 +95,9 @@ export function SheetSurface({
       dragPointerIdRef.current = null;
 
       if (shouldClose) {
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur();
+        }
         onOpenChange(false);
         dragOffsetRef.current = 0;
         setDragOffset(0);
@@ -161,17 +161,14 @@ export function SheetSurface({
     <DialogShell
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      contentAriaDescribedBy={descriptionId}
+      contentTitle={title}
+      contentDescription={description}
       overlayClassName={overlayClassName ?? getUiKitSheetOverlayClassName(theme)}
       contentClassName={cn(getUiKitSheetContentClassName(theme), contentClassName)}
       contentGlowClassName={contentGlowClassName ?? getUiKitGlassSheetGlowClassName(theme)}
       contentStyle={resolvedContentStyle}
       mobileCoverSheet={false}
     >
-      <Dialog.Title className="sr-only">{title}</Dialog.Title>
-      <Dialog.Description id={descriptionId} className="sr-only">
-        {description}
-      </Dialog.Description>
       <div
         className={cn(
           'relative pb-[calc(env(safe-area-inset-bottom,0px)+0.9rem)] pt-3',

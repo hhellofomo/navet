@@ -33,6 +33,10 @@ export function WeatherForecastRow({
       : 'mx-auto mb-1 h-6 w-6';
   const compactForecastValueClassName = isSmall ? 'text-xs leading-none' : 'text-sm leading-none';
   const compactForecastDayClassName = isSmall ? 'mb-1' : isMedium ? 'mb-0.5' : 'mb-1';
+  const weeklyValueClassName =
+    isSmall || isMedium
+      ? `flex items-center justify-center ${isSmall ? 'gap-1' : 'gap-1.5'}`
+      : 'flex flex-col items-center justify-center gap-0.5';
 
   return (
     <div className={`flex w-full items-start justify-between ${isSmall ? 'gap-1' : 'gap-2'}`}>
@@ -54,9 +58,7 @@ export function WeatherForecastRow({
               {day.high}°
             </div>
           ) : (
-            <div
-              className={`flex items-center justify-center ${isSmall ? 'gap-1' : 'gap-1.5'} ${compactForecastValueClassName}`}
-            >
+            <div className={`${weeklyValueClassName} ${compactForecastValueClassName}`}>
               <span className="font-medium" style={titleStyle}>
                 {day.high}°
               </span>

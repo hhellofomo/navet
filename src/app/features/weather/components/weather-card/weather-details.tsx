@@ -1,16 +1,25 @@
 import type { CSSProperties } from 'react';
 import { CaptionValue } from '@/app/components/ui/caption-value';
 import { useI18n } from '@/app/hooks';
+import type { WeatherMetricId } from '@/app/stores/settings-store';
 
 interface WeatherDetailsProps {
   temperature: number;
   highTemp: number;
   lowTemp: number;
+  feelsLikeTemperature?: number;
   rainForecast?: string;
   precipitation: number;
   precipitationUnit: string;
   humidity: number;
   windSpeed: number;
+  windSpeedUnit?: string;
+  windGustSpeed?: number;
+  pressure?: number;
+  pressureUnit?: string;
+  uvIndex?: number;
+  cloudCoverage?: number;
+  selectedMetricIds: WeatherMetricId[];
   textPrimary: string;
   textSecondary: string;
   textShadow?: string;
@@ -22,11 +31,19 @@ export function WeatherDetails({
   temperature,
   highTemp,
   lowTemp,
+  feelsLikeTemperature,
   rainForecast,
   precipitation,
   precipitationUnit,
   humidity,
   windSpeed,
+  windSpeedUnit = 'km/h',
+  windGustSpeed,
+  pressure,
+  pressureUnit = 'hPa',
+  uvIndex,
+  cloudCoverage,
+  selectedMetricIds,
   textPrimary,
   textSecondary,
   textShadow,
@@ -35,52 +52,95 @@ export function WeatherDetails({
 }: WeatherDetailsProps) {
   const { t } = useI18n();
   const precipitationValue = `${precipitation}${precipitationUnit ? ` ${precipitationUnit}` : ''}`;
+  const formatMetricNumber = (value: number) =>
+    Number.isInteger(value) ? `${value}` : value.toFixed(1);
+  const metricsById: Partial<Record<WeatherMetricId, { caption: string; value: string }>> = {
+    precipitation: {
+      caption: t('weather.precipitation'),
+      value: precipitationValue,
+    },
+    humidity: {
+      caption: t('weather.humidity'),
+      value: `${humidity}%`,
+    },
+    wind: {
+      caption: t('weather.wind'),
+      value: `${windSpeed} ${windSpeedUnit}`,
+    },
+    feelsLike:
+      typeof feelsLikeTemperature === 'number'
+        ? {
+            caption: t('weather.metric.feelsLike'),
+            value: `${feelsLikeTemperature}°C`,
+          }
+        : undefined,
+    windGust:
+      typeof windGustSpeed === 'number'
+        ? {
+            caption: t('weather.windGust'),
+            value: `${formatMetricNumber(windGustSpeed)} ${windSpeedUnit}`,
+          }
+        : undefined,
+    pressure:
+      typeof pressure === 'number' && pressure > 0
+        ? {
+            caption: t('weather.pressure'),
+            value: `${formatMetricNumber(pressure)} ${pressureUnit}`,
+          }
+        : undefined,
+    uvIndex:
+      typeof uvIndex === 'number'
+        ? {
+            caption: t('weather.uvIndex'),
+            value: formatMetricNumber(uvIndex),
+          }
+        : undefined,
+    cloudCover:
+      typeof cloudCoverage === 'number'
+        ? {
+            caption: t('weather.cloudCover'),
+            value: `${Math.round(cloudCoverage)}%`,
+          }
+        : undefined,
+  };
+  const visibleMetrics = selectedMetricIds
+    .map((metricId) => metricsById[metricId])
+    .filter((metric): metric is { caption: string; value: string } => Boolean(metric))
+    .slice(0, 5);
 
   return (
-    <div className="shrink-0">
-      <div className="mb-1 text-3xl font-bold leading-none" style={titleStyle}>
-        {temperature}°C
-      </div>
-      <div className="mb-0.5 text-sm" style={subtitleStyle}>
-        H:{highTemp}° L:{lowTemp}°
-      </div>
-      {rainForecast ? (
-        <div className="text-sm" style={subtitleStyle}>
-          {rainForecast}
+    <div className="flex w-full items-end justify-between gap-4">
+      <div className="min-w-0 shrink-0">
+        <div className="mb-1 text-3xl font-bold leading-none" style={titleStyle}>
+          {temperature}°C
         </div>
-      ) : null}
+        <div className="mb-0.5 text-sm" style={subtitleStyle}>
+          H:{highTemp}° L:{lowTemp}°
+        </div>
+        {rainForecast ? (
+          <div className="text-sm" style={subtitleStyle}>
+            {rainForecast}
+          </div>
+        ) : null}
+      </div>
 
-      <div className="shrink-0 space-y-0.5">
-        <CaptionValue
-          caption={t('weather.precipitation')}
-          value={precipitationValue}
-          align="right"
-          captionStyle={{
-            color: textSecondary,
-            textShadow,
-          }}
-          valueStyle={{
-            color: textPrimary,
-            textShadow,
-          }}
-        />
-        <CaptionValue
-          caption={t('weather.humidity')}
-          value={`${humidity}%`}
-          align="right"
-          captionStyle={{
-            color: textSecondary,
-            textShadow,
-          }}
-          valueStyle={titleStyle}
-        />
-        <CaptionValue
-          caption={t('weather.wind')}
-          value={`${windSpeed} km/h`}
-          align="right"
-          captionStyle={subtitleStyle}
-          valueStyle={titleStyle}
-        />
+      <div className="shrink-0 space-y-0.5 text-right">
+        {visibleMetrics.map((metric) => (
+          <CaptionValue
+            key={metric.caption}
+            caption={metric.caption}
+            value={metric.value}
+            align="right"
+            captionStyle={{
+              color: textSecondary,
+              textShadow,
+            }}
+            valueStyle={{
+              color: textPrimary,
+              textShadow,
+            }}
+          />
+        ))}
       </div>
     </div>
   );

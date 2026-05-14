@@ -1,13 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { Button } from '@/app/components/primitives/button';
-import type { WeatherForecastMode } from '@/app/stores/settings-store';
+import type { WeatherForecastMode, WeatherMetricId } from '@/app/stores/settings-store';
 import { getStoryDocsDescription } from '@/app/storybook/story-docs';
 import { SettingsDialogStoryFrame } from '@/app/storybook/story-frames';
 import { WeatherSettingsDialog } from './weather-settings-dialog';
 
 function WeatherSettingsDialogStory() {
   const [mode, setMode] = useState<WeatherForecastMode>('hourly');
+  const [metricIds, setMetricIds] = useState<WeatherMetricId[]>([
+    'precipitation',
+    'humidity',
+    'wind',
+  ]);
   const [tintColor, setTintColor] = useState<string | undefined>('#3b82f6');
   const [isOpen, setIsOpen] = useState(false);
 
@@ -26,6 +31,18 @@ function WeatherSettingsDialogStory() {
         title="Home Weather"
         forecastMode={mode}
         onForecastModeChange={setMode}
+        metricIds={metricIds}
+        onMetricIdsChange={setMetricIds}
+        availableMetricIds={[
+          'precipitation',
+          'humidity',
+          'wind',
+          'feelsLike',
+          'windGust',
+          'pressure',
+          'uvIndex',
+          'cloudCover',
+        ]}
         tintColor={tintColor}
         onTintColorChange={setTintColor}
       />

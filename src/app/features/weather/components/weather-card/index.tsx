@@ -2,6 +2,7 @@ import { MapPin } from 'lucide-react';
 import { memo, useMemo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { CardWrapper } from '@/app/components/ui/card-wrapper';
+import { useI18n } from '@/app/hooks';
 import type { WeatherForecastMode } from '@/app/stores/settings-store';
 import { useWeatherCardController } from './use-weather-card-controller';
 import { WeatherBackground } from './weather-card-overlays';
@@ -24,9 +25,16 @@ interface WeatherCardProps {
   id: string;
   location: string;
   temperature: number;
+  feelsLikeTemperature?: number;
   condition: WeatherCondition | string;
   humidity: number;
   windSpeed: number;
+  windSpeedUnit?: string;
+  windGustSpeed?: number;
+  pressure?: number;
+  pressureUnit?: string;
+  uvIndex?: number;
+  cloudCoverage?: number;
   precipitation: number;
   precipitationUnit: string;
   sunrise: string;
@@ -46,9 +54,16 @@ export const WeatherCard = memo(function WeatherCard({
   id,
   location,
   temperature,
+  feelsLikeTemperature,
   condition,
   humidity,
   windSpeed,
+  windSpeedUnit = 'km/h',
+  windGustSpeed,
+  pressure,
+  pressureUnit = 'hPa',
+  uvIndex,
+  cloudCoverage,
   precipitation,
   precipitationUnit,
   sunrise,
@@ -63,6 +78,7 @@ export const WeatherCard = memo(function WeatherCard({
   onSizeChange: _onSizeChange,
   isEditMode,
 }: WeatherCardProps) {
+  const { t } = useI18n();
   const {
     theme,
     surface,
@@ -79,6 +95,7 @@ export const WeatherCard = memo(function WeatherCard({
     interaction,
     cityName,
     selectedForecastMode,
+    selectedMetricIds,
     updateSettings,
     setTintColor,
   } = useWeatherCardController({ id, location, condition, isEditMode });
@@ -214,6 +231,9 @@ export const WeatherCard = memo(function WeatherCard({
                   </div>
                   <div className={compactMetaTextClassName} style={subtitleStyle}>
                     H:{highTemp}° L:{lowTemp}°
+                    {typeof feelsLikeTemperature === 'number'
+                      ? ` · ${t('weather.feelsLikeShort', { temp: feelsLikeTemperature })}`
+                      : ''}
                   </div>
                 </div>
               ) : null}
@@ -258,11 +278,19 @@ export const WeatherCard = memo(function WeatherCard({
                   temperature={temperature}
                   highTemp={highTemp}
                   lowTemp={lowTemp}
+                  feelsLikeTemperature={feelsLikeTemperature}
                   rainForecast={rainForecast}
                   precipitation={precipitation}
                   precipitationUnit={precipitationUnit}
                   humidity={humidity}
                   windSpeed={windSpeed}
+                  windSpeedUnit={windSpeedUnit}
+                  windGustSpeed={windGustSpeed}
+                  pressure={pressure}
+                  pressureUnit={pressureUnit}
+                  uvIndex={uvIndex}
+                  cloudCoverage={cloudCoverage}
+                  selectedMetricIds={selectedMetricIds}
                   textPrimary={textPrimary}
                   textSecondary={textSecondary}
                   textShadow={weatherTextTreatment.textShadow}
@@ -312,6 +340,18 @@ export const WeatherCard = memo(function WeatherCard({
           title={cityName}
           forecastMode={selectedForecastMode}
           onForecastModeChange={(mode) => updateSettings({ weatherForecastMode: mode })}
+          metricIds={selectedMetricIds}
+          onMetricIdsChange={(metricIds) => updateSettings({ weatherMetricIds: metricIds })}
+          availableMetricIds={[
+            'precipitation',
+            'humidity',
+            'wind',
+            ...(typeof feelsLikeTemperature === 'number' ? (['feelsLike'] as const) : []),
+            ...(typeof windGustSpeed === 'number' ? (['windGust'] as const) : []),
+            ...(typeof pressure === 'number' && pressure > 0 ? (['pressure'] as const) : []),
+            ...(typeof uvIndex === 'number' ? (['uvIndex'] as const) : []),
+            ...(typeof cloudCoverage === 'number' ? (['cloudCover'] as const) : []),
+          ]}
           tintColor={tintColor}
           onTintColorChange={setTintColor}
         />
