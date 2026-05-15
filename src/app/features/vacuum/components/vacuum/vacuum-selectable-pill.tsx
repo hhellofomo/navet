@@ -22,7 +22,7 @@ export function SelectablePill({
       active={active}
       intent="navigation"
       variant="default"
-      className="min-h-18 w-full items-start justify-start rounded-2xl px-4 py-3 text-left"
+      className="min-h-12 w-full items-start justify-start rounded-xl px-3 py-2.5 text-left"
       style={style}
     >
       <div className="text-sm font-semibold">{label}</div>

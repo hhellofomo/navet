@@ -6,7 +6,6 @@ import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-sh
 import { useTheme } from '@/app/hooks';
 import { useSettingsStore } from '@/app/stores';
 import { resolveEffectsQuality } from '@/app/utils/effects-quality';
-import { LightCardLarge } from './light-card-large';
 import { LightCardMedium } from './light-card-medium';
 import { LightCardSmall } from './light-card-small';
 import { getLightCardSurfaceTokens } from './light-card-surface-tokens';
@@ -24,6 +23,10 @@ interface LightCardProps {
   size: CardSize;
   onSizeChange: (id: string, size: CardSize) => void;
   isEditMode: boolean;
+}
+
+function resolveLightCardSize(size: CardSize): CardSize {
+  return size === 'large' || size === 'extra-large' || size === 'medium-vertical' ? 'medium' : size;
 }
 
 export const LightCard = memo(function LightCard({
@@ -48,6 +51,7 @@ export const LightCard = memo(function LightCard({
   const [isKelvinMode, setIsKelvinMode] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const kelvinResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resolvedSize = resolveLightCardSize(size);
 
   const scheduleKelvinReset = useCallback(() => {
     if (kelvinResetTimerRef.current) clearTimeout(kelvinResetTimerRef.current);
@@ -64,7 +68,7 @@ export const LightCard = memo(function LightCard({
     initialState,
     initialBrightness,
     initialTemp,
-    size,
+    size: resolvedSize,
     isEditMode,
   });
   const cardShell = getCardShellSurfaceTokens(theme);
@@ -133,7 +137,7 @@ export const LightCard = memo(function LightCard({
     };
   }, []);
 
-  const isSmall = isCompactCardSize(size);
+  const isSmall = isCompactCardSize(resolvedSize);
 
   const currentTempColor = kelvinToColor(controller.colorTemp);
 
@@ -154,7 +158,7 @@ export const LightCard = memo(function LightCard({
         )}
 
         <BaseCard
-          size={size}
+          size={resolvedSize}
           {...controller.cardInteraction.cardProps}
           interactive={!isEditMode}
           isActive={controller.isOn && theme !== 'black'}
@@ -189,7 +193,7 @@ export const LightCard = memo(function LightCard({
               <LightCardSmall
                 name={name}
                 room={room}
-                size={size}
+                size={resolvedSize}
                 brightness={controller.brightness}
                 currentColor={controller.currentColor}
                 currentTempColor={currentTempColor}
@@ -200,33 +204,6 @@ export const LightCard = memo(function LightCard({
                 iconButtonProps={controller.iconButtonProps}
                 settingsButtonProps={controller.settingsButtonProps}
                 showSettingsButton={controller.showSettingsButton}
-                supportsColorControl={controller.supportsColorControl}
-                supportsColorTemperature={controller.supportsColorTemperature}
-                colorTemp={controller.colorTemp}
-                minColorTemp={controller.minColorTemp}
-                maxColorTemp={controller.maxColorTemp}
-                isKelvinMode={isKelvinMode}
-                onKelvinToggle={handleKelvinToggle}
-                onBrightnessChange={controller.onBrightnessChange}
-                onBrightnessCommit={controller.onBrightnessCommit}
-                onColorChange={controller.onColorChange}
-                onTempChange={handleTempChange}
-                onTempCommit={handleTempCommit}
-              />
-            ) : size === 'medium' ? (
-              <LightCardMedium
-                name={name}
-                brightness={controller.brightness}
-                currentColor={controller.currentColor}
-                currentTempColor={currentTempColor}
-                brightnessPresets={controller.brightnessPresets}
-                isOn={controller.isOn}
-                IconComponent={controller.IconComponent}
-                iconText={controller.iconText}
-                iconButtonProps={controller.iconButtonProps}
-                settingsButtonProps={controller.settingsButtonProps}
-                showSettingsButton={controller.showSettingsButton}
-                showPresetOverflow={controller.showPresetOverflow}
                 supportsColorControl={controller.supportsColorControl}
                 supportsColorTemperature={controller.supportsColorTemperature}
                 colorTemp={controller.colorTemp}
@@ -241,19 +218,19 @@ export const LightCard = memo(function LightCard({
                 onTempCommit={handleTempCommit}
               />
             ) : (
-              <LightCardLarge
+              <LightCardMedium
                 name={name}
                 brightness={controller.brightness}
-                brightnessPresets={controller.brightnessPresets}
-                selectedColor={controller.selectedColor}
                 currentColor={controller.currentColor}
                 currentTempColor={currentTempColor}
+                brightnessPresets={controller.brightnessPresets}
                 isOn={controller.isOn}
                 IconComponent={controller.IconComponent}
                 iconText={controller.iconText}
                 iconButtonProps={controller.iconButtonProps}
                 settingsButtonProps={controller.settingsButtonProps}
                 showSettingsButton={controller.showSettingsButton}
+                showPresetOverflow={controller.showPresetOverflow}
                 supportsColorControl={controller.supportsColorControl}
                 supportsColorTemperature={controller.supportsColorTemperature}
                 colorTemp={controller.colorTemp}

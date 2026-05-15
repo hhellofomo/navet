@@ -46,6 +46,7 @@ interface CardDialogChoicePillProps {
   children: ReactNode;
   className?: string;
   onClick?: () => void;
+  size?: 'default' | 'small' | 'compact';
   style?: CSSProperties;
 }
 
@@ -175,6 +176,7 @@ export const CardDialogChoicePill = memo(function CardDialogChoicePill({
   children,
   className,
   onClick,
+  size = 'default',
   style,
 }: CardDialogChoicePillProps) {
   return (
@@ -182,6 +184,7 @@ export const CardDialogChoicePill = memo(function CardDialogChoicePill({
       active={active}
       onClick={onClick}
       className={cn('min-w-22', className)}
+      size={size}
       style={style}
     >
       {children}

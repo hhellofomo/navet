@@ -2,6 +2,7 @@ import { ScanSearch } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import { CardDialogChoicePill } from '@/app/components/patterns';
 import { Panel } from '@/app/components/primitives';
+import { cn } from '@/app/components/ui/utils';
 import { useI18n } from '@/app/hooks';
 import { SelectablePill } from './vacuum-selectable-pill';
 
@@ -51,13 +52,15 @@ export function VacuumPlannerSection({
   };
 
   return (
-    <div className="mt-3">
-      <div className="mt-3 flex flex-wrap gap-2">
+    <div className="">
+      <div className="flex flex-wrap gap-2">
         {(['all', 'rooms', 'zones'] as PlannerView[]).map((view) => (
           <CardDialogChoicePill
             key={view}
             active={plannerView === view}
             onClick={() => onPlannerViewChange(view)}
+            size="compact"
+            className="min-w-18"
             style={plannerView === view ? activePillStyle : undefined}
           >
             {view === 'all'
@@ -94,7 +97,9 @@ export function VacuumPlannerSection({
       {plannerView === 'rooms' ? (
         <div className="mt-3">
           {roomTargets.length > 0 ? (
-            <div className="grid grid-cols-2 gap-2">
+            <div
+              className={cn('grid gap-2', roomTargets.length === 1 ? 'grid-cols-1' : 'grid-cols-2')}
+            >
               {roomTargets.map((target) => (
                 <SelectablePill
                   key={target}
@@ -119,7 +124,9 @@ export function VacuumPlannerSection({
       {plannerView === 'zones' ? (
         <div className="mt-3">
           {zoneTargets.length > 0 ? (
-            <div className="grid grid-cols-2 gap-2">
+            <div
+              className={cn('grid gap-2', zoneTargets.length === 1 ? 'grid-cols-1' : 'grid-cols-2')}
+            >
               {zoneTargets.map((target) => (
                 <SelectablePill
                   key={target}

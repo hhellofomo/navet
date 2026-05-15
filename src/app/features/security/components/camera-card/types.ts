@@ -5,6 +5,8 @@ export interface CameraCardProps {
   name: string;
   room: string;
   entityPicture?: string;
+  supportedFeatures?: number;
+  isStreamCapable?: boolean;
   size: CardSize;
   onSizeChange: (id: string, size: CardSize) => void;
   isEditMode: boolean;

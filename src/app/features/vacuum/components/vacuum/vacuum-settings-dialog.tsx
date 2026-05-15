@@ -3,6 +3,7 @@ import { memo, useEffect, useMemo, useState } from 'react';
 import {
   CardDialogBody,
   CardDialogHeader,
+  CardDialogSection,
   CardDialogTabList,
   CardDialogTabTrigger,
 } from '@/app/components/patterns';
@@ -10,25 +11,25 @@ import { DialogDoneFooter, ModalSurface } from '@/app/components/primitives';
 import { TabPanel, Tabs } from '@/app/components/primitives/tabs';
 import { CustomCardTintPicker, CustomScrollbar } from '@/app/components/shared/device-editor';
 import {
-  getCustomCardTintSurface,
   getInheritedDialogSectionStyle,
   normalizeCustomCardTint,
   withTintAlpha,
 } from '@/app/components/shared/theme/custom-card-tint-surface';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { cn } from '@/app/components/ui/utils';
 import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import { getEntityTypeLabel } from '@/app/utils/entity-type-label';
 import { VacuumCleaningControls } from './vacuum-cleaning-controls';
 import { VacuumPlannerSection } from './vacuum-planner-section';
-import { getVacuumSettingsDialogSurface } from './vacuum-settings-dialog-surface';
 import { VacuumStatusHeader } from './vacuum-status-header';
 import { VacuumStatusMetrics } from './vacuum-status-metrics';
 import type { VacuumStatus } from './vacuum-utils';
 
 type PlannerView = 'all' | 'rooms' | 'zones';
 type CleaningMode = 'auto' | 'spot' | 'edge' | 'room';
+
+const EMPTY_TARGETS: string[] = [];
+const DEFAULT_VACUUM_ACCENT_COLOR = '#06b6d4';
 
 interface VacuumSettingsDialogProps {
   entityId: string;
@@ -52,12 +53,6 @@ interface VacuumSettingsDialogProps {
   availableZones?: string[];
   tintColor?: string;
   onTintColorChange?: (color: string) => void;
-  surfaceGradientClassName?: string;
-  surfaceBorderClassName?: string;
-  surfaceBackdropClassName?: string;
-  surfaceStateClassName?: string;
-  surfaceGlowClassName?: string;
-  surfaceOverlayClassName?: string;
 }
 
 export const VacuumSettingsDialog = memo(function VacuumSettingsDialog({
@@ -82,23 +77,20 @@ export const VacuumSettingsDialog = memo(function VacuumSettingsDialog({
   availableZones,
   tintColor,
   onTintColorChange,
-  surfaceGradientClassName,
-  surfaceBorderClassName,
-  surfaceBackdropClassName,
-  surfaceStateClassName,
-  surfaceGlowClassName,
-  surfaceOverlayClassName,
 }: VacuumSettingsDialogProps) {
   const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const entityType = getEntityTypeLabel(entityId);
-  const dialogSurface = getVacuumSettingsDialogSurface(theme, currentStatus);
-  const isActive = currentStatus === 'cleaning' || currentStatus === 'returning';
+  const isActive =
+    currentStatus === 'cleaning' || currentStatus === 'mopping' || currentStatus === 'returning';
   const roomTargets = useMemo(
     () => (availableRooms?.length ? availableRooms : room && room !== 'Whole Home' ? [room] : []),
     [availableRooms, room]
   );
-  const zoneTargets = availableZones ?? [];
+  const zoneTargets = useMemo(
+    () => (availableZones?.length ? availableZones : EMPTY_TARGETS),
+    [availableZones]
+  );
   const speedOptions = useMemo(
     () =>
       fanSpeeds?.length
@@ -155,18 +147,22 @@ export const VacuumSettingsDialog = memo(function VacuumSettingsDialog({
   ]);
 
   const primaryActionLabel =
-    currentStatus === 'cleaning' ? t('vacuum.action.pause') : t('vacuum.action.startCleaning');
+    currentStatus === 'cleaning' || currentStatus === 'mopping'
+      ? t('vacuum.action.pause')
+      : t('vacuum.action.startCleaning');
+  const formatTargetCount = (count: number) =>
+    `${count} ${count === 1 ? t('vacuum.settings.room') : t('vacuum.plan.rooms')}`;
   const plannerSummaryLabel =
     plannerView === 'all'
       ? t('vacuum.plan.wholeHome')
       : plannerView === 'rooms'
-        ? `${selectedTargetCount} ${t('vacuum.plan.rooms')}`
+        ? formatTargetCount(selectedTargetCount)
         : `${selectedTargetCount} ${t('vacuum.plan.zones')}`;
   const resolvedTintColor =
     normalizeCustomCardTint(tintColor) ?? normalizeCustomCardTint(localTintColor);
-  const tintSurface = getCustomCardTintSurface(theme, resolvedTintColor);
   const sectionStyle = getInheritedDialogSectionStyle(theme, resolvedTintColor, accentColorValue);
-  const activeControlColor = resolvedTintColor ?? accentColorValue;
+  const activeControlColor =
+    resolvedTintColor ?? normalizeCustomCardTint(accentColorValue) ?? DEFAULT_VACUUM_ACCENT_COLOR;
   const activePillStyle = activeControlColor
     ? {
         backgroundColor: withTintAlpha(activeControlColor, theme === 'light' ? 0.14 : 0.18),
@@ -197,30 +193,12 @@ export const VacuumSettingsDialog = memo(function VacuumSettingsDialog({
       title={name}
       description={entityType}
       disableOpenAutoFocus
-      bodyClassName="p-6"
+      bodyClassName="p-6 max-sm:px-3.5 max-sm:pt-2 max-sm:pb-3"
       overlayClassName={surface.dialogBackdrop}
-      contentClassName={cn(
-        'h-auto max-h-[88vh] max-w-[42rem]',
-        surfaceGradientClassName
-          ? `bg-gradient-to-br ${surfaceGradientClassName}`
-          : dialogSurface.contentClassName,
-        surfaceBackdropClassName,
-        surfaceStateClassName,
-        surfaceBorderClassName ?? dialogSurface.contentBorderClassName
-      )}
-      contentStyle={tintSurface.panelStyle}
-      contentGlowClassName={
-        surfaceGlowClassName
-          ? `bg-gradient-to-br ${surfaceGlowClassName} to-transparent`
-          : dialogSurface.contentGlowClassName
-            ? `bg-gradient-to-br ${dialogSurface.contentGlowClassName} to-transparent`
-            : undefined
-      }
-      contentGlowStyle={tintSurface.glowStyle}
-      contentOverlayClassName={surfaceOverlayClassName ?? tintSurface.overlayClassName ?? undefined}
+      contentClassName="h-auto max-h-[85vh] max-w-md"
     >
-      <CustomScrollbar isOn={isActive}>
-        <CardDialogBody>
+      <CustomScrollbar isOn={isActive} className="max-sm:min-h-0 max-sm:flex-1">
+        <CardDialogBody className="p-0">
           <CardDialogHeader title={name} description={entityType} entityId={entityId} />
 
           <Tabs value={activeTab} defaultValue="controls" onValueChange={setActiveTab}>
@@ -241,7 +219,7 @@ export const VacuumSettingsDialog = memo(function VacuumSettingsDialog({
               </CardDialogTabTrigger>
             </CardDialogTabList>
 
-            <TabPanel value="controls" className="mt-5 space-y-6">
+            <TabPanel value="controls" className="mt-5 space-y-5">
               <VacuumStatusHeader
                 currentStatus={currentStatus}
                 plannerSummaryLabel={plannerSummaryLabel}
@@ -253,6 +231,7 @@ export const VacuumSettingsDialog = memo(function VacuumSettingsDialog({
                 onStartCleaning={onStartCleaning}
                 onPauseCleaning={onPauseCleaning}
                 softControlStyle={softControlStyle ?? undefined}
+                statusBadgeStyle={activePillStyle ?? undefined}
               />
 
               <VacuumStatusMetrics
@@ -262,18 +241,20 @@ export const VacuumSettingsDialog = memo(function VacuumSettingsDialog({
                 sectionStyle={sectionStyle ?? undefined}
               />
 
-              <VacuumPlannerSection
-                plannerView={plannerView}
-                onPlannerViewChange={setPlannerView}
-                roomTargets={roomTargets}
-                zoneTargets={zoneTargets}
-                selectedRooms={selectedRooms}
-                selectedZones={selectedZones}
-                onRoomsChange={setSelectedRooms}
-                onZonesChange={setSelectedZones}
-                sectionStyle={sectionStyle ?? undefined}
-                activePillStyle={activePillStyle ?? undefined}
-              />
+              <CardDialogSection label={t('vacuum.settings.plan')} className="mb-0">
+                <VacuumPlannerSection
+                  plannerView={plannerView}
+                  onPlannerViewChange={setPlannerView}
+                  roomTargets={roomTargets}
+                  zoneTargets={zoneTargets}
+                  selectedRooms={selectedRooms}
+                  selectedZones={selectedZones}
+                  onRoomsChange={setSelectedRooms}
+                  onZonesChange={setSelectedZones}
+                  sectionStyle={sectionStyle ?? undefined}
+                  activePillStyle={activePillStyle ?? undefined}
+                />
+              </CardDialogSection>
 
               <VacuumCleaningControls
                 cleaningMode={selectedCleaningMode}

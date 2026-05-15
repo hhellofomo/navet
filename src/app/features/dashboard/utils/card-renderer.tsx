@@ -9,7 +9,7 @@ import { PersonCard } from '@/app/features/person';
 import { SceneCard } from '@/app/features/scenes';
 import { CameraCard, CoverCard, LockCard } from '@/app/features/security';
 import { GroupedSensorCard, SensorCard, type SensorReading } from '@/app/features/sensors';
-import { VacuumCard } from '@/app/features/vacuum';
+import { VacuumCard, type VacuumStatus } from '@/app/features/vacuum';
 import { WeatherCard } from '@/app/features/weather';
 import { useHomeAssistant, useI18n } from '@/app/hooks';
 import type { HomeAssistantStore } from '@/app/stores/home-assistant-store';
@@ -268,6 +268,8 @@ const cardRegistry: Partial<Record<string, CardRenderFn>> = {
       name={device.name as string}
       room={device.room as string}
       entityPicture={device.entityPicture as string | undefined}
+      supportedFeatures={device.supportedFeatures as number | undefined}
+      isStreamCapable={device.isStreamCapable as boolean | undefined}
       size={size}
       onSizeChange={handleSizeChange}
       isEditMode={isEditMode}
@@ -323,7 +325,7 @@ const cardRegistry: Partial<Record<string, CardRenderFn>> = {
       id={device.id as string}
       name={device.name as string}
       room={device.room as string}
-      status={device.status as 'cleaning' | 'returning' | 'docked' | 'paused' | 'idle'}
+      status={device.status as VacuumStatus}
       battery={device.battery as number}
       cleanedArea={device.cleanedArea as string | undefined}
       cleaningTime={device.cleaningTime as string | undefined}

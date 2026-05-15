@@ -188,7 +188,7 @@ describe('TasksSection', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Run Brew coffee' }));
     fireEvent.click(screen.getByRole('button', { name: 'Run Movie time' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Run Good night' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Good night' }));
     fireEvent.click(screen.getByRole('switch', { name: 'Toggle Brew coffee' }));
     fireEvent.click(screen.getByRole('switch', { name: 'Toggle Night mode' }));
 

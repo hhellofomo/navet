@@ -1,93 +1,87 @@
-export type VacuumStatus = 'cleaning' | 'returning' | 'docked' | 'paused' | 'idle';
-export type VacuumThemeStatus = Exclude<VacuumStatus, 'idle'>;
+export type VacuumStatus =
+  | 'cleaning'
+  | 'mopping'
+  | 'drying'
+  | 'returning'
+  | 'docked'
+  | 'charging'
+  | 'charging-complete'
+  | 'paused'
+  | 'idle'
+  | 'error';
+export type VacuumThemeStatus = 'cleaning' | 'returning' | 'docked' | 'paused' | 'error';
 
-export interface VacuumProgressMetric {
-  labelKey:
-    | 'vacuum.status.cleaning'
-    | 'vacuum.metric.charging'
-    | 'vacuum.metric.fullyCharged'
-    | 'vacuum.settings.battery';
-  progress: number;
-  pulse: boolean;
-}
+export type VacuumStatusLabelKey =
+  | 'vacuum.status.cleaning'
+  | 'vacuum.status.mopping'
+  | 'vacuum.status.drying'
+  | 'vacuum.status.returning'
+  | 'vacuum.status.docked'
+  | 'vacuum.status.charging'
+  | 'vacuum.status.chargingComplete'
+  | 'vacuum.status.paused'
+  | 'vacuum.status.error'
+  | 'vacuum.status.idle';
 
 export function normalizeVacuumStatus(
   state: unknown,
   fallback: VacuumStatus = 'idle'
 ): VacuumStatus {
-  if (state === 'cleaning') return 'cleaning';
-  if (state === 'returning' || state === 'returning_home') return 'returning';
-  if (state === 'paused') return 'paused';
-  if (state === 'docked' || state === 'charging') return 'docked';
-  if (state === 'idle') return 'idle';
+  const normalized =
+    typeof state === 'string' ? state.trim().toLowerCase().replace(/\s+/g, '_') : '';
+
+  if (normalized === 'cleaning') return 'cleaning';
+  if (normalized === 'mopping' || normalized === 'washing' || normalized === 'washing_mop') {
+    return 'mopping';
+  }
+  if (normalized === 'drying' || normalized === 'mop_drying' || normalized === 'drying_mop') {
+    return 'drying';
+  }
+  if (normalized === 'returning' || normalized === 'returning_home') return 'returning';
+  if (normalized === 'paused') return 'paused';
+  if (normalized === 'charging') return 'charging';
+  if (
+    normalized === 'charged' ||
+    normalized === 'fully_charged' ||
+    normalized === 'charging_complete'
+  ) {
+    return 'charging-complete';
+  }
+  if (normalized === 'docked') return 'docked';
+  if (normalized === 'error' || normalized === 'fault') return 'error';
+  if (normalized === 'idle') return 'idle';
   return fallback;
 }
 
 export function getVacuumThemeStatus(status: VacuumStatus): VacuumThemeStatus {
-  return status === 'idle' ? 'docked' : status;
+  if (status === 'cleaning' || status === 'mopping') return 'cleaning';
+  if (status === 'returning') return 'returning';
+  if (status === 'paused') return 'paused';
+  if (status === 'error') return 'error';
+  return 'docked';
 }
 
-export function getVacuumStatusText(status: VacuumStatus): string {
+export function getVacuumStatusLabelKey(status: VacuumStatus): VacuumStatusLabelKey {
   switch (status) {
     case 'cleaning':
-      return 'Cleaning';
+      return 'vacuum.status.cleaning';
+    case 'mopping':
+      return 'vacuum.status.mopping';
+    case 'drying':
+      return 'vacuum.status.drying';
     case 'returning':
-      return 'Returning to dock';
+      return 'vacuum.status.returning';
     case 'docked':
-      return 'Docked';
+      return 'vacuum.status.docked';
+    case 'charging':
+      return 'vacuum.status.charging';
+    case 'charging-complete':
+      return 'vacuum.status.chargingComplete';
     case 'paused':
-      return 'Paused';
+      return 'vacuum.status.paused';
+    case 'error':
+      return 'vacuum.status.error';
     default:
-      return 'Idle';
+      return 'vacuum.status.idle';
   }
-}
-
-function clampPercentage(value: number) {
-  return Math.max(0, Math.min(100, Math.round(value)));
-}
-
-export function deriveVacuumProgressMetric({
-  status,
-  battery,
-  cleaningProgress,
-}: {
-  status: VacuumStatus;
-  battery: number;
-  cleaningProgress?: number;
-}): VacuumProgressMetric {
-  if (status === 'cleaning') {
-    return {
-      labelKey: 'vacuum.status.cleaning',
-      progress: clampPercentage(cleaningProgress ?? 0),
-      pulse: false,
-    };
-  }
-
-  if (status === 'docked') {
-    if (battery >= 100) {
-      return {
-        labelKey: 'vacuum.metric.fullyCharged',
-        progress: 100,
-        pulse: false,
-      };
-    }
-
-    return {
-      labelKey: 'vacuum.metric.charging',
-      progress: clampPercentage(battery),
-      pulse: true,
-    };
-  }
-
-  return {
-    labelKey: 'vacuum.settings.battery',
-    progress: clampPercentage(battery),
-    pulse: false,
-  };
-}
-
-export function getVacuumBatteryGradientClass(battery: number): string {
-  if (battery > 60) return 'from-green-500 to-green-600';
-  if (battery > 30) return 'from-amber-500 to-amber-600';
-  return 'from-red-500 to-red-600';
 }

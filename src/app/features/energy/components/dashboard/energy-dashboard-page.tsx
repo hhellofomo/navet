@@ -1,6 +1,7 @@
-import { Activity, AlertTriangle, CheckCircle2, Circle, PlugZap } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Flame, Leaf, PlugZap, Sun, Zap } from 'lucide-react';
 import { memo } from 'react';
 import { TabList, Tabs, TabTrigger, Text } from '@/app/components/primitives';
+import { themeColorValues } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
 import { useEnergyLoadHistory } from '../../hooks/use-energy-load-history';
@@ -24,6 +25,12 @@ interface EnergyDashboardPageProps {
 }
 
 const rangeOptions: EnergyRange[] = ['now', 'today', 'week', 'month'];
+const heroLegendColors = {
+  generated: themeColorValues.green,
+  liveLoad: themeColorValues.teal,
+  gridImport: themeColorValues.orange,
+  trackedDevices: themeColorValues.blue,
+};
 
 export const EnergyDashboardPage = memo(function EnergyDashboardPage({
   dashboard,
@@ -38,7 +45,12 @@ export const EnergyDashboardPage = memo(function EnergyDashboardPage({
   const liveWatts = Math.round(dashboard.totals.currentLoadW);
   const gridWatts = Math.round(Math.max(dashboard.totals.importW, dashboard.totals.exportW));
   const trackedKWh = dashboard.topConsumers.reduce((sum, consumer) => sum + consumer.energyKWh, 0);
-  const unavailableCount = sourceDiagnostics.filter(
+  const unavailableDeviceCount = getUnavailableDeviceDiagnostics(
+    dashboard.topConsumers,
+    sourceDiagnostics
+  ).length;
+  const trackedDeviceCount = dashboard.topConsumers.length + unavailableDeviceCount;
+  const sourceUnavailableCount = getSourceDiagnostics(sourceDiagnostics).filter(
     (source) => source.status === 'configured_unavailable'
   ).length;
 
@@ -48,7 +60,7 @@ export const EnergyDashboardPage = memo(function EnergyDashboardPage({
         className={`overflow-hidden rounded-[28px] border ${surface.border} ${surface.panel} ${surface.cardShadow}`}
       >
         <div className="grid min-h-[28rem] gap-8 p-5 md:p-8 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)]">
-          <div className="min-w-0">
+          <div className="flex min-w-0 flex-col">
             <p
               className={`text-[11px] font-semibold uppercase tracking-[0.2em] md:text-xs md:tracking-[0.24em] ${surface.textMuted}`}
             >
@@ -65,48 +77,72 @@ export const EnergyDashboardPage = memo(function EnergyDashboardPage({
               <MinimalStat
                 label="Used now"
                 value={`${liveWatts} W`}
-                dotClassName="bg-teal-400"
+                dotColor={heroLegendColors.liveLoad}
                 className="min-w-[10.5rem]"
                 surfaceText={surface.textSecondary}
               />
               <MinimalStat
                 label="Imported today"
                 value={`${formatEnergyValue(dashboard.totals.importTodayKWh)} kWh`}
-                dotClassName="bg-amber-400"
+                dotColor={heroLegendColors.gridImport}
                 className="min-w-[12.5rem]"
                 surfaceText={surface.textSecondary}
               />
+              {dashboard.totals.solarTodayKWh > 0 ? (
+                <MinimalStat
+                  label="Generated today"
+                  value={`${formatEnergyValue(dashboard.totals.solarTodayKWh)} kWh`}
+                  dotColor={heroLegendColors.generated}
+                  className="min-w-[13rem]"
+                  surfaceText={surface.textSecondary}
+                />
+              ) : null}
               <MinimalStat
                 label="Tracked devices"
-                value={`${dashboard.topConsumers.length}`}
-                dotClassName="bg-sky-400"
+                value={`${trackedDeviceCount}`}
+                dotColor={heroLegendColors.trackedDevices}
                 surfaceText={surface.textSecondary}
               />
             </div>
 
-            <div className="hidden pt-10 xl:block">
-              <DeviceTable consumers={dashboard.topConsumers} surface={surface} />
+            <div className="mt-auto hidden pt-10 xl:block">
+              <DeviceTable
+                accentColor={accentColor}
+                consumers={dashboard.topConsumers}
+                gridImportTodayKWh={dashboard.totals.importTodayKWh}
+                sourceDiagnostics={sourceDiagnostics}
+                surface={surface}
+              />
             </div>
           </div>
 
-          <div className="grid min-w-0 gap-4">
+          <div className="grid min-w-0 gap-6 content-start">
             <LoadOrb
+              generatedColor={heroLegendColors.generated}
+              generatedTodayKWh={dashboard.totals.solarTodayKWh}
               loadW={liveWatts}
               todayKWh={dashboard.totals.importTodayKWh}
-              accentColor={accentColor}
-              gridImportW={dashboard.totals.importW}
-              solarW={dashboard.totals.solarW}
+              importColor={heroLegendColors.gridImport}
               surface={surface}
+              trackedColor={heroLegendColors.trackedDevices}
+              trackedTodayKWh={trackedKWh}
             />
             <SourceDiagnostics
+              accentColor={accentColor}
               sources={sourceDiagnostics}
-              unavailableCount={unavailableCount}
+              unavailableCount={sourceUnavailableCount}
               surface={surface}
             />
           </div>
 
           <div className="xl:hidden">
-            <DeviceTable consumers={dashboard.topConsumers} surface={surface} />
+            <DeviceTable
+              accentColor={accentColor}
+              consumers={dashboard.topConsumers}
+              gridImportTodayKWh={dashboard.totals.importTodayKWh}
+              sourceDiagnostics={sourceDiagnostics}
+              surface={surface}
+            />
           </div>
         </div>
       </section>
@@ -193,7 +229,7 @@ function CompactLoadSparklines({
     <section
       className={`rounded-[28px] border p-5 ${surface.border} ${surface.panel} ${surface.cardShadow}`}
     >
-      <div className="mb-4 flex items-end justify-between gap-4">
+      <div className="mb-4">
         <div>
           <div
             className={`text-[11px] font-semibold uppercase tracking-[0.18em] ${surface.textMuted}`}
@@ -201,9 +237,6 @@ function CompactLoadSparklines({
             Live use
           </div>
           <h2 className={`mt-2 text-lg font-semibold ${surface.textPrimary}`}>Sparklines</h2>
-        </div>
-        <div className={`text-right text-sm font-semibold ${surface.textPrimary}`}>
-          {Math.round(wholeHomeCurrentW)} W
         </div>
       </div>
 
@@ -252,19 +285,19 @@ function DeviceSparklineRow({
 function MinimalStat({
   label,
   value,
-  dotClassName,
+  dotColor,
   className = '',
   surfaceText,
 }: {
   label: string;
   value: string;
-  dotClassName: string;
+  dotColor: string;
   className?: string;
   surfaceText: string;
 }) {
   return (
     <div className={`flex items-center gap-2 text-sm ${surfaceText} ${className}`}>
-      <span className={`h-2 w-2 rounded-full ${dotClassName}`} />
+      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: dotColor }} />
       <span className="font-semibold tabular-nums">{value}</span>
       <span>{label}</span>
     </div>
@@ -272,23 +305,30 @@ function MinimalStat({
 }
 
 function LoadOrb({
+  generatedColor,
+  generatedTodayKWh,
+  importColor,
   loadW,
   todayKWh,
-  accentColor,
-  gridImportW,
-  solarW,
   surface,
+  trackedColor,
+  trackedTodayKWh,
 }: {
+  generatedColor: string;
+  generatedTodayKWh: number;
+  importColor: string;
   loadW: number;
   todayKWh: number;
-  accentColor: string;
-  gridImportW: number;
-  solarW: number;
   surface: ReturnType<typeof getThemeSurfaceTokens>;
+  trackedColor: string;
+  trackedTodayKWh: number;
 }) {
   const dots = buildOrbDots();
-  const hasSolarContribution = solarW > 0 && solarW >= gridImportW;
-  const generatedColor = '#0f9f9a';
+  const orbShares = getLoadOrbShares({
+    generatedKWh: generatedTodayKWh,
+    importedKWh: todayKWh,
+    trackedKWh: trackedTodayKWh,
+  });
 
   return (
     <div className="relative flex min-h-[19rem] min-w-0 items-center justify-center overflow-hidden">
@@ -298,11 +338,13 @@ function LoadOrb({
             key={dot.id}
             className="absolute rounded-full"
             style={{
-              backgroundColor: hasSolarContribution
-                ? dot.tone === 'accent'
-                  ? accentColor
-                  : generatedColor
-                : accentColor,
+              backgroundColor: getLoadOrbDotColor({
+                angle: dot.angle,
+                generatedColor,
+                importColor,
+                shares: orbShares,
+                trackedColor,
+              }),
               height: dot.size,
               left: `calc(50% + ${dot.x}px)`,
               opacity: dot.opacity,
@@ -329,12 +371,20 @@ function LoadOrb({
 }
 
 function DeviceTable({
+  accentColor,
   consumers,
+  gridImportTodayKWh,
+  sourceDiagnostics,
   surface,
 }: {
+  accentColor: string;
   consumers: EnergyConsumer[];
+  gridImportTodayKWh: number;
+  sourceDiagnostics: EnergySourceDiagnostic[];
   surface: ReturnType<typeof getThemeSurfaceTokens>;
 }) {
+  const unavailableDevices = getUnavailableDeviceDiagnostics(consumers, sourceDiagnostics);
+
   return (
     <section className="min-w-0">
       <div className="mb-3">
@@ -370,12 +420,11 @@ function DeviceTable({
                       {consumer.name}
                     </div>
                     <div className={`truncate text-xs sm:block ${surface.textMuted}`}>
-                      {consumer.status === 'active' ? 'Active' : 'Idle'} ·{' '}
-                      {formatEnergyPercent(consumer.shareOfLoad * 100)}% of live load
+                      {getDeviceUsageSubtitle(consumer, gridImportTodayKWh)}
                     </div>
                   </div>
                   <div className="flex shrink-0 justify-end sm:hidden">
-                    <DeviceStatusSwitch status={consumer.status} />
+                    <DeviceStatusSwitch accentColor={accentColor} status={consumer.status} />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3 sm:contents">
@@ -395,23 +444,83 @@ function DeviceTable({
                   </div>
                 </div>
                 <div className="hidden justify-end sm:flex">
-                  <DeviceStatusSwitch status={consumer.status} />
+                  <DeviceStatusSwitch accentColor={accentColor} status={consumer.status} />
                 </div>
               </div>
             ))}
           </>
         )}
+        {unavailableDevices.length > 0 ? (
+          <div className={`border-t ${surface.border}`}>
+            {unavailableDevices.map((device, index) => (
+              <div
+                key={device.id}
+                className={`grid gap-3 px-4 py-3 text-sm sm:grid-cols-[minmax(0,1fr)_5rem_5rem_4rem] sm:items-center ${
+                  consumers.length === 0 && index % 2 === 0 ? surface.subtleBg : ''
+                }`}
+              >
+                <div className="min-w-0 sm:col-span-2">
+                  <div className={`truncate font-medium ${surface.textSecondary}`}>
+                    {device.label}
+                  </div>
+                  <div className={`truncate text-xs ${surface.textMuted}`}>Unavailable</div>
+                </div>
+                <div className={`hidden text-right text-sm sm:block ${surface.textMuted}`}>-</div>
+                <div className={`text-xs font-medium sm:text-right ${surface.textMuted}`}>
+                  Unavailable
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : null}
       </div>
     </section>
   );
 }
 
-function DeviceStatusSwitch({ status }: { status: EnergyConsumer['status'] }) {
+function getDeviceUsageSubtitle(consumer: EnergyConsumer, gridImportTodayKWh: number) {
+  if (consumer.status === 'active') {
+    return `Active · ${formatEnergyPercent(consumer.shareOfLoad * 100)}% of live load`;
+  }
+
+  if (consumer.energyKWh > 0) {
+    const gridShare =
+      gridImportTodayKWh > 0
+        ? formatEnergyPercent((consumer.energyKWh / gridImportTodayKWh) * 100)
+        : null;
+    return gridShare
+      ? `Idle · ${gridShare}% of grid consumed today`
+      : `Idle · ${formatEnergyValue(consumer.energyKWh)} kWh today`;
+  }
+
+  return 'Idle · no live draw';
+}
+
+function getUnavailableDeviceDiagnostics(
+  consumers: EnergyConsumer[],
+  sourceDiagnostics: EnergySourceDiagnostic[]
+) {
+  const visibleConsumerIds = new Set(consumers.map((consumer) => consumer.id));
+  return sourceDiagnostics.filter(
+    (source) =>
+      source.id.startsWith('device:') &&
+      source.status === 'configured_unavailable' &&
+      source.entityId &&
+      !visibleConsumerIds.has(source.entityId)
+  );
+}
+
+function DeviceStatusSwitch({
+  accentColor,
+  status,
+}: {
+  accentColor: string;
+  status: EnergyConsumer['status'];
+}) {
   return (
     <span
-      className={`inline-flex h-5 w-9 items-center rounded-full p-0.5 ${
-        status === 'active' ? 'bg-teal-400/80' : 'bg-white/18'
-      }`}
+      className="inline-flex h-5 w-9 items-center rounded-full bg-white/18 p-0.5"
+      style={status === 'active' ? { backgroundColor: `${accentColor}cc` } : undefined}
     >
       <span
         className={`h-4 w-4 rounded-full bg-white transition-transform ${
@@ -423,14 +532,18 @@ function DeviceStatusSwitch({ status }: { status: EnergyConsumer['status'] }) {
 }
 
 function SourceDiagnostics({
+  accentColor,
   sources,
   unavailableCount,
   surface,
 }: {
+  accentColor: string;
   sources: EnergySourceDiagnostic[];
   unavailableCount: number;
   surface: ReturnType<typeof getThemeSurfaceTokens>;
 }) {
+  const sourceRows = getSourceDiagnostics(sources);
+
   return (
     <section
       className={`min-w-0 overflow-hidden rounded-[24px] border p-4 ${surface.border} ${surface.panelMuted}`}
@@ -446,7 +559,10 @@ function SourceDiagnostics({
             {unavailableCount} unavailable
           </div>
         ) : (
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-teal-400/15 px-2.5 py-1 text-xs font-medium text-teal-300">
+          <div
+            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"
+            style={{ backgroundColor: `${accentColor}24`, color: accentColor }}
+          >
             <CheckCircle2 className="h-3.5 w-3.5" />
             Ready
           </div>
@@ -454,18 +570,10 @@ function SourceDiagnostics({
       </div>
 
       <div className="mt-4 grid gap-2">
-        {sources.map((source) => (
+        {sourceRows.map((source) => (
           <div key={source.id} className="flex min-w-0 items-center justify-between gap-3 text-sm">
             <div className="flex min-w-0 items-center gap-2">
-              {source.status === 'configured_unavailable' ? (
-                <AlertTriangle className="h-4 w-4 shrink-0 text-amber-300" />
-              ) : source.currentPowerW && source.currentPowerW > 0 ? (
-                <Activity className="h-4 w-4 shrink-0 text-teal-300" />
-              ) : source.id.startsWith('device:') ? (
-                <PlugZap className="h-4 w-4 shrink-0 text-sky-300" />
-              ) : (
-                <Circle className="h-4 w-4 shrink-0 text-white/40" />
-              )}
+              <SourceIcon source={source} accentColor={accentColor} />
               <div className="min-w-0">
                 <div className={`truncate font-medium ${surface.textPrimary}`}>{source.label}</div>
                 <div className={`truncate text-xs ${surface.textMuted}`}>
@@ -481,6 +589,38 @@ function SourceDiagnostics({
       </div>
     </section>
   );
+}
+
+function SourceIcon({
+  accentColor,
+  source,
+}: {
+  accentColor: string;
+  source: EnergySourceDiagnostic;
+}) {
+  if (source.status === 'configured_unavailable') {
+    return <AlertTriangle className="h-4 w-4 shrink-0 text-amber-300" />;
+  }
+
+  const iconClassName = 'h-4 w-4 shrink-0';
+  if (source.id === 'grid-import') {
+    return <Zap className={iconClassName} style={{ color: accentColor }} />;
+  }
+  if (source.id === 'grid-export') {
+    return <PlugZap className={`${iconClassName} text-amber-300`} />;
+  }
+  if (source.id === 'solar') {
+    return <Sun className={iconClassName} style={{ color: themeColorValues.yellow }} />;
+  }
+  if (source.id === 'gas') {
+    return <Flame className={iconClassName} style={{ color: themeColorValues.red }} />;
+  }
+
+  return <Leaf className={iconClassName} style={{ color: themeColorValues.green }} />;
+}
+
+function getSourceDiagnostics(sourceDiagnostics: EnergySourceDiagnostic[]) {
+  return sourceDiagnostics.filter((source) => !source.id.startsWith('device:'));
 }
 
 function RangeRow({
@@ -533,10 +673,10 @@ function rangeLabel(range: EnergyRange) {
 
 function buildOrbDots() {
   const dots: Array<{
+    angle: number;
     id: string;
     opacity: number;
     size: number;
-    tone: 'accent' | 'teal';
     x: number;
     y: number;
   }> = [];
@@ -546,12 +686,11 @@ function buildOrbDots() {
     const count = 18 + ring * 8;
     for (let index = 0; index < count; index += 1) {
       const angle = (index / count) * Math.PI * 2 - Math.PI / 2;
-      const sideBias = Math.cos(angle) > 0.28;
       dots.push({
+        angle,
         id: `${ring}:${index}`,
         opacity: 0.9 - ring * 0.12,
         size: 4 + (4 - ring) * 1.2,
-        tone: sideBias ? 'accent' : 'teal',
         x: Math.cos(angle) * radius,
         y: Math.sin(angle) * radius,
       });
@@ -559,4 +698,76 @@ function buildOrbDots() {
   }
 
   return dots;
+}
+
+function getLoadOrbDotColor({
+  angle,
+  generatedColor,
+  importColor,
+  shares,
+  trackedColor,
+}: {
+  angle: number;
+  generatedColor: string;
+  importColor: string;
+  shares: LoadOrbShares;
+  trackedColor: string;
+}) {
+  const progress = (angle + Math.PI) / (Math.PI * 2);
+
+  if (progress <= shares.generated) {
+    return generatedColor;
+  }
+
+  if (progress <= shares.generated + shares.imported) {
+    return importColor;
+  }
+
+  if (shares.tracked > 0) {
+    return trackedColor;
+  }
+
+  return importColor;
+}
+
+interface LoadOrbShares {
+  generated: number;
+  imported: number;
+  tracked: number;
+}
+
+function getLoadOrbShares({
+  generatedKWh,
+  importedKWh,
+  trackedKWh,
+}: {
+  generatedKWh: number;
+  importedKWh: number;
+  trackedKWh: number;
+}): LoadOrbShares {
+  const raw = {
+    generated: Math.max(0, generatedKWh),
+    imported: Math.max(0, importedKWh),
+    tracked: Math.max(0, trackedKWh),
+  };
+  const total = raw.generated + raw.imported + raw.tracked;
+
+  if (total <= 0) {
+    return { generated: 0, imported: 1, tracked: 0 };
+  }
+
+  const presentEntries = Object.entries(raw).filter(([, value]) => value > 0) as Array<
+    [keyof LoadOrbShares, number]
+  >;
+  const minVisibleShare = 0.08;
+  const reserved = presentEntries.length * minVisibleShare;
+  const remaining = Math.max(0, 1 - reserved);
+
+  return presentEntries.reduce<LoadOrbShares>(
+    (shares, [key, value]) => {
+      shares[key] = minVisibleShare + (value / total) * remaining;
+      return shares;
+    },
+    { generated: 0, imported: 0, tracked: 0 }
+  );
 }

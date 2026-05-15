@@ -1,7 +1,9 @@
-import { Clapperboard, Play, ScrollText } from 'lucide-react';
+import { Clapperboard, Play } from 'lucide-react';
 import { useState } from 'react';
 import { Button, Panel, Tag } from '@/app/components/primitives';
+import { getDashboardCardFootprint } from '@/app/components/shared/card-size-selector';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { SwitchCard } from '@/app/features/lighting';
 import { useI18n, useServiceActionHandler, useTheme } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 import type { QuickActionRoutine } from '../types';
@@ -16,13 +18,43 @@ interface QuickActionCardProps {
   shouldReduceMotion: boolean;
 }
 
+const smallScriptCardFootprint = getDashboardCardFootprint('small');
+
+function ScriptQuickActionCard({ action }: { action: QuickActionRoutine }) {
+  const { t } = useI18n();
+
+  return (
+    <div
+      style={{
+        height: `${smallScriptCardFootprint.heightPx}px`,
+        minHeight: `${smallScriptCardFootprint.heightPx}px`,
+      }}
+    >
+      <SwitchCard
+        id={action.id}
+        name={action.name}
+        size="small"
+        initialState={action.state === 'on'}
+        entityType={t('deviceType.script')}
+        serviceDomain="script"
+        serviceAction="turn_on"
+        isEditMode={false}
+      />
+    </div>
+  );
+}
+
 function QuickActionCard({ action, shouldReduceMotion }: QuickActionCardProps) {
   const { t } = useI18n();
-  const { theme } = useTheme();
+  const { theme, accentColor } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const runAction = useServiceActionHandler();
   const [isRunning, setIsRunning] = useState(false);
-  const Icon = action.type === 'scene' ? Clapperboard : ScrollText;
+  const Icon = Clapperboard;
+
+  if (action.type === 'script') {
+    return <ScriptQuickActionCard action={action} />;
+  }
 
   const handleRun = () => {
     setIsRunning(true);
@@ -44,8 +76,11 @@ function QuickActionCard({ action, shouldReduceMotion }: QuickActionCardProps) {
       }`}
     >
       <div className="flex items-start justify-between gap-4">
-        <div className={`rounded-2xl border p-2.5 ${surface.border} ${surface.panel}`}>
-          <Icon className={`h-4 w-4 ${surface.textSecondary}`} aria-hidden="true" />
+        <div
+          className="rounded-2xl border p-2.5"
+          style={{ backgroundColor: `${accentColor}18`, borderColor: `${accentColor}38` }}
+        >
+          <Icon className="h-4 w-4" style={{ color: accentColor }} aria-hidden="true" />
         </div>
         <Tag tone="accent">{action.type}</Tag>
       </div>
@@ -54,7 +89,7 @@ function QuickActionCard({ action, shouldReduceMotion }: QuickActionCardProps) {
         <p className={`mt-2 text-sm ${surface.textSecondary}`}>{action.room}</p>
       </div>
       <Button
-        variant="secondary"
+        variant="primary"
         size="small"
         leading={<Play className="h-4 w-4" aria-hidden="true" />}
         loading={isRunning}

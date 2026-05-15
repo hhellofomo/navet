@@ -54,9 +54,11 @@ export const DashboardCardItem = memo(function DashboardCardItem({
   const ambientLightBleed = useSettingsStore(settingsSelectors.ambientLightBleed);
   const RemoveActionIcon = usesHideAction ? EyeOff : X;
   const removeAriaLabel = t('dashboard.edit.removeEntityFromDashboard');
-  const spanClass = getCardSpanClass(size);
-  const editControlSize = device?.type === 'media' && size === 'medium-vertical' ? 'medium' : size;
   const allowedSizes = getAllowedSizes(device, card, allowExtraLargeSizes);
+  const resolvedSize = resolveAllowedSize(size, allowedSizes);
+  const spanClass = getCardSpanClass(resolvedSize);
+  const editControlSize =
+    device?.type === 'media' && resolvedSize === 'medium-vertical' ? 'medium' : resolvedSize;
 
   // Drag is only enabled in edit mode when the card is inside a zone band.
   const draggable = isEditMode && zone !== undefined;
@@ -98,16 +100,20 @@ export const DashboardCardItem = memo(function DashboardCardItem({
       )}
       {isEditMode ? (
         <DashboardResizeTrigger
-          cardSize={size}
+          cardSize={resolvedSize}
           triggerSize={editControlSize}
           allowedSizes={allowedSizes}
           onSizeChange={(nextSize) => handleSizeChange(id, nextSize)}
         />
       ) : null}
       {device
-        ? renderCard({ device, size, handleSizeChange, isEditMode })
+        ? renderCard({ device, size: resolvedSize, handleSizeChange, isEditMode })
         : card && (
-            <WidgetCard card={{ ...card, size }} isEditMode={isEditMode} onUpdate={onUpdateCard} />
+            <WidgetCard
+              card={{ ...card, size: resolvedSize }}
+              isEditMode={isEditMode}
+              onUpdate={onUpdateCard}
+            />
           )}
     </>
   );
@@ -178,10 +184,14 @@ function getAllowedSizes(
       return ['small', 'medium', 'large'];
     case 'weather':
       return ['small', 'medium', 'large'];
+    case 'vacuums':
+      return ['small', 'medium'];
     case 'switches':
       return ['tiny', 'extra-small', 'small'];
     case 'helpers':
       return ['tiny', 'extra-small', 'small'];
+    case 'lights':
+      return ['extra-small', 'small', 'medium'];
     case 'persons':
       return ['tiny', 'extra-small', 'small'];
     case 'locks':
@@ -191,6 +201,21 @@ function getAllowedSizes(
     default:
       return ['extra-small', 'small', 'medium', 'large'];
   }
+}
+
+function resolveAllowedSize(size: CardSize, allowedSizes: CardSize[]) {
+  if (allowedSizes.includes(size)) {
+    return size;
+  }
+
+  if (
+    (size === 'large' || size === 'extra-large' || size === 'medium-vertical') &&
+    allowedSizes.includes('medium')
+  ) {
+    return 'medium';
+  }
+
+  return allowedSizes[0] ?? size;
 }
 
 function areDashboardCardItemPropsEqual(

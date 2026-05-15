@@ -25,10 +25,6 @@ function VacuumSettingsDialogStory(
         onClose={() => setIsOpen(false)}
         tintColor={tintColor}
         onTintColorChange={setTintColor}
-        surfaceGradientClassName="from-white/24 via-cyan-200/18 to-white/10"
-        surfaceBorderClassName="border-white/22"
-        surfaceBackdropClassName="backdrop-blur-2xl saturate-[1.18]"
-        surfaceGlowClassName="from-cyan-200/18"
       />
     </SettingsDialogStoryFrame>
   );

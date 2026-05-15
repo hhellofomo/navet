@@ -20,12 +20,23 @@ interface DetailSectionProps {
   error: string | null;
   emptyLabel: string;
   surface: ReturnType<typeof getThemeSurfaceTokens>;
+  accentColor: string;
 }
 
-function DetailSection({ title, items, loading, error, emptyLabel, surface }: DetailSectionProps) {
+function DetailSection({
+  title,
+  items,
+  loading,
+  error,
+  emptyLabel,
+  surface,
+  accentColor,
+}: DetailSectionProps) {
   return (
     <Panel muted padded={false} className="grid gap-3 p-4">
-      <div className={`text-[11px] font-semibold uppercase ${surface.textMuted}`}>{title}</div>
+      <div className="text-[11px] font-semibold uppercase" style={{ color: accentColor }}>
+        {title}
+      </div>
       {loading ? (
         <p className={`text-sm ${surface.textSecondary}`}>{emptyLabel}</p>
       ) : error ? (
@@ -34,7 +45,7 @@ function DetailSection({ title, items, loading, error, emptyLabel, surface }: De
         <ol className={`space-y-2 text-sm leading-6 ${surface.textPrimary}`}>
           {items.map((item, index) => (
             <li key={`${title}-${index}`} className="flex gap-3">
-              <span className={`mt-0.5 text-xs font-semibold ${surface.textMuted}`}>
+              <span className="mt-0.5 text-xs font-semibold" style={{ color: accentColor }}>
                 {index + 1}
               </span>
               <span>{item}</span>
@@ -50,7 +61,7 @@ function DetailSection({ title, items, loading, error, emptyLabel, surface }: De
 
 export function AutomationTaskRow({ automation, shouldReduceMotion }: AutomationTaskRowProps) {
   const { formatDateTime, t } = useI18n();
-  const { theme } = useTheme();
+  const { theme, accentColor } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const entities = useHomeAssistant(homeAssistantSelectors.entities);
   const runAction = useServiceActionHandler();
@@ -162,7 +173,7 @@ export function AutomationTaskRow({ automation, shouldReduceMotion }: Automation
             <h3 className={`truncate text-base font-semibold ${surface.textPrimary}`}>
               {automation.name}
             </h3>
-            <Badge tone={automation.enabled ? 'success' : 'neutral'}>
+            <Badge tone={automation.enabled ? 'accent' : 'neutral'}>
               {automation.enabled ? t('tasks.automation.enabled') : t('tasks.automation.disabled')}
             </Badge>
           </div>
@@ -214,7 +225,10 @@ export function AutomationTaskRow({ automation, shouldReduceMotion }: Automation
       </div>
 
       {isDetailsOpen ? (
-        <div className="grid gap-3 border-t border-white/10 pt-4 md:grid-cols-2">
+        <div
+          className="grid gap-3 border-t pt-4 md:grid-cols-2"
+          style={{ borderColor: `${accentColor}26` }}
+        >
           <DetailSection
             title={t('tasks.automation.details.when')}
             items={configSections.triggers}
@@ -222,6 +236,7 @@ export function AutomationTaskRow({ automation, shouldReduceMotion }: Automation
             error={detailsError}
             emptyLabel={t('tasks.automation.details.none')}
             surface={surface}
+            accentColor={accentColor}
           />
           <DetailSection
             title={t('tasks.automation.details.if')}
@@ -230,6 +245,7 @@ export function AutomationTaskRow({ automation, shouldReduceMotion }: Automation
             error={detailsError}
             emptyLabel={t('tasks.automation.details.none')}
             surface={surface}
+            accentColor={accentColor}
           />
           <DetailSection
             title={t('tasks.automation.details.then')}
@@ -238,9 +254,10 @@ export function AutomationTaskRow({ automation, shouldReduceMotion }: Automation
             error={detailsError}
             emptyLabel={t('tasks.automation.details.none')}
             surface={surface}
+            accentColor={accentColor}
           />
           <Panel muted padded={false} className="grid gap-2 p-4">
-            <div className={`text-[11px] font-semibold uppercase ${surface.textMuted}`}>
+            <div className="text-[11px] font-semibold uppercase" style={{ color: accentColor }}>
               {t('tasks.automation.details.diagnostics')}
             </div>
             <dl className={`grid gap-2 text-sm ${surface.textSecondary}`}>

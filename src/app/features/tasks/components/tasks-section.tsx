@@ -1,4 +1,5 @@
-import { Bot, ClipboardList, Clock3, Power, PowerOff } from 'lucide-react';
+import { Bot, ClipboardList, Clock3, type LucideIcon, Power, PowerOff } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 import { DashboardEmptyState, DashboardHeroSection, SectionCard } from '@/app/components/patterns';
 import { Badge, InteractivePill, MessageBar, Panel } from '@/app/components/primitives';
@@ -12,6 +13,36 @@ type AutomationVisibilityFilter = 'all' | 'active' | 'inactive';
 
 const automationFilterPillClassName =
   'shrink-0 whitespace-nowrap md:h-9 md:gap-1.5 md:px-3.5 md:text-sm [&>svg]:md:h-4 [&>svg]:md:w-4';
+
+function AutomationHeroStatBadge({
+  active = false,
+  accentColor,
+  children,
+  icon: Icon,
+}: {
+  active?: boolean;
+  accentColor: string;
+  children: ReactNode;
+  icon: LucideIcon;
+}) {
+  return (
+    <span
+      className="inline-flex h-[26px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 text-xs font-semibold leading-none"
+      style={{
+        backgroundColor: active ? `${accentColor}12` : 'rgba(255,255,255,0.04)',
+        borderColor: active ? `${accentColor}48` : 'rgba(255,255,255,0.1)',
+        color: active ? '#ffffff' : undefined,
+      }}
+    >
+      <Icon
+        className="h-3.5 w-3.5 shrink-0"
+        style={{ color: active ? accentColor : undefined }}
+        aria-hidden="true"
+      />
+      {children}
+    </span>
+  );
+}
 
 function TasksLoadingState() {
   const { theme } = useTheme();
@@ -118,18 +149,15 @@ export function TasksSection() {
           actionsClassName="hidden md:flex"
           actions={
             <>
-              <Badge className="shrink-0 whitespace-nowrap">
-                <Bot className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
+              <AutomationHeroStatBadge accentColor={accentColor} icon={Bot}>
                 {controller.automations.length} {t('sections.tasks.automations.plural')}
-              </Badge>
-              <Badge tone="success" className="shrink-0 whitespace-nowrap">
-                <Power className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
+              </AutomationHeroStatBadge>
+              <AutomationHeroStatBadge active accentColor={accentColor} icon={Power}>
                 {controller.enabledAutomations.length} {t('tasks.hero.active')}
-              </Badge>
-              <Badge className="shrink-0 whitespace-nowrap">
-                <PowerOff className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
+              </AutomationHeroStatBadge>
+              <AutomationHeroStatBadge accentColor={accentColor} icon={PowerOff}>
                 {controller.disabledAutomations.length} {t('tasks.filters.disabled')}
-              </Badge>
+              </AutomationHeroStatBadge>
             </>
           }
           aside={

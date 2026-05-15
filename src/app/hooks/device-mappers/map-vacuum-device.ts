@@ -1,4 +1,5 @@
 import type { HassEntity } from 'home-assistant-js-websocket';
+import { normalizeVacuumStatus } from '@/app/features/vacuum';
 import type { VacuumDevice } from '../../types/device.types';
 import { parseNumberish } from '../ha-entity-utils';
 
@@ -17,7 +18,10 @@ export function mapVacuumDevice(
   name: string,
   room: string
 ): VacuumDevice {
-  const batteryLevel = parseNumberish(entity.attributes?.battery_level);
+  const batteryLevel =
+    parseNumberish(entity.attributes?.battery_level) ??
+    parseNumberish(entity.attributes?.battery) ??
+    parseNumberish(entity.attributes?.battery_percent);
   const cleanedAreaValue =
     parseNumberish(entity.attributes?.cleaned_area) ??
     parseNumberish(entity.attributes?.cleaned_area_today) ??
@@ -47,16 +51,9 @@ export function mapVacuumDevice(
     'bin_fullness',
   ]);
 
-  const normalizedStatus: VacuumDevice['status'] =
-    entity.state === 'cleaning'
-      ? 'cleaning'
-      : entity.state === 'returning'
-        ? 'returning'
-        : entity.state === 'docked'
-          ? 'docked'
-          : entity.state === 'paused'
-            ? 'paused'
-            : 'idle';
+  const normalizedStatus = normalizeVacuumStatus(
+    readFirst(entity.attributes, ['status', 'state', 'activity']) ?? entity.state
+  );
 
   return {
     id: entityId,

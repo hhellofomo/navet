@@ -183,7 +183,8 @@ function buildConsumers(
     .filter((device) => {
       const energyValue = parseNumberState(entities?.[device.entityId]?.state);
       const powerValue = parseNumberState(entities?.[device.powerEntityId ?? '']?.state);
-      return energyValue !== null || powerValue !== null;
+      const statisticsEnergyKWh = todayKWh[device.entityId];
+      return energyValue !== null || powerValue !== null || (statisticsEnergyKWh ?? 0) > 0;
     })
     .map((device) => {
       const powerW = parseW(entities?.[device.powerEntityId ?? '']?.state);
@@ -303,6 +304,7 @@ export function useEnergyHaData(range: EnergyRange): {
 } {
   const connection = useHomeAssistant(homeAssistantSelectors.connection);
   const allEntities = useHomeAssistant(homeAssistantSelectors.entities);
+  const entityRegistry = useHomeAssistant(homeAssistantSelectors.entityRegistry, shallow);
   const [haSourceConfig, setHaSourceConfig] = useState<EnergySourceConfig | null>(null);
 
   useEffect(() => {
@@ -339,9 +341,9 @@ export function useEnergyHaData(range: EnergyRange): {
   const runtimeSourceConfig = useMemo(
     () =>
       haSourceConfig && allEntities
-        ? augmentConfigWithLivePowerEntities(haSourceConfig, allEntities)
+        ? augmentConfigWithLivePowerEntities(haSourceConfig, allEntities, entityRegistry)
         : haSourceConfig,
-    [allEntities, haSourceConfig]
+    [allEntities, entityRegistry, haSourceConfig]
   );
 
   // Build the list of entity IDs that are directly named in the config. This
