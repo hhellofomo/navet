@@ -25,6 +25,7 @@ Navet should grow an internal component workshop before it grows a package works
 - Storybook manager UI, docs pages, and canvas default to dark mode
 - Token stories should document all four Navet themes: glass, dark, light, and black
 - Storybook docs and examples should prefer `@/app/ui-kit/*` imports when a stable shared export exists
+- Detailed story placement, fixture, and review rules live in `docs/STORYBOOK_WORKFLOW.md`
 
 ## Story File Placement
 
@@ -61,6 +62,7 @@ The code foundation now groups stable exports into three buckets:
   - curated public export surface for Storybook navigation and cross-app discovery
 - `src/app/ui-kit/`
   - canonical developer import surface that re-exports stable primitives, patterns, and tokens
+  - concept stories for starting points, stable export inventory, and common composition recipes
 - `src/app/components/system/tokens/`
   - theme surface helpers, accent shell treatments, color helpers, and style calculators
 

@@ -1,5 +1,43 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
+const layerCards = [
+  {
+    title: 'Primitives',
+    importPath: '@/app/ui-kit/primitives',
+    description:
+      'Small reusable controls and surfaces: buttons, fields, card shells, tabs, pills, modal shells, and card header parts.',
+  },
+  {
+    title: 'Patterns',
+    importPath: '@/app/ui-kit/patterns',
+    description:
+      'Reusable compositions that encode Navet layout intent: section cards, field blocks, dialog sections, empty states, and preview frames.',
+  },
+  {
+    title: 'Tokens',
+    importPath: '@/app/ui-kit/tokens',
+    description:
+      'Theme-aware helpers for surfaces, spacing, focus rings, radius choices, card states, and interaction treatments.',
+  },
+];
+
+const workflowSteps = [
+  'Check the primitive and pattern stories before authoring new UI.',
+  'Keep behavior inside the owning feature unless the UI is reusable across features.',
+  'Expose stable shared pieces through the UI-kit entrypoints.',
+  'Update colocated stories and the UI-kit inventory when an export becomes stable.',
+  'Run pnpm check:stories after changing Storybook structure or adding stories.',
+];
+
+const storybookSurfaces = [
+  ['Concepts', 'UI-kit discovery, recipes, and contribution guidance'],
+  ['Theme', 'Foundations, surface helpers, typography, motion, colors, and card-state tokens'],
+  ['Components', 'Primitives, patterns, shared app controls, and UI wrappers'],
+  ['App Shell', 'Header, sidebar, room navigation, search, notifications, and section controls'],
+  ['Cards', 'Entity cards, custom dashboard widgets, catalogs, sizes, and state matrices'],
+  ['Pages', 'Dashboard flows, settings sections, energy pages, and feature-level compositions'],
+];
+
 function StartHereStory() {
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -16,52 +54,75 @@ function StartHereStory() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <article className="rounded-[24px] border border-white/10 bg-white/5 p-5">
-          <h2 className="text-lg font-semibold text-white">Primitives</h2>
-          <p className="mt-2 text-sm leading-6 text-white/74">
-            Buttons, inputs, tabs, modal shells, sheet shells, and shared surface containers.
-          </p>
-          <pre className="mt-3 overflow-x-auto rounded-xl bg-black/20 p-3 text-xs text-white/82">
-            {`import { Button, ModalSurface, SheetSurface } from '@/app/ui-kit/primitives';`}
-          </pre>
+        {layerCards.map((layer) => (
+          <article
+            key={layer.title}
+            className="rounded-[24px] border border-white/10 bg-white/5 p-5"
+          >
+            <h2 className="text-lg font-semibold text-white">{layer.title}</h2>
+            <p className="mt-2 text-sm leading-6 text-white/74">{layer.description}</p>
+            <pre className="mt-3 overflow-x-auto rounded-xl bg-black/20 p-3 text-xs text-white/82">
+              {`import { ... } from '${layer.importPath}';`}
+            </pre>
+          </article>
+        ))}
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-[1fr_1.15fr]">
+        <article className="rounded-[28px] border border-white/10 bg-white/6 p-6">
+          <h2 className="text-xl font-semibold text-white">Contribution flow</h2>
+          <ol className="mt-4 space-y-3 text-sm leading-6 text-white/78">
+            {workflowSteps.map((step, index) => (
+              <li key={step} className="flex gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/8 text-xs font-semibold text-white">
+                  {index + 1}
+                </span>
+                <span>{step}</span>
+              </li>
+            ))}
+          </ol>
         </article>
-        <article className="rounded-[24px] border border-white/10 bg-white/5 p-5">
-          <h2 className="text-lg font-semibold text-white">Patterns</h2>
-          <p className="mt-2 text-sm leading-6 text-white/74">
-            Composed reusable structures such as section cards, hero layouts, field blocks, and
-            empty states.
-          </p>
-          <pre className="mt-3 overflow-x-auto rounded-xl bg-black/20 p-3 text-xs text-white/82">
-            {`import { DashboardHeroSection, SectionCard } from '@/app/ui-kit/patterns';`}
-          </pre>
-        </article>
-        <article className="rounded-[24px] border border-white/10 bg-white/5 p-5">
-          <h2 className="text-lg font-semibold text-white">Tokens</h2>
-          <p className="mt-2 text-sm leading-6 text-white/74">
-            Theme-aware surface, spacing, focus, radius, and shell helpers for new shared UI.
-          </p>
-          <pre className="mt-3 overflow-x-auto rounded-xl bg-black/20 p-3 text-xs text-white/82">
-            {`import { getThemeSurfaceTokens, navetUiKitRadiusTokens } from '@/app/ui-kit/tokens';`}
-          </pre>
+
+        <article className="rounded-[28px] border border-white/10 bg-white/6 p-6">
+          <h2 className="text-xl font-semibold text-white">Storybook map</h2>
+          <div className="mt-4 overflow-hidden rounded-[20px] border border-white/10">
+            <table className="min-w-full divide-y divide-white/10 text-left text-sm text-white/82">
+              <thead className="bg-black/20 text-white/60">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">Root</th>
+                  <th className="px-4 py-3 font-semibold">Use for</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/10">
+                {storybookSurfaces.map(([root, useFor]) => (
+                  <tr key={root}>
+                    <td className="px-4 py-3 font-medium text-white">{root}</td>
+                    <td className="px-4 py-3">{useFor}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </article>
       </section>
 
       <section className="rounded-[28px] border border-white/10 bg-white/6 p-6">
         <h2 className="text-xl font-semibold text-white">Rules</h2>
-        <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-white/78">
-          <li>Do not import shared UI from feature modules.</li>
-          <li>
-            Do not add new one-off shells when `ModalSurface`, `SheetSurface`, or `SurfacePanel`
-            fit.
-          </li>
-          <li>
-            Do not add new shared UI to `components/shared` unless it is intentionally app-specific.
-          </li>
-          <li>
-            Every new primitive or pattern must have a Storybook story and should be discoverable
-            from this UI-kit surface.
-          </li>
-        </ul>
+        <div className="mt-4 grid gap-3 text-sm leading-6 text-white/78 md:grid-cols-2">
+          <p className="rounded-[18px] border border-white/10 bg-black/15 p-4">
+            Author new shared controls in `components/primitives` or `components/patterns`.
+          </p>
+          <p className="rounded-[18px] border border-white/10 bg-black/15 p-4">
+            Keep `components/system` as a curated public surface, not the default authoring folder.
+          </p>
+          <p className="rounded-[18px] border border-white/10 bg-black/15 p-4">
+            Use `components/shared` only for app-specific shared UI and compatibility shims.
+          </p>
+          <p className="rounded-[18px] border border-white/10 bg-black/15 p-4">
+            Prefer deterministic Storybook fixtures over live Home Assistant data or app-only side
+            effects.
+          </p>
+        </div>
       </section>
     </div>
   );
