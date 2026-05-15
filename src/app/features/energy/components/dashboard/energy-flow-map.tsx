@@ -66,6 +66,12 @@ export const EnergyFlowMap = memo(function EnergyFlowMap({
         : 'rgba(255, 255, 255, 0.18)';
 
   const visibleNodeMap = useMemo(() => new Map(nodes.map((node) => [node.id, node])), [nodes]);
+  const hasStorageOrExport = useMemo(
+    () =>
+      nodes.some((node) => node.id === 'battery') ||
+      flows.some((flow) => flow.direction === 'export' || flow.direction === 'charge'),
+    [flows, nodes]
+  );
   const homePoint = useMemo(() => ({ x: 50, y: 50 }), []);
   const homeNode = visibleNodeMap.get('home') ?? null;
 
@@ -173,12 +179,13 @@ export const EnergyFlowMap = memo(function EnergyFlowMap({
             Energy Flow
           </div>
           <div className={`mt-2 text-xl font-semibold tracking-tight ${surface.textPrimary}`}>
-            Supply, storage, and export in one view
+            {hasStorageOrExport ? 'Supply, storage, and export in one view' : 'Grid to home load'}
           </div>
         </div>
         <Text tone="muted" className="max-w-xs text-right text-sm leading-6">
-          Inactive paths stay quiet. Motion falls back to static beams for reduced-motion and
-          low-power modes.
+          {hasStorageOrExport
+            ? 'Inactive paths stay quiet. Motion falls back to static beams for reduced-motion and low-power modes.'
+            : 'Live grid import is shown when Home Assistant exposes current demand.'}
         </Text>
       </div>
 

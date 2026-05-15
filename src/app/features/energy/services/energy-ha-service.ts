@@ -7,35 +7,37 @@ import type {
 
 // ─── HA WebSocket API shapes ────────────────────────────────────────────────
 
-interface HaEnergySolarSource {
+export interface HaEnergySolarSource {
   type: 'solar';
   stat_energy_from: string;
 }
 
-interface HaEnergyGridSource {
+export interface HaEnergyGridSource {
   type: 'grid';
-  flow_from: { stat_energy_from: string }[];
-  flow_to: { stat_energy_to: string }[];
+  stat_energy_from?: string;
+  stat_energy_to?: string | null;
+  flow_from?: { stat_energy_from: string }[];
+  flow_to?: { stat_energy_to: string }[];
 }
 
-interface HaEnergyBatterySource {
+export interface HaEnergyBatterySource {
   type: 'battery';
   stat_energy_from: string; // discharge
   stat_energy_to: string; // charge
 }
 
-interface HaEnergyGasOrWaterSource {
+export interface HaEnergyGasOrWaterSource {
   type: 'gas' | 'water';
   stat_energy_from: string;
 }
 
-type HaEnergySource =
+export type HaEnergySource =
   | HaEnergySolarSource
   | HaEnergyGridSource
   | HaEnergyBatterySource
   | HaEnergyGasOrWaterSource;
 
-interface HaDeviceConsumption {
+export interface HaDeviceConsumption {
   stat_consumption: string;
   name?: string;
 }
@@ -43,27 +45,20 @@ interface HaDeviceConsumption {
 export interface HaEnergyPrefs {
   energy_sources: HaEnergySource[];
   device_consumption: HaDeviceConsumption[];
+  device_consumption_water?: HaDeviceConsumption[];
 }
+
+export type HaEnergyEntityLike = {
+  state: string;
+  attributes?: Record<string, unknown>;
+};
+
+export type HaEnergyEntityMap = Record<string, HaEnergyEntityLike>;
 
 // ─── API call ────────────────────────────────────────────────────────────────
 
 export async function getEnergyPrefs(connection: Connection): Promise<HaEnergyPrefs> {
   return connection.sendMessagePromise({ type: 'energy/get_prefs' }) as Promise<HaEnergyPrefs>;
-}
-
-// ─── Heuristics ──────────────────────────────────────────────────────────────
-
-/**
- * Try to guess a live power (W) sensor from a cumulative energy (kWh) sensor id.
- * e.g. sensor.solar_energy_today → sensor.solar_power
- *      sensor.grid_import_kwh   → sensor.grid_import_w
- * Returns undefined if no transformation is possible.
- */
-function guessPowerEntityId(energyEntityId: string): string | undefined {
-  const transformed = energyEntityId
-    .replace(/_energy(_today|_total|_kwh)?$/, '_power')
-    .replace(/_kwh$/, '_w');
-  return transformed !== energyEntityId ? transformed : undefined;
 }
 
 const DEVICE_CATEGORY_HINTS: [string, EnergyConsumerCategory][] = [
@@ -77,10 +72,10 @@ const DEVICE_CATEGORY_HINTS: [string, EnergyConsumerCategory][] = [
   ['boiler', 'water_heater'],
   ['floor_heating', 'floor_heating'],
   ['underfloor', 'floor_heating'],
+  ['dishwasher', 'dishwasher'],
   ['washer', 'washer'],
   ['washing_machine', 'washer'],
   ['dryer', 'dryer'],
-  ['dishwasher', 'dishwasher'],
   ['toilet_heater', 'toilet_heater'],
   ['bathroom_heater', 'bathroom_heater'],
 ];
@@ -90,12 +85,135 @@ function guessDeviceCategory(name: string): EnergyConsumerCategory {
   return DEVICE_CATEGORY_HINTS.find(([k]) => lc.includes(k))?.[1] ?? 'other';
 }
 
+function getEntityDeviceClass(entity: HaEnergyEntityLike | undefined): string {
+  return String(entity?.attributes?.device_class ?? '').toLowerCase();
+}
+
+function getEntityUnit(entity: HaEnergyEntityLike | undefined): string {
+  return String(
+    entity?.attributes?.unit_of_measurement ?? entity?.attributes?.native_unit_of_measurement ?? ''
+  ).toUpperCase();
+}
+
+function parsePowerEntityWatts(entity: HaEnergyEntityLike | undefined): number | null {
+  if (!entity) {
+    return null;
+  }
+
+  const raw = Number.parseFloat(String(entity.state));
+  if (!Number.isFinite(raw)) {
+    return null;
+  }
+
+  const unit = getEntityUnit(entity);
+  if (unit === 'W') {
+    return raw;
+  }
+  if (unit === 'KW') {
+    return raw * 1000;
+  }
+
+  return getEntityDeviceClass(entity) === 'power' ? raw : null;
+}
+
+function getPowerCandidateIds(energyEntityId: string): string[] {
+  return [
+    energyEntityId.replace('_summation_delivered', '_instantaneous_demand'),
+    energyEntityId.replace('_summation_received', '_instantaneous_demand'),
+    energyEntityId.replace('_summation_delivered', '_power'),
+    energyEntityId.replace('_summation_received', '_power'),
+    energyEntityId.replace('_energy_usage', '_power'),
+    energyEntityId.replace('_energy_usage', '_power_usage'),
+    energyEntityId.replace('_energy_usage', '_power_consumed'),
+    energyEntityId.replace('_energy_usage', '_power_now'),
+    energyEntityId.replace('_energy_usage', '_current_power'),
+    energyEntityId.replace('_energy', '_power'),
+    energyEntityId.replace('_kwh', '_power'),
+    energyEntityId.replace('_total_energy', '_power'),
+    energyEntityId.replace('_summation_delivered', '_electrical_measurement'),
+  ].filter(
+    (candidate, index, candidates) =>
+      candidate !== energyEntityId && candidates.indexOf(candidate) === index
+  );
+}
+
+function inferRelatedPowerEntityId(
+  energyEntityId: string | undefined,
+  entities: HaEnergyEntityMap
+): string | undefined {
+  if (!energyEntityId) {
+    return undefined;
+  }
+
+  for (const candidate of getPowerCandidateIds(energyEntityId)) {
+    if (parsePowerEntityWatts(entities[candidate]) !== null) {
+      return candidate;
+    }
+  }
+
+  return parsePowerEntityWatts(entities[energyEntityId]) !== null ? energyEntityId : undefined;
+}
+
+function inferHomeLoadPowerEntityId(
+  config: EnergySourceConfig,
+  entities: HaEnergyEntityMap
+): string | undefined {
+  const relatedGridPowerEntityId = inferRelatedPowerEntityId(
+    config.gridImportEnergyEntityId,
+    entities
+  );
+  if (relatedGridPowerEntityId) {
+    return relatedGridPowerEntityId;
+  }
+
+  const candidates = Object.entries(entities)
+    .filter(
+      ([entityId, entity]) =>
+        entityId.startsWith('sensor.') && parsePowerEntityWatts(entity) !== null
+    )
+    .map(([entityId, entity]) => {
+      const friendlyName = String(entity.attributes?.friendly_name ?? '').toLowerCase();
+      const haystack = `${entityId} ${friendlyName}`;
+
+      let score = 0;
+      if (haystack.includes('instantaneous_demand') || haystack.includes('instantaneous demand')) {
+        score += 100;
+      }
+      if (
+        haystack.includes('home load') ||
+        haystack.includes('home_load') ||
+        haystack.includes('house power') ||
+        haystack.includes('active power') ||
+        haystack.includes('total power') ||
+        haystack.includes('main power') ||
+        haystack.includes('demand')
+      ) {
+        score += 30;
+      }
+      if (
+        haystack.includes('solar') ||
+        haystack.includes('battery') ||
+        haystack.includes('grid export') ||
+        haystack.includes('pv') ||
+        haystack.includes('charger')
+      ) {
+        score -= 40;
+      }
+
+      return { entityId, score };
+    })
+    .filter((candidate) => candidate.score > 0)
+    .sort((left, right) => right.score - left.score);
+
+  return candidates[0]?.entityId;
+}
+
 // ─── Prefs → config mapping ──────────────────────────────────────────────────
 
 /**
  * Convert HA energy preferences into an EnergySourceConfig.
- * Power sensor IDs are guessed heuristically — the user should review and
- * correct them in the setup form before saving.
+ * This intentionally maps only IDs exposed by Home Assistant Energy prefs.
+ * Navet does not infer or persist extra local energy entity configuration.
  */
 export function mapPrefsToConfig(prefs: HaEnergyPrefs): EnergySourceConfig {
   const config: EnergySourceConfig = { devices: [] };
@@ -104,28 +222,33 @@ export function mapPrefsToConfig(prefs: HaEnergyPrefs): EnergySourceConfig {
     switch (source.type) {
       case 'solar':
         config.solarEnergyEntityId = source.stat_energy_from;
-        config.solarPowerEntityId = guessPowerEntityId(source.stat_energy_from);
         break;
 
       case 'grid': {
         const gridSource = source as HaEnergyGridSource;
-        const importId = gridSource.flow_from?.[0]?.stat_energy_from;
-        const exportId = gridSource.flow_to?.[0]?.stat_energy_to;
+        const importId = gridSource.stat_energy_from ?? gridSource.flow_from?.[0]?.stat_energy_from;
+        const exportId = gridSource.stat_energy_to ?? gridSource.flow_to?.[0]?.stat_energy_to;
         if (importId) {
           config.gridImportEnergyEntityId = importId;
-          config.gridImportPowerEntityId = guessPowerEntityId(importId);
         }
         if (exportId) {
           config.gridExportEnergyEntityId = exportId;
-          config.gridExportPowerEntityId = guessPowerEntityId(exportId);
         }
         break;
       }
 
       case 'battery':
-        // SOC sensor is not in energy prefs — the user must set it manually.
-        // Battery power sign convention also varies per integration.
-        // Battery discharge/charge stats are not mapped until battery support is added.
+        // HA Energy prefs expose battery energy statistics, but not live SOC or
+        // power sensors. Keep battery live state unavailable rather than
+        // guessing local entities.
+        break;
+
+      case 'gas':
+        config.gasEnergyEntityId = source.stat_energy_from;
+        break;
+
+      case 'water':
+        config.hotWaterEnergyEntityId = source.stat_energy_from;
         break;
     }
   }
@@ -136,10 +259,46 @@ export function mapPrefsToConfig(prefs: HaEnergyPrefs): EnergySourceConfig {
       entityId: device.stat_consumption,
       name,
       category: guessDeviceCategory(name),
-      powerEntityId: guessPowerEntityId(device.stat_consumption),
     };
   });
-  config.devices = devices;
+  const waterDevices: EnergyDeviceSource[] =
+    prefs.device_consumption_water?.map((device) => {
+      const name = device.name ?? device.stat_consumption;
+      return {
+        entityId: device.stat_consumption,
+        name,
+        category: 'water_heater',
+      };
+    }) ?? [];
+  config.devices = [...devices, ...waterDevices];
 
   return config;
+}
+
+export function augmentConfigWithLivePowerEntities(
+  config: EnergySourceConfig,
+  entities: HaEnergyEntityMap
+): EnergySourceConfig {
+  const gridImportPowerEntityId =
+    config.gridImportPowerEntityId ??
+    inferRelatedPowerEntityId(config.gridImportEnergyEntityId, entities);
+  const gridExportPowerEntityId =
+    config.gridExportPowerEntityId ??
+    inferRelatedPowerEntityId(config.gridExportEnergyEntityId, entities);
+  const solarPowerEntityId =
+    config.solarPowerEntityId ?? inferRelatedPowerEntityId(config.solarEnergyEntityId, entities);
+  const homeLoadPowerEntityId =
+    config.homeLoadPowerEntityId ?? inferHomeLoadPowerEntityId(config, entities);
+
+  return {
+    ...config,
+    gridImportPowerEntityId,
+    gridExportPowerEntityId,
+    solarPowerEntityId,
+    homeLoadPowerEntityId,
+    devices: config.devices.map((device) => ({
+      ...device,
+      powerEntityId: device.powerEntityId ?? inferRelatedPowerEntityId(device.entityId, entities),
+    })),
+  };
 }

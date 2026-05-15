@@ -1129,7 +1129,10 @@ export const svMessages = {
   'charts.powerSparkline.useLabel': 'Anvandning: {value} W',
   'energy.setup.panelTitle': 'Anslut till Home Assistant Energy',
   'energy.setup.panelDescription':
-    'Koppla dina HA-sensorentiteter till varje energikälla. Auto-detektering läser din HA Energy-konfiguration - granska och korrigera de föreslagna sensor-ID:n innan du sparar.',
+    'Konfigurera energipanelen i Home Assistant. Navet läser HA Energy-inställningar och recorder-statistik direkt.',
+  'energy.sourcesFound.title': 'Home Assistant Energy-kallor hittades',
+  'energy.sourcesFound.description':
+    'Navet hittade dessa skrivskyddade HA Energy-kallor och vantar pa recorder-statistik innan energipanelen ritas.',
   'energy.setup.autoDetect.title': 'Auto-detektera från HA Energy',
   'energy.setup.autoDetect.description':
     'Läser din Energy-dashboardkonfiguration och fyller i fälten nedan.',
@@ -1210,7 +1213,7 @@ export const svMessages = {
   'energy.widgets.consumers.title': 'Storsta forbrukare',
   'energy.widgets.consumers.eyebrow': 'Atgardsprioritet',
   'energy.widgets.consumers.empty':
-    'Inga enskilda enheter ar konfigurerade. Lagg till enhetsmonitorer i dina HA-energiinstllningar och kor auto-detect igen.',
+    'Inga enskilda enheter ar konfigurerade. Lagg till enhetsmonitorer i Home Assistant Energy.',
   'energy.widgets.consumers.loadShare': '{value}% av lasten',
   'energy.widgets.consumers.kwhToday': '{value} kWh idag',
   'energy.widgets.storage.title': 'Lagring och sol',

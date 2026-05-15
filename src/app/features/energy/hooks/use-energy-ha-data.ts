@@ -1,10 +1,16 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { shallow } from 'zustand/shallow';
 import { useHomeAssistant } from '@/app/hooks';
+import { homeAssistantService } from '@/app/services/home-assistant.service';
 import type { HomeAssistantStore } from '@/app/stores/home-assistant-store';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { HEATING_CATEGORIES } from '../data/energy-constants';
 import { getMockEnergyOverview } from '../data/mock-energy-dashboard';
-import { useEnergyDashboardStore } from '../stores/energy-dashboard-store';
+import {
+  augmentConfigWithLivePowerEntities,
+  getEnergyPrefs,
+  mapPrefsToConfig,
+} from '../services/energy-ha-service';
 import type {
   EnergyConsumer,
   EnergyDeviceSource,
@@ -12,9 +18,9 @@ import type {
   EnergyOverview,
   EnergyRange,
   EnergySourceConfig,
+  EnergySourceDiagnostic,
   EnergyStat,
 } from '../types/energy.types';
-import { useInferredHomeLoadSensor } from './use-energy-entity-options';
 import { useEnergyStatisticsToday } from './use-energy-statistics-today';
 
 type EntityMap = Record<
@@ -34,6 +40,18 @@ function parseW(state: string | undefined): number {
 function parsePct(state: string | undefined): number {
   const n = parseFloat(state ?? '');
   return Number.isFinite(n) ? Math.max(0, Math.min(100, n)) : 0;
+}
+
+function parseNumberState(state: string | undefined): number | null {
+  const n = Number.parseFloat(state ?? '');
+  return Number.isFinite(n) ? n : null;
+}
+
+function getEntityFriendlyName(entities: EntityMap | null | undefined, entityId?: string) {
+  const friendlyName = entities?.[entityId ?? '']?.attributes?.friendly_name;
+  return typeof friendlyName === 'string' && friendlyName.trim().length > 0
+    ? friendlyName.trim()
+    : undefined;
 }
 
 function buildLiveStats(
@@ -81,6 +99,18 @@ function buildLiveStats(
         ]
       : []),
   ];
+}
+
+function hasEnergySourceConfig(config: EnergySourceConfig | null): config is EnergySourceConfig {
+  return Boolean(
+    config &&
+      (config.solarEnergyEntityId ||
+        config.gridImportEnergyEntityId ||
+        config.gridExportEnergyEntityId ||
+        config.gasEnergyEntityId ||
+        config.hotWaterEnergyEntityId ||
+        config.devices.length > 0)
+  );
 }
 
 function buildFlow(
@@ -150,6 +180,11 @@ function buildConsumers(
   homeLoadW: number
 ): EnergyConsumer[] {
   return devices
+    .filter((device) => {
+      const energyValue = parseNumberState(entities?.[device.entityId]?.state);
+      const powerValue = parseNumberState(entities?.[device.powerEntityId ?? '']?.state);
+      return energyValue !== null || powerValue !== null;
+    })
     .map((device) => {
       const powerW = parseW(entities?.[device.powerEntityId ?? '']?.state);
       // Device totals are "today" values, so only use daily statistics here.
@@ -162,7 +197,10 @@ function buildConsumers(
           : 0;
       return {
         id: device.entityId,
-        name: device.name,
+        name:
+          getEntityFriendlyName(entities, device.powerEntityId) ??
+          getEntityFriendlyName(entities, device.entityId) ??
+          device.name,
         category: device.category,
         powerEntityId: device.powerEntityId,
         powerW,
@@ -173,6 +211,40 @@ function buildConsumers(
       };
     })
     .sort((a, b) => b.energyKWh - a.energyKWh || b.powerW - a.powerW);
+}
+
+function getSourceDiagnosticStatus(
+  entities: EntityMap | null | undefined,
+  entityId?: string,
+  liveEntityId?: string,
+  todayKWh?: number
+): EnergySourceDiagnostic['status'] {
+  if (!entityId && !liveEntityId) {
+    return 'not_configured';
+  }
+
+  const energyValue = parseNumberState(entities?.[entityId ?? '']?.state);
+  const liveValue = parseNumberState(entities?.[liveEntityId ?? '']?.state);
+  const entityState = entityId ? entities?.[entityId]?.state : undefined;
+  const liveState = liveEntityId ? entities?.[liveEntityId]?.state : undefined;
+  const hasUnavailableEntity =
+    (entityId && entityState !== undefined && energyValue === null) ||
+    (liveEntityId && liveState !== undefined && liveValue === null);
+
+  if (hasUnavailableEntity && energyValue === null && liveValue === null) {
+    return 'configured_unavailable';
+  }
+
+  const hasNumericValue = energyValue !== null || liveValue !== null || (todayKWh ?? 0) > 0;
+
+  if (!hasNumericValue) {
+    return 'configured_unavailable';
+  }
+
+  const hasNonZeroValue =
+    (energyValue ?? 0) > 0 || (liveValue ?? 0) > 0 || (todayKWh !== undefined && todayKWh > 0);
+
+  return hasNonZeroValue ? 'configured_numeric' : 'configured_idle';
 }
 
 function getConfiguredDevicePowerW(
@@ -222,29 +294,76 @@ function createEmptyOverview(): EnergyOverview {
  * validated.
  */
 export function useEnergyHaData(range: EnergyRange): {
+  energySourceDiagnostics: EnergySourceDiagnostic[];
+  hasEnergyStatisticsLoaded: boolean;
   overview: EnergyOverview;
   isConfigured: boolean;
   currentLoadStatisticId?: string;
+  haSourceConfig: EnergySourceConfig | null;
 } {
-  const sourceConfig = useEnergyDashboardStore((s) => s.sourceConfig);
+  const connection = useHomeAssistant(homeAssistantSelectors.connection);
+  const allEntities = useHomeAssistant(homeAssistantSelectors.entities);
+  const [haSourceConfig, setHaSourceConfig] = useState<EnergySourceConfig | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchEnergyPrefs() {
+      const activeConnection = connection ?? homeAssistantService.getConnection();
+      if (!activeConnection) {
+        setHaSourceConfig(null);
+        return;
+      }
+
+      try {
+        const prefs = await getEnergyPrefs(activeConnection);
+        if (!cancelled) {
+          setHaSourceConfig(mapPrefsToConfig(prefs));
+        }
+      } catch (error) {
+        console.error('[EnergyHaData] Failed to fetch Home Assistant energy prefs:', error);
+        if (!cancelled) {
+          setHaSourceConfig(null);
+        }
+      }
+    }
+
+    void fetchEnergyPrefs();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [connection]);
+
+  const isConfigured = hasEnergySourceConfig(haSourceConfig);
+  const runtimeSourceConfig = useMemo(
+    () =>
+      haSourceConfig && allEntities
+        ? augmentConfigWithLivePowerEntities(haSourceConfig, allEntities)
+        : haSourceConfig,
+    [allEntities, haSourceConfig]
+  );
 
   // Build the list of entity IDs that are directly named in the config. This
   // drives a narrow subscription so we only re-render when a relevant entity
   // changes instead of on every HA entity update.
   const configEntityIds = useMemo(() => {
-    if (!sourceConfig) return [] as string[];
+    if (!runtimeSourceConfig) return [] as string[];
     return [
-      sourceConfig.solarPowerEntityId,
-      sourceConfig.batterySocEntityId,
-      sourceConfig.batteryPowerEntityId,
-      sourceConfig.gridImportPowerEntityId,
-      sourceConfig.gridExportPowerEntityId,
-      sourceConfig.homeLoadPowerEntityId,
-      sourceConfig.gridImportEnergyEntityId,
-      sourceConfig.solarEnergyEntityId,
-      ...sourceConfig.devices.flatMap((d) => [d.entityId, d.powerEntityId].filter(Boolean)),
+      runtimeSourceConfig.solarPowerEntityId,
+      runtimeSourceConfig.batterySocEntityId,
+      runtimeSourceConfig.batteryPowerEntityId,
+      runtimeSourceConfig.gridImportPowerEntityId,
+      runtimeSourceConfig.gridExportPowerEntityId,
+      runtimeSourceConfig.homeLoadPowerEntityId,
+      runtimeSourceConfig.gridImportEnergyEntityId,
+      runtimeSourceConfig.gridExportEnergyEntityId,
+      runtimeSourceConfig.solarEnergyEntityId,
+      runtimeSourceConfig.gasEnergyEntityId,
+      runtimeSourceConfig.hotWaterEnergyEntityId,
+      ...runtimeSourceConfig.devices.flatMap((d) => [d.entityId, d.powerEntityId].filter(Boolean)),
     ].filter((id): id is string => Boolean(id));
-  }, [sourceConfig]);
+  }, [runtimeSourceConfig]);
 
   const configEntitySelector = useCallback(
     (state: HomeAssistantStore) => {
@@ -264,59 +383,126 @@ export function useEnergyHaData(range: EnergyRange): {
   // re-renders when the same entity references are returned.
   const configEntities = useHomeAssistant(configEntitySelector, shallow);
 
-  const needsInference = sourceConfig !== null && !sourceConfig.homeLoadPowerEntityId;
-  const inferredHomeLoadCandidate = useInferredHomeLoadSensor();
-  const inferredHomeLoad = needsInference
-    ? inferredHomeLoadCandidate
-    : { entityId: undefined as string | undefined, watts: 0 };
+  const energyStatisticIds = useMemo(() => {
+    if (!haSourceConfig) {
+      return [];
+    }
 
-  const todayKWh = useEnergyStatisticsToday(sourceConfig);
+    return [
+      haSourceConfig.gridImportEnergyEntityId,
+      haSourceConfig.gridExportEnergyEntityId,
+      haSourceConfig.solarEnergyEntityId,
+      haSourceConfig.gasEnergyEntityId,
+      haSourceConfig.hotWaterEnergyEntityId,
+      ...haSourceConfig.devices.map((device) => device.entityId),
+    ].filter((id): id is string => Boolean(id));
+  }, [haSourceConfig]);
+
+  const todayStatistics = useEnergyStatisticsToday(energyStatisticIds);
+  const todayKWh = todayStatistics.values;
+  const energySourceDiagnostics = useMemo<EnergySourceDiagnostic[]>(() => {
+    if (!haSourceConfig) {
+      return [];
+    }
+
+    const config = runtimeSourceConfig ?? haSourceConfig;
+    const entries: EnergySourceDiagnostic[] = [];
+    const addEntry = (
+      id: string,
+      label: string,
+      entityId: string | undefined,
+      liveEntityId?: string
+    ) => {
+      if (!entityId && !liveEntityId) {
+        return;
+      }
+
+      entries.push({
+        id,
+        label:
+          getEntityFriendlyName(allEntities, liveEntityId) ??
+          getEntityFriendlyName(allEntities, entityId) ??
+          label,
+        entityId,
+        liveEntityId,
+        status: getSourceDiagnosticStatus(
+          allEntities,
+          entityId,
+          liveEntityId,
+          entityId ? todayKWh[entityId] : undefined
+        ),
+        currentPowerW: liveEntityId
+          ? (parseNumberState(allEntities?.[liveEntityId]?.state) ?? 0)
+          : undefined,
+        todayKWh: entityId ? (todayKWh[entityId] ?? 0) : undefined,
+      });
+    };
+
+    addEntry(
+      'grid-import',
+      'Grid import',
+      haSourceConfig.gridImportEnergyEntityId,
+      config.gridImportPowerEntityId
+    );
+    addEntry(
+      'grid-export',
+      'Grid export',
+      haSourceConfig.gridExportEnergyEntityId,
+      config.gridExportPowerEntityId
+    );
+    addEntry(
+      'solar',
+      'Solar production',
+      haSourceConfig.solarEnergyEntityId,
+      config.solarPowerEntityId
+    );
+    addEntry('gas', 'Gas', haSourceConfig.gasEnergyEntityId);
+    addEntry('hot-water', 'Hot water', haSourceConfig.hotWaterEnergyEntityId);
+
+    for (const device of haSourceConfig.devices) {
+      const runtimeDevice = config.devices.find(
+        (candidate) => candidate.entityId === device.entityId
+      );
+      addEntry(
+        `device:${device.entityId}`,
+        device.name,
+        device.entityId,
+        runtimeDevice?.powerEntityId
+      );
+    }
+
+    return entries;
+  }, [allEntities, haSourceConfig, runtimeSourceConfig, todayKWh]);
 
   const { overview, currentLoadStatisticId } = useMemo(() => {
-    if (!sourceConfig) {
+    if (!isConfigured || !runtimeSourceConfig) {
       return { overview: createEmptyOverview(), currentLoadStatisticId: undefined };
     }
 
+    const config = runtimeSourceConfig;
     const entities = configEntities;
-    const solarW = parseW(entities?.[sourceConfig.solarPowerEntityId ?? '']?.state);
-    const batterySoc = parsePct(entities?.[sourceConfig.batterySocEntityId ?? '']?.state);
-    const batteryPowerRaw = parseW(entities?.[sourceConfig.batteryPowerEntityId ?? '']?.state);
-    const gridImportW = parseW(entities?.[sourceConfig.gridImportPowerEntityId ?? '']?.state);
-    const gridExportW = parseW(entities?.[sourceConfig.gridExportPowerEntityId ?? '']?.state);
+    const solarW = parseW(entities?.[config.solarPowerEntityId ?? '']?.state);
+    const batterySoc = parsePct(entities?.[config.batterySocEntityId ?? '']?.state);
+    const batteryPowerRaw = parseW(entities?.[config.batteryPowerEntityId ?? '']?.state);
+    const gridImportW = parseW(entities?.[config.gridImportPowerEntityId ?? '']?.state);
+    const gridExportW = parseW(entities?.[config.gridExportPowerEntityId ?? '']?.state);
     // batteryPowerRaw sign convention: positive = charging, negative = discharging
     const batteryDischargeW = batteryPowerRaw < 0 ? Math.abs(batteryPowerRaw) : 0;
     const batteryChargeW = batteryPowerRaw > 0 ? batteryPowerRaw : 0;
-    const monitoredDevicePowerW = getConfiguredDevicePowerW(sourceConfig.devices, entities);
+    const monitoredDevicePowerW = getConfiguredDevicePowerW(config.devices, entities);
     const derivedHomeLoadW = Math.max(
       0,
       solarW + gridImportW + batteryDischargeW - gridExportW - batteryChargeW
     );
-    const configuredHomeLoadW = sourceConfig.homeLoadPowerEntityId
-      ? parseW(entities?.[sourceConfig.homeLoadPowerEntityId]?.state)
+    const configuredHomeLoadW = config.homeLoadPowerEntityId
+      ? parseW(entities?.[config.homeLoadPowerEntityId]?.state)
       : 0;
-    const homeLoadW = Math.max(
-      configuredHomeLoadW,
-      inferredHomeLoad.watts,
-      derivedHomeLoadW,
-      monitoredDevicePowerW
-    );
-    const currentLoadStatisticId =
-      configuredHomeLoadW > 0
-        ? sourceConfig.homeLoadPowerEntityId
-        : inferredHomeLoad.watts > 0
-          ? inferredHomeLoad.entityId
-          : sourceConfig.homeLoadPowerEntityId;
+    const homeLoadW = Math.max(configuredHomeLoadW, derivedHomeLoadW, monitoredDevicePowerW);
+    const currentLoadStatisticId = config.homeLoadPowerEntityId;
 
     return {
       overview: {
-        liveStats: buildLiveStats(
-          sourceConfig,
-          homeLoadW,
-          solarW,
-          batterySoc,
-          gridImportW,
-          gridExportW
-        ),
+        liveStats: buildLiveStats(config, homeLoadW, solarW, batterySoc, gridImportW, gridExportW),
         flow: buildFlow(
           solarW,
           batteryDischargeW,
@@ -326,7 +512,7 @@ export function useEnergyHaData(range: EnergyRange): {
           homeLoadW
         ),
         trend: getMockEnergyOverview(range).trend, // replaced by statistics in follow-up
-        topConsumers: buildConsumers(sourceConfig.devices, entities, todayKWh, homeLoadW),
+        topConsumers: buildConsumers(config.devices, entities, todayKWh, homeLoadW),
         insights: [],
         totals: {
           currentLoadW: homeLoadW,
@@ -334,18 +520,23 @@ export function useEnergyHaData(range: EnergyRange): {
           batteryPercent: batterySoc,
           importW: gridImportW,
           exportW: gridExportW,
-          importTodayKWh: sourceConfig.gridImportEnergyEntityId
-            ? (todayKWh[sourceConfig.gridImportEnergyEntityId] ?? 0)
+          importTodayKWh: config.gridImportEnergyEntityId
+            ? (todayKWh[config.gridImportEnergyEntityId] ?? 0)
             : 0,
-          solarTodayKWh: sourceConfig.solarEnergyEntityId
-            ? (todayKWh[sourceConfig.solarEnergyEntityId] ?? 0)
+          exportTodayKWh: config.gridExportEnergyEntityId
+            ? (todayKWh[config.gridExportEnergyEntityId] ?? 0)
             : 0,
-          gasTodayKWh: 0,
-          hotWaterTodayKWh: 0,
+          solarTodayKWh: config.solarEnergyEntityId
+            ? (todayKWh[config.solarEnergyEntityId] ?? 0)
+            : 0,
+          gasTodayKWh: config.gasEnergyEntityId ? (todayKWh[config.gasEnergyEntityId] ?? 0) : 0,
+          hotWaterTodayKWh: config.hotWaterEnergyEntityId
+            ? (todayKWh[config.hotWaterEnergyEntityId] ?? 0)
+            : 0,
           costToday: 0,
           projectedMonthCost: 0,
         },
-        nodes: sourceConfig.devices.map((device) => ({
+        nodes: config.devices.map((device) => ({
           id: device.entityId,
           name: device.name,
           kind: 'consumer' as const,
@@ -358,11 +549,14 @@ export function useEnergyHaData(range: EnergyRange): {
       },
       currentLoadStatisticId,
     };
-  }, [sourceConfig, configEntities, inferredHomeLoad, range, todayKWh]);
+  }, [runtimeSourceConfig, configEntities, isConfigured, range, todayKWh]);
 
   return {
+    energySourceDiagnostics,
+    hasEnergyStatisticsLoaded: todayStatistics.hasLoaded,
     overview,
-    isConfigured: sourceConfig !== null,
+    isConfigured,
     currentLoadStatisticId,
+    haSourceConfig,
   };
 }

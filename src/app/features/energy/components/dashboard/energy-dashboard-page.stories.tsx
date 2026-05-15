@@ -4,6 +4,8 @@ import { defaultSettings, useSettingsStore } from '@/app/stores/settings-store';
 import type { ThemeMode } from '@/app/stores/theme-store';
 import { useThemeStore } from '@/app/stores/theme-store';
 import { getEnergyDashboardScenario } from '../../data/mock-energy-dashboard';
+import type { EnergyOverview, EnergySourceDiagnostic } from '../../types/energy.types';
+import { buildEnergyDashboardModel } from '../../utils/build-energy-dashboard-model';
 import { EnergyDashboardPage } from './energy-dashboard-page';
 
 function ThemeDecorator({ theme, children }: { theme: ThemeMode; children: ReactNode }) {
@@ -46,6 +48,123 @@ function withTheme(theme: ThemeMode): Decorator {
 }
 
 const defaultScenario = getEnergyDashboardScenario('default');
+const gridOnlyOverview: EnergyOverview = {
+  liveStats: [
+    { label: 'Home Load', value: '0.4 kW' },
+    { label: 'Grid', value: '0.4 kW import' },
+  ],
+  flow: [
+    { id: 'grid', label: 'Grid Import', value: 0.39, direction: 'source', tone: 'grid' },
+    { id: 'home', label: 'Home Load', value: 0.39, direction: 'sink', tone: 'load' },
+  ],
+  trend: [
+    { label: '12:00', value: 340 },
+    { label: '12:05', value: 386 },
+    { label: '12:10', value: 365 },
+  ],
+  topConsumers: [
+    {
+      id: 'sensor.bathroom_floor_energy_usage',
+      name: 'Bathroom Energy Usage',
+      category: 'floor_heating',
+      powerEntityId: 'sensor.bathroom_floor_power',
+      powerW: 0,
+      energyKWh: 0,
+      shareOfLoad: 0,
+      costToday: 0,
+      status: 'idle',
+    },
+    {
+      id: 'sensor.toilet_energy_usage',
+      name: 'Toilet Energy Usage',
+      category: 'toilet_heater',
+      powerEntityId: 'sensor.toilet_power',
+      powerW: 0,
+      energyKWh: 0,
+      shareOfLoad: 0,
+      costToday: 0,
+      status: 'idle',
+    },
+  ],
+  insights: [],
+  totals: {
+    currentLoadW: 386,
+    solarW: 0,
+    batteryPercent: 0,
+    batteryPowerW: 0,
+    importW: 386,
+    exportW: 0,
+    importTodayKWh: 4.2,
+    exportTodayKWh: 0,
+    solarTodayKWh: 0,
+    gasTodayKWh: 0,
+    hotWaterTodayKWh: 0,
+    costToday: 0,
+    projectedMonthCost: 0,
+  },
+  nodes: [],
+};
+const gridOnlyDashboard = buildEnergyDashboardModel({
+  overview: gridOnlyOverview,
+  range: 'today',
+  trend: gridOnlyOverview.trend,
+  periodTotals: { today: 4.2, week: 0, month: 0 },
+  sourceConfig: {
+    gridImportEnergyEntityId: 'sensor.develco_zhemi101_summation_delivered',
+    gridImportPowerEntityId: 'sensor.develco_zhemi101_instantaneous_demand',
+    homeLoadPowerEntityId: 'sensor.develco_zhemi101_instantaneous_demand',
+    devices: [
+      {
+        entityId: 'sensor.bathroom_floor_energy_usage',
+        name: 'Bathroom Energy Usage',
+        category: 'floor_heating',
+        powerEntityId: 'sensor.bathroom_floor_power',
+      },
+      {
+        entityId: 'sensor.toilet_energy_usage',
+        name: 'Toilet Energy Usage',
+        category: 'toilet_heater',
+        powerEntityId: 'sensor.toilet_power',
+      },
+    ],
+  },
+});
+const gridOnlyDiagnostics: EnergySourceDiagnostic[] = [
+  {
+    id: 'grid-import',
+    label: 'Grid import',
+    entityId: 'sensor.develco_zhemi101_summation_delivered',
+    liveEntityId: 'sensor.develco_zhemi101_instantaneous_demand',
+    status: 'configured_numeric',
+    currentPowerW: 386,
+    todayKWh: 4.2,
+  },
+  {
+    id: 'device:bathroom',
+    label: 'Bathroom Energy Usage',
+    entityId: 'sensor.bathroom_floor_energy_usage',
+    liveEntityId: 'sensor.bathroom_floor_power',
+    status: 'configured_idle',
+    currentPowerW: 0,
+    todayKWh: 0,
+  },
+  {
+    id: 'device:toilet',
+    label: 'Toilet Energy Usage',
+    entityId: 'sensor.toilet_energy_usage',
+    liveEntityId: 'sensor.toilet_power',
+    status: 'configured_idle',
+    currentPowerW: 0,
+    todayKWh: 0,
+  },
+  {
+    id: 'device:gym-heater',
+    label: 'Gym Heater',
+    entityId: 'sensor.ikea_of_sweden_inspelning_smart_plug_summation_delivered',
+    liveEntityId: 'sensor.ikea_of_sweden_inspelning_smart_plug_power',
+    status: 'configured_unavailable',
+  },
+];
 
 const meta = {
   title: 'Pages/Energy/Dashboard/Page',
@@ -63,7 +182,7 @@ const meta = {
     onRangeChange: () => {},
     selectedNodeId: 'home',
     onNodeSelect: () => {},
-    onOpenSetup: () => {},
+    sourceDiagnostics: [],
   },
 } satisfies Meta<typeof EnergyDashboardPage>;
 
@@ -88,6 +207,14 @@ export const BatteryCharging: Story = buildScenarioStory('battery-charging');
 export const BatteryDischarging: Story = buildScenarioStory('battery-discharging');
 export const ExportingToGrid: Story = buildScenarioStory('exporting-grid');
 export const NoSolarInactive: Story = buildScenarioStory('inactive');
+
+export const GridOnlyCurrentHaData: Story = {
+  args: {
+    dashboard: gridOnlyDashboard,
+    range: 'today',
+    sourceDiagnostics: gridOnlyDiagnostics,
+  },
+};
 
 export const LiquidGlassTheme: Story = {
   ...buildScenarioStory('default'),
