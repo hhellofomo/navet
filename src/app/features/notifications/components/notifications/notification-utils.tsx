@@ -3,6 +3,7 @@ import { Fragment, type ReactNode } from 'react';
 import { ImageWithFallback } from '@/app/components/figma/ImageWithFallback';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import type { PrimaryColor } from '@/app/hooks';
+import { sanitizeExternalUrl, sanitizeImageUrl } from '@/app/utils/url-security';
 import type { Notification } from './use-notifications';
 
 export const formatTimestamp = (
@@ -58,24 +59,11 @@ export function getNotificationColor(
 }
 
 function resolveNotificationAssetUrl(url: string, hassUrl?: string): string {
-  if (!url) {
-    return url;
-  }
+  return sanitizeImageUrl(url, hassUrl, { allowDataImage: true }) ?? '';
+}
 
-  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
-    return url;
-  }
-
-  if (!hassUrl) {
-    return url;
-  }
-
-  try {
-    return new URL(url, hassUrl).toString();
-  } catch (error) {
-    console.error('[NotificationUtils] Failed to resolve notification URL:', error);
-    return url;
-  }
+function resolveNotificationLinkUrl(url: string, hassUrl?: string): string | null {
+  return sanitizeExternalUrl(url, hassUrl);
 }
 
 function renderInlineMarkdown(
@@ -97,21 +85,36 @@ function renderInlineMarkdown(
     const [raw, imageAlt, imageUrl, linkLabel, linkUrl, boldText, codeText, italicText] = match;
 
     if (imageUrl) {
+      const safeImageUrl = resolveNotificationAssetUrl(imageUrl, hassUrl);
+      if (!safeImageUrl) {
+        lastIndex = match.index + raw.length;
+        match = pattern.exec(content);
+        continue;
+      }
+
       parts.push(
         <ImageWithFallback
           key={`${imageUrl}-${match.index}`}
-          src={resolveNotificationAssetUrl(imageUrl, hassUrl)}
+          src={safeImageUrl}
           alt={imageAlt || imageAltText || ''}
           className="mt-2 max-h-36 w-full rounded-2xl border border-white/10 object-cover"
         />
       );
     } else if (linkUrl && linkLabel) {
+      const safeLinkUrl = resolveNotificationLinkUrl(linkUrl, hassUrl);
+      if (!safeLinkUrl) {
+        parts.push(linkLabel);
+        lastIndex = match.index + raw.length;
+        match = pattern.exec(content);
+        continue;
+      }
+
       parts.push(
         <a
           key={`${linkUrl}-${match.index}`}
-          href={resolveNotificationAssetUrl(linkUrl, hassUrl)}
+          href={safeLinkUrl}
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           className="underline decoration-white/25 underline-offset-4 transition-opacity hover:opacity-80"
         >
           {linkLabel}

@@ -17,6 +17,10 @@ import {
 } from '@/app/components/shared/device-editor';
 import { getCustomCardTintSurface } from '@/app/components/shared/theme/custom-card-tint-surface';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import {
+  parseButtonServiceCall,
+  sanitizeButtonEntityId,
+} from '@/app/features/dashboard/utils/button-widget-security';
 import { useI18n, useTheme } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 import { getDashboardWidgetSurfaceTokens } from './widget-surface-tokens';
@@ -99,10 +103,16 @@ function ButtonSettingsDialog({
       }
     }
 
+    const serviceCall = parseButtonServiceCall(service);
+    if (service.trim() && !serviceCall) {
+      toast.error(t('widgets.button.invalidServiceData'));
+      return;
+    }
+
     onSave({
       label: label.trim() || undefined,
-      service: service.trim() || undefined,
-      entityId: entityId.trim() || undefined,
+      service: serviceCall ? `${serviceCall.domain}.${serviceCall.service}` : undefined,
+      entityId: sanitizeButtonEntityId(entityId),
       icon: selectedIcon,
       serviceData: parsedServiceData,
       tintColor: tintColor.trim() || undefined,
@@ -232,18 +242,17 @@ export function ButtonWidget({ data = {}, onUpdate, isEditMode = false }: Button
 
   const handleTap = async () => {
     if (isEditMode || !data.service) return;
-    const parts = data.service.split('.');
-    if (parts.length < 2) return;
-    const [domain, ...rest] = parts;
-    const service = rest.join('.');
+    const serviceCall = parseButtonServiceCall(data.service);
+    if (!serviceCall) return;
+    const entityId = sanitizeButtonEntityId(data.entityId);
     setIsPressed(true);
     setTimeout(() => setIsPressed(false), 400);
     try {
       await homeAssistantService.callService(
-        domain,
-        service,
+        serviceCall.domain,
+        serviceCall.service,
         data.serviceData ?? {},
-        data.entityId ? { entity_id: data.entityId } : undefined
+        entityId ? { entity_id: entityId } : undefined
       );
     } catch (error) {
       console.error('[ButtonWidget] Service call failed:', error);

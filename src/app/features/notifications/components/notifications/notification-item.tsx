@@ -4,6 +4,7 @@ import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { type PrimaryColor, type ThemeType, useI18n } from '@/app/hooks';
 import { useAuth } from '@/app/stores/auth-store';
 import { authSelectors } from '@/app/stores/selectors';
+import { sanitizeExternalUrl } from '@/app/utils/url-security';
 import { getNotificationSurfaceTokens } from './notification-surface-tokens';
 import {
   getNotificationColor,
@@ -45,6 +46,9 @@ export function NotificationItem({
       : t('notifications.action.delete');
   const accentColor = getNotificationColor(notification.type, primaryColor);
   const unreadIndicatorColor = getThemeColorValue(primaryColor);
+  const detailsUrl = notification.detailsUrl
+    ? sanitizeExternalUrl(notification.detailsUrl, config?.url)
+    : null;
   const iconToneClassName =
     notification.type === 'success'
       ? theme === 'light'
@@ -137,14 +141,14 @@ export function NotificationItem({
               >
                 {secondaryActionLabel}
               </InteractivePill>
-              {notification.source === 'update' && notification.detailsUrl ? (
+              {notification.source === 'update' && detailsUrl ? (
                 <>
                   <span
                     aria-hidden="true"
                     className={`h-4 w-px shrink-0 ${theme === 'light' ? 'bg-gray-300/90' : 'bg-white/12'}`}
                   />
                   <Link
-                    href={notification.detailsUrl}
+                    href={detailsUrl}
                     target="_blank"
                     size="small"
                     appearance="subtle"

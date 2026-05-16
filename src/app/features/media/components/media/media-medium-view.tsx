@@ -131,6 +131,8 @@ export function MediaMediumView({
               size="medium"
               isActive={isActive}
               accentColor={palette.highlight}
+              titleStyle={{ color: fallbackTitleColor }}
+              subtitleStyle={{ color: fallbackSubtitleColor }}
             />
             <div className="flex shrink-0 items-center gap-2.5 self-start">
               <MediaVisualizerButton

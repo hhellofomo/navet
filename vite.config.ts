@@ -1,10 +1,17 @@
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import { lookup } from 'node:dns/promises'
 import { readFileSync } from 'node:fs'
 import type { ServerResponse } from 'node:http'
+import { isIP } from 'node:net'
 import path from 'path'
 import { defineConfig, loadEnv, type PluginOption, type PreviewServer, type ViteDevServer } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import {
+  isAllowedRSSContentType,
+  isBlockedRSSHostname,
+  isPrivateIpAddress,
+} from './src/app/utils/rss-proxy-security'
 
 const packageJson = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as {
   version?: string
@@ -72,9 +79,54 @@ function getAppChunkName(id: string) {
   return undefined
 }
 
+const RSS_PROXY_MAX_BYTES = 1024 * 1024
+const RSS_PROXY_TIMEOUT_MS = 10000
+
+async function assertPublicHostname(hostname: string) {
+  const normalizedHostname = hostname.toLowerCase()
+  if (isBlockedRSSHostname(normalizedHostname)) {
+    throw new Error('Private hostnames are not allowed')
+  }
+
+  if (isIP(normalizedHostname)) {
+    if (isPrivateIpAddress(normalizedHostname)) {
+      throw new Error('Private IP addresses are not allowed')
+    }
+    return
+  }
+
+  const addresses = await lookup(normalizedHostname, { all: true, verbatim: true })
+  if (addresses.length === 0 || addresses.some((entry) => isPrivateIpAddress(entry.address))) {
+    throw new Error('Private DNS targets are not allowed')
+  }
+}
+
+async function validateRSSProxyTargetUrl(targetUrl: string) {
+  const parsedUrl = new URL(targetUrl)
+  if (parsedUrl.protocol !== 'https:') {
+    throw new Error('Only HTTPS feeds are allowed')
+  }
+
+  await assertPublicHostname(parsedUrl.hostname)
+  return parsedUrl
+}
+
+function setSecurityHeaders(res: ServerResponse) {
+  res.setHeader('X-Content-Type-Options', 'nosniff')
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
+}
+
 function rssProxyPlugin() {
   const setNoStoreHeaders = (res: ServerResponse) => {
     res.setHeader('Cache-Control', 'no-store')
+    setSecurityHeaders(res)
+  }
+
+  const sendJson = (res: ServerResponse, statusCode: number, payload: Record<string, string>) => {
+    res.statusCode = statusCode
+    setNoStoreHeaders(res)
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.end(JSON.stringify(payload))
   }
 
   const handleRequest = async (requestUrlValue: string | null | undefined, res: ServerResponse) => {
@@ -82,52 +134,59 @@ function rssProxyPlugin() {
     const targetUrl = requestUrl?.searchParams.get('url')?.trim()
 
     if (!targetUrl) {
-      res.statusCode = 400
-      setNoStoreHeaders(res)
-      res.setHeader('Content-Type', 'application/json')
-      res.end(JSON.stringify({ error: 'Missing url query parameter' }))
+      sendJson(res, 400, { error: 'Missing url query parameter' })
       return
     }
 
     try {
-      const parsedUrl = new URL(targetUrl)
+      const parsedUrl = await validateRSSProxyTargetUrl(targetUrl)
+      const abortController = new AbortController()
+      const timeoutId = setTimeout(() => abortController.abort(), RSS_PROXY_TIMEOUT_MS)
 
-      if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-        throw new Error('Invalid protocol')
-      }
+      try {
+        const upstreamResponse = await fetch(parsedUrl, {
+          redirect: 'error',
+          signal: abortController.signal,
+          headers: {
+            Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9',
+            'User-Agent': 'Navet RSS Reader/1.0',
+          },
+        })
 
-      const upstreamResponse = await fetch(parsedUrl, {
-        headers: {
-          Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8',
-          'User-Agent': 'Navet RSS Reader/1.0',
-        },
-      })
-
-      if (!upstreamResponse.ok) {
-        res.statusCode = 502
-        setNoStoreHeaders(res)
-        res.setHeader('Content-Type', 'application/json')
-        res.end(
-          JSON.stringify({
+        if (!upstreamResponse.ok) {
+          sendJson(res, 502, {
             error: `Upstream feed request failed with status ${upstreamResponse.status}`,
           })
-        )
-        return
+          return
+        }
+
+        const contentType = upstreamResponse.headers.get('content-type')
+        if (!isAllowedRSSContentType(contentType)) {
+          sendJson(res, 502, { error: 'Upstream feed returned an unsupported content type' })
+          return
+        }
+
+        const contentLength = Number(upstreamResponse.headers.get('content-length') ?? '0')
+        if (contentLength > RSS_PROXY_MAX_BYTES) {
+          sendJson(res, 502, { error: 'Upstream feed is too large' })
+          return
+        }
+
+        const body = await upstreamResponse.text()
+        if (new TextEncoder().encode(body).byteLength > RSS_PROXY_MAX_BYTES) {
+          sendJson(res, 502, { error: 'Upstream feed is too large' })
+          return
+        }
+
+        res.statusCode = 200
+        setNoStoreHeaders(res)
+        res.setHeader('Content-Type', contentType ?? 'application/xml; charset=utf-8')
+        res.end(body)
+      } finally {
+        clearTimeout(timeoutId)
       }
-
-      const contentType =
-        upstreamResponse.headers.get('content-type') ?? 'application/xml; charset=utf-8'
-      const body = await upstreamResponse.text()
-
-      res.statusCode = 200
-      setNoStoreHeaders(res)
-      res.setHeader('Content-Type', contentType)
-      res.end(body)
     } catch {
-      res.statusCode = 502
-      setNoStoreHeaders(res)
-      res.setHeader('Content-Type', 'application/json')
-      res.end(JSON.stringify({ error: 'Unable to load feed' }))
+      sendJson(res, 502, { error: 'Unable to load feed' })
     }
   }
 
@@ -147,10 +206,22 @@ function rssProxyPlugin() {
 }
 
 function homeAssistantPreviewProxyPlugin(hassUrl?: string, hassToken?: string) {
+  const normalizedHassUrl = (() => {
+    if (!hassUrl) {
+      return null
+    }
+
+    try {
+      return new URL(hassUrl)
+    } catch {
+      return null
+    }
+  })()
+
   return {
     name: 'navet-ha-preview-proxy',
     configurePreviewServer(server: PreviewServer) {
-      if (!hassUrl) {
+      if (!normalizedHassUrl) {
         return
       }
 
@@ -162,8 +233,30 @@ function homeAssistantPreviewProxyPlugin(hassUrl?: string, hassToken?: string) {
         }
 
         try {
-          const targetUrl = new URL(req.url, `${hassUrl}/`)
+          let decodedUrl = ''
+          try {
+            decodedUrl = decodeURIComponent(req.url)
+          } catch {
+            res.statusCode = 400
+            res.end('Invalid proxy path')
+            return
+          }
+
+          if (req.url.includes('..') || decodedUrl.includes('..')) {
+            res.statusCode = 400
+            res.end('Invalid proxy path')
+            return
+          }
+
+          const targetUrl = new URL(req.url, normalizedHassUrl)
+          if (targetUrl.origin !== normalizedHassUrl.origin) {
+            res.statusCode = 400
+            res.end('Invalid proxy target')
+            return
+          }
+
           const upstreamResponse = await fetch(targetUrl, {
+            redirect: 'manual',
             headers: hassToken
               ? {
                 Authorization: `Bearer ${hassToken}`,
@@ -172,6 +265,7 @@ function homeAssistantPreviewProxyPlugin(hassUrl?: string, hassToken?: string) {
           })
 
           res.statusCode = upstreamResponse.status
+          setSecurityHeaders(res)
 
           const contentType = upstreamResponse.headers.get('content-type')
           if (contentType) {
@@ -274,7 +368,7 @@ export default defineConfig(({ mode }) => {
   return {
     base: './',
     cacheDir: '.cache/vite',
-    envPrefix: ['VITE_', 'NAVET_'],
+    envPrefix: ['VITE_'],
     define: {
       __APP_VERSION__: JSON.stringify(packageJson.version ?? '0.0.0'),
     },

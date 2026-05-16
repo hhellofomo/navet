@@ -25,6 +25,7 @@ the docs that are meant to describe the current codebase rather than historical 
 
 - [technical/REACT_ZUSTAND.md](technical/REACT_ZUSTAND.md): Zustand-only shared state guidance
 - [STORYBOOK_WORKFLOW.md](STORYBOOK_WORKFLOW.md): Storybook workflow and story authoring guide
+- [PUBLIC_LAUNCH_SECURITY.md](PUBLIC_LAUNCH_SECURITY.md): security gates and deployment hardening for public releases
 - [../design-system/README.md](../design-system/README.md): UI-layer boundaries and Storybook-first workflow
 - [../design-system/FEATURES.md](../design-system/FEATURES.md): current product surface, section routing, and ownership map
 - [../design-system/UI-GUIDELINES.md](../design-system/UI-GUIDELINES.md): visual rules, theme constraints, and performance-sensitive UI guidance

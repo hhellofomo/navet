@@ -24,11 +24,13 @@ import { BoundsFitter } from './map-bounds-fitter';
 import { buildMarkerIcon } from './map-marker-icon';
 import { mapMarkersEqual, selectMapMarkersFromHa } from './map-markers';
 import { getTileUrl, TILE_ATTRIBUTION } from './map-tiles';
+import type { MapMarker } from './map-types';
 import { getDashboardWidgetSurfaceTokens } from './widget-surface-tokens';
 
 export interface MapWidgetProps {
   size?: CardSize;
   tintColor?: string;
+  markers?: MapMarker[];
   onTintColorChange?: (color: string) => void;
   isEditMode?: boolean;
 }
@@ -82,6 +84,7 @@ function MapSettingsDialog({
 export const MapWidget = memo(function MapWidget({
   size = 'large',
   tintColor,
+  markers: staticMarkers,
   onTintColorChange,
   isEditMode = false,
 }: MapWidgetProps) {
@@ -110,7 +113,8 @@ export const MapWidget = memo(function MapWidget({
   );
   const mapInnerStyle = useMemo(() => surface.panelStyle, [surface.panelStyle]);
 
-  const markers = useHomeAssistant(selectMapMarkersFromHa, mapMarkersEqual);
+  const homeAssistantMarkers = useHomeAssistant(selectMapMarkersFromHa, mapMarkersEqual);
+  const markers = staticMarkers ?? homeAssistantMarkers;
   const resolvedMarkers = useMemo(
     () =>
       markers.map((marker) => ({

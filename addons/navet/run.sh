@@ -8,10 +8,22 @@ NGINX_CONF="/etc/nginx/http.d/default.conf"
 HASS_URL="$(bashio::config 'hass_url')"
 HASS_TOKEN="$(bashio::config 'token')"
 
+if [[ -n "${HASS_URL}" && ! "${HASS_URL}" =~ ^https?:// ]]; then
+  echo "hass_url must be empty or start with http:// or https://" >&2
+  exit 1
+fi
+
+if [[ "${HASS_URL}${HASS_TOKEN}" == *\"* || "${HASS_URL}${HASS_TOKEN}" == *\'* || "${HASS_URL}${HASS_TOKEN}" == *";"* ]]; then
+  echo "hass_url and token must not contain quotes or semicolons" >&2
+  exit 1
+fi
+
+HASS_URL_JS="${HASS_URL//\\/\\\\}"
+HASS_URL_JS="${HASS_URL_JS//\"/\\\"}"
+
 cat > "${CONFIG_FILE}" <<EOF
 window.__NAVET_CONFIG__ = {
-  hassUrl: "${HASS_URL}",
-  token: "${HASS_TOKEN}"
+  hassUrl: "${HASS_URL_JS}"
 };
 EOF
 
@@ -29,7 +41,12 @@ server {
   root /usr/share/nginx/html;
   index index.html;
 
+  include /etc/nginx/snippets/navet-security-headers.conf;
+
   location /__navet_ha_proxy__/ {
+    if (\$uri ~ "\.\.") {
+      return 400;
+    }
     proxy_pass ${HASS_URL}/;
     proxy_http_version 1.1;
     proxy_set_header Host \$proxy_host;

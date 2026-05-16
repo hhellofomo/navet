@@ -16,19 +16,19 @@ describe('useThemeStore', () => {
     });
 
     expect(useThemeStore.getState().theme).toBe('black');
-    expect(useThemeStore.getState().wallpaper).toBe('./wallpapers/sunrise.jpg');
+    expect(useThemeStore.getState().wallpaper).toBe('/wallpapers/sunrise.jpg');
   });
 
   it('normalizes same-origin wallpaper URLs when set directly', () => {
     useThemeStore.getState().setWallpaper(`${window.location.origin}/wallpapers/aurora.jpg`);
 
-    expect(useThemeStore.getState().wallpaper).toBe('./wallpapers/aurora.jpg');
+    expect(useThemeStore.getState().wallpaper).toBe('/wallpapers/aurora.jpg');
   });
 
   it('maps legacy adaptive wallpaper presets to the flat pack', () => {
     useThemeStore.getState().setWallpaper('preset:soft-dark-gradient');
 
-    expect(useThemeStore.getState().wallpaper).toBe('./wallpapers/soft-dark-gradient.svg');
+    expect(useThemeStore.getState().wallpaper).toBe('/wallpapers/soft-dark-gradient.svg');
   });
 
   it('rehydrates normalized persisted values', async () => {
@@ -47,7 +47,7 @@ describe('useThemeStore', () => {
     await useThemeStore.persist.rehydrate();
 
     expect(useThemeStore.getState().theme).toBe('black');
-    expect(useThemeStore.getState().wallpaper).toBe('./wallpapers/night.jpg');
+    expect(useThemeStore.getState().wallpaper).toBe('/wallpapers/night.jpg');
     expect(useThemeStore.getState().primaryColor).toBe('green');
   });
 });
