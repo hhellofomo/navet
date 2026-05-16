@@ -19,7 +19,6 @@ the docs that are meant to describe the current codebase rather than historical 
 - [DOCKER_HOME_ASSISTANT_ADDON.md](DOCKER_HOME_ASSISTANT_ADDON.md): Docker and Home Assistant add-on deployment
 - [VERSIONING.md](VERSIONING.md): release numbering and bump policy
 - [ROADMAP.md](ROADMAP.md): planned work and shipped history
-- [card-properties.md](card-properties.md): card behavior and property reference
 
 ### Architecture and implementation
 
@@ -29,7 +28,6 @@ the docs that are meant to describe the current codebase rather than historical 
 - [../design-system/README.md](../design-system/README.md): UI-layer boundaries and Storybook-first workflow
 - [../design-system/FEATURES.md](../design-system/FEATURES.md): current product surface, section routing, and ownership map
 - [../design-system/UI-GUIDELINES.md](../design-system/UI-GUIDELINES.md): visual rules, theme constraints, and performance-sensitive UI guidance
-- [../design-system/STORYBOOK_FOUNDATION.md](../design-system/STORYBOOK_FOUNDATION.md): Storybook structure and workshop rules
 
 ### Branding and legal
 
@@ -69,8 +67,7 @@ Use these directories when docs need to be checked against the live implementati
 1. [../design-system/README.md](../design-system/README.md)
 2. [../design-system/UI-GUIDELINES.md](../design-system/UI-GUIDELINES.md)
 3. [STORYBOOK_WORKFLOW.md](STORYBOOK_WORKFLOW.md)
-4. [../design-system/STORYBOOK_FOUNDATION.md](../design-system/STORYBOOK_FOUNDATION.md)
-5. [../README.md](../README.md) for current command and review workflow
+4. [../README.md](../README.md) for current command and review workflow
 
 ### Working on dashboard, state, or section flows
 
@@ -101,9 +98,4 @@ Use these directories when docs need to be checked against the live implementati
 - When the Home Assistant service split or typed event flow changes, update `README.md` and `technical/REACT_ZUSTAND.md`
 - When setup scripts or test commands change, update `README.md`
 
-## Known Scope
-
-This index intentionally focuses on active docs. Some older topic documents may still need a deeper
-staleness audit, especially if they describe features that have evolved faster than the docs.
-
-Last updated: May 15, 2026
+Last updated: May 17, 2026

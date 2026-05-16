@@ -36,10 +36,7 @@ Use this folder when you are:
 
 - [UI-GUIDELINES.md](UI-GUIDELINES.md): visual rules, accessibility, motion, and performance constraints
 - [FEATURES.md](FEATURES.md): current feature inventory, ownership map, and test/story coverage
-- [STORYBOOK_FOUNDATION.md](STORYBOOK_FOUNDATION.md): Storybook structure and review workflow
 - [../docs/STORYBOOK_WORKFLOW.md](../docs/STORYBOOK_WORKFLOW.md): story placement, fixtures, UI-kit discovery, and review checklist
-- [LAYOUT-STRUCTURE.md](LAYOUT-STRUCTURE.md): app-shell and layout architecture
-- [MOODBOARD.md](MOODBOARD.md): visual direction and references
 
 ## Shared UI Layers
 
@@ -149,7 +146,7 @@ portable primitive behavior.
 ## Foundations and Tokens
 
 The first-layer shared foundations live in
-[`src/app/components/system/tokens/foundations.ts`](/Users/vishal/Development/Github/Navet/Navet/src/app/components/system/tokens/foundations.ts).
+[`src/app/components/system/tokens/foundations.ts`](../src/app/components/system/tokens/foundations.ts).
 
 This file is the common source for:
 
@@ -180,7 +177,7 @@ Navet supports four themes:
 - `black`
 
 Shared surface decisions should resolve through helpers in
-[`src/app/components/shared/theme/`](/Users/vishal/Development/Github/Navet/Navet/src/app/components/shared/theme), especially:
+[`src/app/components/shared/theme/`](../src/app/components/shared/theme), especially:
 
 - `theme-surface-tokens`
 - `card-shell-surface-tokens`
@@ -197,7 +194,7 @@ settings mention `contrast`, treat that as legacy naming rather than the preferr
 ## Card System
 
 The canonical size registry lives in
-[`src/app/components/shared/card-size-selector.tsx`](/Users/vishal/Development/Github/Navet/Navet/src/app/components/shared/card-size-selector.tsx).
+[`src/app/components/shared/card-size-selector.tsx`](../src/app/components/shared/card-size-selector.tsx).
 
 Supported sizes:
 
@@ -264,11 +261,11 @@ Storybook currently covers:
 - settings sections
 
 Cross-feature story helpers live in
-[`src/app/storybook/`](/Users/vishal/Development/Github/Navet/Navet/src/app/storybook). Import frame
+[`src/app/storybook/`](../src/app/storybook). Import frame
 helpers from `@/app/storybook/story-frames`.
 
 Storybook authoring details live in
-[`docs/STORYBOOK_WORKFLOW.md`](/Users/vishal/Development/Github/Navet/Navet/docs/STORYBOOK_WORKFLOW.md).
+[`docs/STORYBOOK_WORKFLOW.md`](../docs/STORYBOOK_WORKFLOW.md).
 Use that guide for story placement, fixture rules, UI-kit discovery updates, and review checklists.
 
 ## Testing Shared UI Logic
@@ -279,12 +276,12 @@ behavior.
 
 Shared test support lives in:
 
-- [`src/setupTests.ts`](/Users/vishal/Development/Github/Navet/Navet/src/setupTests.ts)
-- [`src/test/render.tsx`](/Users/vishal/Development/Github/Navet/Navet/src/test/render.tsx)
-- [`src/test/store-reset.ts`](/Users/vishal/Development/Github/Navet/Navet/src/test/store-reset.ts)
-- [`src/test/browser-mocks.ts`](/Users/vishal/Development/Github/Navet/Navet/src/test/browser-mocks.ts)
-- [`src/test/factories/home-assistant-service-stub.ts`](/Users/vishal/Development/Github/Navet/Navet/src/test/factories/home-assistant-service-stub.ts)
-- [`src/test/mocks/virtual-pwa-register.ts`](/Users/vishal/Development/Github/Navet/Navet/src/test/mocks/virtual-pwa-register.ts)
+- [`src/setupTests.ts`](../src/setupTests.ts)
+- [`src/test/render.tsx`](../src/test/render.tsx)
+- [`src/test/store-reset.ts`](../src/test/store-reset.ts)
+- [`src/test/browser-mocks.ts`](../src/test/browser-mocks.ts)
+- [`src/test/factories/home-assistant-service-stub.ts`](../src/test/factories/home-assistant-service-stub.ts)
+- [`src/test/mocks/virtual-pwa-register.ts`](../src/test/mocks/virtual-pwa-register.ts)
 
 Use unit tests for:
 

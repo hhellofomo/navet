@@ -73,20 +73,18 @@ The GitHub Actions publish workflow publishes a multi-arch image to GitHub Conta
 - `ghcr.io/<owner>/navet:sha-<commit>`
 - `ghcr.io/<owner>/navet:latest`
 
-Manual dispatch can still publish an additional version tag such as `0.1.0-private.1`.
+Manual dispatch can still publish an additional version tag such as `0.1.0-beta.3`.
 
-### Private GHCR Deployment
+### GHCR Deployment
 
-Because the repository is private, the GHCR image is private by default.
-
-Typical pull flow on your deployment host:
+If the published GHCR image is public, deployment hosts can pull it directly:
 
 ```bash
-echo $GITHUB_TOKEN | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
 docker pull ghcr.io/<owner>/navet:latest
 ```
 
-The token should have package read access.
+If you publish the image from a fork or private registry, use the matching owner and registry
+authentication policy for that environment.
 
 ## Option 2: Home Assistant Add-on
 
@@ -136,7 +134,7 @@ Typical flow:
 
 ### Update Flow
 
-For private Home Assistant development:
+For Home Assistant add-on updates:
 
 1. Update files in this repo
 2. Bump `addons/navet/config.yaml` version
@@ -193,20 +191,17 @@ The CI workflow runs on pushes to `main` and on pull requests. It currently:
 6. Runs `pnpm test`
 7. Runs `pnpm build`
 
-## Recommended Private Workflow
+## Public Release Notes
 
-If you are the only consumer right now:
-
-1. Keep the repo private
-2. Let pushes to `main` publish the GHCR add-on image
-3. Refresh and rebuild the Home Assistant add-on from the custom repository
-4. Move to tag-based or public releases only when you are ready to distribute the project
+- Keep Docker and add-on image tags aligned with `package.json` and `addons/navet/config.yaml`
+- Prefer documented release tags for public users over asking them to track `main`
+- Keep `NAVET_HASS_TOKEN` server-only in Docker and add-on deployments
 
 ## Notes Specific to This Repo
 
-- `vite.config.ts` currently sets the dev server host to `navet.local` on port `5200`
-- Local development also requires a hosts-file entry such as `127.0.0.1 navet.local`
-- That only affects development and does not block Docker packaging
+- `vite.config.ts` controls the local development host and port
+- A local hostname such as `navet.local` may require a hosts-file entry
+- Local development host settings do not affect Docker packaging
 - `index.html` now loads `/config.js` before the app bootstraps
 - Home Assistant credentials are still persisted in browser storage after login
 - Dashboard config export/import intentionally excludes connection URL and token

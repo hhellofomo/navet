@@ -44,7 +44,7 @@ Examples:
 ## Source Of Truth
 
 - `package.json` is the canonical app version
-- the in-app Settings -> Project screen reads the version from `package.json` through [app-version.ts](/Users/vishal/Development/Github/Navet/Navet/src/app/constants/app-version.ts)
+- the in-app Settings -> Project screen reads the version from `package.json` through [app-version.ts](../src/app/constants/app-version.ts)
 
 ## Release Flow
 
@@ -54,7 +54,7 @@ Recommended lightweight flow:
 2. Bump `package.json`.
 3. If the release meaning changed, update this file.
 4. Tag the commit with `v<version>`, for example `v0.1.0-beta.2`.
-5. Push the tag to GitHub to trigger [.github/workflows/github-release.yml](/Users/vishal/Development/Github/Navet/Navet/.github/workflows/github-release.yml).
+5. Push the tag to GitHub to trigger [.github/workflows/github-release.yml](../.github/workflows/github-release.yml).
 6. If needed, manually run the container publish workflows for matching image tags.
 
 ## GitHub Releases
