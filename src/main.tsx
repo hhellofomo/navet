@@ -4,7 +4,7 @@ import DemoApp from './app/demo/demo-app.tsx';
 import { registerPwaServiceWorker } from './app/pwa/pwa-update-store';
 import './styles/index.css';
 
-const isDemoRoute = window.location.pathname.startsWith('/demo');
+const isDemoRoute = window.location.pathname.split('/').filter(Boolean).includes('demo');
 
 if (!isDemoRoute) {
   registerPwaServiceWorker();

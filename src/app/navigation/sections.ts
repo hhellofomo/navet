@@ -31,9 +31,19 @@ const getBasePath = (): string => {
   return href.endsWith('/') ? href : `${href}/`;
 };
 
+const getDemoPathPrefix = (pathname: string): string | null => {
+  const segments = pathname.split('/').filter(Boolean);
+  const demoSegmentIndex = segments.indexOf('demo');
+  if (demoSegmentIndex === -1) return null;
+  return `/${segments.slice(0, demoSegmentIndex + 1).join('/')}`;
+};
+
 export const sectionToPath = (section: Section): string => {
-  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/demo')) {
-    return section === 'home' ? '/demo' : `/demo/${section}`;
+  if (typeof window !== 'undefined') {
+    const demoPathPrefix = getDemoPathPrefix(window.location.pathname);
+    if (demoPathPrefix) {
+      return section === 'home' ? demoPathPrefix : `${demoPathPrefix}/${section}`;
+    }
   }
 
   const base = getBasePath();
@@ -41,8 +51,10 @@ export const sectionToPath = (section: Section): string => {
 };
 
 export const pathToSection = (pathname: string): Section => {
-  if (pathname === '/demo' || pathname.startsWith('/demo/')) {
-    const segment = pathname.replace(/^\/demo\/?/, '').split('/')[0] ?? '';
+  const pathSegments = pathname.split('/').filter(Boolean);
+  const demoSegmentIndex = pathSegments.indexOf('demo');
+  if (demoSegmentIndex !== -1) {
+    const segment = pathSegments[demoSegmentIndex + 1] ?? '';
     if (!segment || !isSection(segment)) return 'home';
     return segment;
   }

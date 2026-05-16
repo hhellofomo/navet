@@ -56,7 +56,8 @@ const DEMO_ROOMS = [
   'Toilet',
   'Unassigned',
 ];
-const DEMO_WALLPAPER = '/demo/navet-demo-background.jpg';
+const DEMO_ASSET_BASE_PATH = `${import.meta.env.BASE_URL}demo/`;
+const DEMO_WALLPAPER = `${DEMO_ASSET_BASE_PATH}navet-demo-background.jpg`;
 
 const energyTrend = [
   ['00:00', 420],
@@ -186,7 +187,7 @@ const demoHomeWidgets: CustomCard[] = [
     createdAt: 2,
     data: {
       sourceMode: 'urls',
-      photoUrls: ['/demo/navet-demo-background.jpg'],
+      photoUrls: [DEMO_WALLPAPER],
       shuffleEnabled: false,
     },
   },
@@ -1209,13 +1210,14 @@ function DemoSectionContent({ section, activeRoom }: { section: DemoSection; act
 }
 
 function getDemoSectionFromPath() {
-  const [, rootSegment, sectionSegment] = window.location.pathname.split('/');
+  const pathSegments = window.location.pathname.split('/').filter(Boolean);
+  const demoSegmentIndex = pathSegments.indexOf('demo');
 
-  if (rootSegment !== 'demo') {
+  if (demoSegmentIndex === -1) {
     return null;
   }
 
-  return sanitizeDemoSection(sectionSegment);
+  return sanitizeDemoSection(pathSegments[demoSegmentIndex + 1]);
 }
 
 function sanitizeDemoSection(value: unknown): DemoSection {
