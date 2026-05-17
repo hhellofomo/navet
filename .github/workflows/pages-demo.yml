@@ -34,6 +34,9 @@ jobs:
       - name: Activate pinned pnpm
         run: corepack install
 
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -48,6 +51,21 @@ jobs:
             mkdir -p "pages/demo/${section}"
             cp pages/demo/index.html "pages/demo/${section}/index.html"
           done
+          printf '%s\n' \
+            '<!doctype html>' \
+            '<html lang="en">' \
+            '  <head>' \
+            '    <meta charset="utf-8">' \
+            '    <meta name="viewport" content="width=device-width, initial-scale=1">' \
+            '    <meta http-equiv="refresh" content="0; url=/navet/demo/">' \
+            '    <title>Navet Demo</title>' \
+            "    <script>window.location.replace('/navet/demo/')</script>" \
+            '  </head>' \
+            '  <body>' \
+            '    <a href="/navet/demo/">Open the Navet demo</a>' \
+            '  </body>' \
+            '</html>' \
+            > pages/index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
