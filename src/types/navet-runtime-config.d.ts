@@ -1,5 +1,6 @@
 interface NavetRuntimeConfig {
   hassUrl?: string;
+  hassToken?: string;
 }
 
 interface Window {

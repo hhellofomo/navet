@@ -23,11 +23,19 @@ Connects to Home Assistant over WebSocket.
 pnpm typecheck    # type-check without emitting
 pnpm check        # Biome lint + format check
 pnpm format       # Biome format (auto-fix)
+pnpm check:stories # validate Storybook title, coverage, and ownership rules
+pnpm check:ui-kit  # validate UI-kit import and boundary rules
+pnpm test          # unit tests
+pnpm storybook:build # static Storybook build for GitHub Pages
 ```
 
 **Do not run `pnpm build` unless explicitly asked.**
 **Do not run `pnpm typecheck` or `pnpm check` yourself** — ask the user to run them and report back.
 If a commit or hook is blocked by TypeScript errors, fix the type errors instead of updating or relying on a typecheck baseline.
+
+Storybook builds for GitHub Pages at `/navet/storybook/` via `STORYBOOK_BASE_PATH=/navet/storybook/`.
+Keep manager and preview asset paths relative or base-aware; do not add root-relative `/logo.svg`
+style paths in Storybook configuration.
 
 ---
 
@@ -57,15 +65,25 @@ src/app/
     system/        # Curated public surface for Storybook and cross-app discovery
     shared/        # App-specific shared UI + compatibility shims
     figma/         # Design integration components
+  config/          # App-level configuration helpers
+  constants/       # Shared constants
   stores/          # All Zustand stores (auth, config, HA, settings, theme, navigation …)
   pwa/             # PWA update state and install/update support
   services/        # HomeAssistantService — WebSocket + HA API
   hooks/           # Shared hook modules (useHomeAssistant, useDeviceMap, useCardState …)
+    device-mappers/ # HA domain-specific entity-to-device mappers
+    entity-utils/   # Shared HA entity parsing and formatting helpers
+    theme-generators/
   session/         # Config serialization helpers
   utils/           # Pure helpers (storage, effects-quality, colors, dashboard-config)
   i18n/            # Translation files (en, sv, de, fr, es)
+  marketing/       # Marketing/public-site support modules
   navigation/      # Section type and helpers
   storybook/       # Shared Storybook utilities (story-frames, story-docs)
+  ui-kit/          # Storybook-facing inventory, overview, and recipe stories
+  test-utils/      # Shared test helpers
+  types/           # Shared app-level TypeScript types
+  demo/            # GitHub Pages demo app and demo data
 ```
 
 ---
@@ -233,6 +251,18 @@ copy all service state on every event.
 
 ---
 
+## Publishing Rules
+
+- CI checks run on branch pushes and pull requests.
+- GitHub Pages deploys the demo at `/navet/demo/` and Storybook at `/navet/storybook/`.
+- Pushes to `main` publish only developer app images: `ghcr.io/awesomestvi/navet:dev` and `sha-*`.
+- Manual Publish workflow runs are for developer hardware testing and default to the `dev` app image tag.
+- Public beta app images publish only from `v*-alpha.*`, `v*-beta.*`, and `v*-rc.*` tags. They update the exact tag, `beta`, `latest`, and `sha-*`.
+- Home Assistant add-on images do not publish on every `main` push. They publish on manual workflow runs as `dev` or on public beta tags as add-on version, `beta`, `latest`, and `sha-*`.
+- There is no stable channel yet. Treat `latest` as the current public beta compatibility tag because existing users already consume it.
+
+---
+
 ## Key Files
 
 | File | Purpose |
@@ -245,11 +275,15 @@ copy all service state on every event.
 | [src/app/features/dashboard/utils/card-renderer.tsx](src/app/features/dashboard/utils/card-renderer.tsx) | Dashboard card registry |
 | [src/app/components/shared/theme/theme-surface-tokens.ts](src/app/components/shared/theme/theme-surface-tokens.ts) | Shared surface theme tokens |
 | [src/app/hooks/use-ha-devices.ts](src/app/hooks/use-ha-devices.ts) | HA entity to device type mapping |
-| [src/app/hooks/ha-entity-utils.ts](src/app/hooks/ha-entity-utils.ts) | Entity transformation utilities |
-| [src/app/hooks/ha-device-mappers.ts](src/app/hooks/ha-device-mappers.ts) | Device mapper registry |
+| [src/app/hooks/device-mappers/](src/app/hooks/device-mappers/) | Domain-specific HA device mapper modules |
+| [src/app/hooks/entity-utils/](src/app/hooks/entity-utils/) | Shared HA entity parsing and formatting helpers |
+| [src/app/hooks/ha-entity-utils.ts](src/app/hooks/ha-entity-utils.ts) | Compatibility barrel for entity transformation utilities |
+| [src/app/hooks/ha-device-mappers.ts](src/app/hooks/ha-device-mappers.ts) | Compatibility barrel for the device mapper registry |
 | [src/app/stores/selectors.ts](src/app/stores/selectors.ts) | Typed selectors for all stores |
 | [src/app/storybook/story-frames.tsx](src/app/storybook/story-frames.tsx) | Shared Storybook frame utilities — `EntityCardStoryFrame`, `SettingsDialogStoryFrame`, `noopCardSizeChange` |
 | [src/app/storybook/story-docs.ts](src/app/storybook/story-docs.ts) | Story-specific documentation strings |
+| [src/app/ui-kit/](src/app/ui-kit/) | Storybook UI-kit discovery pages |
+| [.storybook/main.ts](.storybook/main.ts) | Storybook Vite integration, static assets, and base path support |
 | [docs/technical/REACT_ZUSTAND.md](docs/technical/REACT_ZUSTAND.md) | State management decision guide |
 | [design-system/UI-GUIDELINES.md](design-system/UI-GUIDELINES.md) | Color system, typography, card sizes, glass effects |
 | [design-system/FEATURES.md](design-system/FEATURES.md) | Feature map with test locations |

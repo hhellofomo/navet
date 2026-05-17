@@ -1,5 +1,6 @@
 interface NavetRuntimeConfig {
   hassUrl?: string;
+  hassToken?: string;
 }
 
 function normalizeValue(value: string | undefined): string | undefined {
@@ -21,5 +22,6 @@ export function getRuntimeConfig(): NavetRuntimeConfig {
 
   return {
     hassUrl: normalizeUrl(runtimeConfig.hassUrl),
+    hassToken: normalizeValue(runtimeConfig.hassToken),
   };
 }

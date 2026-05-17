@@ -20,10 +20,13 @@ fi
 
 HASS_URL_JS="${HASS_URL//\\/\\\\}"
 HASS_URL_JS="${HASS_URL_JS//\"/\\\"}"
+HASS_TOKEN_JS="${HASS_TOKEN//\\/\\\\}"
+HASS_TOKEN_JS="${HASS_TOKEN_JS//\"/\\\"}"
 
 cat > "${CONFIG_FILE}" <<EOF
 window.__NAVET_CONFIG__ = {
-  hassUrl: "${HASS_URL_JS}"
+  hassUrl: "${HASS_URL_JS}",
+  hassToken: "${HASS_TOKEN_JS}"
 };
 EOF
 

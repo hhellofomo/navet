@@ -1,3 +1,4 @@
 window.__NAVET_CONFIG__ = {
-  hassUrl: "${NAVET_HASS_URL_JS}"
+  hassUrl: "${NAVET_HASS_URL_JS}",
+  hassToken: "${NAVET_HASS_TOKEN_JS}"
 };

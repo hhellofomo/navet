@@ -46,7 +46,8 @@ The production container writes `/config.js` from:
 - `NAVET_HASS_URL`
 - `NAVET_HASS_TOKEN`
 
-If those are unset, Navet falls back to manual setup in the UI.
+If both are set, Navet uses them as the initial Home Assistant session and opens the dashboard
+without the login form. If either is unset, Navet falls back to manual setup in the UI.
 
 Direct RSS URLs also flow through the same-origin `/__navet_rss_proxy__` path. nginx handles those
 requests directly through its embedded `njs` runtime so the browser avoids CORS issues without a
@@ -155,11 +156,12 @@ For standalone Docker users:
 The app resolves Home Assistant defaults in this order:
 
 1. Browser `localStorage`
-2. Runtime `window.__NAVET_CONFIG__` from `/config.js` for `hassUrl` only
-3. Server-side nginx proxy authorization from `NAVET_HASS_TOKEN`
+2. Runtime `window.__NAVET_CONFIG__` from `/config.js`
+3. Manual setup in the UI
 
-`NAVET_HASS_TOKEN` is intentionally server-only. It must not be exposed through `/config.js`, a
-static hosted build, or any browser-readable runtime configuration.
+Standalone Docker and add-on deployments serve `/config.js` only from the running instance. Treat
+`NAVET_HASS_TOKEN` as a deployment secret and use a least-privilege Home Assistant token for shared
+dashboard devices.
 
 ## Current Performance Work
 
