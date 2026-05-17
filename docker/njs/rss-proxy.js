@@ -8,6 +8,7 @@ var PRIVATE_HOSTNAMES = {
   'localhost.': true,
   '0.0.0.0': true,
 };
+var HTTPS_URL_PATTERN = /^https:\/\/(?:[^/?#@]+@)?(\[[^\]]+\]|[^/?#:]+)(?::[0-9]+)?(?:[/?#]|$)/i;
 
 function sendJson(r, statusCode, payload) {
   r.headersOut['Cache-Control'] = 'no-store';
@@ -62,34 +63,88 @@ function isBlockedHostname(hostname) {
   );
 }
 
-async function handle(r) {
+function decodeQueryValue(value) {
+  try {
+    return decodeURIComponent(value.replace(/\+/g, ' '));
+  } catch (error) {
+    return value;
+  }
+}
+
+function getRawQueryString(r) {
+  return typeof r.variables.args === 'string' ? r.variables.args : '';
+}
+
+function getTargetUrlFromRawQuery(r) {
+  var query = getRawQueryString(r);
+  if (!query) {
+    return '';
+  }
+
+  var pairs = query.split('&');
+  for (var i = 0; i < pairs.length; i += 1) {
+    var pair = pairs[i];
+    var separatorIndex = pair.indexOf('=');
+    var rawKey = separatorIndex === -1 ? pair : pair.slice(0, separatorIndex);
+    if (decodeQueryValue(rawKey) !== 'url') {
+      continue;
+    }
+
+    var rawValue = separatorIndex === -1 ? '' : pair.slice(separatorIndex + 1);
+    return decodeQueryValue(rawValue).trim();
+  }
+
+  return '';
+}
+
+function getTargetUrl(r) {
   var targetUrl = typeof r.args.url === 'string' ? r.args.url.trim() : '';
+  if (!targetUrl) {
+    targetUrl = getTargetUrlFromRawQuery(r);
+  }
+
+  if (targetUrl.indexOf('https%3A') === 0 || targetUrl.indexOf('https%3a') === 0) {
+    targetUrl = decodeQueryValue(targetUrl).trim();
+  }
+
+  return targetUrl;
+}
+
+function getHttpsHostname(targetUrl) {
+  var match = HTTPS_URL_PATTERN.exec(targetUrl);
+  if (!match) {
+    return null;
+  }
+
+  return match[1].replace(/^\[/, '').replace(/\]$/, '');
+}
+
+async function handle(r) {
+  var targetUrl = getTargetUrl(r);
 
   if (!targetUrl) {
     sendJson(r, 400, { error: 'Missing url query parameter' });
     return;
   }
 
-  var parsedUrl;
-  try {
-    parsedUrl = new URL(targetUrl);
-  } catch (error) {
-    sendJson(r, 400, { error: 'Invalid feed URL' });
-    return;
-  }
-
-  if (parsedUrl.protocol !== 'https:') {
+  if (targetUrl.indexOf('https://') !== 0) {
     sendJson(r, 400, { error: 'Only HTTPS feeds are allowed' });
     return;
   }
 
-  if (isBlockedHostname(parsedUrl.hostname)) {
+  var hostname = getHttpsHostname(targetUrl);
+  if (!hostname) {
+    sendJson(r, 400, { error: 'Invalid feed URL' });
+    return;
+  }
+
+  if (isBlockedHostname(hostname)) {
     sendJson(r, 400, { error: 'Private feed hosts are not allowed' });
     return;
   }
 
   try {
-    var response = await ngx.fetch(parsedUrl.toString(), {
+    var response = await ngx.fetch(targetUrl, {
       headers: {
         Accept: ACCEPT_HEADER,
         'User-Agent': USER_AGENT,

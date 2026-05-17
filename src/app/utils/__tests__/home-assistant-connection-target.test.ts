@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
+  resolveAddonLocalEndpointUrl,
   resolveHomeAssistantConnectionUrl,
   resolveIngressAwarePath,
 } from '../home-assistant-connection-target';
@@ -8,6 +9,7 @@ describe('home-assistant-connection-target', () => {
   beforeEach(() => {
     window.__NAVET_CONFIG__ = undefined;
     document.querySelector('base')?.remove();
+    window.history.replaceState(null, '', '/');
   });
 
   it('keeps user-entered Home Assistant URLs for non-runtime sessions', () => {
@@ -42,5 +44,41 @@ describe('home-assistant-connection-target', () => {
     expect(resolveIngressAwarePath('/__navet_ha_proxy__')).toBe(
       '/api/hassio_ingress/addon-slug/__navet_ha_proxy__'
     );
+  });
+
+  it('uses an ingress-aware same-origin URL for add-on-local endpoints', () => {
+    const base = document.createElement('base');
+    base.href = `${window.location.origin}/api/hassio_ingress/navet_dev/`;
+    document.head.append(base);
+
+    expect(resolveAddonLocalEndpointUrl('/__navet_session__/default')).toBe(
+      `${window.location.origin}/api/hassio_ingress/navet_dev/__navet_session__/default`
+    );
+  });
+
+  it('infers the ingress base from the current path when the base tag is missing', () => {
+    window.history.replaceState(null, '', '/api/hassio_ingress/navet_dev/dashboard');
+
+    expect(resolveAddonLocalEndpointUrl('/__navet_profile__/default')).toBe(
+      `${window.location.origin}/api/hassio_ingress/navet_dev/__navet_profile__/default`
+    );
+  });
+
+  it('uses the ingress-aware proxy URL for matching hosted runtime sessions', () => {
+    const base = document.createElement('base');
+    base.href = `${window.location.origin}/api/hassio_ingress/navet_dev/`;
+    document.head.append(base);
+    window.__NAVET_CONFIG__ = {
+      hassUrl: 'https://ha.example.com',
+      hassToken: 'runtime-token',
+      proxyBaseUrl: '/__navet_ha_proxy__',
+    };
+
+    expect(
+      resolveHomeAssistantConnectionUrl({
+        url: 'https://ha.example.com',
+        token: 'stored-user-token',
+      })
+    ).toBe(`${window.location.origin}/api/hassio_ingress/navet_dev/__navet_ha_proxy__`);
   });
 });
