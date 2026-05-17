@@ -7,20 +7,30 @@ import { useI18n } from '@/app/hooks';
 import type { EffectsQuality } from '@/app/stores/settings-store';
 import { detectDeviceTier } from '@/app/utils/detect-device-tier';
 import { getLegacyReducedEffectsFlags } from '@/app/utils/effects-quality';
+import { getPublicAssetUrl } from '@/app/utils/public-assets';
 import type { SettingsSectionController } from '../hooks/use-settings-section-controller';
 import { SettingsItem } from './settings-section-shell';
 
 const BUILT_IN_WALLPAPERS = [
-  { id: 'soft-dark-gradient', src: '/wallpapers/soft-dark-gradient.svg' },
-  { id: 'frosted-glass-abstract', src: '/wallpapers/frosted-glass-abstract.svg' },
-  { id: 'blurred-forest-mood', src: '/wallpapers/blurred-forest-mood.svg' },
-  { id: 'luxury-living-room-ambient', src: '/wallpapers/luxury-living-room-ambient.svg' },
-  { id: 'matte-concrete-texture', src: '/wallpapers/matte-concrete-texture.svg' },
-  { id: 'muted-nebula-space', src: '/wallpapers/muted-nebula-space.svg' },
-  { id: 'scandinavian-warm-neutral', src: '/wallpapers/scandinavian-warm-neutral.svg' },
-  { id: 'subtle-smart-grid', src: '/wallpapers/subtle-smart-grid.svg' },
-  { id: 'pure-oled-black-luxury', src: '/wallpapers/pure-oled-black-luxury.svg' },
-  { id: 'dynamic-sunrise-gradient', src: '/wallpapers/dynamic-sunrise-gradient.svg' },
+  { id: 'soft-dark-gradient', src: getPublicAssetUrl('wallpapers/soft-dark-gradient.svg') },
+  { id: 'frosted-glass-abstract', src: getPublicAssetUrl('wallpapers/frosted-glass-abstract.svg') },
+  { id: 'blurred-forest-mood', src: getPublicAssetUrl('wallpapers/blurred-forest-mood.svg') },
+  {
+    id: 'luxury-living-room-ambient',
+    src: getPublicAssetUrl('wallpapers/luxury-living-room-ambient.svg'),
+  },
+  { id: 'matte-concrete-texture', src: getPublicAssetUrl('wallpapers/matte-concrete-texture.svg') },
+  { id: 'muted-nebula-space', src: getPublicAssetUrl('wallpapers/muted-nebula-space.svg') },
+  {
+    id: 'scandinavian-warm-neutral',
+    src: getPublicAssetUrl('wallpapers/scandinavian-warm-neutral.svg'),
+  },
+  { id: 'subtle-smart-grid', src: getPublicAssetUrl('wallpapers/subtle-smart-grid.svg') },
+  { id: 'pure-oled-black-luxury', src: getPublicAssetUrl('wallpapers/pure-oled-black-luxury.svg') },
+  {
+    id: 'dynamic-sunrise-gradient',
+    src: getPublicAssetUrl('wallpapers/dynamic-sunrise-gradient.svg'),
+  },
 ] as const;
 
 export function AppearanceThemeAccentItem({

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { getPublicAssetUrl } from '@/app/utils/public-assets';
 import { sanitizeImageUrl } from '@/app/utils/url-security';
 
 export type ThemeMode = 'light' | 'dark' | 'black' | 'glass';
@@ -15,16 +16,18 @@ export type PrimaryColor =
   | 'custom';
 
 const LEGACY_ADAPTIVE_WALLPAPER_MAP: Record<string, string> = {
-  'preset:soft-dark-gradient': '/wallpapers/soft-dark-gradient.svg',
-  'preset:frosted-glass-abstract': '/wallpapers/frosted-glass-abstract.svg',
-  'preset:blurred-forest-mood': '/wallpapers/blurred-forest-mood.svg',
-  'preset:luxury-living-room-ambient': '/wallpapers/luxury-living-room-ambient.svg',
-  'preset:matte-concrete-texture': '/wallpapers/matte-concrete-texture.svg',
-  'preset:muted-nebula-space': '/wallpapers/muted-nebula-space.svg',
-  'preset:scandinavian-warm-neutral': '/wallpapers/scandinavian-warm-neutral.svg',
-  'preset:subtle-smart-grid': '/wallpapers/subtle-smart-grid.svg',
-  'preset:pure-oled-black-luxury': '/wallpapers/pure-oled-black-luxury.svg',
-  'preset:dynamic-sunrise-gradient': '/wallpapers/dynamic-sunrise-gradient.svg',
+  'preset:soft-dark-gradient': getPublicAssetUrl('wallpapers/soft-dark-gradient.svg'),
+  'preset:frosted-glass-abstract': getPublicAssetUrl('wallpapers/frosted-glass-abstract.svg'),
+  'preset:blurred-forest-mood': getPublicAssetUrl('wallpapers/blurred-forest-mood.svg'),
+  'preset:luxury-living-room-ambient': getPublicAssetUrl(
+    'wallpapers/luxury-living-room-ambient.svg'
+  ),
+  'preset:matte-concrete-texture': getPublicAssetUrl('wallpapers/matte-concrete-texture.svg'),
+  'preset:muted-nebula-space': getPublicAssetUrl('wallpapers/muted-nebula-space.svg'),
+  'preset:scandinavian-warm-neutral': getPublicAssetUrl('wallpapers/scandinavian-warm-neutral.svg'),
+  'preset:subtle-smart-grid': getPublicAssetUrl('wallpapers/subtle-smart-grid.svg'),
+  'preset:pure-oled-black-luxury': getPublicAssetUrl('wallpapers/pure-oled-black-luxury.svg'),
+  'preset:dynamic-sunrise-gradient': getPublicAssetUrl('wallpapers/dynamic-sunrise-gradient.svg'),
 };
 
 interface ThemeState {
@@ -62,17 +65,14 @@ function normalizeWallpaperPath(wallpaper: string | null | undefined) {
   }
 
   if (trimmed.startsWith('/wallpapers/')) {
-    return trimmed;
+    return getPublicAssetUrl(trimmed.slice(1));
   }
 
   if (typeof window !== 'undefined') {
     try {
       const resolved = new URL(trimmed, window.location.href);
-      if (
-        resolved.origin === window.location.origin &&
-        resolved.pathname.startsWith('/wallpapers/')
-      ) {
-        return resolved.pathname;
+      if (resolved.origin === window.location.origin) {
+        return `${resolved.pathname}${resolved.search}${resolved.hash}`;
       }
     } catch (error) {
       console.error('[ThemeStore] Wallpaper URL resolution failed:', error);
