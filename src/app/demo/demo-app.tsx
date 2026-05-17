@@ -61,8 +61,6 @@ const DEMO_ROOMS = [
   'Toilet',
   'Unassigned',
 ];
-const DEMO_ASSET_BASE_PATH = `${import.meta.env.BASE_URL}demo/`;
-const DEMO_WALLPAPER = `${DEMO_ASSET_BASE_PATH}navet-demo-background.jpg`;
 
 const energyTrend = [
   ['00:00', 420],
@@ -192,7 +190,7 @@ const demoHomeWidgets: CustomCard[] = [
     createdAt: 2,
     data: {
       sourceMode: 'urls',
-      photoUrls: [DEMO_WALLPAPER],
+      photoUrls: [cameraSampleImage],
       shuffleEnabled: false,
     },
   },
@@ -312,7 +310,7 @@ function useDemoDisplayDefaults() {
     useThemeStore.getState().setTheme('dark');
     useThemeStore.getState().setPrimaryColor('orange');
     useThemeStore.getState().setCustomPrimaryColor(null);
-    useThemeStore.getState().setWallpaper(DEMO_WALLPAPER);
+    useThemeStore.getState().setWallpaper(null);
     useSettingsStore.getState().updateSettings({
       ...defaultSettings,
       username: 'Navet',

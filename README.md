@@ -5,6 +5,7 @@ A polished Home Assistant dashboard for wall panels, tablets, phones, and deskto
 ![Navet dashboard demo on iPad frame](docs/marketing/assets/use-cases/navet-ipad-frame-dashboard.jpg)
 
 [Live demo](https://awesomestvi.github.io/navet/demo/) ·
+[Storybook](https://awesomestvi.github.io/navet/storybook/) ·
 [Get started](#get-started) ·
 [Security notes](docs/PUBLIC_LAUNCH_SECURITY.md)
 
@@ -69,6 +70,10 @@ Open the public beta demo:
 [https://awesomestvi.github.io/navet/demo/](https://awesomestvi.github.io/navet/demo/)
 
 The demo uses fake `/demo` data. It does not connect to a real Home Assistant instance.
+
+Review the public Storybook:
+
+[https://awesomestvi.github.io/navet/storybook/](https://awesomestvi.github.io/navet/storybook/)
 
 ## Get Started
 
