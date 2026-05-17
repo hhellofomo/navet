@@ -204,6 +204,7 @@ export function useMediaCardController({
   const { albumArt, handleArtworkError } = useMediaArtworkResolution({
     entityId,
     artworkKey,
+    artworkVersionKey: liveEntity?.last_updated,
     liveEntityPicture,
     liveArtworkKey,
     homeAssistantUrl: authConfig?.url,
