@@ -3,7 +3,9 @@ name: Publish GitHub Release
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*-alpha.*'
+      - 'v*-beta.*'
+      - 'v*-rc.*'
   workflow_dispatch:
     inputs:
       tag:
@@ -34,11 +36,7 @@ jobs:
 
           echo "value=$TAG" >> "$GITHUB_OUTPUT"
 
-          if echo "$TAG" | grep -Eq -- '-(beta|alpha|rc)\.'; then
-            echo "prerelease=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "prerelease=false" >> "$GITHUB_OUTPUT"
-          fi
+          echo "prerelease=true" >> "$GITHUB_OUTPUT"
 
       - name: Build release notes
         id: notes
@@ -57,8 +55,9 @@ jobs:
             echo
             echo "### Container Publishing"
             echo
-            echo "- App images: trigger [Publish](https://github.com/${{ github.repository }}/actions/workflows/publish.yml) if you want a matching manual image tag."
-            echo "- Home Assistant add-on images: trigger [Publish Home Assistant Add-on](https://github.com/${{ github.repository }}/actions/workflows/publish-addon.yml) after bumping \`addons/navet/config.yaml\`."
+            echo "- App images publish automatically for prerelease tags through [Publish](https://github.com/${{ github.repository }}/actions/workflows/publish.yml): \`$TAG\`, \`beta\`, \`latest\`, and \`sha-*\`."
+            echo "- Home Assistant add-on images publish automatically for prerelease tags through [Publish Home Assistant Add-on](https://github.com/${{ github.repository }}/actions/workflows/publish-addon.yml): add-on version, \`beta\`, \`latest\`, and \`sha-*\`."
+            echo "- Manual workflow runs publish developer images tagged \`dev\` for Raspberry Pi testing before a public beta tag."
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 

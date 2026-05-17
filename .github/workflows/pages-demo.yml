@@ -1,4 +1,4 @@
-name: Deploy demo to Pages
+name: Deploy demo and Storybook to Pages
 
 on:
   push:
@@ -45,10 +45,14 @@ jobs:
       - name: Build demo
         run: pnpm exec vite build --base=/navet/demo/
 
-      - name: Stage demo for Pages
+      - name: Build Storybook
+        run: pnpm storybook:build
+
+      - name: Stage Pages artifact
         run: |
           mkdir pages
           mv dist pages/demo
+          mv .cache/storybook-static pages/storybook
           for section in energy security tasks locks lights media settings; do
             mkdir -p "pages/demo/${section}"
             cp pages/demo/index.html "pages/demo/${section}/index.html"

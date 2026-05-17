@@ -2,12 +2,14 @@ name: Publish
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*-alpha.*'
+      - 'v*-beta.*'
+      - 'v*-rc.*'
   workflow_dispatch:
     inputs:
       version:
-        description: Release version tag for the Docker image
+        description: Developer image tag for manual hardware testing
         required: true
         default: dev
 
@@ -51,15 +53,29 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,value=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || 'main' }}
-            type=sha
-            type=raw,value=latest
+      - name: Resolve Docker tags
+        id: tags
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+            {
+              echo "value<<EOF"
+              echo "$IMAGE:$VERSION"
+              echo "$IMAGE:sha-${GITHUB_SHA::7}"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          else
+            {
+              echo "value<<EOF"
+              echo "$IMAGE:${GITHUB_REF_NAME}"
+              echo "$IMAGE:beta"
+              echo "$IMAGE:latest"
+              echo "$IMAGE:sha-${GITHUB_SHA::7}"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Build and push image
         uses: docker/build-push-action@v6
@@ -68,5 +84,4 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.tags.outputs.value }}

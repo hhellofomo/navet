@@ -22,7 +22,7 @@
     "clean:root": "node scripts/clean-root-artifacts.mjs",
     "clean:all": "node scripts/clean-root-artifacts.mjs --all",
     "storybook": "STORYBOOK=1 HOME=$PWD/.cache/storybook/home XDG_CONFIG_HOME=$PWD/.cache/storybook STORYBOOK_DISABLE_TELEMETRY=1 SBCONFIG_PORT=6006 storybook dev --ci",
-    "storybook:build": "STORYBOOK=1 HOME=$PWD/.cache/storybook/home XDG_CONFIG_HOME=$PWD/.cache/storybook STORYBOOK_DISABLE_TELEMETRY=1 storybook build -o .cache/storybook-static",
+    "storybook:build": "STORYBOOK=1 STORYBOOK_BASE_PATH=/navet/storybook/ HOME=$PWD/.cache/storybook/home XDG_CONFIG_HOME=$PWD/.cache/storybook STORYBOOK_DISABLE_TELEMETRY=1 storybook build -o .cache/storybook-static",
     "build-storybook": "pnpm storybook:build",
     "lint": "biome lint ./src",
     "format": "biome format --write ./src",
