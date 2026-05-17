@@ -52,6 +52,7 @@ export function SlideAction({
     startProgress: number;
     startX: number;
   } | null>(null);
+  const rafRef = useRef<number | null>(null);
   const progressRef = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
@@ -60,6 +61,9 @@ export function SlideAction({
     return () => {
       if (completionTimerRef.current !== null) {
         window.clearTimeout(completionTimerRef.current);
+      }
+      if (rafRef.current !== null) {
+        window.cancelAnimationFrame(rafRef.current);
       }
     };
   }, []);
@@ -110,6 +114,20 @@ export function SlideAction({
       track.style.setProperty('--slide-label-opacity', `${labelOpacity}`);
     },
     [metrics.knobSize, metrics.padding]
+  );
+
+  const scheduleProgress = useCallback(
+    (nextProgress: number) => {
+      if (rafRef.current !== null) {
+        window.cancelAnimationFrame(rafRef.current);
+      }
+
+      rafRef.current = window.requestAnimationFrame(() => {
+        rafRef.current = null;
+        applyProgress(nextProgress);
+      });
+    },
+    [applyProgress]
   );
 
   useEffect(() => {
@@ -168,7 +186,7 @@ export function SlideAction({
       Math.max(0, dragState.startProgress + deltaX / dragState.maxTravel)
     );
 
-    applyProgress(nextProgress);
+    scheduleProgress(nextProgress);
     event.preventDefault();
     event.stopPropagation();
   };
@@ -270,10 +288,9 @@ export function SlideAction({
         }`}
         style={{
           height: metrics.knobSize,
+          transform: `translateX(calc(${metrics.padding}px + var(--slide-knob-offset))) translateY(-50%)`,
           width: metrics.knobSize,
           ...thumbStyle,
-          transform: `translateX(calc(${metrics.padding}px + var(--slide-knob-offset))) translateY(-50%)`,
-          transition: isDragging || isCompleting ? 'none' : thumbStyle?.transition,
         }}
       >
         {isCompleting && CompletionIcon ? (

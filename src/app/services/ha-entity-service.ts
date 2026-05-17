@@ -7,28 +7,12 @@ import type {
   HomeAssistantResolvedMediaSource,
 } from './home-assistant.service';
 
-type HAServiceTarget = {
-  entity_id?: string | string[];
-  area_id?: string | string[];
-  device_id?: string | string[];
-};
-
-type HAServiceCaller = (
-  domain: string,
-  service: string,
-  serviceData?: Record<string, unknown>,
-  target?: HAServiceTarget
-) => Promise<void>;
-
 /**
  * Provides domain-specific Home Assistant service calls for entity control.
  * Handles lights, switches, climate, media players, cameras, locks, vacuums, and covers.
  */
 class HAEntityService {
-  constructor(
-    private connection: () => Connection | null,
-    private serviceCaller?: HAServiceCaller
-  ) {}
+  constructor(private connection: () => Connection | null) {}
 
   /**
    * Call a Home Assistant service over the active websocket connection.
@@ -58,11 +42,6 @@ class HAEntityService {
     }
     if (target?.device_id && normalizedServiceData.device_id === undefined) {
       normalizedServiceData.device_id = target.device_id;
-    }
-
-    if (this.serviceCaller) {
-      await this.serviceCaller(domain, service, normalizedServiceData, target);
-      return;
     }
 
     const { callService: callHassService } = await import('home-assistant-js-websocket');
@@ -138,27 +117,7 @@ class HAEntityService {
   }
 
   async setClimateTemperature(entityId: string, temperature: number): Promise<void> {
-    const domain = entityId.startsWith('water_heater.') ? 'water_heater' : 'climate';
-    await this.callService(domain, 'set_temperature', { temperature }, { entity_id: entityId });
-  }
-
-  async setClimateHvacMode(entityId: string, hvacMode: string): Promise<void> {
-    if (entityId.startsWith('water_heater.')) {
-      await this.callService(
-        'water_heater',
-        'set_operation_mode',
-        { operation_mode: hvacMode },
-        { entity_id: entityId }
-      );
-      return;
-    }
-
-    await this.callService(
-      'climate',
-      'set_hvac_mode',
-      { hvac_mode: hvacMode },
-      { entity_id: entityId }
-    );
+    await this.callService('climate', 'set_temperature', { temperature }, { entity_id: entityId });
   }
 
   async updateMediaPlayerPlayback(

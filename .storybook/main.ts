@@ -4,7 +4,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const storybookDir = path.dirname(fileURLToPath(import.meta.url));
-const storybookBasePath = process.env.STORYBOOK_BASE_PATH?.trim() || './';
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(ts|tsx)'],
@@ -183,7 +182,6 @@ const config: StorybookConfig = {
 
     return {
       ...config,
-      base: storybookBasePath,
       plugins: [...filteredPlugins, tailwindcss()],
       resolve: {
         ...(config.resolve ?? {}),

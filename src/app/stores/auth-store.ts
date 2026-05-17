@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { STORAGE_KEYS } from '../constants/storage-keys';
-import { saveDashboardSession } from '../services/dashboard-session.service';
 import {
   clearStoredSessionConfig,
   normalizeSessionConfig,
@@ -33,9 +32,6 @@ export const useAuthStore = create<AuthState>()((set) => ({
 
     // Keep the connection config in sync with the authenticated session
     const saved = await useConfigStore.getState().saveConfig(authConfig);
-    if (saved) {
-      void saveDashboardSession(authConfig);
-    }
     return saved;
   },
 

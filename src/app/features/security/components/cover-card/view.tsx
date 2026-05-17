@@ -56,10 +56,6 @@ interface CoverCardViewProps {
   handleOpen: () => void;
   handleClose: () => void;
   handleStop: () => void;
-  canOpen: boolean;
-  canClose: boolean;
-  canStop: boolean;
-  canSetPosition: boolean;
   setDeviceClass: (deviceClass: DeviceClass) => void;
 }
 
@@ -87,10 +83,6 @@ export function CoverCardView({
   handleOpen,
   handleClose,
   handleStop,
-  canOpen,
-  canClose,
-  canStop,
-  canSetPosition,
   setDeviceClass,
 }: CoverCardViewProps) {
   const { t } = useI18n();
@@ -141,10 +133,6 @@ export function CoverCardView({
             onStop={handleStop}
             onClose={handleClose}
             onSetPosition={handlePositionChange}
-            canOpen={canOpen}
-            canStop={canStop}
-            canClose={canClose}
-            canSetPosition={canSetPosition}
           />
         ) : isMedium ? (
           <MediumCoverLayout
@@ -162,10 +150,6 @@ export function CoverCardView({
             onStop={handleStop}
             onClose={handleClose}
             onSetPosition={handlePositionChange}
-            canOpen={canOpen}
-            canStop={canStop}
-            canClose={canClose}
-            canSetPosition={canSetPosition}
           />
         ) : (
           <LargeCoverLayout
@@ -183,10 +167,6 @@ export function CoverCardView({
             onStop={handleStop}
             onClose={handleClose}
             onSetPosition={handlePositionChange}
-            canOpen={canOpen}
-            canStop={canStop}
-            canClose={canClose}
-            canSetPosition={canSetPosition}
           />
         )}
       </div>
@@ -278,10 +258,6 @@ interface SharedCoverLayoutProps {
   onStop: () => void;
   onClose: () => void;
   onSetPosition?: (newPosition: number) => void;
-  canOpen: boolean;
-  canStop: boolean;
-  canClose: boolean;
-  canSetPosition: boolean;
 }
 
 function CoverCardHeader({
@@ -357,9 +333,6 @@ function CompactCoverLayout({
   onOpen,
   onStop,
   onClose,
-  canOpen,
-  canStop,
-  canClose,
 }: SharedCoverLayoutProps) {
   return (
     <div className="flex h-full flex-col">
@@ -392,9 +365,6 @@ function CompactCoverLayout({
             onOpen={onOpen}
             onStop={onStop}
             onClose={onClose}
-            canOpen={canOpen}
-            canStop={canStop}
-            canClose={canClose}
           />
         }
       />
@@ -418,9 +388,6 @@ function MediumCoverLayout({
   onOpen,
   onStop,
   onClose,
-  canOpen,
-  canStop,
-  canClose,
 }: SharedCoverLayoutProps) {
   return (
     <div className="flex h-full flex-col">
@@ -453,9 +420,6 @@ function MediumCoverLayout({
             onOpen={onOpen}
             onStop={onStop}
             onClose={onClose}
-            canOpen={canOpen}
-            canStop={canStop}
-            canClose={canClose}
           />
         }
       />
@@ -480,10 +444,6 @@ function LargeCoverLayout({
   onStop,
   onClose,
   onSetPosition,
-  canOpen,
-  canStop,
-  canClose,
-  canSetPosition,
 }: SharedCoverLayoutProps) {
   const { t } = useI18n();
 
@@ -504,7 +464,6 @@ function LargeCoverLayout({
           theme={theme}
           ariaLabel={t('cover.ariaLabel', { name })}
           onSetPosition={onSetPosition ?? (() => undefined)}
-          disabled={!canSetPosition}
         />
 
         <div className="flex min-w-0 flex-col rounded-[28px] border border-white/10 bg-black/10 p-4 backdrop-blur-sm">
@@ -518,12 +477,7 @@ function LargeCoverLayout({
 
           {onSetPosition && (
             <div className="mt-auto pt-4">
-              <CoverPresetChips
-                position={position}
-                theme={theme}
-                onSetPosition={onSetPosition}
-                disabled={!canSetPosition}
-              />
+              <CoverPresetChips position={position} theme={theme} onSetPosition={onSetPosition} />
             </div>
           )}
         </div>
@@ -538,9 +492,6 @@ function LargeCoverLayout({
           onOpen={onOpen}
           onStop={onStop}
           onClose={onClose}
-          canOpen={canOpen}
-          canStop={canStop}
-          canClose={canClose}
         />
       </div>
     </div>

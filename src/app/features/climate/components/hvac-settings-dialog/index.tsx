@@ -36,7 +36,6 @@ export const HVACSettingsDialog = memo(function HVACSettingsDialog({
   step = 0.5,
   temperaturePresets = [{ value: 18 }, { value: 21 }, { value: 24 }],
   siblingEntities = [],
-  supportedHvacModes,
   onModeChange,
   onTargetTempChange,
   onTargetTempCommit,
@@ -111,7 +110,7 @@ export const HVACSettingsDialog = memo(function HVACSettingsDialog({
                   minTemp={minTemp}
                   maxTemp={maxTemp}
                   step={step}
-                  helperText={getHvacTemperatureStatusLabel(t, targetTemp, currentTemp, visualMode)}
+                  helperText={getHvacTemperatureStatusLabel(t, targetTemp, currentTemp)}
                   onTargetTempChange={onTargetTempChange}
                   onTargetTempCommit={onTargetTempCommit}
                   variant="immersive"
@@ -137,7 +136,6 @@ export const HVACSettingsDialog = memo(function HVACSettingsDialog({
                         mode={visualMode}
                         isOn={isOn}
                         onModeChange={onModeChange}
-                        supportedHvacModes={supportedHvacModes}
                         size="medium"
                       />
                     </div>

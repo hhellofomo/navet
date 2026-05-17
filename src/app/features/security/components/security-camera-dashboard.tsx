@@ -6,7 +6,7 @@ import {
   getDashboardGridColumnCount,
 } from '@/app/components/shared/card-size-selector';
 import type { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { DashboardCardItem, DashboardEditActions } from '@/app/features/dashboard';
+import { DashboardCardItem } from '@/app/features/dashboard';
 import { useBreakpointCols } from '@/app/hooks/use-breakpoint-cols';
 import type { DeviceWithType } from '@/app/types/device.types';
 import type { CameraDashboardModel } from '../utils/security-camera-dashboard-model';
@@ -16,7 +16,6 @@ interface SecurityCameraDashboardProps {
   isEditMode: boolean;
   cardSizes: Record<string, CardSize>;
   updateCardSize: (id: string, size: CardSize) => void;
-  onRemoveEntity?: (entityId: string) => void;
   surface: ReturnType<typeof getThemeSurfaceTokens>;
   labels: {
     primaryTitle: string;
@@ -40,46 +39,39 @@ function CameraGrid({
   cardSizes,
   updateCardSize,
   isEditMode,
-  onRemoveEntity,
 }: {
   cameras: CameraDashboardModel['primaryCameras'];
   cardSizes: Record<string, CardSize>;
   updateCardSize: (id: string, size: CardSize) => void;
   isEditMode: boolean;
-  onRemoveEntity?: (entityId: string) => void;
 }) {
   const breakpointCols = useBreakpointCols();
 
   return (
-    <DashboardEditActions isEditMode={isEditMode} onRemoveEntity={onRemoveEntity}>
-      <div
-        className="grid w-full grid-flow-row-dense gap-3 lg:gap-4"
-        style={
-          {
-            ...getCardGridAutoRowsStyle(breakpointCols),
-            gridTemplateColumns: `repeat(${getDashboardGridColumnCount(breakpointCols)}, minmax(0, 1fr))`,
-          } as CSSProperties
-        }
-      >
-        {cameras.map((camera, index) => {
-          const size = cardSizes[camera.id] ?? getDefaultCameraSize(index);
+    <div
+      className="grid w-full grid-flow-row-dense gap-3 lg:gap-4"
+      style={
+        {
+          ...getCardGridAutoRowsStyle(breakpointCols),
+          gridTemplateColumns: `repeat(${getDashboardGridColumnCount(breakpointCols)}, minmax(0, 1fr))`,
+        } as CSSProperties
+      }
+    >
+      {cameras.map((camera, index) => {
+        const size = cardSizes[camera.id] ?? getDefaultCameraSize(index);
 
-          return (
-            <DashboardCardItem
-              key={camera.id}
-              id={camera.id}
-              device={asCameraDevice(camera)}
-              size={size}
-              isEditMode={isEditMode}
-              handleSizeChange={updateCardSize}
-              onRemoveEntity={onRemoveEntity}
-              allowEntityRemoval
-              usesHideAction
-            />
-          );
-        })}
-      </div>
-    </DashboardEditActions>
+        return (
+          <DashboardCardItem
+            key={camera.id}
+            id={camera.id}
+            device={asCameraDevice(camera)}
+            size={size}
+            isEditMode={isEditMode}
+            handleSizeChange={updateCardSize}
+          />
+        );
+      })}
+    </div>
   );
 }
 
@@ -88,7 +80,6 @@ export function SecurityCameraDashboard({
   isEditMode,
   cardSizes,
   updateCardSize,
-  onRemoveEntity,
   surface,
   labels,
 }: SecurityCameraDashboardProps) {
@@ -106,7 +97,6 @@ export function SecurityCameraDashboard({
             cardSizes={cardSizes}
             updateCardSize={updateCardSize}
             isEditMode={isEditMode}
-            onRemoveEntity={onRemoveEntity}
           />
         </section>
       ) : (
@@ -138,7 +128,6 @@ export function SecurityCameraDashboard({
             cardSizes={cardSizes}
             updateCardSize={updateCardSize}
             isEditMode={isEditMode}
-            onRemoveEntity={onRemoveEntity}
           />
         </section>
       ) : null}

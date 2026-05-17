@@ -8,7 +8,6 @@ export interface HVACCardProps {
   initialCurrentTemp?: number;
   initialMode?: string;
   initialAction?: string;
-  supportedHvacModes?: string[];
   initialState?: boolean;
   size: CardSize;
   onSizeChange: (id: string, size: CardSize) => void;

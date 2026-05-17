@@ -18,7 +18,6 @@ export function createHomeAssistantServiceStub() {
     config: new Set(),
     registries: new Set(),
     connection: new Set(),
-    error: new Set(),
   };
 
   let connected = false;

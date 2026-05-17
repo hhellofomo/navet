@@ -1,4 +1,4 @@
-import { CarFront, Check, Loader2, Lock, Unlock } from 'lucide-react';
+import { CarFront, Lock, Unlock } from 'lucide-react';
 import { memo, useEffect, useState } from 'react';
 import {
   BaseCard,
@@ -61,7 +61,6 @@ export const LockCard = memo(function LockCard({
   isEditMode = false,
 }: Omit<LockCardProps, 'room'>) {
   const [isLocked, setIsLocked] = useState(initialState);
-  const [pendingTargetLocked, setPendingTargetLocked] = useState<boolean | null>(null);
   const [isPendingAction, setIsPendingAction] = useState(false);
   const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
   const { t } = useI18n();
@@ -69,23 +68,12 @@ export const LockCard = memo(function LockCard({
 
   useEffect(() => {
     if (liveEntity) {
-      if (liveEntity.state !== 'locked' && liveEntity.state !== 'unlocked') {
-        return;
-      }
-
-      const nextIsLocked = liveEntity.state === 'locked';
-      setIsLocked(nextIsLocked);
-      if (pendingTargetLocked === nextIsLocked) {
-        setPendingTargetLocked(null);
-        setIsPendingAction(false);
-      }
+      setIsLocked(liveEntity.state === 'locked');
       return;
     }
 
     setIsLocked(initialState);
-    setPendingTargetLocked(null);
-    setIsPendingAction(false);
-  }, [liveEntity, initialState, pendingTargetLocked]);
+  }, [liveEntity, initialState]);
 
   const { theme, colors } = useTheme();
   const cardShell = getCardShellSurfaceTokens(theme);
@@ -94,13 +82,8 @@ export const LockCard = memo(function LockCard({
   const resolvedSize = resolveLockCardSize(size);
   const isVehicleLock = isVehicleLockEntity(id, name, liveAttributes);
   const IconComponent = isVehicleLock ? CarFront : isLocked ? Lock : Unlock;
-  const pendingLabel =
-    pendingTargetLocked === null
-      ? null
-      : pendingTargetLocked
-        ? t('security.locking')
-        : t('security.unlocking');
-  const statusLabel = pendingLabel ?? (isLocked ? t('security.locked') : t('security.unlocked'));
+  const completionIcon = isVehicleLock ? CarFront : isLocked ? Unlock : Lock;
+  const statusLabel = isLocked ? t('security.locked') : t('security.unlocked');
   const swipeLabel = isLocked ? t('security.slideToUnlock') : t('security.slideToLock');
   const cardColors = isLocked ? colors.lock.locked : colors.lock.unlocked;
   const stateIconClassName =
@@ -132,31 +115,13 @@ export const LockCard = memo(function LockCard({
       return;
     }
 
-    const nextLocked = !isLocked;
-    const nextState: 'locked' | 'unlocked' = nextLocked ? 'locked' : 'unlocked';
-    setPendingTargetLocked(nextLocked);
+    const nextState: 'locked' | 'unlocked' = isLocked ? 'unlocked' : 'locked';
     setIsPendingAction(true);
 
-    void runAction(
-      async () => {
-        await homeAssistantService.updateLock(id, nextState);
-        if (!liveEntity) {
-          setIsLocked(nextLocked);
-          setPendingTargetLocked(null);
-          setIsPendingAction(false);
-        }
-      },
-      t('security.feedback.updateLockFailed'),
-      {
-        onError: () => {
-          setPendingTargetLocked(null);
-          setIsPendingAction(false);
-        },
-      }
-    ).finally(() => {
-      if (!liveEntity) {
-        setIsPendingAction(false);
-      }
+    void runAction(async () => {
+      await homeAssistantService.updateLock(id, nextState);
+    }, t('security.feedback.updateLockFailed')).finally(() => {
+      setIsPendingAction(false);
     });
   };
 
@@ -244,11 +209,7 @@ export const LockCard = memo(function LockCard({
             />
             <div className="absolute inset-[8px] rounded-full border border-white/10" />
             <div className={`absolute inset-[14px] rounded-full ${securitySurface.lockButtonBg}`} />
-            {isPendingAction ? (
-              <Loader2 className={`relative h-6.5 w-6.5 animate-spin ${stateIconClassName}`} />
-            ) : (
-              <IconComponent className={`relative h-6.5 w-6.5 ${stateIconClassName}`} />
-            )}
+            <IconComponent className={`relative h-6.5 w-6.5 ${stateIconClassName}`} />
           </div>
         </div>
 
@@ -256,7 +217,7 @@ export const LockCard = memo(function LockCard({
           <SlideAction
             actionLabel={swipeLabel}
             ariaLabel={swipeLabel}
-            completionIcon={Check}
+            completionIcon={completionIcon}
             disabled={isEditMode || isPendingAction}
             labelStyle={{ color: slideLabelTokens.titleColor }}
             onComplete={handleToggleLock}

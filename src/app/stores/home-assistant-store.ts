@@ -7,7 +7,6 @@ import {
   type HomeAssistantEntityRegistryEntry,
   homeAssistantService,
 } from '../services/home-assistant.service';
-import type { HomeAssistantPanelHass } from '../services/home-assistant-panel-adapter';
 import { useErrorStore } from './error-store';
 
 interface HomeAssistantState {
@@ -26,7 +25,6 @@ interface HomeAssistantState {
 
 interface HomeAssistantActions {
   connect: (config: HomeAssistantConfiguration) => Promise<void>;
-  syncPanelHass: (hass: HomeAssistantPanelHass) => void;
   disconnect: () => void;
   clearError: () => void;
 }
@@ -57,7 +55,6 @@ const ENTITY_DEBOUNCE_MS = 50;
 export const homeAssistantStore = createStore<HomeAssistantStore>()((set, _get) => {
   let entityDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   let activeServiceUnsubscribe: (() => void) | null = null;
-  let panelRegistryLoadStarted = false;
 
   const clearEntityDebounce = () => {
     if (entityDebounceTimer !== null) {
@@ -105,15 +102,6 @@ export const homeAssistantStore = createStore<HomeAssistantStore>()((set, _get) 
               set({ connected, connection, connecting: reconnecting, reconnecting });
             }
           ),
-          homeAssistantService.addListener('error', ({ message }) => {
-            set({
-              error: message,
-              connecting: false,
-              reconnecting: false,
-              connected: false,
-            });
-            useErrorStore.getState().setError(message);
-          }),
         ];
         const unsubscribe = () => {
           for (const fn of unsubscribers) fn();
@@ -156,46 +144,9 @@ export const homeAssistantStore = createStore<HomeAssistantStore>()((set, _get) 
       }
     },
 
-    syncPanelHass: (hass: HomeAssistantPanelHass) => {
-      clearServiceSubscriptions();
-      homeAssistantService.setPanelHass(hass);
-      useErrorStore.getState().clearError();
-
-      set({
-        connected: true,
-        config: homeAssistantService.getConfig(),
-        entities: homeAssistantService.getEntities(),
-        user: homeAssistantService.getUser(),
-        connection: homeAssistantService.getConnection(),
-        error: null,
-        connecting: false,
-        reconnecting: false,
-      });
-
-      if (panelRegistryLoadStarted) {
-        return;
-      }
-
-      panelRegistryLoadStarted = true;
-      void homeAssistantService
-        .loadRegistries()
-        .then(() => {
-          set({
-            areas: homeAssistantService.getAreas(),
-            deviceRegistry: homeAssistantService.getDeviceRegistry(),
-            entityRegistry: homeAssistantService.getEntityRegistry(),
-          });
-        })
-        .catch((error) => {
-          console.error('[HomeAssistantStore] Failed to load panel registries:', error);
-          panelRegistryLoadStarted = false;
-        });
-    },
-
     disconnect: () => {
       useErrorStore.getState().clearError();
       clearServiceSubscriptions();
-      panelRegistryLoadStarted = false;
       homeAssistantService.disconnect();
       set(initialState);
     },
