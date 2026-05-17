@@ -19,11 +19,12 @@ Assistant URLs, access tokens, entity state, camera snapshots, and media URLs as
 
 - Browser-entered Home Assistant tokens are stored in `localStorage` for local/self-hosted use. Any
   XSS in the app would expose those tokens, so CSP and URL sanitization are release blockers.
-- `NAVET_HASS_TOKEN` is server-only for Docker and Home Assistant add-on deployments. It may be used
-  by nginx to inject the upstream `Authorization` header, but it must never be written into
-  `config.js`, `window.__NAVET_CONFIG__`, or a Vite client environment variable.
+- `NAVET_HASS_TOKEN` may be injected into Docker and Home Assistant add-on runtime config so those
+  deployments can start without the login form. It must never be included in a public static build,
+  Vite client environment variable, checked-in file, or demo deployment.
 - Prefer least-privilege Home Assistant users/tokens for dashboard deployments. Avoid using an owner
-  account token on shared tablets or public networks.
+  account token on shared tablets or public networks. Treat Docker and add-on instances with runtime
+  tokens as authenticated Home Assistant clients.
 
 ## Proxies
 
@@ -32,6 +33,10 @@ Assistant URLs, access tokens, entity state, camera snapshots, and media URLs as
   following redirects.
 - `/__navet_ha_proxy__/` must stay scoped to the configured Home Assistant origin. Do not add support
   for arbitrary absolute target URLs.
+- `/__navet_session__/default` is a same-origin deployment session store. Treat access to this path
+  as access to the shared Home Assistant credentials for that Navet deployment.
+- `/__navet_profile__/default` is a same-origin deployment profile store. Treat access to this path
+  as access to modify the shared Navet dashboard for that deployment.
 - If a reverse proxy or ingress sits in front of Navet, keep these paths protected by the same origin
   and do not expose them as unauthenticated general-purpose proxy endpoints.
 

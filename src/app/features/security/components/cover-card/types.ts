@@ -20,6 +20,8 @@ export interface CoverCardProps {
   name: string;
   room: string;
   initialPosition?: number;
+  supportedFeatures?: number;
+  hasPosition?: boolean;
   initialDeviceClass?: DeviceClass;
   size: CardSize;
   onSizeChange: (id: string, size: CardSize) => void;

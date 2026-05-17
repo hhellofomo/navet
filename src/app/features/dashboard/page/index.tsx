@@ -5,9 +5,11 @@ import { DashboardArrivalReveal } from '../components/dashboard-arrival-reveal';
 import { DashboardOverlays } from '../components/dashboard-overlays';
 import { DashboardSectionRouter } from '../components/dashboard-section-router';
 import { useDashboardController } from '../hooks/use-dashboard-controller';
+import { useDashboardProfileSync } from '../hooks/use-dashboard-profile-sync';
 
 export function DashboardPage() {
   const { t } = useI18n();
+  useDashboardProfileSync();
   const controller = useDashboardController();
   const isDashboardReady =
     controller.devicesLoaded &&

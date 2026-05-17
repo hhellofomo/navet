@@ -7,9 +7,15 @@ interface CoverPresetChipsProps {
   position: number;
   theme: ThemeType;
   onSetPosition: (pos: number) => void;
+  disabled?: boolean;
 }
 
-export function CoverPresetChips({ position, theme, onSetPosition }: CoverPresetChipsProps) {
+export function CoverPresetChips({
+  position,
+  theme,
+  onSetPosition,
+  disabled = false,
+}: CoverPresetChipsProps) {
   const isLight = theme === 'light';
 
   return (
@@ -20,11 +26,15 @@ export function CoverPresetChips({ position, theme, onSetPosition }: CoverPreset
           <button
             key={preset}
             type="button"
+            disabled={disabled}
             onClick={(e) => {
               e.stopPropagation();
+              if (disabled) {
+                return;
+              }
               onSetPosition(preset);
             }}
-            className={`flex-1 rounded-xl px-2 py-2 text-xs font-medium transition-colors ${
+            className={`flex-1 rounded-xl px-2 py-2 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${
               isActive
                 ? isLight
                   ? 'bg-indigo-100 text-indigo-700'

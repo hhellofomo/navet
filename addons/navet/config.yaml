@@ -18,6 +18,8 @@ map:
 options:
   hass_url: ""
   token: ""
+  dashboard_config_url: ""
 schema:
   hass_url: str?
   token: password?
+  dashboard_config_url: str?

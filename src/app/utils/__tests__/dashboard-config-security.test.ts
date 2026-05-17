@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
-import { useCustomCardsStore } from '@/app/features/dashboard';
-import { importDashboardConfig } from '@/app/utils/dashboard-config';
+import { useCustomCardsStore, useDashboardEntitiesStore } from '@/app/features/dashboard';
+import { importDashboardConfig, importDashboardConfigFromUrl } from '@/app/utils/dashboard-config';
 
 const baseConfig = {
   version: 3,
@@ -21,6 +21,7 @@ describe('dashboard-config import hardening', () => {
   beforeEach(() => {
     localStorage.clear();
     useCustomCardsStore.setState(useCustomCardsStore.getInitialState(), true);
+    useDashboardEntitiesStore.setState(useDashboardEntitiesStore.getInitialState(), true);
   });
 
   it('drops unsafe custom card URLs and service calls', () => {
@@ -92,5 +93,34 @@ describe('dashboard-config import hardening', () => {
     expect(localStorage.getItem(STORAGE_KEYS.cardSizes)).not.toContain('nested');
     expect(localStorage.getItem(STORAGE_KEYS.cardOrders)).toContain('switch.kettle');
     expect(localStorage.getItem(STORAGE_KEYS.homeDashboardLayout)).toContain('null');
+  });
+
+  it('imports dashboard config from a runtime URL', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        [
+          'version: 3',
+          'app: navet',
+          'theme:',
+          '  theme: dark',
+          '  primaryColor: orange',
+          'settings: {}',
+          'navigation:',
+          '  currentRoom: all',
+          '  activeSection: home',
+          'dashboardEntities:',
+          '  onboardingCompleted: true',
+        ].join('\n'),
+        { status: 200 }
+      )
+    );
+
+    await importDashboardConfigFromUrl('/navet-dashboard.yaml');
+
+    expect(fetch).toHaveBeenCalledWith('/navet-dashboard.yaml', {
+      cache: 'no-store',
+      credentials: 'same-origin',
+    });
+    expect(localStorage.getItem('navet-dashboard-entities')).toContain('onboardingCompleted');
   });
 });

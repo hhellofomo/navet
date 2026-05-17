@@ -1,40 +1,66 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
+import { useHomeAssistant, useI18n, useServiceActionHandler, useTheme } from '@/app/hooks';
+import { homeAssistantService } from '@/app/services/home-assistant.service';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { DEVICE_CLASS_CONFIG } from './constants';
 import type { CoverCardProps, CoverState, DeviceClass } from './types';
 import { CoverCardView } from './view';
 
+const COVER_FEATURE_OPEN = 1;
+const COVER_FEATURE_CLOSE = 2;
+const COVER_FEATURE_SET_POSITION = 4;
+const COVER_FEATURE_STOP = 8;
+
+function supportsCoverFeature(
+  supportedFeatures: number | undefined,
+  feature: number,
+  defaultValue: boolean
+) {
+  if (typeof supportedFeatures !== 'number') {
+    return defaultValue;
+  }
+
+  return (supportedFeatures & feature) !== 0;
+}
+
 export const CoverCardContainer = memo(function CoverCardContainer({
   id,
   name,
   room,
-  initialPosition = 0,
+  initialPosition,
+  supportedFeatures: initialSupportedFeatures,
+  hasPosition: initialHasPosition,
   initialDeviceClass = 'blind',
   size,
   onSizeChange,
   isEditMode,
 }: CoverCardProps) {
-  const [position, setPosition] = useState(initialPosition);
+  const resolvedInitialPosition = initialPosition ?? 0;
+  const [position, setPosition] = useState(resolvedInitialPosition);
   const [deviceClass, setDeviceClass] = useState<DeviceClass>(initialDeviceClass);
   const [coverState, setCoverState] = useState<CoverState>(
-    initialPosition === 100 ? 'open' : initialPosition === 0 ? 'closed' : 'open'
+    resolvedInitialPosition === 100 ? 'open' : resolvedInitialPosition === 0 ? 'closed' : 'open'
   );
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const movementRef = useRef<number | null>(null);
   const { t } = useI18n();
-
-  const stopMovement = useCallback(() => {
-    if (movementRef.current !== null) {
-      clearInterval(movementRef.current);
-      movementRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => stopMovement, [stopMovement]);
+  const runAction = useServiceActionHandler();
   const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
+  const liveAttributes = liveEntity?.attributes as Record<string, unknown> | undefined;
+  const liveSupportedFeatures =
+    typeof liveAttributes?.supported_features === 'number'
+      ? liveAttributes.supported_features
+      : undefined;
+  const resolvedSupportedFeatures = liveSupportedFeatures ?? initialSupportedFeatures;
+  const hasLivePosition = typeof liveAttributes?.current_position === 'number';
+  const hasPosition = hasLivePosition || Boolean(initialHasPosition);
+  const canOpen = supportsCoverFeature(resolvedSupportedFeatures, COVER_FEATURE_OPEN, true);
+  const canClose = supportsCoverFeature(resolvedSupportedFeatures, COVER_FEATURE_CLOSE, true);
+  const canStop = supportsCoverFeature(resolvedSupportedFeatures, COVER_FEATURE_STOP, true);
+  const canSetPosition =
+    hasPosition &&
+    supportsCoverFeature(resolvedSupportedFeatures, COVER_FEATURE_SET_POSITION, false);
 
   useEffect(() => {
     if (!liveEntity) return;
@@ -51,53 +77,54 @@ export const CoverCardContainer = memo(function CoverCardContainer({
   const { colors, theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
 
+  const callCoverService = useCallback(
+    (service: string, serviceData: Record<string, unknown> = {}) =>
+      homeAssistantService.callService('cover', service, serviceData, { entity_id: id }),
+    [id]
+  );
+
   // Used by the large-card slider for direct position setting.
   const handlePositionChange = (newPosition: number) => {
-    stopMovement();
+    if (!canSetPosition) {
+      return;
+    }
+
     setPosition(newPosition);
     setCoverState(newPosition === 100 ? 'open' : newPosition === 0 ? 'closed' : 'open');
+    void runAction(
+      () => callCoverService('set_cover_position', { position: newPosition }),
+      t('cover.feedback.updateFailed')
+    );
   };
 
-  // Step ~2% every 50 ms → ~2.5 s full travel, matching a real blind.
-  const STEP = 2;
-  const INTERVAL_MS = 50;
-
   const handleOpen = () => {
-    stopMovement();
+    if (!canOpen) {
+      return;
+    }
+
     setCoverState('opening');
-    movementRef.current = window.setInterval(() => {
-      setPosition((prev) => {
-        const next = Math.min(100, prev + STEP);
-        if (next >= 100) {
-          stopMovement();
-          setCoverState('open');
-        }
-        return next;
-      });
-    }, INTERVAL_MS);
+    void runAction(() => callCoverService('open_cover'), t('cover.feedback.updateFailed'));
   };
 
   const handleClose = () => {
-    stopMovement();
+    if (!canClose) {
+      return;
+    }
+
     setCoverState('closing');
-    movementRef.current = window.setInterval(() => {
-      setPosition((prev) => {
-        const next = Math.max(0, prev - STEP);
-        if (next <= 0) {
-          stopMovement();
-          setCoverState('closed');
-        }
-        return next;
-      });
-    }, INTERVAL_MS);
+    void runAction(() => callCoverService('close_cover'), t('cover.feedback.updateFailed'));
   };
 
   const handleStop = () => {
-    stopMovement();
+    if (!canStop) {
+      return;
+    }
+
     setPosition((prev) => {
       setCoverState(prev >= 100 ? 'open' : prev <= 0 ? 'closed' : 'open');
       return prev;
     });
+    void runAction(() => callCoverService('stop_cover'), t('cover.feedback.updateFailed'));
   };
 
   // Get state text and color — active states use the accent color, inactive use muted
@@ -156,6 +183,10 @@ export const CoverCardContainer = memo(function CoverCardContainer({
       handleOpen={handleOpen}
       handleClose={handleClose}
       handleStop={handleStop}
+      canOpen={canOpen}
+      canClose={canClose}
+      canStop={canStop}
+      canSetPosition={canSetPosition}
       setDeviceClass={setDeviceClass}
     />
   );
