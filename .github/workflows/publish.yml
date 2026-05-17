@@ -2,6 +2,8 @@ name: Publish
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*-alpha.*'
       - 'v*-beta.*'
@@ -66,12 +68,19 @@ jobs:
               echo "$IMAGE:sha-${GITHUB_SHA::7}"
               echo "EOF"
             } >> "$GITHUB_OUTPUT"
-          else
+          elif [ "${GITHUB_REF_TYPE}" = "tag" ]; then
             {
               echo "value<<EOF"
               echo "$IMAGE:${GITHUB_REF_NAME}"
               echo "$IMAGE:beta"
               echo "$IMAGE:latest"
+              echo "$IMAGE:sha-${GITHUB_SHA::7}"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          else
+            {
+              echo "value<<EOF"
+              echo "$IMAGE:dev"
               echo "$IMAGE:sha-${GITHUB_SHA::7}"
               echo "EOF"
             } >> "$GITHUB_OUTPUT"
