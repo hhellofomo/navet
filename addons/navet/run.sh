@@ -33,7 +33,8 @@ cat > "${CONFIG_FILE}" <<EOF
 window.__NAVET_CONFIG__ = {
   hassUrl: "${HASS_URL_JS}",
   hassToken: "${HASS_TOKEN_JS}",
-  dashboardConfigUrl: "${DASHBOARD_CONFIG_URL_JS}"
+  dashboardConfigUrl: "${DASHBOARD_CONFIG_URL_JS}",
+  proxyBaseUrl: "/__navet_ha_proxy__"
 };
 EOF
 
@@ -62,6 +63,10 @@ server {
     proxy_pass ${HASS_URL}/;
     proxy_http_version 1.1;
     proxy_set_header Host \$proxy_host;
+    proxy_set_header Upgrade \$http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_read_timeout 3600s;
+    proxy_send_timeout 3600s;
 ${PROXY_AUTH_DIRECTIVE}
   }
 

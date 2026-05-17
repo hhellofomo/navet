@@ -113,6 +113,7 @@ const cardRegistry: Partial<Record<string, CardRenderFn>> = {
       room={device.room as string}
       initialTemp={device.temp as number | undefined}
       initialMode={device.mode as string | undefined}
+      supportedHvacModes={device.supportedHvacModes as string[] | undefined}
       size={size}
       onSizeChange={handleSizeChange}
       isEditMode={isEditMode}
@@ -128,6 +129,7 @@ const cardRegistry: Partial<Record<string, CardRenderFn>> = {
       initialCurrentTemp={device.currentTemperature as number | undefined}
       initialMode={device.mode as string | undefined}
       initialAction={device.action as string | undefined}
+      supportedHvacModes={device.supportedHvacModes as string[] | undefined}
       initialState={(device.mode as string | undefined) !== 'off'}
       size={size}
       onSizeChange={handleSizeChange}

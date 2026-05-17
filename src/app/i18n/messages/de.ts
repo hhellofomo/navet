@@ -629,6 +629,7 @@ export const deMessages = {
   'climate.coolingDownTo': 'Kühlt auf {temp}°C herunter',
   'climate.heatingTo': 'Heizt auf {temp}°C',
   'climate.feedback.updateTemperatureFailed': 'Temperatur konnte nicht aktualisiert werden',
+  'climate.feedback.updateModeFailed': 'Modus konnte nicht aktualisiert werden',
   'climate.decreaseTemperature': 'Temperatur senken',
   'climate.increaseTemperature': 'Temperatur erhöhen',
   'climate.gaugeLabel': '{mode} Temperaturanzeige zeigt {temp} Grad',

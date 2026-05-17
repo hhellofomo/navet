@@ -624,6 +624,7 @@ export const svMessages = {
   'climate.coolingDownTo': 'Kyler ner till {temp}°C',
   'climate.heatingTo': 'Värmer till {temp}°C',
   'climate.feedback.updateTemperatureFailed': 'Det gick inte att uppdatera temperaturen',
+  'climate.feedback.updateModeFailed': 'Det gick inte att uppdatera läget',
   'climate.decreaseTemperature': 'Sänk temperaturen',
   'climate.increaseTemperature': 'Höj temperaturen',
   'climate.gaugeLabel': '{mode} temperaturmätare som visar {temp} grader',

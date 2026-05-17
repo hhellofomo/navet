@@ -69,6 +69,7 @@ export const HVACCardMediumLayout = memo(function HVACCardMediumLayout({
                   mode={controller.visualMode}
                   isOn={controller.isOn}
                   onModeChange={controller.setMode}
+                  supportedHvacModes={controller.supportedHvacModes}
                   size="medium"
                 />
               </CardActionRowGroup>

@@ -29,6 +29,7 @@ export const HVACCard = memo(function HVACCard({
   initialCurrentTemp = 22,
   initialMode = 'cool',
   initialAction,
+  supportedHvacModes,
   initialState = true,
   size,
   onSizeChange: _onSizeChange,
@@ -44,6 +45,7 @@ export const HVACCard = memo(function HVACCard({
     initialCurrentTemp,
     initialMode,
     initialAction,
+    supportedHvacModes,
     initialState,
     isEditMode,
     size: resolvedSize,
@@ -53,7 +55,8 @@ export const HVACCard = memo(function HVACCard({
   const targetTemperatureLabel = getHvacTemperatureStatusLabel(
     t,
     controller.targetTemp,
-    controller.currentTemp
+    controller.currentTemp,
+    controller.visualMode
   );
   const tone = !controller.isOn
     ? 'neutral'
@@ -274,6 +277,7 @@ export const HVACCard = memo(function HVACCard({
           maxTemp={controller.maxTemp}
           step={controller.step}
           siblingEntities={controller.siblingEntities}
+          supportedHvacModes={controller.supportedHvacModes}
           onTargetTempChange={controller.setTargetTemp}
           onTargetTempCommit={controller.commitTargetTemp}
           onModeChange={controller.setMode}

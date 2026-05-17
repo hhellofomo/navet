@@ -1,7 +1,7 @@
-name: Navet
-version: "0.1.7"
-slug: navet
-description: Modern smart home dashboard for Home Assistant
+name: Navet Dev
+version: "dev"
+slug: navet_dev
+description: Development build of the Navet smart home dashboard
 url: https://github.com/awesomestvi/navet
 image: ghcr.io/awesomestvi/{arch}-navet-addon
 arch:
@@ -15,8 +15,8 @@ ports:
   8099/tcp: 8099
 ports_description:
   8099/tcp: Direct Navet dashboard access
-panel_icon: mdi:view-dashboard
-panel_title: Navet
+panel_icon: mdi:view-dashboard-edit
+panel_title: Navet Dev
 map:
   - addon_config:rw
 options:

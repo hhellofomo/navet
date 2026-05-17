@@ -101,6 +101,7 @@ authentication policy for that environment.
 
 - `repository.yaml`
 - `addons/navet/config.yaml`
+- `addons/navet-dev/config.yaml`
 - `addons/navet/Dockerfile`
 - `addons/navet/run.sh`
 - `addons/navet/rootfs/etc/nginx/nginx.conf`
@@ -110,6 +111,7 @@ authentication policy for that environment.
 - `addons/navet/icon.png`
 - `addons/navet/logo.png`
 - `addons/navet/README.md`
+- `addons/navet-dev/README.md`
 - `.github/workflows/publish-addon.yml`
 
 ### Current Behavior
@@ -120,10 +122,15 @@ The add-on:
 - Builds that image from repo root in CI
 - Serves Navet with `nginx`
 - Handles direct RSS proxy requests through nginx `njs`
-- Use `ingress: true`
-- Generate `/config.js` from add-on options
-- Fall back to manual login in Navet if no options are provided
-- Optionally import a shared dashboard YAML export on first launch
+- Uses `ingress: true`
+- Exposes optional direct browser access on `8099/tcp`
+- Generates `/config.js` from add-on options
+- Falls back to manual login in Navet if no options are provided
+- Optionally imports a shared dashboard YAML export on first launch
+
+The repository also includes **Navet Dev**, a separate add-on entry with slug `navet_dev`. It uses
+the same published add-on image name as the regular add-on, but sets `version: "dev"` so Home
+Assistant pulls `ghcr.io/awesomestvi/{arch}-navet-addon:dev`.
 
 ### Add-on Options
 
@@ -136,12 +143,13 @@ The add-on:
 Typical flow:
 
 1. Push changes to the repository
-2. In Home Assistant, open Settings -> Add-ons -> Add-on Store
-3. Refresh the custom add-on repository
-4. Open the `Navet` add-on
-5. Optionally set `hass_url`, `token`, and `dashboard_config_url`
-6. Install or rebuild the add-on image for the new version
-7. Open Navet through the Ingress panel entry
+2. Run the **Publish Home Assistant Add-on** GitHub Actions workflow manually
+3. In Home Assistant, open Settings -> Add-ons -> Add-on Store
+4. Refresh the custom add-on repository
+5. Open the `Navet Dev` add-on
+6. Optionally set `hass_url`, `token`, and `dashboard_config_url`
+7. Install, rebuild, or reinstall the add-on image for the current `dev` tag
+8. Open Navet through the Ingress panel entry
 
 ### Update Flow
 

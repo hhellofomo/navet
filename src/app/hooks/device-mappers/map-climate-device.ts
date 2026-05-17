@@ -2,6 +2,14 @@ import type { HassEntity } from 'home-assistant-js-websocket';
 import type { ClimateDevice } from '../../types/device.types';
 import { parseNumberish } from '../ha-entity-utils';
 
+function parseSupportedHvacModes(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+
+  return value.filter((mode): mode is string => typeof mode === 'string');
+}
+
 export function mapClimateDevice(
   entityId: string,
   entity: HassEntity,
@@ -24,5 +32,6 @@ export function mapClimateDevice(
     action:
       (typeof entity.attributes?.hvac_action === 'string' && entity.attributes.hvac_action) ||
       undefined,
+    supportedHvacModes: parseSupportedHvacModes(entity.attributes?.hvac_modes),
   };
 }

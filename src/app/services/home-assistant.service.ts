@@ -64,6 +64,7 @@ export interface HAServiceEventMap {
     entities: HomeAssistantEntityRegistryEntry[];
   };
   connection: { connected: boolean; connection: Connection | null; reconnecting: boolean };
+  error: { message: string };
 }
 
 export type HAServiceEventType = keyof HAServiceEventMap;
@@ -100,7 +101,7 @@ class HomeAssistantService {
     callback: (data: HAServiceEventMap[K]) => void
   ): () => void {
     // Forward to connection service for connection-related events
-    if (event === 'connection' || event === 'config' || event === 'entities') {
+    if (event === 'connection' || event === 'config' || event === 'entities' || event === 'error') {
       return this.connectionService.addListener(event, callback);
     }
 
@@ -251,6 +252,13 @@ class HomeAssistantService {
    */
   async setClimateTemperature(entityId: string, temperature: number): Promise<void> {
     await this.entityService.setClimateTemperature(entityId, temperature);
+  }
+
+  /**
+   * Set climate HVAC mode
+   */
+  async setClimateHvacMode(entityId: string, hvacMode: string): Promise<void> {
+    await this.entityService.setClimateHvacMode(entityId, hvacMode);
   }
 
   /**

@@ -22,6 +22,7 @@ import {
   settingsSelectors,
 } from './stores/selectors';
 import { resolveEffectsQuality } from './utils/effects-quality';
+import { resolveHomeAssistantConnectionUrl } from './utils/home-assistant-connection-target';
 import { clearViewportCssVars, syncViewportCssVars } from './utils/viewport';
 
 function AppContent() {
@@ -58,7 +59,7 @@ function AppContent() {
       return;
     }
     void connect({
-      hassUrl: configToUse.url,
+      hassUrl: resolveHomeAssistantConnectionUrl(configToUse),
       token: configToUse.token,
     });
   }, [isAuthenticated, authConfig, haConfig, connect]);
@@ -68,7 +69,7 @@ function AppContent() {
 
     if (isAuthenticated && configToUse && !connected && !connecting) {
       void connect({
-        hassUrl: configToUse.url,
+        hassUrl: resolveHomeAssistantConnectionUrl(configToUse),
         token: configToUse.token,
       });
     }
