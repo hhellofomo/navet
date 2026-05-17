@@ -2,15 +2,11 @@ import type { HassEntities } from 'home-assistant-js-websocket';
 import { parseRSSDocument, toRSSItem } from './rss-feed-parser';
 import type { RSSItem, RSSProvider } from './types';
 
-const RSS_PROXY_PATH = '__navet_rss_proxy__';
+const RSS_PROXY_PATH = '/__navet_rss_proxy__';
 
 function getRSSProxyRequestUrl(feedUrl: string) {
   const baseUrl =
-    typeof document !== 'undefined' && document.baseURI
-      ? document.baseURI
-      : typeof window !== 'undefined'
-        ? window.location.href
-        : '/';
+    typeof window !== 'undefined' && window.location.origin ? window.location.origin : '/';
   const proxyUrl = new URL(RSS_PROXY_PATH, baseUrl);
   proxyUrl.searchParams.set('url', feedUrl);
   return proxyUrl.toString();

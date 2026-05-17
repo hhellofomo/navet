@@ -33,6 +33,36 @@ afterEach(() => {
 });
 
 describe('useRSSFeedItems', () => {
+  it('requests the root RSS proxy when the document base URI is nested', async () => {
+    const baseElement = document.createElement('base');
+    baseElement.href = 'http://localhost:3000/navet/storybook/iframe.html';
+    document.head.append(baseElement);
+
+    const providers = [makeProvider('nested-base', 'Nested', 'https://feeds.example.com/rss.xml')];
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(
+        makeRssResponse([
+          makeItem({
+            title: 'Nested base article',
+            link: 'https://nested.example.com/1',
+          }),
+        ])
+      )
+    );
+
+    try {
+      const { result } = renderHook(() => useRSSFeedItems(providers, null, 1), { wrapper });
+
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+      expect(requestedUrl.pathname).toBe('/__navet_rss_proxy__');
+      expect(requestedUrl.searchParams.get('url')).toBe('https://feeds.example.com/rss.xml');
+    } finally {
+      baseElement.remove();
+    }
+  });
+
   it('sorts merged provider items by recency before applying the limit', async () => {
     const providers = [
       makeProvider('bbc-world-sort', 'BBC World', 'https://feeds.example.com/bbc.xml'),
