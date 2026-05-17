@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { ErrorDisplay } from './components/shared/error-display';
 import { NetworkStatusBanner } from './components/shared/network-status-banner';
@@ -9,6 +9,7 @@ import { DashboardPage } from './features/dashboard';
 import { useHomeAssistant, useTheme } from './hooks';
 import { useViewportResize } from './hooks/use-viewport-resize';
 import { I18nProvider } from './i18n';
+import { loadDashboardSession } from './services/dashboard-session.service';
 import { useSettingsStore } from './stores';
 import { useAuth } from './stores/auth-store';
 import { useConfig } from './stores/config-store';
@@ -25,6 +26,7 @@ import { clearViewportCssVars, syncViewportCssVars } from './utils/viewport';
 
 function AppContent() {
   const { isAuthenticated, config: authConfig } = useAuth(useShallow(authSelectors.session));
+  const login = useAuth(authSelectors.login);
   const haConfig = useConfig(configSelectors.config);
   const connected = useHomeAssistant(homeAssistantSelectors.connected);
   const connecting = useHomeAssistant(homeAssistantSelectors.connecting);
@@ -42,6 +44,7 @@ function AppContent() {
   const [isOnline, setIsOnline] = useState(() =>
     typeof navigator === 'undefined' ? true : navigator.onLine
   );
+  const sharedSessionLoadAttempted = useRef(false);
 
   const syncViewportEnvironment = useCallback(() => {
     syncViewportCssVars();
@@ -70,6 +73,22 @@ function AppContent() {
       });
     }
   }, [isAuthenticated, authConfig, haConfig, connected, connecting, connect]);
+
+  useEffect(() => {
+    if (isAuthenticated || sharedSessionLoadAttempted.current) {
+      return;
+    }
+
+    sharedSessionLoadAttempted.current = true;
+
+    void loadDashboardSession().then(({ session }) => {
+      if (!session) {
+        return;
+      }
+
+      void login(session.url, session.token);
+    });
+  }, [isAuthenticated, login]);
 
   useEffect(() => {
     document.documentElement.style.setProperty('--navet-accent', accentColor);

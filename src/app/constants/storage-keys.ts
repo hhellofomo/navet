@@ -19,4 +19,5 @@ export const STORAGE_KEYS = {
   lightMemoryState: 'ha-dashboard-light-memory-state',
   cardZones: 'ha-dashboard-card-zones',
   homeDashboardLayout: 'ha-dashboard-home-layout',
+  dashboardProfileSync: 'navet-dashboard-profile-sync',
 } as const;

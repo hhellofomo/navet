@@ -6,8 +6,13 @@ describe('runtime-config', () => {
     window.__NAVET_CONFIG__ = {
       hassUrl: 'https://ha.example.com/',
       hassToken: '  token  ',
+      dashboardConfigUrl: '  /navet-dashboard.yaml  ',
     };
 
-    expect(getRuntimeConfig()).toEqual({ hassUrl: 'https://ha.example.com', hassToken: 'token' });
+    expect(getRuntimeConfig()).toEqual({
+      hassUrl: 'https://ha.example.com',
+      hassToken: 'token',
+      dashboardConfigUrl: '/navet-dashboard.yaml',
+    });
   });
 });

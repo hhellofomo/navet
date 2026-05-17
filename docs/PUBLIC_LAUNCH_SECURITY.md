@@ -33,6 +33,10 @@ Assistant URLs, access tokens, entity state, camera snapshots, and media URLs as
   following redirects.
 - `/__navet_ha_proxy__/` must stay scoped to the configured Home Assistant origin. Do not add support
   for arbitrary absolute target URLs.
+- `/__navet_session__/default` is a same-origin deployment session store. Treat access to this path
+  as access to the shared Home Assistant credentials for that Navet deployment.
+- `/__navet_profile__/default` is a same-origin deployment profile store. Treat access to this path
+  as access to modify the shared Navet dashboard for that deployment.
 - If a reverse proxy or ingress sits in front of Navet, keep these paths protected by the same origin
   and do not expose them as unauthenticated general-purpose proxy endpoints.
 

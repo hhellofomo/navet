@@ -45,13 +45,21 @@ The production container writes `/config.js` from:
 
 - `NAVET_HASS_URL`
 - `NAVET_HASS_TOKEN`
+- `NAVET_DASHBOARD_CONFIG_URL`
 
-If both are set, Navet uses them as the initial Home Assistant session and opens the dashboard
-without the login form. If either is unset, Navet falls back to manual setup in the UI.
+If `NAVET_HASS_URL` and `NAVET_HASS_TOKEN` are set, Navet uses them as the initial Home Assistant
+session and opens the dashboard without the login form. If either is unset, Navet falls back to
+manual setup in the UI.
+If `NAVET_DASHBOARD_CONFIG_URL` is set, a fresh browser imports that Navet dashboard YAML export
+before showing onboarding.
 
 Direct RSS URLs also flow through the same-origin `/__navet_rss_proxy__` path. nginx handles those
 requests directly through its embedded `njs` runtime so the browser avoids CORS issues without a
 separate Node process in the runtime image.
+Dashboard profile sync uses same-origin njs endpoints and stores shared state under `/data`:
+
+- `/__navet_session__/default` stores the Home Assistant URL/token entered for this Navet instance
+- `/__navet_profile__/default` stores the shared dashboard profile
 
 ### Local Run Example
 
@@ -115,11 +123,13 @@ The add-on:
 - Use `ingress: true`
 - Generate `/config.js` from add-on options
 - Fall back to manual login in Navet if no options are provided
+- Optionally import a shared dashboard YAML export on first launch
 
 ### Add-on Options
 
 - `hass_url`
 - `token`
+- `dashboard_config_url`
 
 ### Local Add-on Development
 
@@ -129,7 +139,7 @@ Typical flow:
 2. In Home Assistant, open Settings -> Add-ons -> Add-on Store
 3. Refresh the custom add-on repository
 4. Open the `Navet` add-on
-5. Optionally set `hass_url` and `token`
+5. Optionally set `hass_url`, `token`, and `dashboard_config_url`
 6. Install or rebuild the add-on image for the new version
 7. Open Navet through the Ingress panel entry
 
@@ -162,6 +172,23 @@ The app resolves Home Assistant defaults in this order:
 Standalone Docker and add-on deployments serve `/config.js` only from the running instance. Treat
 `NAVET_HASS_TOKEN` as a deployment secret and use a least-privilege Home Assistant token for shared
 dashboard devices.
+
+## Shared Dashboard Profile
+
+Docker and Home Assistant add-on deployments expose a same-origin dashboard profile endpoint:
+
+- `GET /__navet_session__/default`
+- `PUT /__navet_session__/default`
+- `GET /__navet_profile__/default`
+- `PUT /__navet_profile__/default`
+
+The frontend loads a shared session before showing the login form, imports the profile on
+authenticated startup when it is newer than the local profile, then saves completed dashboard changes
+back every few seconds. This lets credentials and a dashboard created in one browser become available
+in another browser or Home Assistant companion-app WebView.
+
+Standalone Docker deployments should mount `/data` to keep the profile across container recreates.
+The included `docker-compose.yml` uses a named `navet-data` volume for this.
 
 ## Current Performance Work
 

@@ -1,0 +1,94 @@
+import fs from 'fs';
+
+var MAX_SESSION_BYTES = 16 * 1024;
+var SESSION_PATH = '/data/navet-session.json';
+
+function sendJson(r, statusCode, payload) {
+  r.headersOut['Cache-Control'] = 'no-store';
+  r.headersOut['Content-Type'] = 'application/json; charset=utf-8';
+  r.return(statusCode, JSON.stringify(payload));
+}
+
+function isValidSession(value) {
+  return (
+    value &&
+    typeof value.url === 'string' &&
+    /^https?:\/\//.test(value.url) &&
+    typeof value.token === 'string' &&
+    value.token.length > 0
+  );
+}
+
+function readSession(r) {
+  try {
+    var stat = fs.statSync(SESSION_PATH);
+    if (stat.size > MAX_SESSION_BYTES) {
+      sendJson(r, 413, { error: 'Session is too large' });
+      return;
+    }
+
+    var content = fs.readFileSync(SESSION_PATH, 'utf8');
+    var parsed = JSON.parse(content);
+    if (!isValidSession(parsed)) {
+      sendJson(r, 404, { error: 'Session not found' });
+      return;
+    }
+
+    r.headersOut['Cache-Control'] = 'no-store';
+    r.headersOut['Content-Type'] = 'application/json; charset=utf-8';
+    r.return(200, JSON.stringify(parsed));
+  } catch (error) {
+    if (error && error.code === 'ENOENT') {
+      sendJson(r, 404, { error: 'Session not found' });
+      return;
+    }
+
+    sendJson(r, 500, { error: 'Unable to read session' });
+  }
+}
+
+function writeSession(r) {
+  try {
+    var body = r.requestText || '';
+    if (!body || body.length > MAX_SESSION_BYTES) {
+      sendJson(r, 400, { error: 'Invalid session body' });
+      return;
+    }
+
+    var parsed = JSON.parse(body);
+    if (!isValidSession(parsed)) {
+      sendJson(r, 400, { error: 'Unsupported session' });
+      return;
+    }
+
+    fs.writeFileSync(
+      SESSION_PATH,
+      JSON.stringify({
+        url: parsed.url,
+        token: parsed.token,
+        updatedAt: parsed.updatedAt || new Date().toISOString(),
+      }),
+      'utf8'
+    );
+    sendJson(r, 200, { ok: true });
+  } catch (error) {
+    sendJson(r, 400, { error: 'Unable to save session' });
+  }
+}
+
+function handle(r) {
+  if (r.method === 'GET') {
+    readSession(r);
+    return;
+  }
+
+  if (r.method === 'PUT') {
+    writeSession(r);
+    return;
+  }
+
+  r.headersOut.Allow = 'GET, PUT';
+  sendJson(r, 405, { error: 'Method not allowed' });
+}
+
+export default { handle: handle };
