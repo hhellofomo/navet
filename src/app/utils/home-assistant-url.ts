@@ -44,6 +44,10 @@ export function resolveHomeAssistantAbsoluteUrl(resourceUrl: string, hassUrl?: s
     return hassUrl ? `${hassUrl}${resourceUrl}` : resourceUrl;
   }
 
+  if (resourceUrl.startsWith('/') && isSafeRelativePath(resourceUrl)) {
+    return resourceUrl;
+  }
+
   return sanitizeImageUrl(resourceUrl) ?? null;
 }
 
@@ -70,6 +74,10 @@ export function resolveHomeAssistantProxyUrl(resourceUrl: string, hassUrl?: stri
     isHomeAssistantRelativeUrl(resourceUrl)
   ) {
     return `${HOME_ASSISTANT_PROXY_PATH}${resourceUrl}`;
+  }
+
+  if (resourceUrl.startsWith('/') && isSafeRelativePath(resourceUrl)) {
+    return resourceUrl;
   }
 
   if (!isAbsoluteHttpUrl(resourceUrl)) {
