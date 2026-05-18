@@ -32,7 +32,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 StaticPathConfig(
                     STATIC_PATH,
                     str(frontend_dir),
-                    cache_headers=True,
+                    # The panel entrypoint is an unversioned module URL. Avoid stale HA/browser
+                    # caches serving an older navet-panel.js after integration updates.
+                    cache_headers=False,
                 )
             ]
         )
