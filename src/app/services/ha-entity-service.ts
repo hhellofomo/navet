@@ -7,12 +7,28 @@ import type {
   HomeAssistantResolvedMediaSource,
 } from './home-assistant.service';
 
+type HAServiceTarget = {
+  entity_id?: string | string[];
+  area_id?: string | string[];
+  device_id?: string | string[];
+};
+
+type HAServiceCaller = (
+  domain: string,
+  service: string,
+  serviceData?: Record<string, unknown>,
+  target?: HAServiceTarget
+) => Promise<void>;
+
 /**
  * Provides domain-specific Home Assistant service calls for entity control.
  * Handles lights, switches, climate, media players, cameras, locks, vacuums, and covers.
  */
 class HAEntityService {
-  constructor(private connection: () => Connection | null) {}
+  constructor(
+    private connection: () => Connection | null,
+    private serviceCaller?: HAServiceCaller
+  ) {}
 
   /**
    * Call a Home Assistant service over the active websocket connection.
@@ -42,6 +58,11 @@ class HAEntityService {
     }
     if (target?.device_id && normalizedServiceData.device_id === undefined) {
       normalizedServiceData.device_id = target.device_id;
+    }
+
+    if (this.serviceCaller) {
+      await this.serviceCaller(domain, service, normalizedServiceData, target);
+      return;
     }
 
     const { callService: callHassService } = await import('home-assistant-js-websocket');

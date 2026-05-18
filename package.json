@@ -16,6 +16,7 @@
   "packageManager": "pnpm@10.33.2",
   "scripts": {
     "build": "vite build",
+    "build:ha-panel": "node scripts/build-ha-panel.mjs",
     "dev": "vite",
     "preview": "pnpm build && pnpm preview:config && vite preview --host 0.0.0.0 --port 4173",
     "preview:config": "node scripts/write-preview-config.mjs",
