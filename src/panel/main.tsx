@@ -145,6 +145,7 @@ class NavetPanelElement extends HTMLElement {
     states: HassEntities;
     config: HassConfig;
     user?: HassUser;
+    connection?: HomeAssistantPanelHass['connection'];
     callService: HomeAssistantPanelHass['callService'];
     callWS: HomeAssistantPanelHass['callWS'];
   }) {
