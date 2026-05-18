@@ -12,7 +12,9 @@ Connects to Home Assistant over WebSocket.
 - Summary must be lowercase, imperative mood, no period at the end
 - Keep the summary line under 72 characters
 - Do not use generic or free-form commit messages
-- Do not add bullet-point bodies unless the change genuinely requires explanation beyond the summary line
+- Include a concise bullet-point body for meaningful changes so the project can track what changed between releases
+- Keep commit bodies focused on user-visible behavior, architecture, tests, docs, or operational impact
+- Trivial commits such as formatting-only or metadata-only changes may omit the body
 - Do not use `git commit --no-verify` unless the user explicitly approves skipping hooks for that commit
 
 ---

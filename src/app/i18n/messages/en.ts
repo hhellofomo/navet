@@ -968,6 +968,10 @@ export const enMessages = {
   'notifications.empty.description': "You're all caught up!",
   'errorDisplay.title': 'Connection Error',
   'errorDisplay.retry': 'Retry Connection',
+  'errorDisplay.backToLogin': 'Back to login',
+  'errorDisplay.connectionInterrupted': 'Connection interrupted',
+  'errorDisplay.connectionInterruptedDescription':
+    'Navet could not complete the Home Assistant session. Check the saved URL and token, then try again.',
   'errorDisplay.commonIssues': 'Common issues:',
   'errorDisplay.issue.1': 'Smart home system is not running or unreachable',
   'errorDisplay.issue.2': 'Incorrect URL or access token',

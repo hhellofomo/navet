@@ -10,6 +10,23 @@ function parseSupportedHvacModes(value: unknown): string[] | undefined {
   return value.filter((mode): mode is string => typeof mode === 'string');
 }
 
+function resolveClimateSupportedModes(entityId: string, entity: HassEntity): string[] | undefined {
+  const supportedModes = parseSupportedHvacModes(
+    entity.attributes?.hvac_modes ?? entity.attributes?.operation_list
+  );
+
+  return entityId.startsWith('water_heater.') ? (supportedModes ?? []) : supportedModes;
+}
+
+function resolveClimateMode(entity: HassEntity): string {
+  return (
+    (typeof entity.state === 'string' && entity.state) ||
+    (typeof entity.attributes?.hvac_mode === 'string' && entity.attributes.hvac_mode) ||
+    (typeof entity.attributes?.operation_mode === 'string' && entity.attributes.operation_mode) ||
+    'off'
+  );
+}
+
 export function mapClimateDevice(
   entityId: string,
   entity: HassEntity,
@@ -25,13 +42,11 @@ export function mapClimateDevice(
     currentTemperature:
       parseNumberish(entity.attributes?.current_temperature) ??
       (parseFloat(entity.attributes?.temperature ?? '0') || 0),
-    mode:
-      (typeof entity.state === 'string' && entity.state) ||
-      (typeof entity.attributes?.hvac_mode === 'string' && entity.attributes.hvac_mode) ||
-      'off',
+    mode: resolveClimateMode(entity),
     action:
       (typeof entity.attributes?.hvac_action === 'string' && entity.attributes.hvac_action) ||
       undefined,
-    supportedHvacModes: parseSupportedHvacModes(entity.attributes?.hvac_modes),
+    supportedHvacModes: resolveClimateSupportedModes(entityId, entity),
+    serviceDomain: entityId.startsWith('water_heater.') ? 'water_heater' : 'climate',
   };
 }

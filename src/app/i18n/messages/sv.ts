@@ -972,6 +972,10 @@ export const svMessages = {
   'notifications.empty.description': 'Du är ikapp!',
   'errorDisplay.title': 'Anslutningsfel',
   'errorDisplay.retry': 'Försök igen',
+  'errorDisplay.backToLogin': 'Tillbaka till inloggning',
+  'errorDisplay.connectionInterrupted': 'Anslutningen avbröts',
+  'errorDisplay.connectionInterruptedDescription':
+    'Navet kunde inte slutföra Home Assistant-sessionen. Kontrollera sparad URL och token och försök igen.',
   'errorDisplay.commonIssues': 'Vanliga problem:',
   'errorDisplay.issue.1': 'Smarta hem-systemet kör inte eller kan inte nås',
   'errorDisplay.issue.2': 'Fel URL eller access-token',

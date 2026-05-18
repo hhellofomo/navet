@@ -986,6 +986,10 @@ export const frMessages = {
   'notifications.empty.description': 'Vous êtes à jour !',
   'errorDisplay.title': 'Erreur de connexion',
   'errorDisplay.retry': 'Réessayer la connexion',
+  'errorDisplay.backToLogin': 'Retour à la connexion',
+  'errorDisplay.connectionInterrupted': 'Connexion interrompue',
+  'errorDisplay.connectionInterruptedDescription':
+    'Navet n’a pas pu terminer la session Home Assistant. Vérifiez l’URL et le jeton enregistrés, puis réessayez.',
   'errorDisplay.commonIssues': 'Problèmes fréquents :',
   'errorDisplay.issue.1': 'Le système domotique n’est pas lancé ou est inaccessible',
   'errorDisplay.issue.2': 'URL ou jeton d’accès incorrect',

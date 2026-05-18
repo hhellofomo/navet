@@ -7,7 +7,7 @@ import {
 } from '@/app/components/shared/card-size-selector';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import type { STORAGE_KEYS } from '@/app/constants/storage-keys';
-import { DashboardCardItem } from '@/app/features/dashboard';
+import { DashboardCardItem, DashboardEditActions } from '@/app/features/dashboard';
 import { useCardState, useTheme } from '@/app/hooks';
 import { useBreakpointCols } from '@/app/hooks/use-breakpoint-cols';
 import type { DeviceCollection, DeviceWithType } from '@/app/types/device.types';
@@ -21,6 +21,9 @@ export const EntityGrid = memo(function EntityGrid({
   isEditMode = false,
   cardSizeStorageKey = 'cardSizes',
   headerAction,
+  onRemoveEntity,
+  allowEntityRemoval = false,
+  usesHideAction = false,
 }: {
   devices: DeviceWithType[];
   rawDevices: DeviceCollection;
@@ -30,6 +33,9 @@ export const EntityGrid = memo(function EntityGrid({
   isEditMode?: boolean;
   cardSizeStorageKey?: keyof typeof STORAGE_KEYS;
   headerAction?: ReactNode;
+  onRemoveEntity?: (entityId: string) => void;
+  allowEntityRemoval?: boolean;
+  usesHideAction?: boolean;
 }) {
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
@@ -47,31 +53,36 @@ export const EntityGrid = memo(function EntityGrid({
         </div>
         {headerAction}
       </div>
-      <div
-        className="grid w-full grid-flow-row-dense gap-3 lg:gap-4"
-        style={
-          {
-            ...getCardGridAutoRowsStyle(breakpointCols),
-            gridTemplateColumns: `repeat(${getDashboardGridColumnCount(breakpointCols)}, minmax(0, 1fr))`,
-          } as CSSProperties
-        }
-      >
-        {devices.map((device) => {
-          const size = (cardSizes[device.id] ?? device.size) as CardSize;
+      <DashboardEditActions isEditMode={isEditMode} onRemoveEntity={onRemoveEntity}>
+        <div
+          className="grid w-full grid-flow-row-dense gap-3 lg:gap-4"
+          style={
+            {
+              ...getCardGridAutoRowsStyle(breakpointCols),
+              gridTemplateColumns: `repeat(${getDashboardGridColumnCount(breakpointCols)}, minmax(0, 1fr))`,
+            } as CSSProperties
+          }
+        >
+          {devices.map((device) => {
+            const size = (cardSizes[device.id] ?? device.size) as CardSize;
 
-          return (
-            <div key={device.id} className={getCardSpanClass(size)}>
-              <DashboardCardItem
-                id={device.id}
-                device={device}
-                size={size}
-                isEditMode={isEditMode}
-                handleSizeChange={updateCardSize}
-              />
-            </div>
-          );
-        })}
-      </div>
+            return (
+              <div key={device.id} className={getCardSpanClass(size)}>
+                <DashboardCardItem
+                  id={device.id}
+                  device={device}
+                  size={size}
+                  isEditMode={isEditMode}
+                  handleSizeChange={updateCardSize}
+                  onRemoveEntity={onRemoveEntity}
+                  allowEntityRemoval={allowEntityRemoval}
+                  usesHideAction={usesHideAction}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </DashboardEditActions>
     </section>
   );
 });

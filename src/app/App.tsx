@@ -10,12 +10,13 @@ import { useHomeAssistant, useTheme } from './hooks';
 import { useViewportResize } from './hooks/use-viewport-resize';
 import { I18nProvider } from './i18n';
 import { loadDashboardSession } from './services/dashboard-session.service';
-import { useSettingsStore } from './stores';
+import { useErrorStore, useSettingsStore } from './stores';
 import { useAuth } from './stores/auth-store';
 import { useConfig } from './stores/config-store';
 import { startNavigationStoreSync } from './stores/navigation-store';
 import { initializeSearchStore } from './stores/search-store';
 import {
+  appErrorSelectors,
   authSelectors,
   configSelectors,
   homeAssistantSelectors,
@@ -23,12 +24,19 @@ import {
 } from './stores/selectors';
 import { resolveEffectsQuality } from './utils/effects-quality';
 import { resolveHomeAssistantConnectionUrl } from './utils/home-assistant-connection-target';
+import { storage } from './utils/storage';
 import { clearViewportCssVars, syncViewportCssVars } from './utils/viewport';
+
+function getConnectionAttemptKey(config: { url: string; token: string }) {
+  return `${resolveHomeAssistantConnectionUrl(config)}\n${config.token}`;
+}
 
 function AppContent() {
   const { isAuthenticated, config: authConfig } = useAuth(useShallow(authSelectors.session));
   const login = useAuth(authSelectors.login);
+  const logout = useAuth(authSelectors.logout);
   const haConfig = useConfig(configSelectors.config);
+  const appError = useErrorStore(appErrorSelectors.error);
   const connected = useHomeAssistant(homeAssistantSelectors.connected);
   const connecting = useHomeAssistant(homeAssistantSelectors.connecting);
   const reconnecting = useHomeAssistant(homeAssistantSelectors.reconnecting);
@@ -46,6 +54,7 @@ function AppContent() {
     typeof navigator === 'undefined' ? true : navigator.onLine
   );
   const sharedSessionLoadAttempted = useRef(false);
+  const failedConnectionAttemptKey = useRef<string | null>(null);
 
   const syncViewportEnvironment = useCallback(() => {
     syncViewportCssVars();
@@ -58,19 +67,43 @@ function AppContent() {
     if (!isAuthenticated || !configToUse) {
       return;
     }
-    void connect({
+    failedConnectionAttemptKey.current = null;
+    const connectionConfig = {
       hassUrl: resolveHomeAssistantConnectionUrl(configToUse),
       token: configToUse.token,
+    };
+
+    void connect(connectionConfig).catch(() => {
+      failedConnectionAttemptKey.current = getConnectionAttemptKey(configToUse);
     });
   }, [isAuthenticated, authConfig, haConfig, connect]);
+
+  const resetSessionToLogin = useCallback(() => {
+    failedConnectionAttemptKey.current = null;
+    storage.clear();
+    logout();
+  }, [logout]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      failedConnectionAttemptKey.current = null;
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const configToUse = authConfig || haConfig;
 
     if (isAuthenticated && configToUse && !connected && !connecting) {
+      const attemptKey = getConnectionAttemptKey(configToUse);
+      if (failedConnectionAttemptKey.current === attemptKey) {
+        return;
+      }
+
       void connect({
         hassUrl: resolveHomeAssistantConnectionUrl(configToUse),
         token: configToUse.token,
+      }).catch(() => {
+        failedConnectionAttemptKey.current = attemptKey;
       });
     }
   }, [isAuthenticated, authConfig, haConfig, connected, connecting, connect]);
@@ -140,9 +173,10 @@ function AppContent() {
     <>
       <ErrorDisplay
         onRetry={isAuthenticated && (authConfig || haConfig) ? retryConnect : undefined}
+        onResetSession={isAuthenticated ? resetSessionToLogin : undefined}
       />
       <PwaUpdatePrompt />
-      {isAuthenticated ? (
+      {isAuthenticated && !appError ? (
         <NetworkStatusBanner
           connected={connected}
           connecting={connecting}
