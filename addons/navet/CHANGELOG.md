@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.8
+
+- Updated Navet to `0.1.1-beta.1`
+- Added section-focused dashboard surfaces for media, security, and device layouts
+- Added Home Assistant `water_heater` entities to the HVAC card flow
+- Improved hosted/authenticated app, login, and error-display behavior
+- Added HACS repository metadata for custom repository installs (WIP)
+
 ## 0.1.7
 
 - Updated Navet to `0.1.0-beta.4`

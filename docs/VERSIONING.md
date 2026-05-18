@@ -5,8 +5,8 @@ Navet is currently in beta. Until the product contract is stable, use pre-`1.0` 
 ## Current Phase
 
 - Current release line: `0.x`
-- Current version: `0.1.0-beta.4`
-- Meaning: first structured beta milestone, fourth prerelease build in that milestone
+- Current version: `0.1.1-beta.1`
+- Meaning: first beta candidate for the `0.1.1` dashboard and device-support release
 
 ## Scheme
 
@@ -22,6 +22,7 @@ Examples:
 - `0.1.0-beta.2`
 - `0.1.0-beta.3`
 - `0.1.0-beta.4`
+- `0.1.1-beta.1`
 - `0.1.0`
 - `0.1.1`
 - `0.2.0`
@@ -55,7 +56,7 @@ Recommended lightweight flow:
 1. Decide whether the change is `patch`, `minor`, or `beta prerelease`.
 2. Bump `package.json`.
 3. If the release meaning changed, update this file.
-4. Tag the commit with `v<version>`, for example `v0.1.0-beta.4`.
+4. Tag the commit with `v<version>`, for example `v0.1.1-beta.1`.
 5. Push the tag to GitHub to trigger [.github/workflows/github-release.yml](../.github/workflows/github-release.yml).
 6. If needed, manually run the container publish workflows for matching image tags.
 
