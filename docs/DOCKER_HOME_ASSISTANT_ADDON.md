@@ -2,6 +2,7 @@
 
 This guide documents the implemented packaging for Navet as:
 
+- A Home Assistant custom panel integration installable through HACS
 - A standalone Docker container
 - A Home Assistant add-on with Ingress
 
@@ -15,18 +16,51 @@ Navet is currently a Vite-built single-page app with Home Assistant credentials 
 
 This means:
 
+- A native Home Assistant custom panel is supported through the `custom_components/navet`
+  integration
 - Docker is straightforward today
 - A Home Assistant add-on is supported today
 - Runtime config works without rebuilding the image
 
-The current deployment path is:
+For Home Assistant OS and Supervised users, the HACS custom panel path is the recommended
+Home Assistant-native setup. The add-on remains supported for users who specifically want a
+separately hosted Navet instance through Ingress or direct port access.
+
+The custom panel deployment path is:
+
+1. Install the Navet integration through HACS or by copying `custom_components/navet`
+2. Restart Home Assistant
+3. Add the Navet integration from Settings -> Devices & services
+4. Open the Navet sidebar panel at `/navet`
+
+The Docker and add-on deployment path is:
 
 1. Build the app to static files
 2. Serve it with `nginx`
 3. Generate `/config.js` from runtime environment or add-on options
 4. Expose it directly or through Home Assistant Ingress
 
-## Option 1: Standalone Docker
+## Option 1: Home Assistant Custom Panel
+
+### HACS Install Flow
+
+1. In HACS, open the three-dot menu and choose **Custom repositories**.
+2. Add `https://github.com/awesomestvi/navet` with category **Integration**.
+3. Download **Navet**.
+4. Restart Home Assistant.
+5. Add **Navet** from **Settings -> Devices & services -> Add integration**.
+6. Open **Navet** from the Home Assistant sidebar.
+
+### Current Behavior
+
+The integration:
+
+- Registers a Home Assistant custom panel at `/navet`
+- Serves bundled static assets from `/api/navet/static/`
+- Loads `navet-panel.js` as the panel module
+- Ships local Home Assistant brand assets from `custom_components/navet/brand/`
+
+## Option 2: Standalone Docker
 
 ### Files in This Repo
 
@@ -95,7 +129,11 @@ docker pull ghcr.io/<owner>/navet:latest
 If you publish the image from a fork or private registry, use the matching owner and registry
 authentication policy for that environment.
 
-## Option 2: Home Assistant Add-on
+## Option 3: Optional Home Assistant Add-on
+
+Use this option when you specifically want Navet hosted as a Home Assistant add-on with Ingress or
+direct access on port `8099`. For the normal Home Assistant sidebar panel experience, use the HACS
+custom panel integration instead.
 
 ### Files in This Repo
 
