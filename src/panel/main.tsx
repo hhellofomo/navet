@@ -1,4 +1,5 @@
 import type { HassConfig, HassEntities, HassUser } from 'home-assistant-js-websocket';
+import leafletStyles from 'leaflet/dist/leaflet.css?inline';
 import { useCallback, useEffect } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { useShallow } from 'zustand/react/shallow';
@@ -16,9 +17,22 @@ import { settingsSelectors } from '@/app/stores/selectors';
 import { useSettingsStore } from '@/app/stores/settings-store';
 import { resolveEffectsQuality } from '@/app/utils/effects-quality';
 import { clearViewportCssVars, syncViewportCssVars } from '@/app/utils/viewport';
-import '@/styles/index.css';
+import navetPanelStyles from '@/styles/index.css?inline';
 
 window.__NAVET_PANEL__ = true;
+
+const PANEL_STYLE_ID = 'navet-panel-styles';
+
+function ensurePanelStyles() {
+  if (document.getElementById(PANEL_STYLE_ID)) {
+    return;
+  }
+
+  const style = document.createElement('style');
+  style.id = PANEL_STYLE_ID;
+  style.textContent = `${navetPanelStyles}\n${leafletStyles}`;
+  document.head.append(style);
+}
 
 interface HomeAssistantPanelRoute {
   path?: string;
@@ -125,6 +139,8 @@ class NavetPanelElement extends HTMLElement {
   private renderQueued = false;
 
   connectedCallback() {
+    ensurePanelStyles();
+
     this.style.display = 'block';
     this.style.height = '100%';
     this.style.minHeight = '100dvh';
