@@ -766,6 +766,7 @@ export const svMessages = {
   'notifications.action.hide': 'Dölj',
   'notifications.action.delete': 'Ta bort',
   'notifications.title': 'Notiser',
+  'notifications.section.important': 'Viktigt',
   'notifications.section.updates': 'Uppdateringar',
   'notifications.section.notifications': 'Notiser',
   'notifications.header.markAllRead': 'Markera alla som lästa',
@@ -785,6 +786,9 @@ export const svMessages = {
   'notifications.update.installingProgress': 'Installerar {progress}%',
   'notifications.update.installing': 'Installerar uppdatering...',
   'notifications.update.readyToInstall': 'Redo att installera {version}',
+  'notifications.navet.addonPhaseOut.title': 'Flytta Navet till den anpassade panelen',
+  'notifications.navet.addonPhaseOut.message':
+    'Home Assistant-tillagget fasas ut gradvis. Installera Navet via HACS som en anpassad panel for den enklare, rekommenderade vagen. [Visa installationsstegen](https://github.com/awesomestvi/navet#home-assistant-custom-panel-with-hacs).',
   'media.readyToPlay': 'Redo att spela',
   'weather.today': 'I dag',
   'weather.dayFallback': 'Dag {day}',

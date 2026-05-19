@@ -775,6 +775,7 @@ export const frMessages = {
   'notifications.action.hide': 'Masquer',
   'notifications.action.delete': 'Supprimer',
   'notifications.title': 'Notifications',
+  'notifications.section.important': 'Important',
   'notifications.section.updates': 'Mises à jour',
   'notifications.section.notifications': 'Notifications',
   'notifications.header.markAllRead': 'Tout marquer comme lu',
@@ -795,6 +796,9 @@ export const frMessages = {
   'notifications.update.installingProgress': 'Installation {progress}%',
   'notifications.update.installing': 'Installation de la mise a jour...',
   'notifications.update.readyToInstall': 'Pret a installer {version}',
+  'notifications.navet.addonPhaseOut.title': 'Deplacer Navet vers le panneau personnalise',
+  'notifications.navet.addonPhaseOut.message':
+    'Le module complementaire Home Assistant sera progressivement abandonne. Installez Navet via HACS comme panneau personnalise pour utiliser le parcours recommande, plus simple. [Voir les etapes de configuration](https://github.com/awesomestvi/navet#home-assistant-custom-panel-with-hacs).',
   'media.readyToPlay': 'Pret a lire',
   'weather.today': 'Aujourd’hui',
   'weather.dayFallback': 'Jour {day}',
