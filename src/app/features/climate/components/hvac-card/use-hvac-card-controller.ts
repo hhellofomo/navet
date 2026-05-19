@@ -60,6 +60,7 @@ export function useHVACCardController({
   initialCurrentTemp = 22,
   initialMode = 'cool',
   initialAction,
+  supportedHvacModes: initialSupportedHvacModes,
   initialState = true,
   isEditMode,
   size,
@@ -71,6 +72,7 @@ export function useHVACCardController({
   | 'initialCurrentTemp'
   | 'initialMode'
   | 'initialAction'
+  | 'supportedHvacModes'
   | 'initialState'
   | 'isEditMode'
   | 'size'
@@ -80,6 +82,7 @@ export function useHVACCardController({
   const [currentTemp, setCurrentTemp] = useState(initialCurrentTemp);
   const [mode, setMode] = useState(initialMode);
   const [action, setAction] = useState(initialAction);
+  const [supportedHvacModes, setSupportedHvacModes] = useState(initialSupportedHvacModes);
   const [isOn, setIsOn] = useState(initialState);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { colors, theme } = useTheme();
@@ -90,6 +93,7 @@ export function useHVACCardController({
   const pendingTargetTempRef = useRef<number | null>(null);
   const targetTempSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const runTemperatureAction = useServiceActionHandler();
+  const runModeAction = useServiceActionHandler();
 
   useEffect(() => {
     return () => {
@@ -158,17 +162,39 @@ export function useHVACCardController({
     [queueTargetTempSync, schedulePendingTargetTemp, temperatureRange]
   );
 
+  const updateMode = useCallback(
+    (nextMode: string) => {
+      const previousMode = mode;
+      const previousIsOn = isOn;
+      setMode(nextMode);
+      setIsOn(nextMode !== 'off');
+      void runModeAction(
+        () => homeAssistantService.setClimateHvacMode(id, nextMode),
+        t('climate.feedback.updateModeFailed'),
+        {
+          onError: () => {
+            setMode(previousMode);
+            setIsOn(previousIsOn);
+          },
+        }
+      );
+    },
+    [id, isOn, mode, runModeAction, t]
+  );
+
   useHvacEntitySync({
     liveEntity,
     initialTemp,
     initialCurrentTemp,
     initialMode,
     initialAction,
+    initialSupportedHvacModes,
     initialState,
     setTargetTemp: syncTargetTempFromEntity,
     setCurrentTemp,
     setMode,
     setAction,
+    setSupportedHvacModes,
     setIsOn,
   });
 
@@ -260,9 +286,10 @@ export function useHVACCardController({
     visualMode,
     secondaryTextColor,
     siblingEntities,
+    supportedHvacModes,
     setIsOn,
     setIsSettingsOpen,
-    setMode,
+    setMode: updateMode,
     setTargetTemp: (nextTemp: number) => updateTargetTemp(nextTemp),
     commitTargetTemp: (nextTemp: number) => updateTargetTemp(nextTemp, true),
     step: temperatureRange.step,

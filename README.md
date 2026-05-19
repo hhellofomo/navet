@@ -5,6 +5,7 @@ A polished Home Assistant dashboard for wall panels, tablets, phones, and deskto
 ![Navet dashboard demo on iPad frame](docs/marketing/assets/use-cases/navet-ipad-frame-dashboard.jpg)
 
 [Live demo](https://awesomestvi.github.io/navet/demo/) ·
+[Storybook](https://awesomestvi.github.io/navet/storybook/) ·
 [Get started](#get-started) ·
 [Security notes](docs/PUBLIC_LAUNCH_SECURITY.md)
 
@@ -12,14 +13,14 @@ Navet turns Home Assistant into a dedicated smart home control surface. Use it f
 rooms you touch every day: lights, media, cameras, locks, energy, automations, weather, calendars,
 sensors, and custom dashboard widgets.
 
-Current release: `0.1.0-beta.3`
+Current release: `0.1.1-beta.1`
 
 ## Why Navet
 
 - **Made for shared screens.** Navet is designed for wall panels, tablets, family devices, and
   always-on dashboard displays.
-- **Works with your Home Assistant setup.** Run it as a Home Assistant add-on or as a standalone
-  Docker container connected to your Home Assistant instance.
+- **Works with your Home Assistant setup.** Run it as a native Home Assistant custom panel, a Home
+  Assistant add-on, or a standalone Docker container connected to your Home Assistant instance.
 - **Easy to shape around your home.** Arrange rooms, resize cards, reorder devices, add widgets, and
   keep the dashboard focused on the controls you actually use.
 - **Self-hosted by design.** Your Home Assistant URL, token, entity state, and camera feeds stay in
@@ -70,13 +71,47 @@ Open the public beta demo:
 
 The demo uses fake `/demo` data. It does not connect to a real Home Assistant instance.
 
+Review the public Storybook:
+
+[https://awesomestvi.github.io/navet/storybook/](https://awesomestvi.github.io/navet/storybook/)
+
 ## Get Started
 
-Choose the setup that matches where you want Navet to live.
+Choose the setup that matches where you want Navet to live. For Home Assistant OS and Supervised
+users, the HACS custom panel path is the recommended Home Assistant-native setup.
 
-### Home Assistant add-on
+### Home Assistant custom panel with HACS
 
-For Home Assistant OS or supervised installations:
+For the native Home Assistant sidebar experience, install Navet as a HACS custom integration. Home
+Assistant OS and Supervised installations can install HACS, and Navet then registers as a Home
+Assistant custom panel at `/navet` with the bundled dashboard served by Home Assistant.
+
+1. In HACS, open the three-dot menu and choose **Custom repositories**.
+2. Add this repository URL and choose **Integration** as the category:
+
+   ```text
+   https://github.com/awesomestvi/navet
+   ```
+
+3. Download **Navet** from HACS.
+4. Restart Home Assistant.
+5. Open **Settings -> Devices & services -> Add integration**, search for **Navet**, and submit the
+   empty setup form.
+6. Open **Navet** from the Home Assistant sidebar.
+
+Use this path when you want Navet inside Home Assistant itself. Use the add-on or Docker paths below
+only when you want a separately hosted Navet instance with shared runtime configuration.
+
+Existing add-on users should migrate to the HACS custom panel when possible. The add-on remains
+available for now, but it will be phased out gradually as the custom panel becomes the primary Home
+Assistant integration path.
+
+### Optional Home Assistant add-on
+
+Use the add-on when you specifically want Navet hosted as a Home Assistant add-on with Ingress or
+direct access on port `8099`. For the normal Home Assistant sidebar panel experience, use the HACS
+custom panel flow above instead. New Home Assistant OS and Supervised installs should prefer the
+custom panel because the add-on is planned for gradual phase-out.
 
 1. Add the Navet add-on repository to Home Assistant:
 
@@ -99,7 +134,8 @@ For Home Assistant OS or supervised installations:
    dashboard_config_url: ""
    ```
 
-5. Start the add-on and open Navet from the Home Assistant sidebar.
+5. Start the add-on and open Navet from the Home Assistant sidebar, or use the add-on's `8099`
+   direct-access port for a dashboard view without the Home Assistant sidebar.
 
 Set `dashboard_config_url` to a Navet dashboard YAML export if you want fresh browsers or Home
 Assistant companion-app WebViews to bootstrap the same dashboard instead of starting from onboarding.

@@ -1,12 +1,17 @@
 import fs from 'fs';
 
-var MAX_SESSION_BYTES = 16 * 1024;
-var SESSION_PATH = '/data/navet-session.json';
+const MAX_SESSION_BYTES = 16 * 1024;
+const SESSION_PATH = '/data/navet-session.json';
 
 function sendJson(r, statusCode, payload) {
   r.headersOut['Cache-Control'] = 'no-store';
   r.headersOut['Content-Type'] = 'application/json; charset=utf-8';
   r.return(statusCode, JSON.stringify(payload));
+}
+
+function sendNoContent(r) {
+  r.headersOut['Cache-Control'] = 'no-store';
+  r.return(204);
 }
 
 function isValidSession(value) {
@@ -21,16 +26,16 @@ function isValidSession(value) {
 
 function readSession(r) {
   try {
-    var stat = fs.statSync(SESSION_PATH);
+    const stat = fs.statSync(SESSION_PATH);
     if (stat.size > MAX_SESSION_BYTES) {
       sendJson(r, 413, { error: 'Session is too large' });
       return;
     }
 
-    var content = fs.readFileSync(SESSION_PATH, 'utf8');
-    var parsed = JSON.parse(content);
+    const content = fs.readFileSync(SESSION_PATH, 'utf8');
+    const parsed = JSON.parse(content);
     if (!isValidSession(parsed)) {
-      sendJson(r, 404, { error: 'Session not found' });
+      sendNoContent(r);
       return;
     }
 
@@ -39,7 +44,7 @@ function readSession(r) {
     r.return(200, JSON.stringify(parsed));
   } catch (error) {
     if (error && error.code === 'ENOENT') {
-      sendJson(r, 404, { error: 'Session not found' });
+      sendNoContent(r);
       return;
     }
 
@@ -49,13 +54,13 @@ function readSession(r) {
 
 function writeSession(r) {
   try {
-    var body = r.requestText || '';
+    const body = r.requestText || '';
     if (!body || body.length > MAX_SESSION_BYTES) {
       sendJson(r, 400, { error: 'Invalid session body' });
       return;
     }
 
-    var parsed = JSON.parse(body);
+    const parsed = JSON.parse(body);
     if (!isValidSession(parsed)) {
       sendJson(r, 400, { error: 'Unsupported session' });
       return;

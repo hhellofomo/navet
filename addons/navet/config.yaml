@@ -1,5 +1,5 @@
 name: Navet
-version: "0.1.7"
+version: "0.1.8"
 slug: navet
 description: Modern smart home dashboard for Home Assistant
 url: https://github.com/awesomestvi/navet
@@ -11,6 +11,10 @@ startup: application
 init: false
 ingress: true
 ingress_port: 8099
+ports:
+  8099/tcp: 8099
+ports_description:
+  8099/tcp: Direct Navet dashboard access
 panel_icon: mdi:view-dashboard
 panel_title: Navet
 map:

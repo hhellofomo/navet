@@ -1,13 +1,16 @@
 import type { HassEntities } from 'home-assistant-js-websocket';
+import { resolveAddonLocalEndpointUrl } from '@/app/utils/home-assistant-connection-target';
 import { parseRSSDocument, toRSSItem } from './rss-feed-parser';
 import type { RSSItem, RSSProvider } from './types';
 
 const RSS_PROXY_PATH = '/__navet_rss_proxy__';
 
-function getRSSProxyRequestUrl(feedUrl: string) {
+export function getRSSProxyRequestUrl(feedUrl: string) {
   const baseUrl =
-    typeof window !== 'undefined' && window.location.origin ? window.location.origin : '/';
-  const proxyUrl = new URL(RSS_PROXY_PATH, baseUrl);
+    typeof window !== 'undefined' && window.location.origin
+      ? window.location.origin
+      : 'http://localhost';
+  const proxyUrl = new URL(resolveAddonLocalEndpointUrl(RSS_PROXY_PATH), baseUrl);
   proxyUrl.searchParams.set('url', feedUrl);
   return proxyUrl.toString();
 }

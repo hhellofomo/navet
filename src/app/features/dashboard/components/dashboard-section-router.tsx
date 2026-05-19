@@ -1,13 +1,14 @@
-import { Lightbulb, Sparkles } from 'lucide-react';
-import { lazy, type ReactNode, Suspense } from 'react';
+import { Lightbulb, Plus, Sparkles } from 'lucide-react';
+import { lazy, type ReactNode, Suspense, useCallback, useMemo, useState } from 'react';
 import { getManageableRoomOrder } from '@/app/components/layout/mobile-layout-helpers';
 import { RoomNav } from '@/app/components/layout/room-nav';
 import { SectionCustomizeShell } from '@/app/components/layout/section-customize-shell';
 import { DashboardEmptyState } from '@/app/components/patterns';
+import { InteractivePill } from '@/app/components/primitives';
 import { LoadingSpinner } from '@/app/components/primitives/loading-spinner';
 import { RenderProfiler } from '@/app/components/shared/render-profiler';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { ENERGY_WIDGET_ROOM, isAllRooms } from '@/app/constants/rooms';
+import { ALL_ROOMS_ID, ENERGY_WIDGET_ROOM, isAllRooms } from '@/app/constants/rooms';
 import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import type { DeviceWithType } from '@/app/types/device.types';
@@ -15,6 +16,7 @@ import { AllViewGrid } from '../all-view-grid';
 import { DeviceGrid } from '../device-grid';
 import type { DashboardController } from '../hooks/use-dashboard-controller';
 import { DashboardLayout } from '../shell';
+import { AddEntityDialog } from './add-entity-dialog';
 import { HomeDashboardOverview } from './home-dashboard-overview';
 
 const SecuritySection = lazy(async () => {
@@ -51,15 +53,18 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const areas = useHomeAssistant(homeAssistantSelectors.areas);
+  const [isAddLightEntityDialogOpen, setIsAddLightEntityDialogOpen] = useState(false);
   const {
     activeRoom,
     activeSection,
     addableEntityIds,
+    availableDeviceMap,
     cardOrders,
     cardSizes,
     changeRoom,
     customCards,
     deviceMap,
+    handleAddEntity,
     handleDeleteCard,
     handleRemoveEntity,
     handleUpdateCard,
@@ -84,6 +89,25 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     controller.cardOrders[ENERGY_WIDGET_ROOM]?.filter((id) =>
       energyCustomCards.some((card) => card.id === id)
     ) ?? energyCustomCards.map((card) => card.id);
+  const hiddenLightEntityIds = useMemo(
+    () => hiddenEntityIds.filter((entityId) => availableDeviceMap.get(entityId)?.type === 'lights'),
+    [availableDeviceMap, hiddenEntityIds]
+  );
+  const allLightDeviceMap = useMemo(
+    () =>
+      new Map(
+        Array.from(availableDeviceMap.entries()).filter(([, device]) => device.type === 'lights')
+      ),
+    [availableDeviceMap]
+  );
+  const openAddLightEntityDialog = useCallback(() => setIsAddLightEntityDialogOpen(true), []);
+  const closeAddLightEntityDialog = useCallback(() => setIsAddLightEntityDialogOpen(false), []);
+  const handleAddLightEntity = useCallback(
+    (entityId: string) => {
+      handleAddEntity(entityId);
+    },
+    [handleAddEntity]
+  );
 
   let sectionContent: ReactNode;
 
@@ -173,6 +197,21 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
       </Suspense>
     );
   } else if (activeSection === 'lights') {
+    const addHiddenLightEntityAction =
+      isEditMode && hiddenLightEntityIds.length > 0 ? (
+        <InteractivePill
+          intent="action"
+          size="small"
+          onClick={openAddLightEntityDialog}
+          className={`${surface.subtleBg} ${surface.hoverBg}`}
+        >
+          <Plus className={`h-4 w-4 ${surface.textSecondary}`} />
+          <span className={`hidden text-sm font-medium md:inline ${surface.textSecondary}`}>
+            {t('dashboard.addEntity.title')}
+          </span>
+        </InteractivePill>
+      ) : null;
+
     sectionContent = (
       <div {...sectionStackProps} className="relative flex flex-col gap-2 md:gap-6">
         {lightDeviceMap.size > 0 ? (
@@ -180,6 +219,7 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
             isEditMode={isEditMode}
             onToggle={onToggleEditMode ?? (() => {})}
             className="relative"
+            actions={addHiddenLightEntityAction}
           >
             <RenderProfiler id="LightsSection">
               <AllViewGrid
@@ -190,6 +230,9 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
                 cardSizes={cardSizes}
                 grouping="custom"
                 updateCardSize={updateCardSize}
+                onRemoveEntity={handleRemoveEntity}
+                allowEntityRemoval
+                usesHideAction
               />
             </RenderProfiler>
           </SectionCustomizeShell>
@@ -199,17 +242,34 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
               icon={Lightbulb}
               title={t('dashboard.shell.noLightsTitle')}
               description={
-                hiddenEntityIds.length > 0
+                hiddenLightEntityIds.length > 0
                   ? t('dashboard.shell.noLightsHidden')
                   : t('dashboard.shell.noLightsEmpty')
               }
               actionIcon={Lightbulb}
-              actionLabel={hiddenEntityIds.length > 0 ? t('dashboard.addEntity.title') : undefined}
-              onAction={hiddenEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
+              actionLabel={
+                hiddenLightEntityIds.length > 0 ? t('dashboard.addEntity.title') : undefined
+              }
+              onAction={hiddenLightEntityIds.length > 0 ? openAddLightEntityDialog : undefined}
               className="w-full max-w-md"
             />
           </div>
         )}
+
+        {isAddLightEntityDialogOpen ? (
+          <AddEntityDialog
+            open={isAddLightEntityDialogOpen}
+            onClose={closeAddLightEntityDialog}
+            onAddEntity={handleAddLightEntity}
+            currentRoom={ALL_ROOMS_ID}
+            deviceMap={allLightDeviceMap}
+            addedEntityIds={[]}
+            visibleEntityIds={hiddenLightEntityIds}
+            title={t('dashboard.addEntity.title')}
+            description={t('dashboard.addEntity.descriptionWithHidden')}
+            actionLabel={t('dashboard.addEntity.action')}
+          />
+        ) : null}
       </div>
     );
   } else if (activeSection === 'media') {

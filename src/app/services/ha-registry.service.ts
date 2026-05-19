@@ -77,6 +77,16 @@ class HARegistryService {
     return this.entityRegistry;
   }
 
+  replaceRegistries(
+    areas: HomeAssistantAreaRegistryEntry[],
+    devices: HomeAssistantDeviceRegistryEntry[],
+    entities: HomeAssistantEntityRegistryEntry[]
+  ): void {
+    this.areas = areas;
+    this.deviceRegistry = devices;
+    this.entityRegistry = entities;
+  }
+
   /**
    * Update entity area assignment
    */

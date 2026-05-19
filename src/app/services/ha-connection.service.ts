@@ -28,6 +28,7 @@ import type {
 
 export interface HAConnectionEventMap {
   connection: { connected: boolean; connection: Connection | null; reconnecting: boolean };
+  error: { message: string };
   config: HassConfig;
   entities: HassEntities;
   registries: {
@@ -57,8 +58,6 @@ class HAConnectionService {
   private listeners: {
     [K in HAConnectionEventType]?: Array<(data: HAConnectionEventMap[K]) => void>;
   } = {};
-  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
-  private reconnectAttempt = 0;
   private manuallyDisconnected = false;
   private connecting = false;
   private activeConfiguration: HomeAssistantConfiguration | null = null;
@@ -73,7 +72,6 @@ class HAConnectionService {
 
     this.activeConfiguration = configuration;
     this.manuallyDisconnected = false;
-    this.clearReconnectTimer();
 
     if (this.connecting) {
       return;
@@ -99,9 +97,8 @@ class HAConnectionService {
       }
 
       // Create connection
-      this.connection = await createConnection({ auth });
+      this.connection = await createConnection({ auth, setupRetry: 3 });
       this.connected = true;
-      this.reconnectAttempt = 0;
       this.user = await getUser(this.connection);
 
       // Subscribe to entities
@@ -118,8 +115,6 @@ class HAConnectionService {
 
       // Connection events
       this.connection.addEventListener('ready', () => {
-        this.clearReconnectTimer();
-        this.reconnectAttempt = 0;
         this.connected = true;
         this.notifyListeners('connection', {
           connected: true,
@@ -135,17 +130,18 @@ class HAConnectionService {
           connection: this.connection,
           reconnecting: !this.manuallyDisconnected && Boolean(this.activeConfiguration),
         });
-        this.scheduleReconnect();
       });
 
-      this.connection.addEventListener('reconnect-error', () => {
+      this.connection.addEventListener('reconnect-error', (_connection, error) => {
         this.connected = false;
         this.notifyListeners('connection', {
           connected: false,
           connection: this.connection,
-          reconnecting: !this.manuallyDisconnected && Boolean(this.activeConfiguration),
+          reconnecting: false,
         });
-        this.scheduleReconnect();
+        this.notifyListeners('error', {
+          message: this.getErrorMessage(error),
+        });
       });
 
       // Clear auth query string if present
@@ -159,32 +155,10 @@ class HAConnectionService {
     }
   }
 
-  private clearReconnectTimer() {
-    if (this.reconnectTimer !== null) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
-    }
-  }
-
-  private scheduleReconnect() {
-    if (this.manuallyDisconnected || !this.activeConfiguration || this.reconnectTimer !== null) {
-      return;
-    }
-
-    const delayMs = Math.min(30000, 2000 * 2 ** Math.min(this.reconnectAttempt, 4));
-    this.reconnectTimer = setTimeout(() => {
-      this.reconnectTimer = null;
-      this.reconnectAttempt += 1;
-      void this.authenticate(this.activeConfiguration as HomeAssistantConfiguration).catch(() => {
-        this.scheduleReconnect();
-      });
-    }, delayMs);
-  }
-
   /**
    * Handle connection errors, translating numeric error codes to messages
    */
-  private handleError(error: unknown): never {
+  private getErrorMessage(error: unknown): string {
     const errorMessages: Record<number, string> = {
       [ERR_INVALID_AUTH]:
         'Invalid authentication token. Please check your long-lived access token.',
@@ -196,7 +170,22 @@ class HAConnectionService {
     };
 
     if (typeof error === 'number' && error in errorMessages) {
-      throw new Error(errorMessages[error]);
+      return errorMessages[error];
+    }
+
+    return error instanceof Error
+      ? error.message
+      : typeof error === 'string'
+        ? error
+        : 'Failed to connect';
+  }
+
+  /**
+   * Handle connection errors, translating numeric error codes to messages
+   */
+  private handleError(error: unknown): never {
+    if (typeof error === 'number') {
+      throw new Error(this.getErrorMessage(error));
     }
 
     throw error;
@@ -276,7 +265,6 @@ class HAConnectionService {
    */
   disconnect(): void {
     this.manuallyDisconnected = true;
-    this.clearReconnectTimer();
     if (this.connection) {
       this.connection.close();
       this.connection = null;

@@ -1,7 +1,7 @@
 import fs from 'fs';
 
-var MAX_PROFILE_BYTES = 1024 * 1024;
-var PROFILE_PATH = '/data/navet-dashboard-profile.json';
+const MAX_PROFILE_BYTES = 1024 * 1024;
+const PROFILE_PATH = '/data/navet-dashboard-profile.json';
 
 function sendJson(r, statusCode, payload) {
   r.headersOut['Cache-Control'] = 'no-store';
@@ -9,22 +9,27 @@ function sendJson(r, statusCode, payload) {
   r.return(statusCode, JSON.stringify(payload));
 }
 
+function sendNoContent(r) {
+  r.headersOut['Cache-Control'] = 'no-store';
+  r.return(204);
+}
+
 function readProfile(r) {
   try {
-    var stat = fs.statSync(PROFILE_PATH);
+    const stat = fs.statSync(PROFILE_PATH);
     if (stat.size > MAX_PROFILE_BYTES) {
       sendJson(r, 413, { error: 'Dashboard profile is too large' });
       return;
     }
 
-    var content = fs.readFileSync(PROFILE_PATH, 'utf8');
+    const content = fs.readFileSync(PROFILE_PATH, 'utf8');
     JSON.parse(content);
     r.headersOut['Cache-Control'] = 'no-store';
     r.headersOut['Content-Type'] = 'application/json; charset=utf-8';
     r.return(200, content);
   } catch (error) {
     if (error && error.code === 'ENOENT') {
-      sendJson(r, 404, { error: 'Dashboard profile not found' });
+      sendNoContent(r);
       return;
     }
 
@@ -34,7 +39,7 @@ function readProfile(r) {
 
 function writeProfile(r) {
   try {
-    var body = r.requestText || '';
+    const body = r.requestText || '';
     if (!body) {
       sendJson(r, 400, { error: 'Missing dashboard profile body' });
       return;
@@ -45,7 +50,7 @@ function writeProfile(r) {
       return;
     }
 
-    var parsed = JSON.parse(body);
+    const parsed = JSON.parse(body);
     if (!parsed || parsed.app !== 'navet' || parsed.version !== 3) {
       sendJson(r, 400, { error: 'Unsupported dashboard profile' });
       return;

@@ -145,6 +145,7 @@ export const useHADevices = () => {
         }
 
         case 'climate':
+        case 'water_heater':
           climate.push(mapClimateDevice(entityId, entity, name, room));
           break;
 
