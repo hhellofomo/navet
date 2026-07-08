@@ -1,15 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { memo } from 'react';
-import { CardActionRow } from '@/app/components/shared/card-action-row';
-import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
-import {
-  BrightnessPresetsInline,
-  BrightnessSlider,
-  KelvinSlider,
-} from '@/app/components/shared/device-editor';
-import { useTheme } from '@/app/hooks';
-import { CustomColorTrigger } from './custom-color-trigger';
-import { KelvinColorTrigger } from './kelvin-color-trigger';
+import { BrightnessSlider, KelvinSlider } from '@/app/components/shared/device-editor';
+import { LightCardActionRow } from './light-card-action-row';
 import { LightCardHeader } from './light-card-header';
 import type { HeaderIconButtonProps, LightBrightnessPreset } from './light-card-types';
 
@@ -64,8 +56,6 @@ export const LightCardMedium = memo(function LightCardMedium({
   showSettingsButton,
   showPresetOverflow,
 }: LightCardMediumProps) {
-  const { theme } = useTheme();
-
   return (
     <>
       <LightCardHeader
@@ -100,53 +90,23 @@ export const LightCardMedium = memo(function LightCardMedium({
           />
         )}
 
-        <CardActionRow
-          theme={theme}
+        <LightCardActionRow
           size="medium"
-          leftContent={
-            <>
-              {supportsColorTemperature && (
-                <KelvinColorTrigger
-                  isOn={isOn}
-                  currentTempColor={currentTempColor}
-                  isActive={isKelvinMode}
-                  size="medium"
-                  onClick={onKelvinToggle}
-                />
-              )}
-
-              {supportsColorControl && (
-                <CustomColorTrigger
-                  isOn={isOn}
-                  currentColor={currentColor}
-                  onColorChange={onColorChange}
-                  size="medium"
-                />
-              )}
-
-              <div className="flex min-w-0 items-center gap-2">
-                <BrightnessPresetsInline
-                  presets={brightnessPresets}
-                  currentBrightness={brightness}
-                  isOn={isOn}
-                  onBrightnessChange={onBrightnessCommit}
-                  size="medium"
-                  maxVisible={showPresetOverflow ? 3 : undefined}
-                  overflow={showPresetOverflow ? 'menu' : 'hide'}
-                />
-              </div>
-            </>
-          }
-          rightContent={
-            showSettingsButton ? (
-              <CardSettingsActionButton
-                {...settingsButtonProps}
-                theme={theme}
-                size="medium"
-                tone={isOn ? 'default' : 'muted'}
-              />
-            ) : undefined
-          }
+          isOn={isOn}
+          currentColor={currentColor}
+          currentTempColor={currentTempColor}
+          isKelvinMode={isKelvinMode}
+          supportsColorTemperature={supportsColorTemperature}
+          supportsColorControl={supportsColorControl}
+          brightnessPresets={brightnessPresets}
+          brightness={brightness}
+          onKelvinToggle={onKelvinToggle}
+          onColorChange={onColorChange}
+          onBrightnessCommit={onBrightnessCommit}
+          showSettingsButton={showSettingsButton}
+          settingsButtonProps={settingsButtonProps}
+          presetMaxVisible={showPresetOverflow ? 3 : undefined}
+          presetOverflow={showPresetOverflow ? 'menu' : 'hide'}
         />
       </div>
     </>
