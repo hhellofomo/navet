@@ -24,12 +24,14 @@ export function getRoundControlStyles(theme: ThemeType): RoundControlStyles {
 
   if (theme === 'glass') {
     return {
-      defaultButton: 'bg-white/15 text-white hover:bg-white/25',
+      defaultButton:
+        'border border-white/18 bg-[linear-gradient(180deg,rgba(255,255,255,0.18),rgba(255,255,255,0.07)_58%,rgba(255,255,255,0.03)_100%)] text-white shadow-[0_20px_44px_-26px_rgba(6,12,26,0.82),inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-12px_22px_rgba(255,255,255,0.03)] backdrop-blur-2xl hover:border-white/24 hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.22),rgba(255,255,255,0.09)_58%,rgba(255,255,255,0.04)_100%)]',
       defaultIcon: 'text-white',
-      disabledButton: 'bg-white/15 text-white/60 opacity-50 cursor-not-allowed',
+      disabledButton:
+        'border border-white/14 bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.05))] text-white/60 opacity-50 cursor-not-allowed backdrop-blur-xl',
       selectedText: 'text-white',
       emphasisButton:
-        'border border-white/16 bg-[linear-gradient(180deg,rgba(255,255,255,0.18),rgba(255,255,255,0.07))] text-white shadow-[0_22px_48px_-24px_rgba(15,23,42,0.72),inset_0_1px_0_rgba(255,255,255,0.2),inset_0_-10px_18px_rgba(255,255,255,0.03)] backdrop-blur-2xl supports-[backdrop-filter]:bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.05))]',
+        'border border-white/20 bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.16),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.2),rgba(255,255,255,0.08)_58%,rgba(255,255,255,0.04)_100%)] text-white shadow-[0_24px_54px_-26px_rgba(8,14,28,0.82),0_6px_18px_-14px_rgba(255,255,255,0.12),inset_0_1px_0_rgba(255,255,255,0.24),inset_0_-12px_22px_rgba(255,255,255,0.04)] backdrop-blur-2xl supports-[backdrop-filter]:bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.18),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.18),rgba(255,255,255,0.07)_58%,rgba(255,255,255,0.04)_100%)]',
       emphasisIcon: 'text-white',
     };
   }

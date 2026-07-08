@@ -8,8 +8,9 @@ export interface CardShellSurfaceTokens {
 export function getCardShellSurfaceTokens(theme: ThemeType): CardShellSurfaceTokens {
   if (theme === 'glass') {
     return {
-      backdropClassName: 'backdrop-blur-xl',
-      sheenOverlayClassName: 'absolute inset-0 bg-gradient-to-br from-white/5 to-transparent',
+      backdropClassName: 'backdrop-blur-2xl saturate-[1.18]',
+      sheenOverlayClassName:
+        'absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.16),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.04)_20%,transparent_62%)]',
     };
   }
 

@@ -94,49 +94,53 @@ export function getThemeSurfaceTokens(
     return {
       appBg: 'bg-slate-950',
       shellPanel: isHigh
-        ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.06))] border-white/16 shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]'
+        ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.22),rgba(255,255,255,0.09)_18%,rgba(255,255,255,0.04)_48%,rgba(10,18,30,0.12)_100%)] border-white/22 shadow-[0_28px_70px_-40px_rgba(2,8,20,0.86),inset_0_1px_0_rgba(255,255,255,0.26),inset_0_-18px_28px_rgba(255,255,255,0.04)]'
         : isMedium
-          ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.03))] border-white/12 shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]'
+          ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.06)_24%,rgba(255,255,255,0.025)_100%)] border-white/16 shadow-[0_22px_52px_-36px_rgba(2,8,20,0.78),inset_0_1px_0_rgba(255,255,255,0.16)]'
           : 'bg-slate-950/94 border-white/10',
       panel: isHigh
-        ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.05))]'
+        ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.18),rgba(255,255,255,0.08)_18%,rgba(255,255,255,0.03)_46%,rgba(8,14,24,0.08)_100%)]'
         : isMedium
-          ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03))]'
+          ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.13),rgba(255,255,255,0.05)_24%,rgba(255,255,255,0.02)_100%)]'
           : 'bg-slate-950/92',
       panelMuted: isHigh
-        ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.11),rgba(255,255,255,0.04))]'
+        ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.06)_22%,rgba(255,255,255,0.02)_100%)]'
         : isMedium
-          ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02))]'
+          ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.04)_24%,rgba(255,255,255,0.015)_100%)]'
           : 'bg-slate-950/88',
-      border: isHigh ? 'border-white/18' : 'border-white/12',
-      borderStrong: isHigh ? 'border-white/18' : 'border-white/12',
-      divider: 'divide-white/10',
+      border: isHigh ? 'border-white/22' : 'border-white/16',
+      borderStrong: isHigh ? 'border-white/28' : 'border-white/18',
+      divider: isHigh ? 'divide-white/12' : 'divide-white/10',
       textPrimary: 'text-white',
-      textSecondary: 'text-gray-300',
-      textSubtle: 'text-gray-300',
-      textMuted: isHigh ? 'text-white/60' : 'text-white/68',
+      textSecondary: isHigh ? 'text-white/82' : 'text-white/76',
+      textSubtle: isHigh ? 'text-white/72' : 'text-white/68',
+      textMuted: isHigh ? 'text-white/58' : 'text-white/64',
       iconBg: isHigh
-        ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.14),rgba(255,255,255,0.05))]'
-        : 'bg-white/8',
+        ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.06)_55%,rgba(255,255,255,0.03)_100%)]'
+        : 'bg-white/10',
       subtleBg: isHigh
-        ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.03))]'
-        : 'bg-white/6',
-      hoverBg: isHigh ? 'hover:bg-white/14' : 'hover:bg-white/8',
+        ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04)_55%,rgba(255,255,255,0.02)_100%)]'
+        : 'bg-white/8',
+      hoverBg: isHigh ? 'hover:bg-white/16' : 'hover:bg-white/10',
       inputBg: isHigh
-        ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.03))]'
-        : 'bg-white/6',
-      placeholder: 'placeholder-white/45',
+        ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04)_55%,rgba(255,255,255,0.02)_100%)]'
+        : 'bg-white/8',
+      placeholder: 'placeholder-white/40',
       cardShadow: isHigh
-        ? 'shadow-[0_24px_56px_-32px_rgba(3,10,24,0.82),inset_0_1px_0_rgba(255,255,255,0.16)]'
+        ? 'shadow-[0_32px_84px_-44px_rgba(2,8,20,0.9),0_10px_20px_-16px_rgba(255,255,255,0.1),inset_0_1px_0_rgba(255,255,255,0.24),inset_0_-18px_34px_rgba(255,255,255,0.04)]'
         : isMedium
-          ? 'shadow-[0_18px_40px_-30px_rgba(3,10,24,0.72),inset_0_1px_0_rgba(255,255,255,0.10)]'
+          ? 'shadow-[0_24px_58px_-38px_rgba(2,8,20,0.82),inset_0_1px_0_rgba(255,255,255,0.16)]'
           : '',
       lightOverlay: isHigh
-        ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.18),rgba(255,255,255,0.06)_14%,rgba(255,255,255,0.015)_42%,transparent_70%)]'
+        ? 'bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.18),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.24),rgba(255,255,255,0.08)_14%,rgba(255,255,255,0.02)_40%,transparent_72%)]'
         : isMedium
-          ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.03)_18%,transparent_64%)]'
+          ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.05)_18%,transparent_62%)]'
           : 'bg-[linear-gradient(180deg,rgba(255,255,255,0.05),transparent_52%)]',
-      dialogBackdrop: isHigh ? 'bg-black/42' : isMedium ? 'bg-slate-950/68' : 'bg-slate-950/78',
+      dialogBackdrop: isHigh
+        ? 'bg-[rgba(2,6,16,0.42)]'
+        : isMedium
+          ? 'bg-slate-950/70'
+          : 'bg-slate-950/78',
       ringOffset: 'ring-offset-slate-950',
     };
   }

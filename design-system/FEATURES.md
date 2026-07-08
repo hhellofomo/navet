@@ -170,7 +170,7 @@ Navet now uses a single HVAC-based card path for Home Assistant climate entities
 Navet now uses a live Home Assistant-backed media card flow.
 
 #### Current Behavior
-- **Home Assistant media player wiring** - media cards map real `media_player` entities into playback state, volume, mute, metadata, artwork, and remaining-time UI
+- **Home Assistant media player wiring** - media cards map real `media_player` entities into playback state, volume, local mute/unmute volume restoration, metadata, artwork, and remaining-time UI
 - **Artwork-led layouts** - small, medium, and medium-vertical media cards use artwork-led surfaces rather than a separate album-art tile pattern
 - **Shared transport controls** - previous, play/pause, next, volume, and details actions use the shared round control button primitive
 - **Theme-aware inactive treatment** - media off state now follows the same shared card-state surface token system used by other cards
@@ -179,6 +179,7 @@ Navet now uses a live Home Assistant-backed media card flow.
 #### Notes
 - Remaining time is shown only when Home Assistant playback is active
 - Artwork is rendered only when the entity exposes artwork; Navet no longer injects a default placeholder image
+- Production artwork color extraction uses the Navet Home Assistant proxy path instead of direct cross-origin image reads
 - The media dialog and card views share the same transport/action visual language
 
 ---

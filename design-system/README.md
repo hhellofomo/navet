@@ -72,7 +72,7 @@ Complete feature implementation guide:
 
 ### Theme System
 - **Theme Modes**:
-  - Liquid Glass - Frosted translucent panels with luminous accents
+  - Liquid Glass - Frosted layered panels with brighter rim light, thicker depth, and quality-aware blur
   - Dark - Subtle gradients with muted colors
   - Light - Bright pastels with soft accents
   - Black - Deep black surfaces with OLED-friendly contrast
@@ -91,12 +91,12 @@ Complete feature implementation guide:
 ### Color System at a Glance
 - **Background (Dark)**: `#0a0a0a` (Deep black)
 - **Background (Light)**: `#f9fafb` (Gray-50)
-- **Glass Cards**: shared surfaces adapt by effects quality instead of forcing the same live blur treatment everywhere
+- **Glass Cards**: shared surfaces adapt by effects quality, with stronger frost and edge highlights at high quality instead of relying on one flat blur treatment everywhere
 - **Primary Color** (customizable): Orange (default), Blue, Green, Purple, Pink, Red, Yellow, Teal, or a custom accent
 - **Lights**: Orange/Amber when active (or custom primary color)
 - **Climate**: Blue (cooling) / Orange (heating) / Green (auto)
 - **Media**: Pink accent
-- **Media Cards**: Full-bleed artwork layouts with shared round transport controls and theme-aware inactive treatment
+- **Media Cards**: Full-bleed artwork layouts with shared round transport controls, theme-aware inactive treatment, and proxy-safe artwork rendering/palette extraction
 - **Locks**: Red (locked) / Green (unlocked)
 - **Borders**: `border-{color}-700/20` (20% opacity) or `border-gray-200` (light theme)
 
