@@ -294,9 +294,12 @@ Active co-located `__tests__/` directories currently include:
 - [`src/app/features/calendar/components/calendar/__tests__/`](src/app/features/calendar/components/calendar/__tests__)
 - [`src/app/features/dashboard/components/__tests__/`](src/app/features/dashboard/components/__tests__)
 - [`src/app/features/dashboard/hooks/__tests__/`](src/app/features/dashboard/hooks/__tests__)
+- [`src/app/features/dashboard/stores/__tests__/`](src/app/features/dashboard/stores/__tests__)
 - [`src/app/features/energy/components/dashboard/__tests__/`](src/app/features/energy/components/dashboard/__tests__)
 - [`src/app/features/energy/components/energy-setup-wizard/__tests__/`](src/app/features/energy/components/energy-setup-wizard/__tests__)
+- [`src/app/features/energy/services/__tests__/`](src/app/features/energy/services/__tests__)
 - [`src/app/features/energy/utils/__tests__/`](src/app/features/energy/utils/__tests__)
+- [`src/app/features/lighting/components/__tests__/`](src/app/features/lighting/components/__tests__)
 - [`src/app/features/lighting/components/light-card/__tests__/`](src/app/features/lighting/components/light-card/__tests__)
 - [`src/app/features/media/components/media-card/__tests__/`](src/app/features/media/components/media-card/__tests__)
 - [`src/app/features/media/components/media/__tests__/`](src/app/features/media/components/media/__tests__)
@@ -320,6 +323,8 @@ Storybook is the main visual review surface for:
 - dashboard and energy widgets
 
 See [design-system/STORYBOOK_FOUNDATION.md](design-system/STORYBOOK_FOUNDATION.md).
+For story placement, fixture rules, UI-kit discovery updates, and review checklists, see
+[docs/STORYBOOK_WORKFLOW.md](docs/STORYBOOK_WORKFLOW.md).
 
 ## Documentation
 
@@ -328,6 +333,7 @@ Start with [docs/README.md](docs/README.md) for the active docs index.
 Useful entry points:
 
 - [docs/technical/REACT_ZUSTAND.md](docs/technical/REACT_ZUSTAND.md)
+- [docs/STORYBOOK_WORKFLOW.md](docs/STORYBOOK_WORKFLOW.md)
 - [docs/WIDGETS.md](docs/WIDGETS.md)
 - [design-system/README.md](design-system/README.md)
 - [design-system/FEATURES.md](design-system/FEATURES.md)

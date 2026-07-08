@@ -7,6 +7,7 @@ the docs that are meant to describe the current codebase rather than historical 
 
 - [../README.md](../README.md): project overview, setup, commands, testing workflow, and architecture summary
 - [technical/REACT_ZUSTAND.md](technical/REACT_ZUSTAND.md): shared-state rules, store boundaries, and service-to-store flow
+- [STORYBOOK_WORKFLOW.md](STORYBOOK_WORKFLOW.md): Storybook taxonomy, story placement, fixture rules, and review checklist
 - [../design-system/README.md](../design-system/README.md): shared UI layers, Storybook workflow, and theme/token guidance
 - [../design-system/FEATURES.md](../design-system/FEATURES.md): current feature inventory, section ownership, and test/story coverage map
 
@@ -23,6 +24,7 @@ the docs that are meant to describe the current codebase rather than historical 
 ### Architecture and implementation
 
 - [technical/REACT_ZUSTAND.md](technical/REACT_ZUSTAND.md): Zustand-only shared state guidance
+- [STORYBOOK_WORKFLOW.md](STORYBOOK_WORKFLOW.md): Storybook workflow and story authoring guide
 - [../design-system/README.md](../design-system/README.md): UI-layer boundaries and Storybook-first workflow
 - [../design-system/FEATURES.md](../design-system/FEATURES.md): current product surface, section routing, and ownership map
 - [../design-system/UI-GUIDELINES.md](../design-system/UI-GUIDELINES.md): visual rules, theme constraints, and performance-sensitive UI guidance
@@ -65,8 +67,9 @@ Use these directories when docs need to be checked against the live implementati
 
 1. [../design-system/README.md](../design-system/README.md)
 2. [../design-system/UI-GUIDELINES.md](../design-system/UI-GUIDELINES.md)
-3. [../design-system/STORYBOOK_FOUNDATION.md](../design-system/STORYBOOK_FOUNDATION.md)
-4. [../README.md](../README.md) for current command and review workflow
+3. [STORYBOOK_WORKFLOW.md](STORYBOOK_WORKFLOW.md)
+4. [../design-system/STORYBOOK_FOUNDATION.md](../design-system/STORYBOOK_FOUNDATION.md)
+5. [../README.md](../README.md) for current command and review workflow
 
 ### Working on dashboard, state, or section flows
 
@@ -93,7 +96,7 @@ Use these directories when docs need to be checked against the live implementati
 - Prefer updating existing active docs over adding duplicate scratch notes
 - Treat `docs/archive/` as historical material, not the current source of truth
 - When top-level sections, shared stores, widget types, or test locations change, update `README.md` and `design-system/FEATURES.md`
-- When Storybook ownership, UI-layer boundaries, token helpers, or `ui-kit/` exports change, update `design-system/README.md`
+- When Storybook ownership, UI-layer boundaries, token helpers, or `ui-kit/` exports change, update `design-system/README.md` and `STORYBOOK_WORKFLOW.md`
 - When the Home Assistant service split or typed event flow changes, update `README.md` and `technical/REACT_ZUSTAND.md`
 - When setup scripts or test commands change, update `README.md`
 
@@ -102,4 +105,4 @@ Use these directories when docs need to be checked against the live implementati
 This index intentionally focuses on active docs. Some older topic documents may still need a deeper
 staleness audit, especially if they describe features that have evolved faster than the docs.
 
-Last updated: May 14, 2026
+Last updated: May 15, 2026

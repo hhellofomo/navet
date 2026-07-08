@@ -1,5 +1,9 @@
 # Navet - Change History
 
+> Historical snapshot: this archive records older implementation milestones and migration notes.
+> It is not a current implementation reference. Use `README.md`, `docs/README.md`, and
+> `design-system/FEATURES.md` for the live product and architecture map.
+
 This document summarizes the major changes, migrations, and optimizations made to Navet.
 
 ## March 5, 2026 - Rebranding to Navet

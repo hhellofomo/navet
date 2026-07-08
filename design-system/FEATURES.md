@@ -319,9 +319,12 @@ Current co-located `__tests__/` directories:
 - `src/app/features/calendar/components/calendar/__tests__/`
 - `src/app/features/dashboard/components/__tests__/`
 - `src/app/features/dashboard/hooks/__tests__/`
+- `src/app/features/dashboard/stores/__tests__/`
 - `src/app/features/energy/components/dashboard/__tests__/`
 - `src/app/features/energy/components/energy-setup-wizard/__tests__/`
+- `src/app/features/energy/services/__tests__/`
 - `src/app/features/energy/utils/__tests__/`
+- `src/app/features/lighting/components/__tests__/`
 - `src/app/features/lighting/components/light-card/__tests__/`
 - `src/app/features/media/components/media-card/__tests__/`
 - `src/app/features/media/components/media/__tests__/`

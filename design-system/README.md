@@ -37,6 +37,7 @@ Use this folder when you are:
 - [UI-GUIDELINES.md](UI-GUIDELINES.md): visual rules, accessibility, motion, and performance constraints
 - [FEATURES.md](FEATURES.md): current feature inventory, ownership map, and test/story coverage
 - [STORYBOOK_FOUNDATION.md](STORYBOOK_FOUNDATION.md): Storybook structure and review workflow
+- [../docs/STORYBOOK_WORKFLOW.md](../docs/STORYBOOK_WORKFLOW.md): story placement, fixtures, UI-kit discovery, and review checklist
 - [LAYOUT-STRUCTURE.md](LAYOUT-STRUCTURE.md): app-shell and layout architecture
 - [MOODBOARD.md](MOODBOARD.md): visual direction and references
 
@@ -119,6 +120,15 @@ Current entrypoints include:
 
 Use this layer for discovery and workshop organization, not as a replacement for the underlying
 authoring directories.
+
+The UI-kit concept stories have distinct jobs:
+
+- `Concepts/UI Kit Start Here`: explains layer ownership and contribution flow
+- `Concepts/UI Kit Inventory`: lists stable exports and where to import them from
+- `Concepts/UI Kit Recipes`: shows preferred shared compositions for common Navet UI work
+
+When a primitive, pattern, or token helper becomes stable enough for cross-feature use, expose it
+through `src/app/ui-kit/` and update the inventory story in the same change.
 
 ### `src/app/components/layout/`
 
@@ -257,6 +267,10 @@ Cross-feature story helpers live in
 [`src/app/storybook/`](/Users/vishal/Development/Github/Navet/Navet/src/app/storybook). Import frame
 helpers from `@/app/storybook/story-frames`.
 
+Storybook authoring details live in
+[`docs/STORYBOOK_WORKFLOW.md`](/Users/vishal/Development/Github/Navet/Navet/docs/STORYBOOK_WORKFLOW.md).
+Use that guide for story placement, fixture rules, UI-kit discovery updates, and review checklists.
+
 ## Testing Shared UI Logic
 
 Storybook remains the primary review surface for visual behavior, but shared UI logic should use
@@ -283,5 +297,6 @@ Use unit tests for:
 ## Maintenance Expectations
 
 - Update these docs when shared UI ownership, token helpers, or Storybook structure changes
+- Update `docs/STORYBOOK_WORKFLOW.md` when Storybook taxonomy, story placement, or fixture policy changes
 - Update [FEATURES.md](FEATURES.md) when the product surface, section ownership, or test coverage map changes
 - Prefer documenting current layers and rules over preserving historical phrasing
