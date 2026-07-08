@@ -41,9 +41,8 @@ Complete documentation for the Navet smart home dashboard.
 ### Project History
 - **[Change History](archive/CHANGES.md)** - Major changes and migrations
   - Rebranding to Navet
-  - Preact migration
-  - Zustand migration
-  - DnD kit migration
+  - State management migrations
+  - Drag-and-drop migration
   - Optimization history
 - **[Organization Summary](archive/CLEANUP_SUMMARY.md)** - Documentation cleanup details
 
@@ -71,6 +70,9 @@ Complete documentation for the Navet smart home dashboard.
 
 **Run Navet in Docker or as a Home Assistant add-on:**
 → See [Docker and Home Assistant Add-on](DOCKER_HOME_ASSISTANT_ADDON.md)
+
+**Understand recent performance work:**
+→ See [Docker and Home Assistant Add-on -> Current Performance Work](DOCKER_HOME_ASSISTANT_ADDON.md#current-performance-work)
 
 ## 📖 Documentation Organization
 
@@ -120,5 +122,5 @@ docs/
 
 ---
 
-**Last Updated:** March 6, 2026  
+**Last Updated:** March 7, 2026  
 **Documentation Status:** ✅ Complete and organized

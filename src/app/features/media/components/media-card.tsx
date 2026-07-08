@@ -1,12 +1,16 @@
-import { memo } from 'react';
+import { lazy, memo, Suspense } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
 import { useTheme } from '@/app/contexts/theme-context';
 import albumArt from '@/assets/847d39d7e328a23edbec0f0c53ec4c57b6f1d6fb.png';
-import { MediaDialog } from './media/media-dialog';
 import { MediaLargeView } from './media/media-large-view';
 import { MediaMediumView } from './media/media-medium-view';
 import { MediaSmallView } from './media/media-small-view';
 import { useMediaState } from './media/use-media-state';
+
+const MediaDialog = lazy(async () => {
+  const module = await import('./media/media-dialog');
+  return { default: module.MediaDialog };
+});
 
 interface MediaCardProps {
   title: string;
@@ -119,20 +123,24 @@ export const MediaCard = memo(function MediaCard({
         </div>
       </div>
 
-      <MediaDialog
-        isOpen={isOpen}
-        onOpenChange={closeDialog}
-        albumArt={albumArt}
-        title={title}
-        artist={artist}
-        isPlaying={isPlaying}
-        volume={volume}
-        isMuted={isMuted}
-        isLight={isLight}
-        onTogglePlay={togglePlay}
-        onToggleMute={toggleMute}
-        onVolumeChange={handleVolumeChange}
-      />
+      {isOpen && (
+        <Suspense fallback={null}>
+          <MediaDialog
+            isOpen={isOpen}
+            onOpenChange={closeDialog}
+            albumArt={albumArt}
+            title={title}
+            artist={artist}
+            isPlaying={isPlaying}
+            volume={volume}
+            isMuted={isMuted}
+            isLight={isLight}
+            onTogglePlay={togglePlay}
+            onToggleMute={toggleMute}
+            onVolumeChange={handleVolumeChange}
+          />
+        </Suspense>
+      )}
     </>
   );
 });

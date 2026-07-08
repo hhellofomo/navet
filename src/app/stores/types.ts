@@ -28,7 +28,9 @@ export interface NavigationState {
 
 export interface SearchState {
   searchQuery: string;
+  filteredDeviceIds: string[];
   setSearchQuery: (query: string) => void;
+  setFilteredDeviceIds: (ids: string[]) => void;
   clearSearch: () => void;
 }
 

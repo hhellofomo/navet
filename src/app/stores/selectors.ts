@@ -68,7 +68,9 @@ export const navigationSelectors = {
  */
 export const searchSelectors = {
   searchQuery: (state: SearchState) => state.searchQuery,
+  filteredDeviceIds: (state: SearchState) => state.filteredDeviceIds,
   setSearchQuery: (state: SearchState) => state.setSearchQuery,
+  setFilteredDeviceIds: (state: SearchState) => state.setFilteredDeviceIds,
   clearSearch: (state: SearchState) => state.clearSearch,
 
   // Computed selectors

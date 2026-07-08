@@ -1,12 +1,41 @@
 import { X } from 'lucide-react';
+import { lazy, Suspense } from 'react';
 import { useEditModeContext } from '@/app/contexts/edit-mode-context';
 import type { CustomCard } from '@/app/stores';
-import { CalendarWidget, NewsWidget, NoteWidget, PhotoFrameWidget, WeatherWidget } from './widgets';
+
+const CalendarWidget = lazy(async () => {
+  const module = await import('./widgets/calendar-widget');
+  return { default: module.CalendarWidget };
+});
+
+const NewsWidget = lazy(async () => {
+  const module = await import('./widgets/news-widget');
+  return { default: module.NewsWidget };
+});
+
+const NoteWidget = lazy(async () => {
+  const module = await import('./widgets/note-widget');
+  return { default: module.NoteWidget };
+});
+
+const PhotoFrameWidget = lazy(async () => {
+  const module = await import('./widgets/photo-frame-widget');
+  return { default: module.PhotoFrameWidget };
+});
+
+const WeatherWidget = lazy(async () => {
+  const module = await import('./widgets/weather-widget');
+  return { default: module.WeatherWidget };
+});
 
 interface WidgetCardProps {
   card: CustomCard;
   onDelete?: (cardId: string) => void;
   onUpdate?: (cardId: string, data: Record<string, unknown>) => void;
+}
+
+function WidgetFallback() {
+  return <div className="h-full rounded-2xl border border-white/10 bg-white/5 animate-pulse" />;
 }
 
 export function WidgetCard({ card, onDelete, onUpdate }: WidgetCardProps) {
@@ -54,7 +83,7 @@ export function WidgetCard({ card, onDelete, onUpdate }: WidgetCardProps) {
 
   return (
     <div className="relative h-full">
-      {widgetContent}
+      <Suspense fallback={<WidgetFallback />}>{widgetContent}</Suspense>
 
       {/* Delete button in edit mode */}
       {isEditMode && onDelete && (

@@ -22,10 +22,14 @@ import { useHADevices } from './use-ha-devices';
 export const useDevices = (): DeviceCollection => {
   const { connected } = useHomeAssistantContext();
   const haDevices = useHADevices();
+  const fallbackDevices = useMemo(
+    () => ({ ...DEVICES, lights: haDevices.lights }),
+    [haDevices.lights]
+  );
 
   const devices = useMemo(
-    () => (connected ? haDevices : { ...DEVICES, lights: haDevices.lights }),
-    [connected, haDevices]
+    () => (connected ? haDevices : fallbackDevices),
+    [connected, fallbackDevices, haDevices]
   );
 
   return devices;
@@ -36,10 +40,47 @@ export const useDevices = (): DeviceCollection => {
  * Extracts unique rooms from devices
  */
 export const useRooms = (devices: DeviceCollection): string[] => {
+  const {
+    lights,
+    hvac,
+    climate,
+    power,
+    media,
+    weather,
+    wifi,
+    switches,
+    covers,
+    locks,
+    persons,
+    sensors,
+    vacuums,
+    rssFeeds,
+    calendars,
+    'grouped-sensors': groupedSensors,
+  } = devices;
+
   return useMemo(() => {
     const roomsSet = new Set<string>();
+    const deviceGroups = [
+      lights,
+      hvac,
+      climate,
+      power,
+      media,
+      weather,
+      wifi,
+      switches,
+      covers,
+      locks,
+      persons,
+      sensors,
+      vacuums,
+      rssFeeds,
+      calendars,
+      groupedSensors,
+    ];
 
-    Object.values(devices).forEach((deviceArray) => {
+    deviceGroups.forEach((deviceArray) => {
       deviceArray.forEach((device) => {
         if ('room' in device && device.room) {
           roomsSet.add(device.room);
@@ -50,5 +91,22 @@ export const useRooms = (devices: DeviceCollection): string[] => {
     });
 
     return Array.from(roomsSet);
-  }, [devices]);
+  }, [
+    calendars,
+    climate,
+    covers,
+    groupedSensors,
+    hvac,
+    lights,
+    locks,
+    media,
+    persons,
+    power,
+    rssFeeds,
+    sensors,
+    switches,
+    vacuums,
+    weather,
+    wifi,
+  ]);
 };
