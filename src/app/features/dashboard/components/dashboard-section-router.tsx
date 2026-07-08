@@ -177,6 +177,7 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
               hiddenEntityCount={hiddenEntityIds.length}
               allCustomCards={controller.allCustomCards}
               cardZones={controller.cardZones}
+              updateCardZone={controller.updateCardZone}
               onOpenAddEntityDialog={
                 addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined
               }

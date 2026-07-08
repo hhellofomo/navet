@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { CardActionRow } from '@/app/components/shared/card-action-row';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
 import {
@@ -23,9 +23,11 @@ interface LightCardMediumProps {
   maxColorTemp: number;
   brightnessPresets: LightBrightnessPreset[];
   isOn: boolean;
+  isKelvinMode: boolean;
   IconComponent: LucideIcon;
   supportsColorControl: boolean;
   supportsColorTemperature: boolean;
+  onKelvinToggle: () => void;
   onBrightnessChange: (value: number) => void;
   onBrightnessCommit: (value: number) => void;
   onColorChange: (color: string) => void;
@@ -47,9 +49,11 @@ export const LightCardMedium = memo(function LightCardMedium({
   maxColorTemp,
   brightnessPresets,
   isOn,
+  isKelvinMode,
   IconComponent,
   supportsColorControl,
   supportsColorTemperature,
+  onKelvinToggle,
   onBrightnessChange,
   onBrightnessCommit,
   onColorChange,
@@ -61,11 +65,6 @@ export const LightCardMedium = memo(function LightCardMedium({
   showPresetOverflow,
 }: LightCardMediumProps) {
   const { theme } = useTheme();
-  const [isKelvinMode, setIsKelvinMode] = useState(false);
-
-  const handleKelvinToggle = () => {
-    if (isOn) setIsKelvinMode((prev) => !prev);
-  };
 
   return (
     <>
@@ -112,7 +111,7 @@ export const LightCardMedium = memo(function LightCardMedium({
                   currentTempColor={currentTempColor}
                   isActive={isKelvinMode}
                   size="medium"
-                  onClick={handleKelvinToggle}
+                  onClick={onKelvinToggle}
                 />
               )}
 

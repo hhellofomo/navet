@@ -1,10 +1,12 @@
-import { ChevronRight, LayoutDashboard, Plus, Shield } from 'lucide-react';
+import { DndContext, DragOverlay } from '@dnd-kit/core';
+import { ChevronRight, GripVertical, LayoutDashboard, Plus, Shield } from 'lucide-react';
 import { memo, useMemo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
 import type { Section } from '@/app/navigation/sections';
 import type { DeviceWithType } from '@/app/types/device.types';
+import { useDashboardZoneDnd } from '../hooks/use-dashboard-zone-dnd';
 import type { CustomCard } from '../stores/custom-cards-store';
 import { useZoneLayout } from '../zones/use-zone-layout';
 import type { ZoneName } from '../zones/zone-types';
@@ -18,6 +20,7 @@ interface HomeDashboardOverviewProps {
   hiddenEntityCount: number;
   allCustomCards: CustomCard[];
   cardZones: Record<string, ZoneName>;
+  updateCardZone?: (id: string, zone: ZoneName) => void;
   onOpenAddEntityDialog?: () => void;
   onOpenBuilder: () => void;
   onDeleteCard?: (cardId: string) => void;
@@ -33,6 +36,7 @@ export const HomeDashboardOverview = memo(function HomeDashboardOverview({
   hiddenEntityCount,
   allCustomCards,
   cardZones,
+  updateCardZone,
   onOpenAddEntityDialog,
   onOpenBuilder,
   onDeleteCard,
@@ -55,6 +59,28 @@ export const HomeDashboardOverview = memo(function HomeDashboardOverview({
   );
 
   const zoneSections = useZoneLayout(deviceMap, homeCustomCards, cardZones);
+
+  const { sensors, activeId, handleDragStart, handleDragEnd } = useDashboardZoneDnd({
+    updateCardZone: updateCardZone ?? (() => {}),
+  });
+
+  // Resolve the dragged card's size so the DragOverlay matches the actual card dimensions.
+  // Grid math: col = 190px, row = 87px, gap = 16px (lg+)
+  const activeDragSize = useMemo(() => {
+    if (!activeId) return null;
+    if (cardSizes[activeId]) return cardSizes[activeId];
+    const device = deviceMap.get(activeId);
+    if (device) return device.size as CardSize;
+    return homeCustomCards.find((c) => c.id === activeId)?.size ?? 'small';
+  }, [activeId, cardSizes, deviceMap, homeCustomCards]);
+
+  const overlayClass: Record<CardSize, string> = {
+    'extra-small': 'w-[190px] h-[87px]',
+    small: 'w-[190px] h-[190px]',
+    medium: 'w-[396px] h-[190px]',
+    large: 'w-[396px] h-[396px]',
+    hero: 'w-full h-[277px]',
+  };
 
   const totalZonedCards = zoneSections.reduce((sum, s) => sum + s.orderedIds.length, 0);
   const hasCards = totalZonedCards > 0;
@@ -143,22 +169,33 @@ export const HomeDashboardOverview = memo(function HomeDashboardOverview({
         </div>
 
         {hasCards ? (
-          <div className="mt-6 flex flex-col gap-8">
-            {zoneSections.map(({ zone, orderedIds }) => (
-              <ZoneBand
-                key={zone}
-                zone={zone}
-                orderedIds={orderedIds}
-                deviceMap={deviceMap}
-                customCardMap={customCardMap}
-                cardSizes={cardSizes}
-                handleSizeChange={updateCardSize}
-                isEditMode={isEditMode}
-                onDeleteCard={onDeleteCard}
-                onUpdateCard={onUpdateCard}
-              />
-            ))}
-          </div>
+          <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+            <div className="mt-6 flex flex-col gap-8">
+              {zoneSections.map(({ zone, orderedIds }) => (
+                <ZoneBand
+                  key={zone}
+                  zone={zone}
+                  orderedIds={orderedIds}
+                  deviceMap={deviceMap}
+                  customCardMap={customCardMap}
+                  cardSizes={cardSizes}
+                  handleSizeChange={updateCardSize}
+                  isEditMode={isEditMode}
+                  onDeleteCard={onDeleteCard}
+                  onUpdateCard={onUpdateCard}
+                />
+              ))}
+            </div>
+            <DragOverlay dropAnimation={null}>
+              {activeId && activeDragSize ? (
+                <div
+                  className={`flex items-center justify-center rounded-2xl border border-white/20 bg-white/10 backdrop-blur-xl ${overlayClass[activeDragSize]}`}
+                >
+                  <GripVertical className="h-5 w-5 text-white/60" />
+                </div>
+              ) : null}
+            </DragOverlay>
+          </DndContext>
         ) : (
           <div
             className={`mt-5 rounded-[24px] border border-dashed p-8 text-center ${surface.borderStrong} ${surface.panelMuted}`}

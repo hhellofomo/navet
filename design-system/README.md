@@ -114,7 +114,7 @@ Room views use a fixed responsive column grid:
 - desktop (`xl`): `grid-cols-6`
 - large desktop (`2xl`): `grid-cols-8`
 
-The Home view zone bands use a 12-column CSS custom-property grid driven by `useBreakpointCols`, aligned with Tailwind breakpoints: `md` → 6 cols, `lg` → 8 cols, `xl` → 12 cols.
+The Home view zone bands use a CSS custom-property grid driven by `useBreakpointCols`, matching the same breakpoints as room views: `md` → 4 cols, `xl` → 6 cols, `2xl` → 8 cols.
 
 Gaps scale from `gap-2` to `md:gap-3` to `lg:gap-4`, while `auto-rows-[87px]` keeps the card height math stable.
 

@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { useTheme } from '@/app/hooks';
 import { useSettingsStore } from '@/app/stores';
@@ -34,10 +34,22 @@ export const LightCard = memo(function LightCard({
   onSizeChange: _onSizeChange,
   isEditMode,
 }: LightCardProps) {
-  const { theme } = useTheme();
+  const { theme, colors, accentColor } = useTheme();
   const ambientLightBleed = useSettingsStore((state) => state.ambientLightBleed);
   const lowPowerMode = useSettingsStore((state) => state.lowPowerMode);
   const effectsQuality = useSettingsStore((state) => state.effectsQuality);
+  const [isKelvinMode, setIsKelvinMode] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const kelvinResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const scheduleKelvinReset = useCallback(() => {
+    if (kelvinResetTimerRef.current) clearTimeout(kelvinResetTimerRef.current);
+    kelvinResetTimerRef.current = setTimeout(() => {
+      setIsKelvinMode(false);
+      kelvinResetTimerRef.current = null;
+    }, 3000);
+  }, []);
+
   const controller = useLightCardController({
     id,
     name,
@@ -54,7 +66,62 @@ export const LightCard = memo(function LightCard({
     isOn: controller.isOn,
     selectedColor: controller.selectedColor,
     theme,
+    lightColors: colors.switch.on,
+    accentColor,
   });
+
+  const handleKelvinToggle = useCallback(() => {
+    if (!controller.isOn) return;
+    setIsKelvinMode((prev) => {
+      const next = !prev;
+      if (next) {
+        scheduleKelvinReset();
+      } else if (kelvinResetTimerRef.current) {
+        clearTimeout(kelvinResetTimerRef.current);
+        kelvinResetTimerRef.current = null;
+      }
+      return next;
+    });
+  }, [controller.isOn, scheduleKelvinReset]);
+
+  const handleTempChange = useCallback(
+    (temp: number) => {
+      controller.onTempChange(temp);
+      scheduleKelvinReset();
+    },
+    [controller.onTempChange, scheduleKelvinReset]
+  );
+
+  const handleTempCommit = useCallback(
+    (temp: number) => {
+      controller.onTempCommit(temp);
+      scheduleKelvinReset();
+    },
+    [controller.onTempCommit, scheduleKelvinReset]
+  );
+
+  // Reset kelvin mode when clicking outside the card
+  useEffect(() => {
+    if (!isKelvinMode) return;
+    const handlePointerDown = (e: PointerEvent) => {
+      if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
+        setIsKelvinMode(false);
+        if (kelvinResetTimerRef.current) {
+          clearTimeout(kelvinResetTimerRef.current);
+          kelvinResetTimerRef.current = null;
+        }
+      }
+    };
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [isKelvinMode]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (kelvinResetTimerRef.current) clearTimeout(kelvinResetTimerRef.current);
+    };
+  }, []);
 
   const isSmall = isCompactCardSize(size);
 
@@ -77,6 +144,7 @@ export const LightCard = memo(function LightCard({
         )}
 
         <div
+          ref={cardRef}
           {...controller.cardInteraction.cardProps}
           className={`relative z-10 h-full w-full overflow-hidden rounded-3xl ${theme !== 'dark' ? 'border' : ''} ${controller.padding} transition-all duration-500 ${surfaceTokens.cardClassName} ${!isEditMode ? 'cursor-pointer' : ''}`}
           style={surfaceTokens.cardStyle}
@@ -112,11 +180,13 @@ export const LightCard = memo(function LightCard({
                 colorTemp={controller.colorTemp}
                 minColorTemp={controller.minColorTemp}
                 maxColorTemp={controller.maxColorTemp}
+                isKelvinMode={isKelvinMode}
+                onKelvinToggle={handleKelvinToggle}
                 onBrightnessChange={controller.onBrightnessChange}
                 onBrightnessCommit={controller.onBrightnessCommit}
                 onColorChange={controller.onColorChange}
-                onTempChange={controller.onTempChange}
-                onTempCommit={controller.onTempCommit}
+                onTempChange={handleTempChange}
+                onTempCommit={handleTempCommit}
               />
             ) : size === 'medium' ? (
               <LightCardMedium
@@ -136,11 +206,13 @@ export const LightCard = memo(function LightCard({
                 colorTemp={controller.colorTemp}
                 minColorTemp={controller.minColorTemp}
                 maxColorTemp={controller.maxColorTemp}
+                isKelvinMode={isKelvinMode}
+                onKelvinToggle={handleKelvinToggle}
                 onBrightnessChange={controller.onBrightnessChange}
                 onBrightnessCommit={controller.onBrightnessCommit}
                 onColorChange={controller.onColorChange}
-                onTempChange={controller.onTempChange}
-                onTempCommit={controller.onTempCommit}
+                onTempChange={handleTempChange}
+                onTempCommit={handleTempCommit}
               />
             ) : (
               <LightCardLarge
@@ -160,11 +232,13 @@ export const LightCard = memo(function LightCard({
                 colorTemp={controller.colorTemp}
                 minColorTemp={controller.minColorTemp}
                 maxColorTemp={controller.maxColorTemp}
+                isKelvinMode={isKelvinMode}
+                onKelvinToggle={handleKelvinToggle}
                 onBrightnessChange={controller.onBrightnessChange}
                 onBrightnessCommit={controller.onBrightnessCommit}
                 onColorChange={controller.onColorChange}
-                onTempChange={controller.onTempChange}
-                onTempCommit={controller.onTempCommit}
+                onTempChange={handleTempChange}
+                onTempCommit={handleTempCommit}
               />
             )}
           </div>

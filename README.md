@@ -50,7 +50,7 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 - **Custom Widgets** - Add RSS Feed, Photo Frame, Quick Note, Battery Overview, and Button widgets
 - **Entity Visibility Control** - Start with all entities, a blank board, or import a saved config, then add/remove entities as needed
 - **Search & Filter** - Real-time search filters dashboard view, including Home Assistant-style entity id queries such as `light.`, `sensor.`, and full ids, with compact mobile search access from the header
-- **All View Modes** - Switch the `All` room between custom, room, type, or flat grouping
+- **Home Room Grouping** - Switch the Home room between custom, room, type, or no-grouping layouts
 - **Page Zoom Setting** - Appearance settings include page zoom presets so the whole dashboard can be scaled without relying on browser zoom
 - **Live Weather Entity Card** - Home Assistant weather entities now render as the dashboard weather card with forecast and solar data from Home Assistant
 - **Calendar Entities** - Home Assistant calendar entities now render through the live calendar card with per-card source selection, week/month views, and event details
@@ -58,7 +58,6 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 - **Helpers and Scripts** - Home Assistant helper domains and scripts can be added through the existing sensor and switch-style card paths
 - **Home Assistant Notifications** - Navet notifications now show Home Assistant persistent notifications, repairs/issues, update actions, and markdown-formatted message content
 - **Card-Level Room Editing** - Supported entity cards, including calendar and weather, can reassign their room directly from the settings dialog
-- **Notifications** - System notifications panel
 - **Settings** - Comprehensive theme and customization options
 - **User Management** - Login system with user profiles
 - **Data Persistence** - Automatic localStorage persistence of all settings:
@@ -75,9 +74,9 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 
 ### ⚡ Performance
 - **Lazy-Loaded UI** - Settings, add-card flows, widgets, and media dialogs load on demand
-- **Deferred Room Rendering** - Offscreen room groups are deferred in the All view
-- **Batched Room Mounting** - Visible All-view room sections now hydrate cards in smaller batches instead of one large render burst
-- **Offscreen Card Skipping** - Non-edit dashboard cards now use browser offscreen rendering hints to reduce `All` view scroll cost on large boards
+- **Deferred Room Rendering** - Offscreen room groups are deferred in the Home room view
+- **Batched Room Mounting** - Visible Home room sections now hydrate cards in smaller batches instead of one large render burst
+- **Offscreen Card Skipping** - Non-edit dashboard cards now use browser offscreen rendering hints to reduce Home room scroll cost on large boards
 - **Virtualized Entity Picker** - The Add Entity dialog window-renders large Home Assistant entity lists
 - **Smart Re-renders** - Per-entity subscriptions mean each card reacts only to its own HA state changes; the device map rebuilds only when entities are added or removed, not on every state update
 - **Off-screen Skip** - Room sections use `content-visibility: auto` so the browser skips layout, paint, and compositing for rooms outside the viewport; single-room view batch-loads cards on idle frames
@@ -212,6 +211,7 @@ This builds the app, writes `dist/config.js` from `NAVET_HASS_URL` and `NAVET_HA
 - Theme mode names and descriptions follow the selected app language
 - First-run onboarding now gives **Localization** its own step for language, time format, and temperature unit before the appearance step
 - In **Settings -> Appearance**, choose whether active light cards use **Ambient bleed** or stay **Contained** inside the card
+- On light cards that support color temperature, tapping the Kelvin swatch switches the card's slider to the color temperature slider; the slider automatically returns to brightness after 3 seconds of inactivity or when clicking outside the card
 - Choose from **4 built-in wallpapers** (Serene Dawn, Starfield Nocturne, Aurora Veil, Rainforest Canopy) or upload your own image as a dashboard background
 - Custom accent colors, preset accent colors, light colors, and Kelvin swatches now share the same color-picker primitive and sizing language
 - Light brightness presets now use a compact **3-preset** set: **Bright**, **Dim**, and **Night**
@@ -229,9 +229,10 @@ This builds the app, writes `dist/config.js` from `NAVET_HASS_URL` and `NAVET_HA
 
 #### Room Navigation
 - Use **room tabs** to filter by room
-- In **All**, use the **View** dropdown to switch between **Custom**, **Room**, **Type**, and **No Grouping**
+- In **Home**, use the **View** dropdown (edit mode) to switch between **Custom**, **Room**, **Type**, and **No Grouping**
 - Device counts shown for each room
-- The selected dashboard section and room both persist across refresh
+- Each section has its own URL path (`/`, `/security`, `/lights`, `/settings`, etc.) — browser back/forward navigate between sections, and refreshing opens the correct section directly
+- Navigating between sections scrolls back to the top automatically
 - On mobile, the header and room navigation are intentionally compacted so the first card rows appear sooner
 
 #### Calendar Cards

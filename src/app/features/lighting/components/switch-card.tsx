@@ -61,46 +61,50 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
                 {controller.entityType}
               </p>
             </div>
-            {controller.showSettingsButton && !controller.isExtraSmall && (
-              <RoundControlButton
-                theme={controller.theme}
-                size="small"
-                variant="neutral"
-                {...controller.cardInteraction.settingsButtonProps}
-                className={controller.settingsButtonClass}
-              >
-                <Settings2 className="h-3.5 w-3.5" />
-              </RoundControlButton>
-            )}
           </div>
 
           <div className="flex-1" />
 
-          {controller.selectedMetrics.length > 0 && (
-            <div className={controller.isExtraSmall ? 'space-y-0' : 'space-y-0.5'}>
-              {controller.selectedMetrics.map((metric) => (
-                <div
-                  key={metric.label}
-                  className={`flex items-center justify-between ${controller.isExtraSmall ? 'gap-1.5 text-[10px]' : 'gap-2 text-xs'}`}
+          <div className="relative">
+            {controller.showSettingsButton && !controller.isExtraSmall && (
+              <div className="absolute bottom-0 right-0">
+                <RoundControlButton
+                  theme={controller.theme}
+                  size="small"
+                  variant="neutral"
+                  {...controller.cardInteraction.settingsButtonProps}
+                  className={controller.settingsButtonClass}
                 >
-                  <span
-                    className={`${stateSurface.secondaryTextClassName} min-w-0 flex items-center ${controller.isExtraSmall ? 'gap-1 pr-1' : 'gap-1 pr-2'}`}
+                  <Settings2 className="h-3.5 w-3.5" />
+                </RoundControlButton>
+              </div>
+            )}
+            {controller.selectedMetrics.length > 0 && (
+              <div className={controller.isExtraSmall ? 'space-y-1' : 'space-y-1.5'}>
+                {controller.selectedMetrics.map((metric, i) => (
+                  <div
+                    key={metric.label}
+                    className={`flex min-w-0 flex-col ${i === controller.selectedMetrics.length - 1 && controller.showSettingsButton && !controller.isExtraSmall ? 'pr-10' : ''}`}
                   >
-                    {controller.renderMetricIcon(
-                      metric,
-                      `${controller.isExtraSmall ? 'h-2.5 w-2.5' : 'h-3 w-3'} flex-shrink-0`
-                    )}
-                    <span className="truncate">{controller.getMetricLabel(metric)}</span>
-                  </span>
-                  <span
-                    className={`${stateSurface.primaryTextClassName} flex-shrink-0 whitespace-nowrap font-medium`}
-                  >
-                    {controller.formatMetricValue(metric)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
+                    <span
+                      className={`${stateSurface.secondaryTextClassName} flex items-center ${controller.isExtraSmall ? 'gap-1 text-[9px]' : 'gap-1 text-[10px]'}`}
+                    >
+                      {controller.renderMetricIcon(
+                        metric,
+                        `${controller.isExtraSmall ? 'h-2.5 w-2.5' : 'h-3 w-3'} flex-shrink-0`
+                      )}
+                      <span className="truncate">{controller.getMetricLabel(metric)}</span>
+                    </span>
+                    <span
+                      className={`${stateSurface.primaryTextClassName} ${controller.isExtraSmall ? 'pl-[14px] text-[10px]' : 'pl-[16px] text-xs'} font-medium`}
+                    >
+                      {controller.formatMetricValue(metric)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
