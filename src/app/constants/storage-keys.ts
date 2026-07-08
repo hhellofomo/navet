@@ -8,4 +8,6 @@ export const STORAGE_KEYS = {
   switchCardMetricPreferences: 'ha-dashboard-switch-card-metrics',
   calendarCardSources: 'ha-dashboard-calendar-card-sources',
   calendarCardViewModes: 'ha-dashboard-calendar-card-view-modes',
+  rssFeedProviders: 'ha-dashboard-rss-feed-providers',
+  rssCardProviders: 'ha-dashboard-rss-card-providers',
 } as const;

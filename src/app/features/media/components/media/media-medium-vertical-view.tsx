@@ -12,6 +12,7 @@ import { useMediaArtworkColors, withAlpha } from './use-media-artwork-colors';
 interface MediaMediumVerticalViewProps {
   entityId: string;
   artwork?: string | null;
+  onArtworkError?: (imageUrl?: string | null) => void;
   title: string;
   artist: string;
   isActive: boolean;
@@ -31,6 +32,7 @@ interface MediaMediumVerticalViewProps {
 export function MediaMediumVerticalView({
   entityId,
   artwork,
+  onArtworkError,
   title,
   artist,
   isActive,
@@ -70,6 +72,7 @@ export function MediaMediumVerticalView({
     <div className="relative -m-6 flex h-[calc(100%+3rem)] flex-col overflow-hidden rounded-[inherit]">
       <MediaArtworkSurface
         artwork={artwork}
+        onArtworkError={onArtworkError}
         palette={palette}
         layout="stacked"
         artRegionClassName="h-[52%]"

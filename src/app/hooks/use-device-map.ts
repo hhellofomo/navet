@@ -78,7 +78,6 @@ export const useDeviceMap = (devices: DeviceCollection) => {
     persons,
     sensors,
     vacuums,
-    rssFeeds,
     calendars,
     'grouped-sensors': groupedSensors,
   } = devices;
@@ -100,7 +99,6 @@ export const useDeviceMap = (devices: DeviceCollection) => {
       ['persons', persons],
       ['sensors', sensors],
       ['vacuums', vacuums],
-      ['rssFeeds', rssFeeds],
       ['calendars', calendars],
       ['grouped-sensors', groupedSensors],
     ] as const;
@@ -131,7 +129,6 @@ export const useDeviceMap = (devices: DeviceCollection) => {
     media,
     persons,
     power,
-    rssFeeds,
     sensors,
     switches,
     vacuums,

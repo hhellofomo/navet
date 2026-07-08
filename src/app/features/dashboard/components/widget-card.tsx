@@ -1,16 +1,7 @@
 import { X } from 'lucide-react';
 import { lazy, Suspense } from 'react';
+import { RSSFeedCard } from '@/app/features/rss';
 import type { CustomCard } from '../stores/custom-cards-store';
-
-const CalendarWidget = lazy(async () => {
-  const module = await import('./widgets/calendar-widget');
-  return { default: module.CalendarWidget };
-});
-
-const NewsWidget = lazy(async () => {
-  const module = await import('./widgets/news-widget');
-  return { default: module.NewsWidget };
-});
 
 const NoteWidget = lazy(async () => {
   const module = await import('./widgets/note-widget');
@@ -49,11 +40,8 @@ export function WidgetCard({ card, isEditMode, onDelete, onUpdate }: WidgetCardP
 
   let widgetContent: React.ReactNode;
   switch (card.type) {
-    case 'calendar':
-      widgetContent = <CalendarWidget size={card.size} />;
-      break;
-    case 'news':
-      widgetContent = <NewsWidget size={card.size} />;
+    case 'rss':
+      widgetContent = <RSSFeedCard cardId={card.id} inEditMode={isEditMode} size={card.size} />;
       break;
     case 'photo':
       widgetContent = <PhotoFrameWidget size={card.size} />;

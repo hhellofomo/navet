@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 
-export type CardType = 'calendar' | 'news' | 'photo' | 'note';
+export type CardType = 'rss' | 'photo' | 'note';
 
 export interface CustomCard {
   id: string;
@@ -72,9 +72,12 @@ export const useCustomCardsStore = create<CustomCardsState>()(
 
         return {
           ...state,
-          cards: (state.cards as Array<Omit<CustomCard, 'type'> & { type: string }>).filter(
-            (card) => card.type !== 'weather'
-          ),
+          cards: (state.cards as Array<Omit<CustomCard, 'type'> & { type: string }>)
+            .filter((card) => card.type !== 'weather' && card.type !== 'calendar')
+            .map((card) => ({
+              ...card,
+              type: card.type === 'news' ? 'rss' : card.type,
+            })) as CustomCard[],
         };
       },
     }

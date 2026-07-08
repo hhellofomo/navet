@@ -14,7 +14,6 @@ export const DEVICE_TYPE_LABELS: Record<keyof DeviceCollection, string> = {
   persons: 'Person',
   sensors: 'Sensor',
   vacuums: 'Vacuum',
-  rssFeeds: 'RSS Feed',
   calendars: 'Calendar',
   'grouped-sensors': 'Sensor Group',
 };

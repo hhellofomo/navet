@@ -20,6 +20,63 @@ function getPackageName(id: string) {
   return segments[0] ?? null
 }
 
+function rssProxyPlugin() {
+  return {
+    name: 'navet-rss-proxy',
+    configureServer(server) {
+      server.middlewares.use('/__navet_rss_proxy__', async (req, res) => {
+        const requestUrl = req.url ? new URL(req.url, 'http://localhost') : null
+        const targetUrl = requestUrl?.searchParams.get('url')?.trim()
+
+        if (!targetUrl) {
+          res.statusCode = 400
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify({ error: 'Missing url query parameter' }))
+          return
+        }
+
+        try {
+          const parsedUrl = new URL(targetUrl)
+
+          if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+            throw new Error('Invalid protocol')
+          }
+
+          const upstreamResponse = await fetch(parsedUrl, {
+            headers: {
+              Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8',
+              'User-Agent': 'Navet RSS Reader/1.0',
+            },
+          })
+
+          if (!upstreamResponse.ok) {
+            res.statusCode = 502
+            res.setHeader('Content-Type', 'application/json')
+            res.end(
+              JSON.stringify({
+                error: `Upstream feed request failed with status ${upstreamResponse.status}`,
+              })
+            )
+            return
+          }
+
+          const contentType =
+            upstreamResponse.headers.get('content-type') ?? 'application/xml; charset=utf-8'
+          const body = await upstreamResponse.text()
+
+          res.statusCode = 200
+          res.setHeader('Content-Type', contentType)
+          res.end(body)
+        } catch {
+          res.statusCode = 502
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify({ error: 'Unable to load feed' }))
+        }
+      })
+    },
+  }
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const hassUrl = env.NAVET_HASS_URL?.trim().replace(/\/$/, '')
@@ -32,6 +89,7 @@ export default defineConfig(({ mode }) => {
     // Tailwind is not being actively used – do not remove them
     react(),
     tailwindcss(),
+    rssProxyPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: false,

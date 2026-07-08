@@ -22,7 +22,6 @@ export const useDashboardDevices = (
       persons: devices.persons.filter((device) => !hiddenIds.has(device.id)),
       sensors: devices.sensors.filter((device) => !hiddenIds.has(device.id)),
       vacuums: devices.vacuums.filter((device) => !hiddenIds.has(device.id)),
-      rssFeeds: devices.rssFeeds.filter((device) => !hiddenIds.has(device.id)),
       calendars: devices.calendars.filter((device) => !hiddenIds.has(device.id)),
       'grouped-sensors': devices['grouped-sensors'].filter((device) => !hiddenIds.has(device.id)),
     };

@@ -132,7 +132,8 @@ export function AddEntityDialog({
 
         <div
           ref={listRef}
-          className="max-h-[420px] overflow-y-auto p-6 pt-4"
+          className="overflow-y-auto p-6 pt-4"
+          style={{ maxHeight: `${ENTITY_LIST_HEIGHT}px` }}
           onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
         >
           {availableDevices.length > 0 ? (

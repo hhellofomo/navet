@@ -14,8 +14,11 @@ export const useCardOrdering = (
 
   const buildOrders = useCallback(() => {
     const orders: Record<string, string[]> = {};
+    const orderedRooms = Array.from(
+      new Set([...rooms, ...safeCustomCards.map((card) => card.room)])
+    );
 
-    rooms.forEach((room) => {
+    orderedRooms.forEach((room) => {
       const roomCards: string[] = [];
       Object.values(devices).forEach((deviceArray) => {
         (deviceArray as Device[]).forEach((device: Device) => {

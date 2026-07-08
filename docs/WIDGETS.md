@@ -2,6 +2,8 @@
 
 This document explains how the custom widget system works in Navet.
 
+Calendar is no longer a custom dashboard widget. Calendar functionality now comes from live Home Assistant `calendar.*` entity cards.
+
 ## 📋 Table of Contents
 
 - [Overview](#overview)
@@ -18,7 +20,7 @@ The widget system allows users to add customizable cards to their dashboard beyo
 
 ### Key Features
 
-- **4 Built-in Widget Types** - Calendar, News, Photo Frame, Quick Note
+- **3 Built-in Widget Types** - RSS Feed, Photo Frame, Quick Note
 - **3 Size Options** - Small, Medium, Large (adapts to grid)
 - **Room Assignment** - Widgets can be assigned to specific rooms or "All"
 - **Persistent Storage** - Saves to localStorage automatically
@@ -27,45 +29,29 @@ The widget system allows users to add customizable cards to their dashboard beyo
 
 ## 📱 Available Widgets
 
-### 1. Calendar Widget
+### 1. RSS Feed Widget
 
-Displays upcoming events and appointments.
-
-**Features:**
-- Event list with color coding
-- Time and date information
-- Event categories
-- View all button
-
-**Best Sizes:** Medium, Large
-
-**Use Cases:**
-- Family calendar
-- Appointment reminders
-- Event planning
-
----
-
-### 2. News Feed Widget
-
-Shows latest news headlines from various sources.
+Shows live articles from your selected RSS providers.
 
 **Features:**
 - Article titles and sources
 - Timestamps
-- Category badges
 - External link support
+- Per-card provider selection
+- Custom RSS provider URLs
+- Home Assistant Feedreader provider support
+- Per-card provider deletion and source management
 
 **Best Sizes:** Medium, Large
 
 **Use Cases:**
-- News aggregation
+- RSS aggregation
 - Stay informed
 - Quick headlines
 
 ---
 
-### 3. Photo Frame Widget
+### 2. Photo Frame Widget
 
 Beautiful photo carousel with navigation.
 
@@ -84,7 +70,7 @@ Beautiful photo carousel with navigation.
 
 ---
 
-### 4. Quick Note Widget
+### 3. Quick Note Widget
 
 Editable sticky note for quick reminders.
 
@@ -114,9 +100,8 @@ Click the **Add Card** button that appears in edit mode.
 
 ### Step 3: Choose Widget Type
 
-Select from 4 available widget types:
-- Calendar
-- News Feed
+Select from 3 available widget types:
+- RSS Feed
 - Photo Frame
 - Quick Note
 
@@ -161,7 +146,7 @@ Click **Add Widget** to add it to your current room.
 3. Click **Save** to persist changes
 
 **Other Widgets:**
-Calendar, news, and photo widgets remain custom dashboard widgets. Weather is now provided by the Home Assistant weather entity card rather than a custom widget.
+RSS and photo remain custom dashboard widgets. Weather and calendar are now provided by Home Assistant entity cards rather than custom widgets.
 
 ## 🔧 Creating Custom Widgets
 
@@ -261,7 +246,7 @@ Widgets are stored in localStorage under the key `ha-dashboard-custom-cards`:
 [
   {
     "id": "custom-1234567890-abc123",
-    "type": "calendar",
+    "type": "rss",
     "size": "medium",
     "room": "Living Room",
     "data": {},
@@ -269,6 +254,8 @@ Widgets are stored in localStorage under the key `ha-dashboard-custom-cards`:
   }
 ]
 ```
+
+RSS provider definitions and per-card RSS source selections are also stored locally so each RSS card can keep its own provider mix.
 
 ### Storage API
 
@@ -311,7 +298,7 @@ Custom hook for managing widget cards.
 ### Types
 
 ```typescript
-type CardType = 'calendar' | 'news' | 'weather' | 'photo' | 'note';
+type CardType = 'rss' | 'photo' | 'note';
 type Size = 'small' | 'medium' | 'large';
 
 interface CustomCard {
@@ -335,23 +322,10 @@ interface WidgetCardProps {
 }
 ```
 
-**CalendarWidget**
+**RSSFeedCard**
 ```typescript
-interface CalendarWidgetProps {
-  size?: 'small' | 'medium' | 'large';
-}
-```
-
-**NewsWidget**
-```typescript
-interface NewsWidgetProps {
-  size?: 'small' | 'medium' | 'large';
-}
-```
-
-**WeatherWidget**
-```typescript
-interface WeatherWidgetProps {
+interface RSSFeedCardProps {
+  cardId: string;
   size?: 'small' | 'medium' | 'large';
 }
 ```
@@ -379,14 +353,12 @@ interface NoteWidgetProps {
 - [ ] Widget settings dialog for customization
 - [ ] Import/export widget configurations
 - [ ] Widget templates and presets
-- [ ] Real API integrations (calendar, news, weather)
+- [x] RSS provider integration
 - [ ] Custom widget builder UI
 - [ ] Widget sharing between users
 - [ ] Advanced note features (markdown, checklist)
 - [ ] Photo frame with user uploads
-- [ ] Multiple news sources
-- [ ] Location-based weather
-- [ ] Calendar sync (Google, Apple, etc.)
+- [x] Multiple RSS providers per card
 
 ### Community Contributions
 

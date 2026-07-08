@@ -14,11 +14,36 @@ export interface Notification {
   timestamp: Date;
   read: boolean;
   notificationId: string;
-  source: 'persistent_notification' | 'update';
+  source: 'persistent_notification' | 'update' | 'repair';
   isBusy?: boolean;
   progress?: number | null;
   statusLabel?: string;
   requiresRestart?: boolean;
+}
+
+interface HomeAssistantPersistentNotification {
+  notification_id?: string;
+  title?: string;
+  message?: string;
+  created_at?: string;
+  status?: string;
+}
+
+interface HomeAssistantPersistentNotificationEvent {
+  update_type?: 'added' | 'removed' | 'updated' | 'current';
+  notifications?: HomeAssistantPersistentNotification[];
+}
+
+interface HomeAssistantRepairIssue {
+  issue_id?: string;
+  domain?: string;
+  issue_domain?: string;
+  translation_key?: string;
+  severity?: string;
+  breaks_in_ha_version?: string;
+  learn_more_url?: string;
+  title?: string;
+  description?: string;
 }
 
 interface UseNotificationsReturn {
@@ -129,11 +154,15 @@ const inferNotificationType = (
 };
 
 export function useNotifications(): UseNotificationsReturn {
-  const { entities } = useHomeAssistant();
+  const { connection, entities } = useHomeAssistant();
   const [readNotifications, setReadNotifications] = useState<string[]>(loadReadNotifications);
   const [hiddenNotifications, setHiddenNotifications] = useState<string[]>(loadHiddenNotifications);
   const [pendingUpdateInstalls, setPendingUpdateInstalls] =
     useState<string[]>(loadPendingUpdateInstalls);
+  const [persistentNotifications, setPersistentNotifications] = useState<
+    HomeAssistantPersistentNotification[]
+  >([]);
+  const [repairIssues, setRepairIssues] = useState<HomeAssistantRepairIssue[]>([]);
 
   useEffect(() => {
     persistReadNotifications(readNotifications);
@@ -158,48 +187,150 @@ export function useNotifications(): UseNotificationsReturn {
     );
   }, [entities]);
 
+  useEffect(() => {
+    if (!connection) {
+      setPersistentNotifications([]);
+      setRepairIssues([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    void connection
+      .sendMessagePromise({
+        type: 'persistent_notification/get',
+      })
+      .then((result) => {
+        if (cancelled || !Array.isArray(result)) {
+          return;
+        }
+
+        setPersistentNotifications(
+          result.filter(
+            (entry): entry is HomeAssistantPersistentNotification =>
+              typeof entry === 'object' && entry !== null
+          )
+        );
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setPersistentNotifications([]);
+        }
+      });
+
+    void connection
+      .sendMessagePromise({
+        type: 'repairs/list_issues',
+      })
+      .then((result) => {
+        if (cancelled || !Array.isArray(result)) {
+          return;
+        }
+
+        setRepairIssues(
+          result.filter(
+            (entry): entry is HomeAssistantRepairIssue =>
+              typeof entry === 'object' && entry !== null
+          )
+        );
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setRepairIssues([]);
+        }
+      });
+
+    let unsubscribePersistentNotifications: (() => void) | null = null;
+
+    void connection
+      .subscribeMessage(
+        (event: HomeAssistantPersistentNotificationEvent) => {
+          if (cancelled || !Array.isArray(event?.notifications)) {
+            return;
+          }
+
+          setPersistentNotifications(
+            event.notifications.filter(
+              (entry): entry is HomeAssistantPersistentNotification =>
+                typeof entry === 'object' && entry !== null
+            )
+          );
+        },
+        {
+          type: 'persistent_notification/subscribe',
+        }
+      )
+      .then((unsubscribe) => {
+        if (cancelled) {
+          unsubscribe();
+          return;
+        }
+
+        unsubscribePersistentNotifications = unsubscribe;
+      })
+      .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+      unsubscribePersistentNotifications?.();
+    };
+  }, [connection]);
+
   const notifications = useMemo<Notification[]>(() => {
-    if (!entities) {
+    if (!entities && persistentNotifications.length === 0 && repairIssues.length === 0) {
       return [];
     }
 
-    const persistentNotifications = Object.entries(entities)
-      .filter(([entityId]) => entityId.startsWith('persistent_notification.'))
-      .map(([entityId, entity]) => {
-        const notificationId =
-          (typeof entity.attributes?.notification_id === 'string' &&
-            entity.attributes.notification_id) ||
-          entityId.replace('persistent_notification.', '');
-        const title =
-          (typeof entity.attributes?.title === 'string' && entity.attributes.title) ||
-          (typeof entity.attributes?.friendly_name === 'string' &&
-            entity.attributes.friendly_name) ||
-          'Notification';
-        const message =
-          (typeof entity.attributes?.message === 'string' && entity.attributes.message) ||
-          entity.state ||
-          '';
-        const timestampSource =
-          typeof entity.last_changed === 'string'
-            ? entity.last_changed
-            : typeof entity.last_updated === 'string'
-              ? entity.last_updated
-              : '';
-        const timestamp = new Date(timestampSource || Date.now());
+    const livePersistentNotifications = persistentNotifications.map((notification) => {
+      const notificationId = notification.notification_id ?? crypto.randomUUID();
+      const id = `persistent_notification:${notificationId}`;
+      const title = notification.title?.trim() || 'Notification';
+      const message = notification.message?.trim() || '';
+      const timestamp = new Date(notification.created_at ?? Date.now());
 
-        return {
-          id: entityId,
-          notificationId,
-          source: 'persistent_notification' as const,
-          type: inferNotificationType(entityId, entity.attributes ?? {}),
+      return {
+        id,
+        notificationId,
+        source: 'persistent_notification' as const,
+        type: inferNotificationType(id, {
           title,
           message,
-          timestamp: Number.isNaN(timestamp.getTime()) ? new Date() : timestamp,
-          read: readNotifications.includes(entityId),
-        };
-      });
+          severity: notification.status,
+        }),
+        title,
+        message,
+        timestamp: Number.isNaN(timestamp.getTime()) ? new Date() : timestamp,
+        read: readNotifications.includes(id),
+      };
+    });
 
-    const updateNotifications = Object.entries(entities)
+    const liveRepairNotifications = repairIssues.map((issue) => {
+      const issueDomain = issue.issue_domain ?? issue.domain ?? 'homeassistant';
+      const issueId = issue.issue_id ?? issue.translation_key ?? 'issue';
+      const id = `repair:${issueDomain}:${issueId}`;
+      const title =
+        issue.title?.trim() || issue.translation_key?.replace(/_/g, ' ') || 'Home Assistant issue';
+      const messageParts = [
+        issue.description?.trim(),
+        issue.breaks_in_ha_version ? `Affects ${issue.breaks_in_ha_version}` : null,
+      ].filter(Boolean);
+
+      return {
+        id,
+        notificationId: id,
+        source: 'repair' as const,
+        type:
+          typeof issue.severity === 'string' && issue.severity.toLowerCase().includes('error')
+            ? ('error' as const)
+            : ('warning' as const),
+        title,
+        message: messageParts.join(' ') || 'Attention needed in Home Assistant settings.',
+        timestamp: new Date(),
+        read: readNotifications.includes(id),
+      };
+    });
+
+    const updateNotifications = Object.entries(entities ?? {})
       .filter(([entityId, entity]) => {
         if (!entityId.startsWith('update.')) {
           return false;
@@ -285,10 +416,17 @@ export function useNotifications(): UseNotificationsReturn {
         };
       });
 
-    return [...persistentNotifications, ...updateNotifications]
+    return [...livePersistentNotifications, ...liveRepairNotifications, ...updateNotifications]
       .filter((notification) => !hiddenNotifications.includes(notification.id))
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-  }, [entities, hiddenNotifications, pendingUpdateInstalls, readNotifications]);
+  }, [
+    entities,
+    hiddenNotifications,
+    pendingUpdateInstalls,
+    persistentNotifications,
+    readNotifications,
+    repairIssues,
+  ]);
 
   const unreadCount = notifications.filter((notification) => !notification.read).length;
 

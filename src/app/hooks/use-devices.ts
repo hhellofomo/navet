@@ -24,8 +24,11 @@ export const useDevices = (): DeviceCollection => {
   const { connected } = useHomeAssistant();
   const haDevices = useHADevices();
   const fallbackDevices = useMemo(
-    () => ({ ...DEVICES, lights: haDevices.lights }),
-    [haDevices.lights]
+    () => ({
+      ...DEVICES,
+      ...haDevices,
+    }),
+    [haDevices]
   );
 
   const devices = useMemo(

@@ -1,0 +1,134 @@
+import { useMemo } from 'react';
+import { STORAGE_KEYS } from '@/app/constants/storage-keys';
+import { useHomeAssistant } from '@/app/hooks';
+import { usePersistedState } from '@/app/hooks/use-persisted-state';
+import { DEFAULT_RSS_PROVIDERS } from './providers';
+import type { RSSProvider } from './types';
+
+const toProviderId = (value: string): string =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+export function useRSSFeedSources(cardId: string) {
+  const { entities } = useHomeAssistant();
+  const [customProviders, setCustomProviders] = usePersistedState<RSSProvider[]>(
+    STORAGE_KEYS.rssFeedProviders,
+    DEFAULT_RSS_PROVIDERS
+  );
+  const [providerSelectionByCardId, setProviderSelectionByCardId] = usePersistedState<
+    Record<string, string[]>
+  >(STORAGE_KEYS.rssCardProviders, {});
+
+  const homeAssistantProviders = useMemo<RSSProvider[]>(() => {
+    if (!entities) {
+      return [];
+    }
+
+    return Object.entries(entities)
+      .filter(([entityId, entity]) => {
+        if (!entityId.startsWith('event.')) {
+          return false;
+        }
+
+        const attributes = entity.attributes as Record<string, unknown> | undefined;
+        return (
+          typeof attributes?.link === 'string' &&
+          (entityId.includes('feedreader') ||
+            typeof attributes?.title === 'string' ||
+            typeof attributes?.attribution === 'string')
+        );
+      })
+      .map(([entityId, entity]) => {
+        const attributes = entity.attributes as Record<string, unknown> | undefined;
+
+        return {
+          id: `ha:${entityId}`,
+          name:
+            (typeof attributes?.friendly_name === 'string' && attributes.friendly_name) ||
+            (typeof attributes?.title === 'string' && attributes.title) ||
+            entityId,
+          type: 'home-assistant-feedreader' as const,
+          entityId,
+        };
+      })
+      .sort((left, right) => left.name.localeCompare(right.name));
+  }, [entities]);
+
+  const providers = useMemo(
+    () => [...customProviders, ...homeAssistantProviders],
+    [customProviders, homeAssistantProviders]
+  );
+
+  const selectedProviderIds = useMemo(() => {
+    const savedSelection = providerSelectionByCardId[cardId];
+    if (savedSelection) {
+      return savedSelection.filter((providerId) =>
+        providers.some((provider) => provider.id === providerId)
+      );
+    }
+
+    return [];
+  }, [cardId, providerSelectionByCardId, providers]);
+
+  const selectedProviders = useMemo(
+    () => providers.filter((provider) => selectedProviderIds.includes(provider.id)),
+    [providers, selectedProviderIds]
+  );
+
+  const setSelectedProviderIds = (nextProviderIds: string[]) => {
+    setProviderSelectionByCardId((current) => ({
+      ...current,
+      [cardId]: nextProviderIds,
+    }));
+  };
+
+  const addProvider = (name: string, feedUrl: string) => {
+    const trimmedName = name.trim();
+    const trimmedFeedUrl = feedUrl.trim();
+    const baseId = toProviderId(trimmedName || trimmedFeedUrl);
+
+    if (!trimmedName || !trimmedFeedUrl || !baseId) {
+      return null;
+    }
+
+    const uniqueId = customProviders.some((provider) => provider.id === baseId)
+      ? `${baseId}-${Date.now()}`
+      : baseId;
+
+    const nextProvider: RSSProvider = {
+      id: uniqueId,
+      name: trimmedName,
+      type: 'url',
+      feedUrl: trimmedFeedUrl,
+    };
+
+    setCustomProviders((current) => [...current, nextProvider]);
+    setProviderSelectionByCardId((current) => ({
+      ...current,
+      [cardId]: [...new Set([...(current[cardId] ?? selectedProviderIds), nextProvider.id])],
+    }));
+
+    return nextProvider;
+  };
+
+  const removeProvider = (providerId: string) => {
+    setCustomProviders((current) => current.filter((provider) => provider.id !== providerId));
+    setProviderSelectionByCardId((current) => ({
+      ...current,
+      [cardId]: (current[cardId] ?? []).filter((selectedId) => selectedId !== providerId),
+    }));
+  };
+
+  return {
+    providers,
+    selectedProviders,
+    selectedProviderIds,
+    setSelectedProviderIds,
+    addProvider,
+    removeProvider,
+    homeAssistantProviders,
+  };
+}

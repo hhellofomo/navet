@@ -84,6 +84,7 @@ export const MediaCard = memo(function MediaCard({
     closeDialog,
     durationSeconds,
     elapsedSeconds,
+    handleArtworkError,
     handleNext,
     handlePrevious,
     handleVolumeChange,
@@ -159,6 +160,7 @@ export const MediaCard = memo(function MediaCard({
             <MediaSmallView
               entityId={id}
               artwork={resolvedAlbumArt}
+              onArtworkError={handleArtworkError}
               title={title}
               artist={artist}
               isActive={!isOff}
@@ -177,6 +179,7 @@ export const MediaCard = memo(function MediaCard({
             <MediaMediumView
               entityId={id}
               artwork={resolvedAlbumArt}
+              onArtworkError={handleArtworkError}
               title={title}
               artist={artist}
               isActive={!isOff}
@@ -197,6 +200,7 @@ export const MediaCard = memo(function MediaCard({
             <MediaMediumVerticalView
               entityId={id}
               artwork={resolvedAlbumArt}
+              onArtworkError={handleArtworkError}
               title={title}
               artist={artist}
               isActive={!isOff}
@@ -223,6 +227,7 @@ export const MediaCard = memo(function MediaCard({
             isOpen={isOpen}
             onOpenChange={closeDialog}
             artwork={resolvedAlbumArt}
+            onArtworkError={handleArtworkError}
             title={title}
             artist={artist}
             isPlaying={isPlaying}

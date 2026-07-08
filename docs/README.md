@@ -12,13 +12,13 @@ Complete documentation for the Navet smart home dashboard.
 ## 📚 Documentation Structure
 
 ### User Documentation
-- **[Widget System](WIDGETS.md)** - Complete guide to custom widgets
+- **[Widget System](WIDGETS.md)** - Complete guide to custom widgets, including the RSS feed widget
   - Adding widgets
   - Managing widgets
   - Creating custom widgets
   - Widget storage and API
 - **[Main README](../README.md#installable-pwa)** - Installable PWA shell and build verification
-- **[Main README](../README.md#-features)** - Current product features, including the unified HVAC-based climate card path, live calendar cards, Home Assistant notifications, and card-level room reassignment
+- **[Main README](../README.md#-features)** - Current product features, including the unified HVAC-based climate card path, live calendar cards, Home Assistant notifications/repairs, and card-level room reassignment
 - **[Main README](../README.md#room-navigation)** - Dashboard room navigation, All-view grouping modes, and dashboard dropdown behavior
 - **[Design System](../design-system/README.md#core-design-principles)** - Shared primitives, including icon pills, nav/action pills, and card off-state surface tokens
 - **[Docker and Home Assistant Add-on](DOCKER_HOME_ASSISTANT_ADDON.md)** - Packaging and deployment guide
@@ -98,7 +98,7 @@ Complete documentation for the Navet smart home dashboard.
 **Understand calendar card behavior and source selection:**
 → See [Main README -> Calendar Cards](../README.md#calendar-cards)
 
-**Understand Home Assistant-backed notifications:**
+**Understand Home Assistant-backed notifications and repairs:**
 → See [Main README -> Notifications](../README.md#notifications)
 
 **Set up local commit checks:**
@@ -152,5 +152,5 @@ docs/
 
 ---
 
-**Last Updated:** March 11, 2026  
+**Last Updated:** March 13, 2026  
 **Documentation Status:** ✅ Complete and organized

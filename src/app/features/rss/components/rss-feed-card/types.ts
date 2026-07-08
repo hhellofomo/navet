@@ -10,7 +10,18 @@ export interface RSSItem {
   imageUrl?: string;
 }
 
+export type RSSProviderType = 'url' | 'home-assistant-feedreader';
+
+export interface RSSProvider {
+  id: string;
+  name: string;
+  type: RSSProviderType;
+  feedUrl?: string;
+  entityId?: string;
+}
+
 export interface RSSFeedCardProps {
+  cardId: string;
   inEditMode?: boolean;
   size?: CardSize;
   onSizeChange?: (size: CardSize) => void;
