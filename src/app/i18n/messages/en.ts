@@ -27,6 +27,26 @@ export const enMessages = {
     'Automatically switch between Dark and Light based on your device appearance setting.',
   'settings.appearance.systemTheme.auto': 'Auto',
   'settings.appearance.systemTheme.manual': 'Manual',
+  'themePicker.systemModeHelp':
+    'Pick whether Navet should match your device appearance or use a fixed theme that you choose here.',
+  'themePicker.manualThemeTitle': 'Choose manually',
+  'themePicker.manualThemeDescription':
+    'Use one theme consistently, regardless of your device appearance.',
+  'themePicker.currentAppearance': 'Current appearance',
+  'themePicker.systemActiveSummary': 'Following system appearance: {mode}',
+  'themePicker.systemActiveDetail':
+    'Navet is currently using the theme that matches your device. Manual theme choices are paused until Auto is turned off.',
+  'themePicker.manualActiveSummary': 'Using manual theme: {mode}',
+  'themePicker.manualActiveDetail':
+    'This theme stays active until you change it or enable Follow system appearance.',
+  'themePicker.manualThemeDisabledHelp':
+    'Manual theme selection is unavailable while Auto is following your device appearance.',
+  'themePicker.manualThemeEnabledHelp': 'Choose the fixed theme Navet should use.',
+  'themePicker.accentHelp':
+    'Accent color applies in both Auto and Manual modes and stays independent from the theme mode.',
+  'themePicker.activeBadge': 'Active',
+  'themePicker.savedBadge': 'Saved',
+  'themePicker.selectedBadge': 'Selected',
   'settings.appearance.themeAccent.title': 'Theme and accent',
   'settings.appearance.themeAccent.description':
     'Choose the overall visual tone and key accent using the same picker shown during onboarding.',

@@ -23,6 +23,7 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
     followSystemTheme,
     handleRemoveWallpaper,
     handleWallpaperUpload,
+    manualTheme,
     pageZoom,
     primaryColor,
     setPrimaryColor,
@@ -66,7 +67,8 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
           colorOptions={colorOptions}
           customAccent={customPrimaryColor}
           selectedAccent={primaryColor}
-          selectedTheme={theme}
+          selectedTheme={manualTheme}
+          effectiveTheme={theme}
           themeOptions={themeOptions}
           onAccentChange={setPrimaryColor}
           onCustomAccentChange={setCustomPrimaryColor}

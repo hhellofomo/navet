@@ -80,12 +80,7 @@ export const DashboardCardItem = memo(function DashboardCardItem({
       {device
         ? renderCard({ device, size, handleSizeChange, isEditMode })
         : card && (
-            <WidgetCard
-              card={{ ...card, size }}
-              isEditMode={isEditMode}
-              onDelete={onDeleteCard}
-              onUpdate={onUpdateCard}
-            />
+            <WidgetCard card={{ ...card, size }} isEditMode={isEditMode} onUpdate={onUpdateCard} />
           )}
     </>
   );

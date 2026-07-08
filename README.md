@@ -47,7 +47,7 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 
 ### 🛠️ Functionality
 - **Edit Mode** - Card resizing, entered from **Customize**
-- **Custom Widgets** - Add RSS Feed, Photo Frame, and Quick Note widgets
+- **Custom Widgets** - Add RSS Feed, Photo Frame, Quick Note, Battery Overview, and Button widgets
 - **Entity Visibility Control** - Start with all entities, a blank board, or import a saved config, then add/remove entities as needed
 - **Search & Filter** - Real-time search filters dashboard view, including Home Assistant-style entity id queries such as `light.`, `sensor.`, and full ids, with compact mobile search access from the header
 - **All View Modes** - Switch the `All` room between custom, room, type, or flat grouping
@@ -277,10 +277,12 @@ This builds the app, writes `dist/config.js` from `NAVET_HASS_URL` and `NAVET_HA
 
 #### Custom Widgets
 - Open the **Add** dropdown in edit mode to add custom widgets
-- Choose from **3 widget types**:
+- Choose from **5 widget types**:
   - **📰 RSS Feed** - Live articles from direct RSS URLs or Home Assistant Feedreader sources
   - **🖼️ Photo Frame** - Decorative ambient frame with built-in rotating artwork panels
   - **📝 Quick Note** - Editable sticky notes for reminders
+  - **🔋 Battery Overview** - Live battery status summary for HA battery-powered devices
+  - **⚡ Button** - One-tap action button that calls any Home Assistant service
 - Calendar is now provided by live Home Assistant `calendar.*` entity cards instead of a custom widget
 - Available in **3 sizes**: Small, Medium, Large
 - Some dashboard cards also support an **Extra-Small** `1 × 0.5` size for denser layouts where that variant exists

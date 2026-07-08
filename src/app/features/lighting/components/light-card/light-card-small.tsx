@@ -113,31 +113,27 @@ export const LightCardSmall = memo(function LightCardSmall({
               />
             )}
           </div>
+        ) : isKelvinMode && supportsColorTemperature ? (
+          <KelvinSlider
+            value={colorTemp}
+            currentTempColor={currentTempColor}
+            onChange={onTempChange}
+            onCommit={onTempCommit}
+            isOn={isOn}
+            min={minColorTemp}
+            max={maxColorTemp}
+            size="small"
+            showLabel
+          />
         ) : (
-          <>
-            {isKelvinMode && supportsColorTemperature ? (
-              <KelvinSlider
-                value={colorTemp}
-                currentTempColor={currentTempColor}
-                onChange={onTempChange}
-                onCommit={onTempCommit}
-                isOn={isOn}
-                min={minColorTemp}
-                max={maxColorTemp}
-                size="small"
-                showLabel
-              />
-            ) : (
-              <BrightnessSlider
-                value={brightness}
-                onChange={onBrightnessChange}
-                onCommit={onBrightnessCommit}
-                isOn={isOn}
-                size="small"
-                showLabel
-              />
-            )}
-          </>
+          <BrightnessSlider
+            value={brightness}
+            onChange={onBrightnessChange}
+            onCommit={onBrightnessCommit}
+            isOn={isOn}
+            size="small"
+            showLabel
+          />
         )}
 
         {!isExtraSmall && (

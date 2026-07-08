@@ -250,7 +250,7 @@ Full-page settings interface with card-based organization.
 **1. Appearance**
 - **Theme Mode Selection**: 2 × 2 grid of theme option cards
 - **Primary Color Picker**: 8 built-in accent circles plus a custom accent swatch
-- **Visual quality**: choose between High, Medium, and Low glass rendering
+- **Visual quality**: choose between High, Medium, and Low glass rendering; shows the recommended tier for the current device based on an automatic benchmark run at first load
 - **Localized theme picker copy**: theme names and descriptions resolve through the shared i18n dictionaries
 - **Light card ambience**: global visual toggle between ambient bleed and contained light-card rendering
 - **Theme-aware ambience preview**: the ambience preview uses the shared preview-frame primitive, and the shared `Live Preview` header localizes with the active language

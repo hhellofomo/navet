@@ -15,14 +15,12 @@ import type { HeaderIconButtonProps, LightBrightnessPreset } from './light-card-
 
 interface LightCardMediumProps {
   name: string;
-  room: string;
   brightness: number;
   currentColor: string;
   colorTemp: number;
   currentTempColor: string;
   minColorTemp: number;
   maxColorTemp: number;
-  tempOptions: Array<{ value: number; color: string; label: string }>;
   brightnessPresets: LightBrightnessPreset[];
   isOn: boolean;
   IconComponent: LucideIcon;
@@ -61,7 +59,7 @@ export const LightCardMedium = memo(function LightCardMedium({
   settingsButtonProps,
   showSettingsButton,
   showPresetOverflow,
-}: Omit<LightCardMediumProps, 'room' | 'tempOptions'>) {
+}: LightCardMediumProps) {
   const { theme } = useTheme();
   const [isKelvinMode, setIsKelvinMode] = useState(false);
 

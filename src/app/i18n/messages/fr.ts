@@ -28,6 +28,26 @@ export const frMessages = {
     "Basculer automatiquement entre Sombre et Clair selon le réglage d'apparence de votre appareil.",
   'settings.appearance.systemTheme.auto': 'Auto',
   'settings.appearance.systemTheme.manual': 'Manuel',
+  'themePicker.systemModeHelp':
+    'Choisissez si Navet doit suivre l’apparence de votre appareil ou utiliser un thème fixe choisi ici.',
+  'themePicker.manualThemeTitle': 'Choisir manuellement',
+  'themePicker.manualThemeDescription':
+    'Utiliser toujours un thème, quelle que soit l’apparence de votre appareil.',
+  'themePicker.currentAppearance': 'Apparence actuelle',
+  'themePicker.systemActiveSummary': 'Suit l’apparence du système : {mode}',
+  'themePicker.systemActiveDetail':
+    'Navet utilise actuellement le thème qui correspond à votre appareil. Les choix manuels sont mis en pause tant que le mode Auto reste actif.',
+  'themePicker.manualActiveSummary': 'Thème manuel utilisé : {mode}',
+  'themePicker.manualActiveDetail':
+    'Ce thème reste actif jusqu’à ce que vous le changiez ou activiez Suivre l’apparence du système.',
+  'themePicker.manualThemeDisabledHelp':
+    'La sélection manuelle du thème est indisponible tant que le mode Auto suit l’apparence de l’appareil.',
+  'themePicker.manualThemeEnabledHelp': 'Choisissez le thème fixe que Navet doit utiliser.',
+  'themePicker.accentHelp':
+    'La couleur d’accent s’applique en mode Auto comme en mode Manuel et reste indépendante du mode de thème.',
+  'themePicker.activeBadge': 'Actif',
+  'themePicker.savedBadge': 'Enregistré',
+  'themePicker.selectedBadge': 'Sélectionné',
   'settings.appearance.themeAccent.title': 'Thème et accent',
   'settings.appearance.themeAccent.description':
     'Choisissez le ton visuel global et la couleur d’accent avec le même sélecteur que pendant l’onboarding.',

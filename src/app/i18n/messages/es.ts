@@ -27,6 +27,26 @@ export const esMessages = {
     'Cambiar automáticamente entre Oscuro y Claro según la configuración de apariencia del dispositivo.',
   'settings.appearance.systemTheme.auto': 'Auto',
   'settings.appearance.systemTheme.manual': 'Manual',
+  'themePicker.systemModeHelp':
+    'Elige si Navet debe seguir la apariencia del dispositivo o usar un tema fijo que seleccionas aquí.',
+  'themePicker.manualThemeTitle': 'Elegir manualmente',
+  'themePicker.manualThemeDescription':
+    'Usar siempre un tema, independientemente de la apariencia del dispositivo.',
+  'themePicker.currentAppearance': 'Apariencia actual',
+  'themePicker.systemActiveSummary': 'Siguiendo la apariencia del sistema: {mode}',
+  'themePicker.systemActiveDetail':
+    'Navet está usando ahora el tema que coincide con tu dispositivo. Las elecciones manuales quedan en pausa hasta desactivar Auto.',
+  'themePicker.manualActiveSummary': 'Tema manual en uso: {mode}',
+  'themePicker.manualActiveDetail':
+    'Este tema seguirá activo hasta que lo cambies o actives Seguir apariencia del sistema.',
+  'themePicker.manualThemeDisabledHelp':
+    'La selección manual de tema no está disponible mientras Auto siga la apariencia del dispositivo.',
+  'themePicker.manualThemeEnabledHelp': 'Elige el tema fijo que debe usar Navet.',
+  'themePicker.accentHelp':
+    'El color de acento se aplica tanto en modo Auto como Manual y sigue siendo independiente del modo de tema.',
+  'themePicker.activeBadge': 'Activo',
+  'themePicker.savedBadge': 'Guardado',
+  'themePicker.selectedBadge': 'Seleccionado',
   'settings.appearance.themeAccent.title': 'Tema y acento',
   'settings.appearance.themeAccent.description':
     'Elige el tono visual general y el color de acento con el mismo selector que aparece durante el onboarding.',

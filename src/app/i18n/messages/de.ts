@@ -28,6 +28,26 @@ export const deMessages = {
     'Automatisch zwischen Dunkel und Hell wechseln, basierend auf den Darstellungseinstellungen des Geräts.',
   'settings.appearance.systemTheme.auto': 'Auto',
   'settings.appearance.systemTheme.manual': 'Manuell',
+  'themePicker.systemModeHelp':
+    'Lege fest, ob Navet der Gerätedarstellung folgen oder ein festes Thema verwenden soll, das du hier auswählst.',
+  'themePicker.manualThemeTitle': 'Manuell wählen',
+  'themePicker.manualThemeDescription':
+    'Ein Thema immer verwenden, unabhängig von der Darstellung des Geräts.',
+  'themePicker.currentAppearance': 'Aktuelle Darstellung',
+  'themePicker.systemActiveSummary': 'Folgt der Systemdarstellung: {mode}',
+  'themePicker.systemActiveDetail':
+    'Navet verwendet aktuell das Thema, das zu deinem Gerät passt. Manuelle Themen sind pausiert, bis Auto deaktiviert wird.',
+  'themePicker.manualActiveSummary': 'Manuelles Thema aktiv: {mode}',
+  'themePicker.manualActiveDetail':
+    'Dieses Thema bleibt aktiv, bis du es änderst oder Systemdarstellung folgen aktivierst.',
+  'themePicker.manualThemeDisabledHelp':
+    'Die manuelle Themenauswahl ist nicht verfügbar, solange Auto der Gerätedarstellung folgt.',
+  'themePicker.manualThemeEnabledHelp': 'Wähle das feste Thema, das Navet verwenden soll.',
+  'themePicker.accentHelp':
+    'Die Akzentfarbe gilt sowohl im Auto- als auch im manuellen Modus und bleibt unabhängig vom Themenmodus.',
+  'themePicker.activeBadge': 'Aktiv',
+  'themePicker.savedBadge': 'Gespeichert',
+  'themePicker.selectedBadge': 'Ausgewählt',
   'settings.appearance.themeAccent.title': 'Thema und Akzent',
   'settings.appearance.themeAccent.description':
     'Wähle den visuellen Grundton und die Akzentfarbe mit demselben Picker wie im Onboarding.',

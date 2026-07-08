@@ -20,7 +20,7 @@ The widget system allows users to add customizable cards to their dashboard beyo
 
 ### Key Features
 
-- **3 Built-in Widget Types** - RSS Feed, Photo Frame, Quick Note
+- **5 Built-in Widget Types** - RSS Feed, Photo Frame, Quick Note, Battery Overview, Button
 - **3 Size Options** - Small, Medium, Large (adapts to grid)
 - **Room Assignment** - Widgets can be assigned to specific rooms or "All"
 - **Persistent Storage** - Saves to localStorage automatically
@@ -88,6 +88,42 @@ Editable sticky note for quick reminders.
 - Shopping lists
 - Notes and ideas
 
+---
+
+### 4. Battery Overview Widget
+
+Shows a live summary of battery-powered Home Assistant devices.
+
+**Features:**
+- Live battery levels from HA entities
+- Color-coded status indicators
+- Compact list view
+
+**Best Sizes:** Small, Medium, Large
+
+**Use Cases:**
+- Monitoring remote controls and sensors
+- Tracking smart locks and doorbells
+- Household battery maintenance
+
+---
+
+### 5. Button Widget
+
+A one-tap action button that calls any Home Assistant service.
+
+**Features:**
+- Configurable HA service and entity target
+- Custom label
+- Visual press feedback
+
+**Best Sizes:** Small
+
+**Use Cases:**
+- Scene activation
+- Script execution
+- Quick device actions
+
 ## ➕ Adding Widgets
 
 ### Step 1: Enter Edit Mode
@@ -100,10 +136,12 @@ Open the **Add** dropdown that appears in edit mode.
 
 ### Step 3: Choose Widget Type
 
-Select from 3 available widget types:
+Select from 5 available widget types:
 - RSS Feed
 - Photo Frame
 - Quick Note
+- Battery Overview
+- Button
 
 ### Step 4: Select Size
 
