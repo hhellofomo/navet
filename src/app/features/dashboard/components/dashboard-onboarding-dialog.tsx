@@ -115,7 +115,8 @@ export function DashboardOnboardingDialog({
               {isImporting ? 'Importing config...' : 'Import a config file'}
             </h3>
             <p className={`mt-2 text-sm leading-relaxed ${mutedColor}`}>
-              Restore a previously exported Navet dashboard config instead of starting from scratch.
+              Restore a previously exported Navet YAML dashboard config instead of starting from
+              scratch.
             </p>
           </button>
         </div>
@@ -123,7 +124,7 @@ export function DashboardOnboardingDialog({
         <input
           ref={fileInputRef}
           type="file"
-          accept="application/json"
+          accept=".yaml,.yml,application/yaml,text/yaml"
           className="hidden"
           onChange={handleImportFileChange}
         />

@@ -293,7 +293,7 @@ Beautiful placeholder screens for sections without data.
 
 ### First-Time User Flow
 1. **Login Page** → Enter Home Assistant URL and token
-2. **Onboarding Dialog** → Choose start with all entities, a blank dashboard, or import a config file
+2. **Onboarding Dialog** → Choose start with all entities, a blank dashboard, or import a YAML config file
 3. **Dashboard** → See current entities and rooms
 4. **Explore Sections** → Navigate to different sections via sidebar/bottom nav
 5. **Customize** → Go to Settings → Change theme and color

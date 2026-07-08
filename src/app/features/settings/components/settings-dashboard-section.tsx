@@ -174,7 +174,8 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
       >
         <p className={`max-w-2xl text-sm leading-relaxed ${styles.subtleColor}`}>
           Includes theme, layout, room order, card order, hidden entity state, custom widgets, and
-          light preset settings. Connection URL and token are intentionally left out.
+          light preset settings. Export and import both use YAML. Connection URL and token are
+          intentionally left out.
         </p>
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
@@ -197,7 +198,7 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
           <input
             ref={importInputRef}
             type="file"
-            accept="application/json"
+            accept=".yaml,.yml,application/yaml,text/yaml"
             className="hidden"
             onChange={handleImportDashboardConfig}
           />
