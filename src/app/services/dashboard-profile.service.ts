@@ -15,7 +15,7 @@ export async function loadDashboardProfile(): Promise<DashboardProfileLoadResult
       credentials: 'same-origin',
     });
 
-    if (response.status === 404) {
+    if (response.status === 204 || response.status === 404) {
       return { available: true, profile: null };
     }
 

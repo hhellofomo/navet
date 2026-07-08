@@ -9,6 +9,11 @@ function sendJson(r, statusCode, payload) {
   r.return(statusCode, JSON.stringify(payload));
 }
 
+function sendNoContent(r) {
+  r.headersOut['Cache-Control'] = 'no-store';
+  r.return(204);
+}
+
 function readProfile(r) {
   try {
     var stat = fs.statSync(PROFILE_PATH);
@@ -24,7 +29,7 @@ function readProfile(r) {
     r.return(200, content);
   } catch (error) {
     if (error && error.code === 'ENOENT') {
-      sendJson(r, 404, { error: 'Dashboard profile not found' });
+      sendNoContent(r);
       return;
     }
 

@@ -9,6 +9,11 @@ function sendJson(r, statusCode, payload) {
   r.return(statusCode, JSON.stringify(payload));
 }
 
+function sendNoContent(r) {
+  r.headersOut['Cache-Control'] = 'no-store';
+  r.return(204);
+}
+
 function isValidSession(value) {
   return (
     value &&
@@ -30,7 +35,7 @@ function readSession(r) {
     var content = fs.readFileSync(SESSION_PATH, 'utf8');
     var parsed = JSON.parse(content);
     if (!isValidSession(parsed)) {
-      sendJson(r, 404, { error: 'Session not found' });
+      sendNoContent(r);
       return;
     }
 
@@ -39,7 +44,7 @@ function readSession(r) {
     r.return(200, JSON.stringify(parsed));
   } catch (error) {
     if (error && error.code === 'ENOENT') {
-      sendJson(r, 404, { error: 'Session not found' });
+      sendNoContent(r);
       return;
     }
 
