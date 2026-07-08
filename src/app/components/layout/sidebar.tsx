@@ -1,4 +1,14 @@
-import { Clipboard, FlaskConical, Home, Lightbulb, Lock, Settings, Tv, Video } from 'lucide-react';
+import {
+  Clipboard,
+  FlaskConical,
+  Home,
+  Lightbulb,
+  Lock,
+  Settings,
+  Tv,
+  Video,
+  Zap,
+} from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
 import { InteractivePill } from '@/app/components/shared/interactive-pill';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
@@ -56,6 +66,12 @@ export const Sidebar = memo(function Sidebar() {
       label: t('sidebar.home'),
       section: 'home' as Section,
       onClick: () => setActiveSection('home'),
+    },
+    {
+      icon: Zap,
+      label: t('sidebar.energy'),
+      section: 'energy' as Section,
+      onClick: () => setActiveSection('energy'),
     },
     {
       icon: Video,
@@ -168,10 +184,10 @@ export const Sidebar = memo(function Sidebar() {
             {[
               menuItems[0],
               menuItems[1],
-              menuItems[4],
+              menuItems[2],
               menuItems[5],
               menuItems[6],
-              menuItems[7],
+              menuItems[8],
             ].map((item, index) => (
               <InteractivePill
                 key={index}

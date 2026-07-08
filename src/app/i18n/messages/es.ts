@@ -637,6 +637,7 @@ export const esMessages = {
   'security.locked': 'Cerrada',
   'security.unlocked': 'Abierta',
   'sidebar.home': 'Inicio',
+  'sidebar.energy': 'Energía',
   'sidebar.security': 'Seguridad',
   'sidebar.tasks': 'Tareas',
   'sidebar.locks': 'Cerraduras',
