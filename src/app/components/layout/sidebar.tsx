@@ -121,7 +121,7 @@ export const Sidebar = memo(function Sidebar() {
                 key={index}
                 onClick={item.onClick}
                 active={activeSection === item.section}
-                className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${
+                className={`flex h-10 w-10 items-center justify-center rounded-[22px] transition-colors ${
                   activeSection === item.section ? '' : inactiveColor
                 }`}
               >
@@ -175,7 +175,7 @@ export const Sidebar = memo(function Sidebar() {
                 onClick={item.onClick}
                 aria-label={item.label}
                 active={activeSection === item.section}
-                className={`flex h-11 min-w-0 flex-1 basis-0 items-center justify-center rounded-[28px] px-1.5 py-1.5 transition-colors ${
+                className={`flex h-11 min-w-0 flex-1 basis-0 items-center justify-center rounded-[22px] px-1.5 py-1.5 transition-colors ${
                   activeSection === item.section ? '' : inactiveColor
                 }`}
               >

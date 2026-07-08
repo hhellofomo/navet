@@ -36,11 +36,22 @@ export function AmbientLightPreviewCard({
         : 'bg-white/6 border-white/10';
   const primaryBarColor = previewTokens.previewPrimaryBarColor;
   const secondaryBarColor = previewTokens.previewSecondaryBarColor;
+  const innerGlowStyle = isLightTheme
+    ? {
+        background: `radial-gradient(circle at 50% 50%, ${accentColor}20 0%, ${accentColor}10 28%, transparent 60%), linear-gradient(135deg, ${accentColor}10 0%, rgba(255,255,255,0.18) 100%)`,
+      }
+    : isContrastTheme
+      ? {
+          background: `radial-gradient(circle at 50% 50%, ${accentColor}26 0%, ${accentColor}14 28%, transparent 60%), linear-gradient(135deg, ${accentColor}12 0%, rgba(255,255,255,0.03) 100%)`,
+        }
+      : {
+          background: `radial-gradient(circle at 50% 50%, ${accentColor}24 0%, ${accentColor}12 28%, transparent 60%), linear-gradient(135deg, ${accentColor}10 0%, rgba(255,255,255,0.06) 100%)`,
+        };
   const glowOpacityClassName = ambientLightBleed
     ? isLightTheme
       ? 'opacity-100'
       : 'opacity-95'
-    : 'opacity-8';
+    : 'opacity-0';
 
   return (
     <SettingsLivePreviewFrame
@@ -71,6 +82,12 @@ export function AmbientLightPreviewCard({
         />
 
         <div className={`relative z-10 rounded-[20px] border p-3 ${previewCardClassName}`}>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 rounded-[inherit]"
+            style={innerGlowStyle}
+          />
+
           <div className="flex items-center gap-3">
             <div
               className="flex h-10 w-10 items-center justify-center rounded-2xl"

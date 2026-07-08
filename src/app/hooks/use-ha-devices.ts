@@ -575,6 +575,35 @@ export const useHADevices = (): DeviceCollection => {
       return fallback;
     };
 
+    const formatMediaEntityType = (deviceClass: unknown): string => {
+      if (typeof deviceClass !== 'string' || !deviceClass.trim()) {
+        return t('media.type.player');
+      }
+
+      const normalized = deviceClass.trim().toLowerCase();
+
+      switch (normalized) {
+        case 'tv':
+        case 'television':
+          return t('media.type.tv');
+        case 'speaker':
+          return t('media.type.speaker');
+        case 'receiver':
+          return t('media.type.receiver');
+        case 'set_top_box':
+          return t('media.type.setTopBox');
+        case 'streaming_box':
+          return t('media.type.streamingBox');
+        case 'soundbar':
+          return t('media.type.soundbar');
+        default:
+          return deviceClass
+            .trim()
+            .replace(/_/g, ' ')
+            .replace(/\b\w/g, (char) => char.toUpperCase());
+      }
+    };
+
     const normalizeMetric = (
       deviceClass: string | null,
       friendlyName: string,
@@ -788,6 +817,7 @@ export const useHADevices = (): DeviceCollection => {
           break;
 
         case 'media_player': {
+          const mediaEntityType = formatMediaEntityType(entity.attributes?.device_class);
           const entityPicture =
             (typeof entity.attributes?.entity_picture === 'string' &&
               entity.attributes.entity_picture) ||
@@ -806,7 +836,7 @@ export const useHADevices = (): DeviceCollection => {
             (typeof entity.attributes?.source === 'string' && entity.attributes.source) ||
             (typeof entity.attributes?.media_album_name === 'string' &&
               entity.attributes.media_album_name) ||
-            t('media.readyToPlay');
+            mediaEntityType;
           const volumeLevel = parseNumberish(entity.attributes?.volume_level);
           const mediaPosition = parseNumberish(entity.attributes?.media_position);
           const mediaDuration = parseNumberish(entity.attributes?.media_duration);

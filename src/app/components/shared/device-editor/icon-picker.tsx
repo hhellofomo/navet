@@ -115,7 +115,7 @@ export const IconPicker = memo(function IconPicker({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={t('lighting.searchIcons')}
-          className={`w-full rounded-xl border py-2 pl-10 pr-4 text-sm transition-all duration-500 focus:outline-none focus:ring-2 ${
+          className={`w-full rounded-[22px] border py-2 pl-10 pr-4 text-sm transition-all duration-500 focus:outline-none focus:ring-2 ${
             isLightOn
               ? 'border-white/10 bg-white/5 text-white placeholder:text-gray-500 focus:bg-white/10 focus:ring-transparent'
               : 'border-white/5 bg-white/[0.02] text-gray-500 placeholder:text-gray-700 focus:border-gray-500/30 focus:bg-white/5 focus:ring-gray-500/20'

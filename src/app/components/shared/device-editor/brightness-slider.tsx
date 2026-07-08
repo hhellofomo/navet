@@ -28,7 +28,6 @@ interface BrightnessSliderProps {
   disabled?: boolean;
   showLabel?: boolean;
   size?: CardSize;
-  onClick?: (e: React.MouseEvent) => void;
 }
 
 export const BrightnessSlider = memo(function BrightnessSlider({
@@ -39,7 +38,6 @@ export const BrightnessSlider = memo(function BrightnessSlider({
   disabled = false,
   showLabel = true,
   size = 'medium',
-  onClick,
 }: BrightnessSliderProps) {
   const { theme, primaryColor } = useTheme();
   const { t } = useI18n();
@@ -90,8 +88,6 @@ export const BrightnessSlider = memo(function BrightnessSlider({
         value={[value]}
         onValueChange={(val) => onChange(val[0])}
         onValueCommit={(val) => onCommit?.(val[0])}
-        onClick={onClick}
-        onPointerDownCapture={(event) => event.stopPropagation()}
         min={1}
         max={100}
         step={1}

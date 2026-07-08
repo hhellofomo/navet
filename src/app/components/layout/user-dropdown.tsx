@@ -1,6 +1,5 @@
 import { LogOut, Shield } from 'lucide-react';
 import { memo, useMemo, useState } from 'react';
-import { getThemeDropdownSurfaceClasses } from '@/app/components/shared/theme/dropdown-surface-tokens';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar';
@@ -34,7 +33,12 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
   const textMuted = surface.textMuted;
   const divider = surface.border;
   const itemBg = surface.subtleBg;
-  const dropdownSurfaceClass = getThemeDropdownSurfaceClasses(theme);
+  const dropdownPanelClassName = `rounded-2xl border shadow-2xl ${surface.panel} ${surface.border} ${
+    theme === 'glass' ? 'backdrop-blur-xl' : ''
+  }`;
+  const roleBadgeClassName = `flex items-center gap-2 rounded-lg px-3 py-2 ${itemBg}`;
+  const logoutButtonClassName =
+    'inline-flex w-full items-center gap-2 rounded-full bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/15';
 
   const fullName = user?.name?.trim() || t('userDropdown.defaultUser');
   const initials = useMemo(() => {
@@ -74,7 +78,7 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className={`absolute right-0 top-full z-50 mt-2 w-72 overflow-visible ${dropdownSurfaceClass}`}
+          className={`absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden ${dropdownPanelClassName}`}
         >
           {/* User Info Section */}
           <div className={`p-4 border-b ${divider}`}>
@@ -95,7 +99,7 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
             </div>
 
             {/* Role Badge */}
-            <div className={`flex items-center gap-2 px-3 py-2 ${itemBg} rounded-lg`}>
+            <div className={roleBadgeClassName}>
               <Shield className={`w-4 h-4 ${textSecondary}`} />
               <div>
                 <p className={`text-xs ${textMuted}`}>{t('userDropdown.roleLabel')}</p>
@@ -106,11 +110,7 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
 
           {/* Logout Button */}
           <div className={`p-2 border-t ${divider}`}>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-500/10 transition-all`}
-            >
+            <button type="button" onClick={handleLogout} className={logoutButtonClassName}>
               <LogOut className="w-4 h-4" />
               <span className="text-sm font-medium">{t('common.logout')}</span>
             </button>

@@ -2,7 +2,15 @@ import { DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } f
 import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Check, ChevronDown, Edit3, LayoutGrid, Lightbulb } from 'lucide-react';
-import { type ButtonHTMLAttributes, forwardRef, memo, useEffect, useRef } from 'react';
+import {
+  type ButtonHTMLAttributes,
+  type CSSProperties,
+  forwardRef,
+  memo,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import { InteractivePill } from '@/app/components/shared/interactive-pill';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { ThemeDropdownContent } from '@/app/components/shared/theme-dropdown-content';
@@ -127,8 +135,39 @@ export const RoomNav = memo(function RoomNav({
   const dividerClass =
     theme === 'light' ? 'bg-gray-300/90' : theme === 'contrast' ? 'bg-white/30' : 'bg-white/14';
   const stickyOffset = 'calc(env(safe-area-inset-top, 0px) + 8px)';
+  const stickyShellStyle = useMemo<CSSProperties>(() => {
+    if (theme === 'light') {
+      return {
+        '--room-nav-sticky-border': 'rgba(229, 231, 235, 0.8)',
+        '--room-nav-sticky-bg': 'rgba(255, 255, 255, 0.9)',
+        '--room-nav-sticky-shadow': '0 10px 24px -24px rgba(15, 23, 42, 0.22)',
+      } as CSSProperties;
+    }
+
+    if (theme === 'glass') {
+      return {
+        '--room-nav-sticky-border': 'rgba(255, 255, 255, 0.12)',
+        '--room-nav-sticky-bg': 'rgba(255, 255, 255, 0.10)',
+        '--room-nav-sticky-shadow': 'inset 0 1px 0 rgba(255, 255, 255, 0.12)',
+      } as CSSProperties;
+    }
+
+    if (theme === 'contrast') {
+      return {
+        '--room-nav-sticky-border': 'rgba(255, 255, 255, 0.18)',
+        '--room-nav-sticky-bg': 'rgba(0, 0, 0, 0.94)',
+        '--room-nav-sticky-shadow': '0 16px 36px -28px rgba(0, 0, 0, 0.8)',
+      } as CSSProperties;
+    }
+
+    return {
+      '--room-nav-sticky-border': 'rgba(255, 255, 255, 0.1)',
+      '--room-nav-sticky-bg': 'rgba(20, 21, 24, 0.92)',
+      '--room-nav-sticky-shadow': '0 10px 24px -24px rgba(0, 0, 0, 0.72)',
+    } as CSSProperties;
+  }, [theme]);
   const showAllViewGrouping = activeRoom === 'All' && onAllViewGroupingChange;
-  const actionPillClassName = `flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs md:gap-2 md:px-3 md:py-2 md:text-sm transition-colors ${inactiveBg} ${hoverBg}`;
+  const actionPillClassName = `flex items-center gap-1.5 rounded-[22px] px-2.5 py-1.5 text-xs md:gap-2 md:px-3 md:py-2 md:text-sm transition-colors ${inactiveBg} ${hoverBg}`;
   const dropdownItemClassName = `rounded-xl px-3 py-2 ${surface.textPrimary} ${hoverBg}`;
   const allViewGroupingOptions: Array<{ label: string; value: AllViewGrouping }> = [
     { label: t('dashboard.roomNav.grouping.custom'), value: 'custom' },
@@ -160,7 +199,7 @@ export const RoomNav = memo(function RoomNav({
         className="h-0 -mb-6 pointer-events-none md:-mb-8"
       />
       <div ref={stickyRef} className="sticky top-0 z-30" style={{ top: stickyOffset }}>
-        <div ref={shellRef} className="room-nav-shell" data-theme={theme}>
+        <div ref={shellRef} className="room-nav-shell" data-theme={theme} style={stickyShellStyle}>
           <div className="flex items-center gap-1 md:gap-1.5">
             <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
               <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
@@ -252,7 +291,7 @@ export const RoomNav = memo(function RoomNav({
                 onClick={onToggleEditMode}
                 active={isEditMode}
                 intent="action"
-                className={`room-nav-action-pill flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs md:gap-2 md:px-3 md:py-2 md:text-sm transition-colors ${
+                className={`room-nav-action-pill flex items-center gap-1.5 rounded-[22px] px-2.5 py-1.5 text-xs md:gap-2 md:px-3 md:py-2 md:text-sm transition-colors ${
                   isEditMode ? 'shadow-sm' : `${inactiveBg} ${hoverBg}`
                 }`}
               >
@@ -317,7 +356,7 @@ const RoomNavItem = memo(function RoomNavItem({
         transform: CSS.Transform.toString(transform),
         transition,
       }}
-      className={`room-nav-item px-2.5 md:px-3 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+      className={`room-nav-item px-2.5 md:px-3 py-1.5 md:py-2 rounded-[22px] text-xs md:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
         activeRoom === room ? 'room-nav-item-active text-white' : `${textSecondary} ${hoverBg}`
       } ${isEditMode && room !== 'All' ? 'cursor-move active:cursor-grabbing' : ''} ${
         isDragging ? 'opacity-50' : ''

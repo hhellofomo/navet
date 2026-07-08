@@ -83,8 +83,9 @@ Complete feature implementation guide:
 ### Navigation Structure
 - **Sections**: Home (dashboard), Security, Tasks, Locks, Lights, Media, Mock, Settings
 - **Desktop**: Fixed vertical sidebar on left (16px wide)
-- **Mobile**: Compact icon-only bottom navigation bar with 6 key sections including Mock and Settings
+- **Mobile**: Compact icon-only bottom navigation bar with 6 key sections
 - **Mobile Scroll Behavior**: Bottom navigation hides on downward scroll and returns near the top of the document
+- **Mobile Header**: Greeting, search, notifications, and avatar share one compact top row
 - **Empty States**: Beautiful placeholder screens for sections without data
 
 ### Color System at a Glance

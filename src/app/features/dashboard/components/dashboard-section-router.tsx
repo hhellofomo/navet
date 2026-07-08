@@ -16,7 +16,6 @@ import { useI18n } from '@/app/hooks';
 import { AllViewGrid } from '../all-view-grid';
 import { DeviceGrid } from '../device-grid';
 import type { DashboardController } from '../hooks/use-dashboard-controller';
-import { useDashboardEditModeLongPress } from '../hooks/use-dashboard-edit-mode-long-press';
 import { DashboardLayout } from '../shell';
 
 const SettingsSection = lazy(async () => {
@@ -49,7 +48,6 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     isEditMode,
     lightDeviceMap,
     lightRooms,
-    onEnterEditMode,
     onMoveRoom,
     onSetAllViewGrouping,
     onOpenAddCardDialog,
@@ -61,13 +59,8 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     showAddEntityDialog,
     updateCardSize,
   } = controller;
-  const editModeLongPressProps = useDashboardEditModeLongPress({
-    disabled: isEditMode,
-    onLongPress: onEnterEditMode,
-  });
   const sectionStackProps = {
-    className: 'flex flex-col gap-4 md:gap-6',
-    ...editModeLongPressProps,
+    className: 'flex flex-col gap-2 md:gap-6',
   };
 
   let sectionContent: ReactNode;

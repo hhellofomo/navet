@@ -59,6 +59,7 @@ export function MediaMediumVerticalView({
   const controls = getMediaControlStyles(theme);
   const controlSizes = getCardActionControlSizes('small');
   const primaryControlSizes = getCardActionControlSizes('medium');
+  const subduedFallback = !artwork;
   const playButtonStyle = {
     background: `linear-gradient(180deg, ${withAlpha(palette.highlight, 0.34)} 0%, ${withAlpha(palette.vibrant, 0.62)} 100%)`,
     borderColor: withAlpha(palette.highlight, 0.22),
@@ -108,10 +109,12 @@ export function MediaMediumVerticalView({
             </div>
 
             <div className="relative">
-              <div
-                className="pointer-events-none absolute inset-[-26%] rounded-full blur-3xl"
-                style={playGlowStyle}
-              />
+              {!subduedFallback && (
+                <div
+                  className="pointer-events-none absolute inset-[-26%] rounded-full blur-3xl"
+                  style={playGlowStyle}
+                />
+              )}
               <RoundControlButton
                 theme={theme}
                 size="large"
@@ -121,9 +124,11 @@ export function MediaMediumVerticalView({
                   event.stopPropagation();
                   onTogglePlay();
                 }}
-                className="h-12 w-12 border backdrop-blur-xl hover:scale-[1.03] active:scale-95"
-                iconClassName="!text-white"
-                style={playButtonStyle}
+                className={`h-12 w-12 hover:scale-[1.03] active:scale-95 ${
+                  subduedFallback ? '' : 'border backdrop-blur-xl'
+                }`}
+                iconClassName={subduedFallback ? undefined : '!text-white'}
+                style={subduedFallback ? undefined : playButtonStyle}
               >
                 {isPlaying ? (
                   <Pause className={primaryControlSizes.icon} fill="currentColor" />
