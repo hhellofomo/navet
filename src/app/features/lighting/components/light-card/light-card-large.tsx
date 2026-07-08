@@ -15,6 +15,7 @@ import { CustomColorTrigger } from './custom-color-trigger';
 import { KelvinColorTrigger } from './kelvin-color-trigger';
 import { LightCardHeader } from './light-card-header';
 import type { HeaderIconButtonProps, LightBrightnessPreset } from './light-card-types';
+import { roundKelvin } from './light-card-utils';
 
 interface LightCardLargeProps {
   name: string;
@@ -74,7 +75,7 @@ export const LightCardLarge = memo(function LightCardLarge({
     if (isOn) setIsKelvinMode((prev) => !prev);
   };
 
-  const roundedTemp = Math.round(colorTemp / 100) * 100;
+  const roundedTemp = roundKelvin(colorTemp);
 
   return (
     <>

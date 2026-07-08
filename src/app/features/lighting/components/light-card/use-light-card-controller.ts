@@ -301,6 +301,10 @@ export function useLightCardController({
       setSelectedColor(reportedColor);
       lastKnownColorRef.current = reportedColor;
       setCustomColor(reportedColor);
+    } else {
+      // Light is on but in a non-color mode (e.g. color_temp) — clear the color selection
+      // so the swatch doesn't show a stale color from a previous color mode.
+      setSelectedColor(null);
     }
   }, [isAdjustingTemp, liveEntity]);
 

@@ -9,6 +9,8 @@ import { AllViewGrid } from '../all-view-grid';
 import { DeviceGrid } from '../device-grid';
 import type { DashboardController } from '../hooks/use-dashboard-controller';
 import { DashboardLayout } from '../shell';
+import { AllDashboardOrganizer } from './all-dashboard-organizer';
+import { HomeDashboardOverview } from './home-dashboard-overview';
 
 const lazySections = () => import('@/app/components/layout/sections');
 
@@ -16,9 +18,6 @@ const SecuritySection = lazy(() => lazySections().then((m) => ({ default: m.Secu
 const TasksSection = lazy(() => lazySections().then((m) => ({ default: m.TasksSection })));
 const LocksSection = lazy(() => lazySections().then((m) => ({ default: m.LocksSection })));
 const MediaSection = lazy(() => lazySections().then((m) => ({ default: m.MediaSection })));
-const MockEntitiesSection = lazy(() =>
-  lazySections().then((m) => ({ default: m.MockEntitiesSection }))
-);
 const SettingsSection = lazy(async () => {
   const module = await import('@/app/features/settings');
   return { default: module.SettingsSection };
@@ -34,12 +33,14 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     activeRoom,
     activeSection,
     addableEntityIds,
+    allCustomCards,
     allViewGrouping,
     cardOrders,
     cardSizes,
     changeRoom,
     customCards,
     deviceMap,
+    handleAddCard,
     handleDeleteCard,
     handleRemoveEntity,
     handleUpdateCard,
@@ -118,9 +119,29 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     );
   } else if (activeSection === 'mock') {
     sectionContent = (
-      <Suspense fallback={<LoadingSpinner />}>
-        <MockEntitiesSection />
-      </Suspense>
+      <RenderProfiler id="DashboardBuilder">
+        <AllDashboardOrganizer
+          deviceMap={deviceMap}
+          rooms={rooms}
+          cardOrders={cardOrders}
+          isEditMode={isEditMode}
+          cardSizes={cardSizes}
+          updateCardSize={updateCardSize}
+          grouping={allViewGrouping}
+          customCards={allCustomCards}
+          hiddenEntityCount={hiddenEntityIds.length}
+          onDeleteCard={handleDeleteCard}
+          onUpdateCard={handleUpdateCard}
+          onRemoveEntity={handleRemoveEntity}
+          allowEntityRemoval
+          usesHideAction
+          onOpenAddCardDialog={onOpenAddCardDialog}
+          onOpenAddEntityDialog={addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
+          onQuickAddCard={handleAddCard}
+          onToggleEditMode={onToggleEditMode}
+          onGroupingChange={onSetAllViewGrouping}
+        />
+      </RenderProfiler>
     );
   } else if (activeSection === 'settings') {
     sectionContent = (
@@ -147,21 +168,18 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
         />
 
         {activeRoom === 'All' ? (
-          <RenderProfiler id="AllViewGrid">
-            <AllViewGrid
+          <RenderProfiler id="HomeDashboardOverview">
+            <HomeDashboardOverview
               deviceMap={deviceMap}
-              rooms={rooms}
-              cardOrders={cardOrders}
-              isEditMode={isEditMode}
               cardSizes={cardSizes}
-              grouping={allViewGrouping}
               updateCardSize={updateCardSize}
-              customCards={customCards}
-              onDeleteCard={handleDeleteCard}
-              onUpdateCard={handleUpdateCard}
-              onRemoveEntity={handleRemoveEntity}
-              allowEntityRemoval
-              usesHideAction
+              isEditMode={isEditMode}
+              hiddenEntityCount={hiddenEntityIds.length}
+              onOpenAddEntityDialog={
+                addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined
+              }
+              onOpenBuilder={() => controller.setActiveSection('mock')}
+              setActiveSection={controller.setActiveSection}
             />
           </RenderProfiler>
         ) : (
@@ -180,17 +198,6 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
               usesHideAction
             />
           </RenderProfiler>
-        )}
-
-        {deviceMap.size === 0 && customCards.length === 0 && activeRoom === 'All' && (
-          <EmptyState
-            icon={Lightbulb}
-            title={t('dashboard.shell.noVisibleEntitiesTitle')}
-            description={t('dashboard.shell.noVisibleEntitiesDescription')}
-            actionIcon={Lightbulb}
-            actionLabel={addableEntityIds.length > 0 ? t('dashboard.addEntity.title') : undefined}
-            onAction={addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
-          />
         )}
       </div>
     );
