@@ -68,7 +68,7 @@ describe('useMediaArtworkResolution', () => {
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:http://navet.local/album-art');
     vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => undefined);
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(new Blob(['image'], { type: 'image/jpeg' }), {
+      new Response('image', {
         status: 200,
         headers: { 'Content-Type': 'image/jpeg' },
       })

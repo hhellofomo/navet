@@ -142,12 +142,14 @@ function AppContent() {
         onRetry={isAuthenticated && (authConfig || haConfig) ? retryConnect : undefined}
       />
       <PwaUpdatePrompt />
-      <NetworkStatusBanner
-        connected={connected}
-        connecting={connecting}
-        reconnecting={reconnecting}
-        isOnline={isOnline}
-      />
+      {isAuthenticated ? (
+        <NetworkStatusBanner
+          connected={connected}
+          connecting={connecting}
+          reconnecting={reconnecting}
+          isOnline={isOnline}
+        />
+      ) : null}
       <Toaster />
       {!isAuthenticated ? <LoginPage /> : <DashboardPage />}
     </>

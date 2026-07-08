@@ -3,11 +3,13 @@ import { useState } from 'react';
 import { FieldBlock } from '@/app/components/patterns';
 import { Button, Input } from '@/app/components/primitives';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { navetTypographyTokens } from '@/app/components/system/tokens';
 import { getRuntimeConfig } from '@/app/config/runtime-config';
 import { useI18n, useTheme } from '@/app/hooks';
 import { useAuth } from '@/app/stores/auth-store';
 import { useConfig } from '@/app/stores/config-store';
 import { authSelectors, configSelectors } from '@/app/stores/selectors';
+import { getPublicAssetUrl } from '@/app/utils/public-assets';
 
 export function LoginPage() {
   const [url, setUrl] = useState(() => getRuntimeConfig().hassUrl ?? '');
@@ -21,6 +23,8 @@ export function LoginPage() {
   const { theme } = useTheme();
   const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
+
+  const logoSrc = getPublicAssetUrl('logo.svg');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,138 +79,157 @@ export function LoginPage() {
     }
   };
 
-  // Theme colors
-  const bgPrimary =
-    theme === 'light'
-      ? 'bg-gray-50'
-      : theme === 'black'
-        ? 'bg-black'
-        : theme === 'glass'
-          ? 'bg-slate-950'
-          : 'bg-[#0f0f0f]';
-
-  const cardBg =
-    theme === 'light'
-      ? 'bg-white/80'
-      : theme === 'black'
-        ? 'bg-gray-950/95'
-        : theme === 'glass'
-          ? 'bg-white/10'
-          : 'bg-gray-900/40';
-
-  const border =
-    theme === 'light'
-      ? 'border-gray-200'
-      : theme === 'black'
-        ? 'border-white/30'
-        : theme === 'glass'
-          ? 'border-white/20'
-          : 'border-white/10';
-
-  const inputBg =
-    theme === 'light'
-      ? 'bg-gray-100'
-      : theme === 'black'
-        ? 'bg-black/50'
-        : theme === 'glass'
-          ? 'bg-white/8'
-          : 'bg-white/5';
-
-  const textPrimary = surface.textPrimary;
-  const textSecondary = surface.textSecondary;
-  const textMuted = theme === 'black' ? 'text-gray-300' : surface.textMuted;
+  const isLightTheme = theme === 'light';
+  const isBlack = theme === 'black';
+  const textColor = isLightTheme ? 'text-slate-950' : 'text-white';
+  const mutedColor = isLightTheme ? 'text-slate-600' : 'text-white/68';
+  const loginPanelSurface = `${surface.border} ${surface.panelMuted} ${surface.cardShadow}`;
+  const fieldInputClassName = `${surface.inputBg} ${surface.border} ${textColor} ${surface.placeholder}`;
+  const pageBackground = isLightTheme
+    ? 'bg-[radial-gradient(circle_at_50%_34%,rgba(249,115,22,0.22)_0%,rgba(249,115,22,0.10)_24%,transparent_46%),linear-gradient(180deg,#f8fafc_0%,#eef2f7_100%)]'
+    : isBlack
+      ? 'bg-[radial-gradient(circle_at_50%_34%,rgba(249,115,22,0.30)_0%,rgba(249,115,22,0.13)_24%,transparent_46%),linear-gradient(180deg,#050505_0%,#000_100%)]'
+      : 'bg-[radial-gradient(circle_at_50%_34%,rgba(249,115,22,0.30)_0%,rgba(249,115,22,0.12)_24%,transparent_46%),linear-gradient(180deg,#060a12_0%,#030712_100%)]';
 
   return (
-    <div className={`min-h-screen ${bgPrimary} flex items-center justify-center p-4`}>
-      <div className="w-full max-w-md">
-        {/* Logo/Header */}
-        <div className="text-center mb-8">
-          <div
-            className={`inline-flex items-center justify-center w-20 h-20 rounded-3xl ${cardBg} backdrop-blur-xl border ${border} shadow-lg mb-4`}
+    <main className={`relative min-h-screen overflow-y-auto ${pageBackground}`}>
+      <style>{`
+        @keyframes navet-login-rise {
+          0% { opacity: 0; transform: translateY(18px) scale(0.96); filter: blur(10px); }
+          100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+
+        @keyframes navet-login-ring {
+          0% { opacity: 0.72; transform: scale(0.68); }
+          78%, 100% { opacity: 0; transform: scale(1.42); }
+        }
+      `}</style>
+      <div className="pointer-events-none absolute left-1/2 top-[28%] h-80 w-80 -translate-x-1/2 rounded-full bg-orange-500/18 blur-3xl" />
+
+      <section className="relative mx-auto flex min-h-screen w-full max-w-3xl flex-col items-center justify-center px-4 py-5 text-center sm:px-6">
+        <div className="w-full [animation:navet-login-rise_0.9s_ease-out_both]">
+          <div className="mx-auto flex min-h-20 w-full max-w-[18rem] items-center justify-center">
+            <div className="relative flex h-20 w-20 items-center justify-center">
+              {[
+                '[animation:navet-login-ring_4.6s_ease-out_infinite]',
+                '[animation:navet-login-ring_4.6s_ease-out_0.72s_infinite]',
+                '[animation:navet-login-ring_4.6s_ease-out_1.44s_infinite]',
+              ].map((ringClassName) => (
+                <span
+                  key={ringClassName}
+                  className={`absolute inset-0 rounded-full border border-orange-300/30 ${ringClassName}`}
+                />
+              ))}
+              <div className="absolute inset-0 rounded-full bg-orange-500/16 blur-2xl" />
+              <img src={logoSrc} alt="" className="relative z-10 h-20 w-20" />
+            </div>
+          </div>
+
+          <div className="mx-auto mt-4 h-px w-28 bg-[linear-gradient(90deg,transparent,#f97316,transparent)]" />
+
+          <p className={`mt-5 text-xs font-semibold uppercase tracking-[0.24em] ${mutedColor}`}>
+            Navet
+          </p>
+          <h1
+            className={`mx-auto mt-2 max-w-xl text-3xl font-semibold tracking-tight md:text-4xl ${textColor}`}
           >
-            <Home className="w-10 h-10 text-orange-500" />
-          </div>
-          <h1 className={`text-3xl font-bold ${textPrimary} mb-2`}>{t('login.title')}</h1>
-          <p className={`text-sm ${textSecondary}`}>{t('login.subtitle')}</p>
-        </div>
+            {t('login.subtitle')}
+          </h1>
+          <p className={`mx-auto mt-3 max-w-md text-sm leading-relaxed ${mutedColor}`}>
+            {t('login.footer')}
+          </p>
 
-        {/* Login Form */}
-        <div className={`${cardBg} backdrop-blur-xl border ${border} rounded-3xl shadow-2xl p-8`}>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <FieldBlock label={t('login.urlLabel')} htmlFor="url" hint={t('login.urlHelp')}>
-              <Input
-                id="url"
-                type="text"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder={t('login.urlPlaceholder')}
-                leading={<Home className={`h-5 w-5 ${textMuted}`} />}
-                inputClassName={`${inputBg} ${border} ${textPrimary}`}
+          <form
+            onSubmit={handleSubmit}
+            className={`relative mx-auto mt-7 w-full max-w-md overflow-hidden rounded-[28px] border ${loginPanelSurface} p-4 text-left backdrop-blur-2xl sm:p-5`}
+          >
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 opacity-90"
+              style={{
+                background:
+                  'radial-gradient(circle at top left, rgba(249,115,22,0.18), transparent 34%), radial-gradient(circle at bottom right, rgba(20,184,166,0.10), transparent 30%)',
+              }}
+            />
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.025)_22%,transparent_58%)]" />
+            <div className="relative space-y-5">
+              <FieldBlock
+                label={t('login.urlLabel')}
+                htmlFor="url"
+                hint={t('login.urlHelp')}
+                hintClassName={mutedColor}
+              >
+                <Input
+                  id="url"
+                  type="text"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder={t('login.urlPlaceholder')}
+                  leading={<Home className={`h-5 w-5 ${mutedColor}`} />}
+                  inputClassName={fieldInputClassName}
+                  disabled={isLoading}
+                />
+              </FieldBlock>
+
+              <FieldBlock
+                label={t('login.tokenLabel')}
+                htmlFor="token"
+                hint={t('login.tokenHelp')}
+                hintClassName={mutedColor}
+              >
+                <Input
+                  id="token"
+                  type={showToken ? 'text' : 'password'}
+                  value={token}
+                  onChange={(e) => setToken(e.target.value)}
+                  placeholder={t('login.tokenPlaceholder')}
+                  leading={<Key className={`h-5 w-5 ${mutedColor}`} />}
+                  trailing={
+                    <button
+                      type="button"
+                      onClick={() => setShowToken(!showToken)}
+                      className={`flex items-center ${mutedColor} transition-colors hover:text-orange-300`}
+                      disabled={isLoading}
+                      aria-label={showToken ? t('login.hideToken') : t('login.showToken')}
+                    >
+                      {showToken ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  }
+                  inputClassName={fieldInputClassName}
+                  disabled={isLoading}
+                />
+              </FieldBlock>
+
+              {error ? (
+                <div className="flex items-start gap-3 rounded-2xl border border-red-400/22 bg-red-500/12 p-4">
+                  <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-300" />
+                  <p className="text-sm leading-6 text-red-100">{error}</p>
+                </div>
+              ) : null}
+
+              <Button
+                variant="secondary"
+                type="submit"
                 disabled={isLoading}
-              />
-            </FieldBlock>
+                className="min-h-12 w-full rounded-full border-orange-300/20 bg-[linear-gradient(180deg,#fb923c,#f97316)] px-4 py-3 text-white shadow-[0_18px_42px_-24px_rgba(249,115,22,0.88)] transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    {error ? t('login.retrying') : t('login.connecting')}
+                  </span>
+                ) : (
+                  t('login.connect')
+                )}
+              </Button>
 
-            <FieldBlock label={t('login.tokenLabel')} htmlFor="token" hint={t('login.tokenHelp')}>
-              <Input
-                id="token"
-                type={showToken ? 'text' : 'password'}
-                value={token}
-                onChange={(e) => setToken(e.target.value)}
-                placeholder={t('login.tokenPlaceholder')}
-                leading={<Key className={`h-5 w-5 ${textMuted}`} />}
-                trailing={
-                  <button
-                    type="button"
-                    onClick={() => setShowToken(!showToken)}
-                    className={`flex items-center ${textMuted} transition-colors`}
-                    disabled={isLoading}
-                    aria-label={showToken ? t('login.hideToken') : t('login.showToken')}
-                  >
-                    {showToken ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                }
-                inputClassName={`${inputBg} ${border} ${textPrimary}`}
-                disabled={isLoading}
-              />
-            </FieldBlock>
-
-            {/* Error Message */}
-            {error && (
-              <div className="flex items-start gap-3 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
-                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-500">{error}</p>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full rounded-xl px-4 py-3 shadow-lg shadow-orange-500/20 transition-all hover:bg-orange-600 hover:shadow-orange-500/30"
-              style={{ backgroundColor: '#f97316' }}
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="animate-spin h-5 w-5" />
-                  {error ? t('login.retrying') : t('login.connecting')}
-                </span>
-              ) : (
-                t('login.connect')
-              )}
-            </Button>
+              <p className={`${navetTypographyTokens.helper} text-center ${mutedColor}`}>
+                {t('login.help')}
+              </p>
+            </div>
           </form>
-
-          {/* Help Text */}
-          <div className={`mt-6 pt-6 border-t ${border}`}>
-            <p className={`text-sm ${textMuted} text-center leading-relaxed`}>{t('login.help')}</p>
-          </div>
         </div>
-
-        {/* Footer */}
-        <div className="mt-6 text-center">
-          <p className={`text-sm ${textMuted}`}>{t('login.footer')}</p>
-        </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }
