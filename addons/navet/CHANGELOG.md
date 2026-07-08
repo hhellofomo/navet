@@ -2,8 +2,16 @@
 
 ## 0.1.7
 
-- Updated bundled Navet frontend assets for the latest release line
-- Synced add-on package metadata with current published version
+- Updated Navet to `0.1.0-beta.4`
+- Polished the login experience for hosted and authenticated Home Assistant setups
+- Fixed Home Assistant add-on ingress routing for Navet internal endpoints, including dashboard profile/session APIs and RSS proxying
+- Fixed runtime credential loading for Docker and add-on deployments
+- Fixed authenticated media artwork and album art loading
+- Improved HVAC mode controls, entity synchronization, and temperature/status labels
+- Fixed lock, cover, RSS, and slide-action dashboard card interactions
+- Fixed hosted demo and GitHub Pages asset paths
+- Added dashboard profile/session sync so deployed dashboards can persist state across browser sessions
+- Expanded automated coverage for Home Assistant connections, dashboard endpoints, media artwork, cards, RSS feeds, and sessions
 
 ## 0.1.6
 
