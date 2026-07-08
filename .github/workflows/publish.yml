@@ -1,6 +1,9 @@
 name: Publish
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       version:
@@ -51,7 +54,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=${{ github.event.inputs.version }}
+            type=raw,value=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || 'main' }}
+            type=sha
             type=raw,value=latest
 
       - name: Build and push image
