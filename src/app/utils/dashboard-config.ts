@@ -12,7 +12,7 @@ import { getLegacyReducedEffectsFlags, resolveEffectsQuality } from '@/app/utils
 import { storage } from '@/app/utils/storage';
 
 interface DashboardConfigPayload {
-  version: 2;
+  version: 3;
   app: 'navet';
   exportedAt: string;
   theme: {
@@ -37,6 +37,7 @@ interface DashboardConfigPayload {
   cardSizes?: Record<string, string>;
   cardOrders?: Record<string, string[]>;
   cardZones?: Record<string, string>;
+  homeDashboardLayout?: unknown;
   roomOrder?: string[];
 }
 
@@ -120,7 +121,7 @@ export const exportDashboardConfig = (): DashboardConfigPayload => {
   const lightPresetState = useLightPresetStore.getState();
 
   return {
-    version: 2,
+    version: 3,
     app: 'navet',
     exportedAt: new Date().toISOString(),
     theme: {
@@ -162,6 +163,7 @@ export const exportDashboardConfig = (): DashboardConfigPayload => {
     cardZones: pruneEmptyRecord(
       parseStoredJson<Record<string, string>>(STORAGE_KEYS.cardZones, {})
     ),
+    homeDashboardLayout: parseStoredJson(STORAGE_KEYS.homeDashboardLayout, undefined),
     roomOrder: pruneEmptyArray(parseStoredJson<string[]>(STORAGE_KEYS.roomOrder, [])),
   };
 };
@@ -170,7 +172,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
 export const importDashboardConfig = (value: unknown) => {
-  if (!isRecord(value) || (value.version !== 1 && value.version !== 2)) {
+  if (!isRecord(value) || (value.version !== 1 && value.version !== 2 && value.version !== 3)) {
     throw new Error('Unsupported dashboard config format.');
   }
 
@@ -300,6 +302,7 @@ export const importDashboardConfig = (value: unknown) => {
   storage.set(STORAGE_KEYS.cardSizes, isRecord(value.cardSizes) ? value.cardSizes : {});
   storage.set(STORAGE_KEYS.cardOrders, isRecord(value.cardOrders) ? value.cardOrders : {});
   storage.set(STORAGE_KEYS.cardZones, isRecord(value.cardZones) ? value.cardZones : {});
+  storage.set(STORAGE_KEYS.homeDashboardLayout, value.homeDashboardLayout ?? null);
   storage.set(STORAGE_KEYS.roomOrder, Array.isArray(value.roomOrder) ? value.roomOrder : []);
 };
 

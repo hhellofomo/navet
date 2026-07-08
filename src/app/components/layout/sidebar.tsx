@@ -1,14 +1,4 @@
-import {
-  Clipboard,
-  FlaskConical,
-  Home,
-  Lightbulb,
-  Lock,
-  Settings,
-  Tv,
-  Video,
-  Zap,
-} from 'lucide-react';
+import { Clipboard, Home, Lightbulb, Lock, Settings, Tv, Video, Zap } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
 import { InteractivePill } from '@/app/components/shared/interactive-pill';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
@@ -104,12 +94,6 @@ export const Sidebar = memo(function Sidebar() {
       onClick: () => setActiveSection('media'),
     },
     {
-      icon: FlaskConical,
-      label: t('sidebar.mock'),
-      section: 'mock' as Section,
-      onClick: () => setActiveSection('mock'),
-    },
-    {
       icon: Settings,
       label: t('sidebar.settings'),
       section: 'settings' as Section,
@@ -181,29 +165,26 @@ export const Sidebar = memo(function Sidebar() {
               isGlass ? surface.panelMuted : surface.shellPanel
             }`}
           >
-            {[
-              menuItems[0],
-              menuItems[1],
-              menuItems[2],
-              menuItems[5],
-              menuItems[6],
-              menuItems[8],
-            ].map((item, index) => (
-              <InteractivePill
-                key={index}
-                onClick={item.onClick}
-                aria-label={item.label}
-                active={activeSection === item.section}
-                className={`flex h-[49px] min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-[3px] rounded-[24px] px-1 py-1 transition-colors ${
-                  activeSection === item.section ? '' : inactiveColor
-                }`}
-              >
-                <item.icon className="h-[1.2rem] w-[1.2rem] shrink-0" />
-                <span className="max-w-full truncate text-[0.64rem] font-medium leading-none tracking-[-0.01em]">
-                  {item.label}
-                </span>
-              </InteractivePill>
-            ))}
+            {menuItems
+              .filter((item) =>
+                ['home', 'energy', 'security', 'lights', 'media', 'settings'].includes(item.section)
+              )
+              .map((item, index) => (
+                <InteractivePill
+                  key={index}
+                  onClick={item.onClick}
+                  aria-label={item.label}
+                  active={activeSection === item.section}
+                  className={`flex h-[49px] min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-[3px] rounded-[24px] px-1 py-1 transition-colors ${
+                    activeSection === item.section ? '' : inactiveColor
+                  }`}
+                >
+                  <item.icon className="h-[1.2rem] w-[1.2rem] shrink-0" />
+                  <span className="max-w-full truncate text-[0.64rem] font-medium leading-none tracking-[-0.01em]">
+                    {item.label}
+                  </span>
+                </InteractivePill>
+              ))}
           </div>
         </div>
       </div>

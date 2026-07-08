@@ -242,33 +242,6 @@ export const enMessages = {
   'dashboard.roomNav.addCard': 'Add Card',
   'dashboard.roomNav.doneEditing': 'Done Editing',
   'dashboard.roomNav.customize': 'Customize',
-  'dashboard.organizer.eyebrow': 'Dashboard Organizer',
-  'dashboard.organizer.title': 'Build an all-in-one home screen that feels personal.',
-  'dashboard.organizer.description':
-    'Use Home as your launchpad: add personal cards, shape a homescreen, and keep the full device library within reach while you organize everything.',
-  'dashboard.organizer.quickAddTitle': 'Quick setup',
-  'dashboard.organizer.quickAddDescription':
-    'Start with ready-made cards so the dashboard becomes useful before you fine-tune it.',
-  'dashboard.organizer.openLibrary': 'Open card library',
-  'dashboard.organizer.addThisCard': 'Add this card',
-  'dashboard.organizer.homescreenTitle': 'Homescreen cards',
-  'dashboard.organizer.homescreenDescription':
-    'Cards added in Home live here first, so you can compose a personal landing surface before diving into rooms.',
-  'dashboard.organizer.addHomescreenCard': 'Add homescreen card',
-  'dashboard.organizer.homescreenEmptyTitle': 'Start your homescreen with something useful',
-  'dashboard.organizer.homescreenEmptyDescription':
-    'Add notes, actions, feeds, photos, or battery overviews and turn Home into a personalized command center.',
-  'dashboard.organizer.startWithNote': 'Start with a note',
-  'dashboard.organizer.deviceLibraryTitle': 'Device library',
-  'dashboard.organizer.deviceLibraryDescription':
-    'Browse everything you already have and decide how the rest of the dashboard should be grouped.',
-  'dashboard.organizer.deviceLibraryEmptyTitle': 'No visible devices yet',
-  'dashboard.organizer.deviceLibraryEmptyDescription':
-    'Bring devices back from the hidden list or connect more entities, then arrange them around your homescreen cards.',
-  'dashboard.organizer.stats.homescreenCards': 'Homescreen cards',
-  'dashboard.organizer.stats.devices': 'Visible devices',
-  'dashboard.organizer.stats.rooms': 'Rooms',
-  'dashboard.organizer.stats.hidden': 'Hidden devices',
   'dashboard.homeOverview.eyebrow': 'First glance',
   'dashboard.homeOverview.title': 'See the state of home before you touch anything.',
   'dashboard.homeOverview.description':
@@ -286,6 +259,35 @@ export const enMessages = {
   'dashboard.homeOverview.stats.visibleDevices': 'Visible devices',
   'dashboard.homeOverview.stats.featuredCards': 'Featured cards',
   'dashboard.homeOverview.stats.hiddenDevices': 'Hidden devices',
+  'dashboard.homePersonal.eyebrow': 'Personal Home',
+  'dashboard.homePersonal.title': 'Make Home feel like your dashboard, not ours.',
+  'dashboard.homePersonal.description':
+    'Start with an empty canvas, pull in the cards you actually care about, and switch between free-flowing bento and sectioned layouts whenever it suits you.',
+  'dashboard.homePersonal.switchToSections': 'Use Sections',
+  'dashboard.homePersonal.switchToFlow': 'Use Flow Layout',
+  'dashboard.homePersonal.hideHero': 'Hide Hero',
+  'dashboard.homePersonal.showHero': 'Show Hero',
+  'dashboard.homePersonal.createWidget': 'Create Widget',
+  'dashboard.homePersonal.stats.cards': 'Cards on Home',
+  'dashboard.homePersonal.stats.available': 'Available to Place',
+  'dashboard.homePersonal.stats.widgets': 'Saved Widgets',
+  'dashboard.homePersonal.stats.hidden': 'Hidden Devices',
+  'dashboard.homePersonal.mode.flow': 'Flowing bento',
+  'dashboard.homePersonal.mode.sectioned': 'Sectioned bento',
+  'dashboard.homePersonal.canvasTitle': 'Home canvas',
+  'dashboard.homePersonal.canvasSectioned':
+    'Create sections and drop cards into each block to shape your own landing page.',
+  'dashboard.homePersonal.canvasFlow': 'Keep Home loose and fluid with one continuous bento grid.',
+  'dashboard.homePersonal.addSection': 'Add Section',
+  'dashboard.homePersonal.noSections': 'No sections yet',
+  'dashboard.homePersonal.noSectionsDescription':
+    'Create a section first, then drag cards into it from the library.',
+  'dashboard.homePersonal.libraryTitle': 'Card library',
+  'dashboard.homePersonal.libraryDescription':
+    'Drag device cards and saved widgets from here into Home.',
+  'dashboard.homePersonal.libraryEmptyTitle': 'Everything is already on Home',
+  'dashboard.homePersonal.libraryEmptyDescription':
+    'Remove something from the canvas if you want space to recompose it.',
   'dashboard.zones.hero': 'Overview',
   'dashboard.zones.actions': 'Quick Actions',
   'dashboard.zones.status': 'Status',
@@ -632,7 +634,6 @@ export const enMessages = {
   'sidebar.locks': 'Locks',
   'sidebar.lights': 'Lights',
   'sidebar.media': 'Media',
-  'sidebar.mock': 'Dashboard Builder',
   'sidebar.settings': 'Settings',
   'sidebar.brandLogoAlt': 'Brand Logo',
   'sections.security.title': 'Security Cameras',
@@ -661,9 +662,6 @@ export const enMessages = {
   'sections.media.plural': 'players',
   'sections.common.entity': 'entity',
   'sections.common.entities': 'entities',
-  'sections.mock.title': 'Dashboard Builder',
-  'sections.mock.description':
-    'Build your personalized dashboard here: add homescreen widgets, shape the overall layout, and organize the device library around it.',
   'userDropdown.defaultUser': 'User',
   'userDropdown.defaultInitial': 'U',
   'userDropdown.openMenu': 'Open user menu',

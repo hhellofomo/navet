@@ -293,14 +293,15 @@ This builds the app, writes `dist/config.js` from `NAVET_HASS_URL` and `NAVET_HA
 - See [WIDGETS.md](docs/WIDGETS.md) for detailed documentation
 
 #### Sidebar Sections
+- **Security** renders live Home Assistant camera entities with power toggle, snapshot refresh, and a settings dialog for camera-specific controls
 - **Media** now renders live Home Assistant media players in its own section view
 - **Locks** now renders live Home Assistant lock entities in its own section view
-- **Tasks** and **Security** remain placeholders until those domains are mapped into Navet card/device types
+- **Tasks** remains a placeholder until that domain is mapped into Navet card/device types
 
 #### Navigation Sections
 - **Home** for the main dashboard
 - **Security**, **Tasks**, **Locks**, **Lights**, and **Media** as dedicated sections
-- **Dashboard Builder** for building the Home screen: add homescreen widgets, shape the overall layout, and organize the device library
+- **Dashboard Builder** for building the Home screen: add cards from the floating library panel, choose between flow and sectioned layout, and manage sections with drag-and-drop
 - **Settings** for appearance, dashboard, config export/import, and onboarding reset
 - On mobile, the bottom navigation hides on downward scroll and reappears when you return near the top of the page
 

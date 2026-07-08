@@ -249,34 +249,6 @@ export const frMessages = {
   'dashboard.roomNav.addCard': 'Ajouter une carte',
   'dashboard.roomNav.doneEditing': 'Terminer l’édition',
   'dashboard.roomNav.customize': 'Personnaliser',
-  'dashboard.organizer.eyebrow': 'Organisateur du tableau de bord',
-  'dashboard.organizer.title': 'Créez un écran d’accueil vraiment personnel.',
-  'dashboard.organizer.description':
-    'Utilisez Accueil comme point de départ : ajoutez des cartes personnelles, composez un écran d’accueil et gardez toute la bibliothèque d’appareils à portée pendant que vous organisez l’ensemble.',
-  'dashboard.organizer.quickAddTitle': 'Mise en place rapide',
-  'dashboard.organizer.quickAddDescription':
-    'Commencez avec des cartes prêtes à l’emploi pour rendre le tableau de bord utile avant les réglages fins.',
-  'dashboard.organizer.openLibrary': 'Ouvrir la bibliothèque de cartes',
-  'dashboard.organizer.addThisCard': 'Ajouter cette carte',
-  'dashboard.organizer.homescreenTitle': 'Cartes d’accueil',
-  'dashboard.organizer.homescreenDescription':
-    'Les cartes ajoutées dans Accueil apparaissent d’abord ici pour que vous puissiez composer une surface personnelle avant de passer aux pièces.',
-  'dashboard.organizer.addHomescreenCard': 'Ajouter une carte d’accueil',
-  'dashboard.organizer.homescreenEmptyTitle':
-    'Commencez votre écran d’accueil avec quelque chose d’utile',
-  'dashboard.organizer.homescreenEmptyDescription':
-    'Ajoutez des notes, actions, flux, photos ou aperçus de batterie et transformez Accueil en centre de commande personnel.',
-  'dashboard.organizer.startWithNote': 'Commencer avec une note',
-  'dashboard.organizer.deviceLibraryTitle': 'Bibliothèque d’appareils',
-  'dashboard.organizer.deviceLibraryDescription':
-    'Parcourez tout ce que vous avez déjà et décidez comment regrouper le reste du tableau de bord.',
-  'dashboard.organizer.deviceLibraryEmptyTitle': 'Aucun appareil visible pour le moment',
-  'dashboard.organizer.deviceLibraryEmptyDescription':
-    'Ramenez des appareils depuis la liste masquée ou connectez d’autres entités, puis organisez-les autour de vos cartes d’accueil.',
-  'dashboard.organizer.stats.homescreenCards': 'Cartes d’accueil',
-  'dashboard.organizer.stats.devices': 'Appareils visibles',
-  'dashboard.organizer.stats.rooms': 'Pièces',
-  'dashboard.organizer.stats.hidden': 'Appareils masqués',
   'dashboard.homeOverview.eyebrow': 'Premier regard',
   'dashboard.homeOverview.title': 'Voyez l’état de la maison avant de toucher quoi que ce soit.',
   'dashboard.homeOverview.description':
@@ -294,6 +266,36 @@ export const frMessages = {
   'dashboard.homeOverview.stats.visibleDevices': 'Appareils visibles',
   'dashboard.homeOverview.stats.featuredCards': 'Cartes mises en avant',
   'dashboard.homeOverview.stats.hiddenDevices': 'Appareils masqués',
+  'dashboard.homePersonal.eyebrow': 'Accueil personnel',
+  'dashboard.homePersonal.title': 'Faites de l’accueil votre tableau de bord, pas le notre.',
+  'dashboard.homePersonal.description':
+    'Commencez avec une toile vide, glissez seulement les cartes qui comptent pour vous et alternez entre une grille bento libre et une mise en page par sections.',
+  'dashboard.homePersonal.switchToSections': 'Utiliser des sections',
+  'dashboard.homePersonal.switchToFlow': 'Utiliser le flux',
+  'dashboard.homePersonal.hideHero': 'Masquer hero',
+  'dashboard.homePersonal.showHero': 'Afficher hero',
+  'dashboard.homePersonal.createWidget': 'Créer un widget',
+  'dashboard.homePersonal.stats.cards': 'Cartes sur l’accueil',
+  'dashboard.homePersonal.stats.available': 'Disponibles à placer',
+  'dashboard.homePersonal.stats.widgets': 'Widgets enregistrés',
+  'dashboard.homePersonal.stats.hidden': 'Appareils masqués',
+  'dashboard.homePersonal.mode.flow': 'Bento fluide',
+  'dashboard.homePersonal.mode.sectioned': 'Bento sectionné',
+  'dashboard.homePersonal.canvasTitle': 'Toile d’accueil',
+  'dashboard.homePersonal.canvasSectioned':
+    'Créez des sections et déposez des cartes dans chaque bloc pour composer votre propre page d’accueil.',
+  'dashboard.homePersonal.canvasFlow':
+    'Gardez un accueil libre avec une seule grille bento continue.',
+  'dashboard.homePersonal.addSection': 'Ajouter une section',
+  'dashboard.homePersonal.noSections': 'Aucune section pour le moment',
+  'dashboard.homePersonal.noSectionsDescription':
+    'Créez d’abord une section puis glissez-y des cartes depuis la bibliothèque.',
+  'dashboard.homePersonal.libraryTitle': 'Bibliothèque de cartes',
+  'dashboard.homePersonal.libraryDescription':
+    'Glissez les cartes d’appareils et les widgets enregistrés vers l’accueil.',
+  'dashboard.homePersonal.libraryEmptyTitle': 'Tout est déjà sur l’accueil',
+  'dashboard.homePersonal.libraryEmptyDescription':
+    'Retirez un élément de la toile si vous voulez le recomposer.',
   'dashboard.zones.hero': "Vue d'ensemble",
   'dashboard.zones.actions': 'Actions rapides',
   'dashboard.zones.status': 'Statut',
@@ -646,7 +648,6 @@ export const frMessages = {
   'sidebar.locks': 'Serrures',
   'sidebar.lights': 'Lumieres',
   'sidebar.media': 'Media',
-  'sidebar.mock': 'Constructeur du tableau de bord',
   'sidebar.settings': 'Paramètres',
   'sidebar.brandLogoAlt': 'Logo de la marque',
   'sections.security.title': 'Caméras de sécurité',
@@ -675,9 +676,6 @@ export const frMessages = {
   'sections.media.plural': 'lecteurs',
   'sections.common.entity': 'entité',
   'sections.common.entities': 'entités',
-  'sections.mock.title': 'Constructeur du tableau de bord',
-  'sections.mock.description':
-    'Construisez ici votre tableau de bord personnalisé : ajoutez des widgets d’accueil, composez la mise en page générale et organisez la bibliothèque d’appareils autour.',
   'userDropdown.defaultUser': 'Utilisateur',
   'userDropdown.defaultInitial': 'U',
   'userDropdown.openMenu': 'Ouvrir le menu utilisateur',

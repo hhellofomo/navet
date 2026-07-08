@@ -202,7 +202,7 @@ Manages section navigation state across desktop and mobile layouts through a dir
 | Section  | URL Path    | Description                    | Icon      | Status    |
 |----------|-------------|--------------------------------|-----------|-----------|
 | Home     | `/`         | Main dashboard with all cards  | Home      | Active    |
-| Security | `/security` | Security cameras and monitoring | Video     | Placeholder |
+| Security | `/security` | Security cameras and monitoring | Video     | Active |
 | Tasks    | `/tasks`    | Automations and routines       | Clipboard | Placeholder |
 | Locks    | `/locks`    | Smart lock controls            | Lock      | Active    |
 | Lights   | `/lights`   | Lighting control center        | Lightbulb | Active    |
@@ -249,6 +249,128 @@ const { activeSection, setActiveSection } = useNavigation();
 // Navigate to section (also pushes URL and scrolls to top)
 setActiveSection('lights');
 ```
+
+---
+
+## Security System
+
+### Camera Card
+
+**Location**: `src/app/features/security/components/camera-card/`
+
+A full-featured camera card for Home Assistant `camera` entities. Follows the container/view pattern — all HA integration lives in the container and the view is purely presentational.
+
+#### Architecture
+
+| File | Role |
+|---|---|
+| `index.tsx` | Public export |
+| `container.tsx` | HA state, sibling entity discovery, service calls |
+| `view.tsx` | Presentational — snapshot image, overlay buttons |
+| `camera-settings-dialog.tsx` | Settings modal with auto-discovered sibling controls |
+| `types.ts` | `CameraCardProps` interface |
+
+#### Features
+
+- **Live snapshot** — displays `entity_picture` from the live HA entity state, resolved to an absolute URL using the stored HA connection URL
+- **Snapshot refresh** — cache-busting `_t` query parameter incremented on each manual refresh, triggering a new fetch without a page reload
+- **Power toggle** — calls `homeAssistantService.updateCamera(id, 'on'|'off')` based on current entity state
+- **Card resizing** — `CardSizeSelector` in the top-right corner; all standard sizes supported
+- **Unavailable state** — shows a camera icon and "Unavailable" / "No signal" label when the entity is unavailable or has no snapshot URL
+
+#### Settings Dialog
+
+Opened via the settings button in the card's bottom overlay. Automatically discovers sibling entities from the same Home Assistant device (matching `device_id` in the entity registry) and renders the appropriate control for each domain:
+
+| Domain | Control | HA Service |
+|---|---|---|
+| `switch.*` | Toggle switch row | `switch.turn_on` / `switch.turn_off` |
+| `select.*` | Option pill grid | `select.select_option` |
+| `number.*` | Range slider | `number.set_value` |
+
+Room reassignment is available directly in the dialog header via `EntityRoomSelector`.
+
+#### Usage
+
+```tsx
+<CameraCard
+  id="camera.front_door"
+  name="Front Door"
+  room="Entrance"
+  size="medium"
+  onSizeChange={updateCardSize}
+  isEditMode={false}
+/>
+```
+
+#### Registration
+
+- Registered in `src/app/hooks/use-ha-devices.ts` under the `cameras` device type
+- Registered in `src/app/features/dashboard/utils/card-renderer.tsx`
+- Rendered by `SecuritySection` via `src/app/components/layout/sections.tsx`
+
+---
+
+## Dashboard Builder
+
+**Location**: `src/app/features/dashboard/components/home-dashboard-overview.tsx`
+
+The Dashboard Builder (`/mock` section) lets users compose their Home screen from the full device and widget library. It supports two layout modes and full drag-and-drop card ordering.
+
+### Layout Modes
+
+| Mode | Description |
+|---|---|
+| `flow` | All cards in a single responsive masonry grid — the simplest layout |
+| `sectioned` | Cards organised into named sections (rows and column groups) |
+
+Switching to `sectioned` mode auto-creates the first section if none exist. Sections can be renamed inline, removed individually, and split into column arrangements via "Add column".
+
+### Floating Library Panel
+
+The card library is a draggable floating panel (`useLibraryPanel`) that overlays the canvas in edit mode.
+
+- **Position** — defaults to the top-right of the viewport; freely repositioned by dragging the grip handle
+- **Collapse to dock** — collapses to a slim tab pinned to the right edge; expands on click
+- **Search** — filters the available card list (up to 5 results) by name, room, entity type, or entity ID
+- **Add card** — places the card into the first available section (sectioned mode) or the flow canvas
+- **Drag to place** — cards can be dragged from the library panel directly onto a canvas drop zone
+
+### Section Partitioning
+
+Sections in `sectioned` mode are laid out in rows. The `partitionSectionRows` algorithm (in `use-home-dashboard-editor.ts`) enforces two hard constraints:
+
+- Maximum **4 sections per row**
+- Maximum combined span of **8 columns** per row
+
+Each section carries a `HomeDashboardSectionSpan` value that controls how many grid columns it occupies. Sections that would overflow the row start a new row automatically.
+
+### Hook Architecture
+
+| Hook | Location | Responsibility |
+|---|---|---|
+| `useHomeDashboardEditor` | `hooks/use-home-dashboard-editor.ts` | Card map construction, library card list, section rows, flow card list, drag state, drag-end handler, library search/filtering, summary stats |
+| `useLibraryPanel` | `hooks/use-library-panel.ts` | Floating panel position, drag-to-reposition, visibility/collapse toggles, resize-responsive repositioning |
+| `useHomeDashboardLayout` | `hooks/use-home-dashboard-layout.ts` | Persisted layout state — card IDs, section assignments, layout mode, hero visibility |
+
+### Summary Stats
+
+The editor header displays four live counters supplied by `useHomeDashboardEditor`:
+
+| Stat | Description |
+|---|---|
+| Cards | Entities and widgets currently placed on the Home canvas |
+| Available | Cards in the library not yet placed on the canvas |
+| Widgets | Total custom widgets (RSS, Photo, Note, Battery, Button) |
+| Hidden | Entity IDs hidden from all dashboard views |
+
+### Hero Section Toggle
+
+A toggle in the edit toolbar shows or hides the Hero section at the top of the Home view. Cards with `hero` size degrade to `large` when the hero section is hidden.
+
+### Persistence
+
+The Home layout is persisted to `STORAGE_KEYS.homeDashboardLayout` (`ha-dashboard-home-layout`) via the `useHomeDashboardLayout` hook using Zustand `persist` middleware.
 
 ---
 
@@ -341,6 +463,16 @@ Beautiful placeholder screens for sections without data.
 - **Helpful description**: Guides user on next steps
 - **Theme-aware**: Adapts to current theme mode
 - **Centered layout**: Vertically and horizontally centered
+
+#### Props
+| Prop | Type | Required | Description |
+|---|---|---|---|
+| `icon` | `LucideIcon` | Yes | Icon displayed in the empty state |
+| `title` | `string` | Yes | Primary heading |
+| `description` | `string` | Yes | Supporting text |
+| `actionIcon` | `LucideIcon` | No | Icon for the optional action button |
+| `actionLabel` | `string` | No | Label for the optional action button |
+| `onAction` | `() => void` | No | Callback for the optional action button |
 
 #### Usage Pattern
 ```tsx
@@ -467,6 +599,7 @@ Access these through their hook wrappers: `useAuth()`, `useTheme()`, `useNavigat
 - `ha-dashboard-card-sizes` — Per-card size overrides
 - `ha-dashboard-card-orders` — Card ordering per room
 - `ha-dashboard-room-order` — Custom room sort order
+- `ha-dashboard-home-layout` — Home screen layout: card IDs, section assignments, layout mode (`flow`/`sectioned`), hero visibility
 
 Restarting onboarding should always return the user to Home / All before reopening the wizard.
 
@@ -546,6 +679,9 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 - [x] Card ordering store (drag-and-drop for both cards and rooms has been removed)
 - [x] Export/import dashboard YAML config
 - [x] PWA installation support
+- [x] Security section: full camera card with snapshot display, power toggle, refresh, and sibling entity settings dialog
+- [x] Dashboard Builder: flow and sectioned layout modes, floating card library panel, drag-and-drop from library to canvas
+- [x] Energy dashboard: live HA data, statistics, setup panel, device tracking, SVG chart primitives
 
 ### Planned
 - [ ] Custom theme builder with color wheel
@@ -571,8 +707,9 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 2. Create the section component in `src/app/features/<name>/`
 3. Register in `src/app/features/dashboard/components/dashboard-section-router.tsx` using `lazy()`
 4. Add icon to the sidebar (`src/app/components/layout/sidebar.tsx`) and mobile bottom nav if appropriate
-5. Implement an empty state if no data is available, with the primary recovery action visible when possible
-6. Test at all breakpoints
+5. Use `DeviceSectionLayout` in `src/app/components/layout/sections.tsx` for sections that follow the standard device-list pattern (empty state → entity grid). Pass `devices`, `rawDevices`, `emptyIcon`, and the four label strings; the component owns the empty/grid branching logic
+6. Implement an empty state if no data is available, with the primary recovery action visible when possible
+7. Test at all breakpoints
 
 ### When Adding Theme-Dependent Styling
 1. Use the theme hook to get current theme
@@ -591,7 +728,7 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 ---
 
 **Last Updated**: March 20, 2026
-**Version**: 1.7
+**Version**: 1.8
 **Status**: Living Document
 
 ---
@@ -711,3 +848,42 @@ Debounces async HA service calls with in-flight request tracking. Used by the li
 - If a request is already in flight, re-flushes automatically once it resolves
 - Exposes `cancel()` to drop a pending value (e.g. a color change cancels a queued temp sync)
 - Manages its own cleanup on unmount
+
+---
+
+### `useHomeDashboardEditor`
+
+`src/app/features/dashboard/hooks/use-home-dashboard-editor.ts`
+
+Controller hook for the Dashboard Builder edit canvas. Accepts the current `deviceMap`, `allCustomCards`, `homeLayout`, and `cardSizes` and returns everything the `HomeDashboardOverview` component needs to render and interact with the editor.
+
+**Returns**:
+- `allCards` — unified `Map<id, DeviceWithType | CustomCard>` combining devices and widgets
+- `flowCards` — IDs of cards not assigned to any section (used in `flow` mode and as overflow in `sectioned` mode)
+- `sectionRows` — sections partitioned into rows obeying the 4-per-row / span-8 constraints
+- `activeDragCard` / `setActiveDragCard` — active drag overlay state
+- `activeDragSize` — resolved size of the card currently being dragged (for the `DragOverlay`)
+- `sensors` — pre-configured dnd-kit sensors (pointer with 8px activation threshold + keyboard)
+- `handleDragEnd` — resolves drop target and calls `addHomeCard` / `moveHomeCard` as appropriate
+- `libraryCards` — available (unplaced) cards for the floating library panel
+- `filteredLibraryCards` — library cards filtered by search query, capped at 5
+- `libraryQuery` / `setLibraryQuery` — search input state
+- `handleAddFromLibrary` — places a library card onto the canvas
+- `summaryItems` — `{ label, value }[]` for the four stats in the editor header
+
+---
+
+### `useLibraryPanel`
+
+`src/app/features/dashboard/hooks/use-library-panel.ts`
+
+Manages all state and behaviour for the floating card library panel in the Dashboard Builder.
+
+**Returns**:
+- `libraryPanelRef` — `RefObject<HTMLDivElement>` attached to the panel element (needed for drag offset calculation)
+- `isLibraryVisible` / `isLibraryCollapsed` — controls which panel state is rendered
+- `libraryPosition` — `{ x, y }` pixel position; updated on drag and on window resize
+- `handleStartLibraryDrag` — `PointerEvent` handler that attaches `pointermove`/`pointerup` listeners for free-drag repositioning
+- `toggleLibraryVisibility` — shows or hides the panel, resetting the collapsed state
+- `expandLibrary` — shows the full panel and snaps it to the default right-side position
+- `collapseLibraryToDock` — collapses the panel to a slim dock tab on the right edge

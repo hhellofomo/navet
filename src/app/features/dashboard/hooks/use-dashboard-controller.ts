@@ -25,6 +25,7 @@ import { useCardZones } from './use-card-zones';
 import { useCustomCards } from './use-custom-cards';
 import { useDashboardDerivedState } from './use-dashboard-derived-state';
 import { type DashboardDialogs, useDashboardDialogs } from './use-dashboard-dialogs';
+import { useHomeDashboardLayout } from './use-home-dashboard-layout';
 import { type OnboardingController, useOnboardingController } from './use-onboarding-controller';
 export type DashboardController = OnboardingController &
   DashboardDialogs & {
@@ -57,6 +58,16 @@ export type DashboardController = OnboardingController &
     handleRemoveEntity: (entityId: string) => void;
     handleUpdateCard: (cardId: string, data: Record<string, unknown>) => void;
     hiddenEntityIds: string[];
+    homeLayout: ReturnType<typeof useHomeDashboardLayout>['layout'];
+    addHomeCard: ReturnType<typeof useHomeDashboardLayout>['addCard'];
+    removeHomeCard: ReturnType<typeof useHomeDashboardLayout>['removeCard'];
+    moveHomeCard: ReturnType<typeof useHomeDashboardLayout>['moveCard'];
+    setHomeLayoutMode: ReturnType<typeof useHomeDashboardLayout>['setMode'];
+    setHomeShowHero: ReturnType<typeof useHomeDashboardLayout>['setShowHero'];
+    addHomeSection: ReturnType<typeof useHomeDashboardLayout>['addSection'];
+    addHomeColumnSection: ReturnType<typeof useHomeDashboardLayout>['addColumnSection'];
+    renameHomeSection: ReturnType<typeof useHomeDashboardLayout>['renameSection'];
+    removeHomeSection: ReturnType<typeof useHomeDashboardLayout>['removeSection'];
     isEditMode: boolean;
     lightDeviceMap: ReturnType<typeof useDeviceMap>['deviceMap'];
     lightRooms: string[];
@@ -103,6 +114,10 @@ export function useDashboardController(): DashboardController {
   const { cardZones, updateCardZone } = useCardZones();
   const { deviceMap } = useDeviceMap(devices);
   const { deviceMap: availableDeviceMap } = useDeviceMap(allDevices);
+  const homeLayoutController = useHomeDashboardLayout([
+    ...deviceMap.keys(),
+    ...allCustomCards.map((card) => card.id),
+  ]);
   const { addableEntityIds, allEntityIds, lightDeviceMap, lightRooms, orderedCardIds } =
     useDashboardDerivedState({
       activeRoom,
@@ -178,6 +193,16 @@ export function useDashboardController(): DashboardController {
     handleRemoveEntity,
     handleUpdateCard,
     hiddenEntityIds,
+    homeLayout: homeLayoutController.layout,
+    addHomeCard: homeLayoutController.addCard,
+    removeHomeCard: homeLayoutController.removeCard,
+    moveHomeCard: homeLayoutController.moveCard,
+    setHomeLayoutMode: homeLayoutController.setMode,
+    setHomeShowHero: homeLayoutController.setShowHero,
+    addHomeSection: homeLayoutController.addSection,
+    addHomeColumnSection: homeLayoutController.addColumnSection,
+    renameHomeSection: homeLayoutController.renameSection,
+    removeHomeSection: homeLayoutController.removeSection,
     isEditMode,
     lightDeviceMap,
     lightRooms,

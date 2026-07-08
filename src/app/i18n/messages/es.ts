@@ -249,33 +249,6 @@ export const esMessages = {
   'dashboard.roomNav.addCard': 'Agregar tarjeta',
   'dashboard.roomNav.doneEditing': 'Terminar edición',
   'dashboard.roomNav.customize': 'Personalizar',
-  'dashboard.organizer.eyebrow': 'Organizador del panel',
-  'dashboard.organizer.title': 'Construye una pantalla principal realmente personal.',
-  'dashboard.organizer.description':
-    'Usa Inicio como punto de partida: agrega tarjetas personales, crea una pantalla principal y mantén toda la biblioteca de dispositivos a mano mientras organizas todo.',
-  'dashboard.organizer.quickAddTitle': 'Configuración rápida',
-  'dashboard.organizer.quickAddDescription':
-    'Empieza con tarjetas listas para usar para que el panel sea útil antes de ajustarlo al detalle.',
-  'dashboard.organizer.openLibrary': 'Abrir biblioteca de tarjetas',
-  'dashboard.organizer.addThisCard': 'Agregar esta tarjeta',
-  'dashboard.organizer.homescreenTitle': 'Tarjetas de inicio',
-  'dashboard.organizer.homescreenDescription':
-    'Las tarjetas agregadas en Inicio aparecen primero aquí para que puedas componer una superficie personal antes de entrar en las habitaciones.',
-  'dashboard.organizer.addHomescreenCard': 'Agregar tarjeta de inicio',
-  'dashboard.organizer.homescreenEmptyTitle': 'Empieza tu pantalla de inicio con algo útil',
-  'dashboard.organizer.homescreenEmptyDescription':
-    'Agrega notas, acciones, feeds, fotos o resúmenes de batería y convierte Inicio en un centro de control personal.',
-  'dashboard.organizer.startWithNote': 'Empezar con una nota',
-  'dashboard.organizer.deviceLibraryTitle': 'Biblioteca de dispositivos',
-  'dashboard.organizer.deviceLibraryDescription':
-    'Explora todo lo que ya tienes y decide cómo se debe agrupar el resto del panel.',
-  'dashboard.organizer.deviceLibraryEmptyTitle': 'Todavía no hay dispositivos visibles',
-  'dashboard.organizer.deviceLibraryEmptyDescription':
-    'Recupera dispositivos desde la lista oculta o conecta más entidades y luego organízalos alrededor de tus tarjetas de inicio.',
-  'dashboard.organizer.stats.homescreenCards': 'Tarjetas de inicio',
-  'dashboard.organizer.stats.devices': 'Dispositivos visibles',
-  'dashboard.organizer.stats.rooms': 'Habitaciones',
-  'dashboard.organizer.stats.hidden': 'Dispositivos ocultos',
   'dashboard.homeOverview.eyebrow': 'Primera vista',
   'dashboard.homeOverview.title': 'Ve el estado de casa antes de tocar nada.',
   'dashboard.homeOverview.description':
@@ -293,6 +266,36 @@ export const esMessages = {
   'dashboard.homeOverview.stats.visibleDevices': 'Dispositivos visibles',
   'dashboard.homeOverview.stats.featuredCards': 'Tarjetas destacadas',
   'dashboard.homeOverview.stats.hiddenDevices': 'Dispositivos ocultos',
+  'dashboard.homePersonal.eyebrow': 'Inicio personal',
+  'dashboard.homePersonal.title': 'Haz que Inicio sea tu dashboard, no el nuestro.',
+  'dashboard.homePersonal.description':
+    'Empieza con un lienzo vacio, arrastra solo las tarjetas que te importan y cambia entre un bento fluido y un diseño por secciones cuando quieras.',
+  'dashboard.homePersonal.switchToSections': 'Usar secciones',
+  'dashboard.homePersonal.switchToFlow': 'Usar flujo',
+  'dashboard.homePersonal.hideHero': 'Ocultar hero',
+  'dashboard.homePersonal.showHero': 'Mostrar hero',
+  'dashboard.homePersonal.createWidget': 'Crear widget',
+  'dashboard.homePersonal.stats.cards': 'Tarjetas en Inicio',
+  'dashboard.homePersonal.stats.available': 'Disponibles para colocar',
+  'dashboard.homePersonal.stats.widgets': 'Widgets guardados',
+  'dashboard.homePersonal.stats.hidden': 'Dispositivos ocultos',
+  'dashboard.homePersonal.mode.flow': 'Bento fluido',
+  'dashboard.homePersonal.mode.sectioned': 'Bento por secciones',
+  'dashboard.homePersonal.canvasTitle': 'Lienzo de Inicio',
+  'dashboard.homePersonal.canvasSectioned':
+    'Crea secciones y suelta tarjetas en cada bloque para formar tu propia portada.',
+  'dashboard.homePersonal.canvasFlow':
+    'Mantén Inicio suelto y fluido con una sola cuadrícula bento continua.',
+  'dashboard.homePersonal.addSection': 'Agregar sección',
+  'dashboard.homePersonal.noSections': 'Todavía no hay secciones',
+  'dashboard.homePersonal.noSectionsDescription':
+    'Primero crea una sección y luego arrastra tarjetas desde la biblioteca.',
+  'dashboard.homePersonal.libraryTitle': 'Biblioteca de tarjetas',
+  'dashboard.homePersonal.libraryDescription':
+    'Arrastra tarjetas de dispositivos y widgets guardados desde aquí a Inicio.',
+  'dashboard.homePersonal.libraryEmptyTitle': 'Todo ya está en Inicio',
+  'dashboard.homePersonal.libraryEmptyDescription':
+    'Quita algo del lienzo si quieres recomponerlo.',
   'dashboard.zones.hero': 'Resumen',
   'dashboard.zones.actions': 'Acciones rápidas',
   'dashboard.zones.status': 'Estado',
@@ -643,7 +646,6 @@ export const esMessages = {
   'sidebar.locks': 'Cerraduras',
   'sidebar.lights': 'Luces',
   'sidebar.media': 'Media',
-  'sidebar.mock': 'Constructor del panel',
   'sidebar.settings': 'Ajustes',
   'sidebar.brandLogoAlt': 'Logotipo de la marca',
   'sections.security.title': 'Cámaras de seguridad',
@@ -672,9 +674,6 @@ export const esMessages = {
   'sections.media.plural': 'reproductores',
   'sections.common.entity': 'entidad',
   'sections.common.entities': 'entidades',
-  'sections.mock.title': 'Constructor del panel',
-  'sections.mock.description':
-    'Construye aquí tu panel personalizado: agrega widgets a la pantalla principal, define la composición general y organiza la biblioteca de dispositivos a su alrededor.',
   'userDropdown.defaultUser': 'Usuario',
   'userDropdown.defaultInitial': 'U',
   'userDropdown.openMenu': 'Abrir menú de usuario',

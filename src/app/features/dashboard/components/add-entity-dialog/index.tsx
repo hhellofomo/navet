@@ -6,6 +6,7 @@ import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
 import { useI18n, useTheme } from '@/app/hooks';
 import type { DeviceWithType } from '@/app/types/device.types';
 import { getDeviceRoomLabel } from '@/app/utils/device-location';
+import { DashboardEmptyState } from '../dashboard-empty-state';
 import { ENTITY_LIST_HEIGHT, ENTITY_LIST_OVERSCAN, ENTITY_ROW_HEIGHT } from './constants';
 import type { AddEntityDialogProps } from './types';
 
@@ -266,16 +267,17 @@ export function AddEntityDialog({
               </div>
             </div>
           ) : (
-            <div className={`rounded-xl border ${borderColor} ${cardBg} p-8 text-center`}>
-              <p className={`text-sm font-medium ${textColor}`}>
-                {t('dashboard.addEntity.emptyTitle')}
-              </p>
-              <p className={`text-xs ${mutedColor} mt-2`}>
-                {visibleEntityIds
+            <DashboardEmptyState
+              title={t('dashboard.addEntity.emptyTitle')}
+              description={
+                visibleEntityIds
                   ? t('dashboard.addEntity.emptyHidden')
-                  : t('dashboard.addEntity.emptyDefault')}
-              </p>
-            </div>
+                  : t('dashboard.addEntity.emptyDefault')
+              }
+              surface={surface}
+              accentColor={accentColor}
+              compact
+            />
           )}
         </div>
       </div>
