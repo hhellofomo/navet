@@ -154,4 +154,57 @@ describe('augmentConfigWithLivePowerEntities', () => {
 
     expect(augmentConfigWithLivePowerEntities(config, {})).toEqual(config);
   });
+
+  it('matches live power sensors through the Home Assistant entity registry', () => {
+    const config = mapPrefsToConfig({
+      energy_sources: [
+        { type: 'grid', stat_energy_from: 'sensor.meter_total_import' },
+        { type: 'solar', stat_energy_from: 'sensor.roof_array_lifetime_production' },
+      ],
+      device_consumption: [{ stat_consumption: 'sensor.heat_pump_total_consumption' }],
+    });
+
+    const augmented = augmentConfigWithLivePowerEntities(
+      config,
+      {
+        'sensor.meter_total_import': {
+          state: '1400',
+          attributes: { device_class: 'energy', unit_of_measurement: 'kWh' },
+        },
+        'sensor.meter_active_load': {
+          state: '650',
+          attributes: { device_class: 'power', unit_of_measurement: 'W' },
+        },
+        'sensor.roof_array_lifetime_production': {
+          state: '9000',
+          attributes: { device_class: 'energy', unit_of_measurement: 'kWh' },
+        },
+        'sensor.roof_array_output': {
+          state: '1.8',
+          attributes: { device_class: 'power', unit_of_measurement: 'kW' },
+        },
+        'sensor.heat_pump_total_consumption': {
+          state: '120',
+          attributes: { device_class: 'energy', unit_of_measurement: 'kWh' },
+        },
+        'sensor.heat_pump_live_draw': {
+          state: '340',
+          attributes: { device_class: 'power', unit_of_measurement: 'W' },
+        },
+      },
+      [
+        { entity_id: 'sensor.meter_total_import', device_id: 'meter-device' },
+        { entity_id: 'sensor.meter_active_load', device_id: 'meter-device' },
+        { entity_id: 'sensor.roof_array_lifetime_production', device_id: 'solar-device' },
+        { entity_id: 'sensor.roof_array_output', device_id: 'solar-device' },
+        { entity_id: 'sensor.heat_pump_total_consumption', device_id: 'heat-pump-device' },
+        { entity_id: 'sensor.heat_pump_live_draw', device_id: 'heat-pump-device' },
+      ]
+    );
+
+    expect(augmented.gridImportPowerEntityId).toBe('sensor.meter_active_load');
+    expect(augmented.homeLoadPowerEntityId).toBe('sensor.meter_active_load');
+    expect(augmented.solarPowerEntityId).toBe('sensor.roof_array_output');
+    expect(augmented.devices[0]?.powerEntityId).toBe('sensor.heat_pump_live_draw');
+  });
 });

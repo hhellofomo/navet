@@ -58,25 +58,25 @@ const gridOnlyOverview: EnergyOverview = {
     { id: 'home', label: 'Home Load', value: 0.39, direction: 'sink', tone: 'load' },
   ],
   trend: [
-    { label: '12:00', value: 340 },
-    { label: '12:05', value: 386 },
-    { label: '12:10', value: 365 },
+    { label: '12:00', value: 390 },
+    { label: '12:05', value: 434 },
+    { label: '12:10', value: 410 },
   ],
   topConsumers: [
     {
       id: 'sensor.bathroom_floor_energy_usage',
-      name: 'Bathroom Energy Usage',
+      name: 'Bathroom Power',
       category: 'floor_heating',
       powerEntityId: 'sensor.bathroom_floor_power',
       powerW: 0,
-      energyKWh: 0,
+      energyKWh: 3.3,
       shareOfLoad: 0,
       costToday: 0,
       status: 'idle',
     },
     {
       id: 'sensor.toilet_energy_usage',
-      name: 'Toilet Energy Usage',
+      name: 'Toilet Power',
       category: 'toilet_heater',
       powerEntityId: 'sensor.toilet_power',
       powerW: 0,
@@ -88,13 +88,13 @@ const gridOnlyOverview: EnergyOverview = {
   ],
   insights: [],
   totals: {
-    currentLoadW: 386,
+    currentLoadW: 434,
     solarW: 0,
     batteryPercent: 0,
     batteryPowerW: 0,
-    importW: 386,
+    importW: 434,
     exportW: 0,
-    importTodayKWh: 4.2,
+    importTodayKWh: 21.7,
     exportTodayKWh: 0,
     solarTodayKWh: 0,
     gasTodayKWh: 0,
@@ -108,7 +108,7 @@ const gridOnlyDashboard = buildEnergyDashboardModel({
   overview: gridOnlyOverview,
   range: 'today',
   trend: gridOnlyOverview.trend,
-  periodTotals: { today: 4.2, week: 0, month: 0 },
+  periodTotals: { today: 21.7, week: 0, month: 0 },
   sourceConfig: {
     gridImportEnergyEntityId: 'sensor.develco_zhemi101_summation_delivered',
     gridImportPowerEntityId: 'sensor.develco_zhemi101_instantaneous_demand',
@@ -136,21 +136,21 @@ const gridOnlyDiagnostics: EnergySourceDiagnostic[] = [
     entityId: 'sensor.develco_zhemi101_summation_delivered',
     liveEntityId: 'sensor.develco_zhemi101_instantaneous_demand',
     status: 'configured_numeric',
-    currentPowerW: 386,
-    todayKWh: 4.2,
+    currentPowerW: 434,
+    todayKWh: 21.7,
   },
   {
     id: 'device:bathroom',
-    label: 'Bathroom Energy Usage',
+    label: 'Bathroom Power',
     entityId: 'sensor.bathroom_floor_energy_usage',
     liveEntityId: 'sensor.bathroom_floor_power',
-    status: 'configured_idle',
+    status: 'configured_numeric',
     currentPowerW: 0,
-    todayKWh: 0,
+    todayKWh: 3.3,
   },
   {
     id: 'device:toilet',
-    label: 'Toilet Energy Usage',
+    label: 'Toilet Power',
     entityId: 'sensor.toilet_energy_usage',
     liveEntityId: 'sensor.toilet_power',
     status: 'configured_idle',
@@ -190,12 +190,76 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+function buildScenarioSourceDiagnostics(
+  dashboard: typeof defaultScenario.dashboard
+): EnergySourceDiagnostic[] {
+  const diagnostics: EnergySourceDiagnostic[] = [];
+
+  if (dashboard.dataCoverage.hasGridImport) {
+    diagnostics.push({
+      id: 'grid-import',
+      label: 'Grid import',
+      entityId: 'sensor.grid_import_energy',
+      liveEntityId: 'sensor.grid_import_power',
+      status:
+        dashboard.totals.importW > 0 || dashboard.totals.importTodayKWh > 0
+          ? 'configured_numeric'
+          : 'configured_idle',
+      currentPowerW: dashboard.totals.importW,
+      todayKWh: dashboard.totals.importTodayKWh,
+    });
+  }
+
+  if (dashboard.dataCoverage.hasGridExport) {
+    diagnostics.push({
+      id: 'grid-export',
+      label: 'Grid export',
+      entityId: 'sensor.grid_export_energy',
+      liveEntityId: 'sensor.grid_export_power',
+      status:
+        dashboard.totals.exportW > 0 || dashboard.totals.exportTodayKWh > 0
+          ? 'configured_numeric'
+          : 'configured_idle',
+      currentPowerW: dashboard.totals.exportW,
+      todayKWh: dashboard.totals.exportTodayKWh,
+    });
+  }
+
+  if (dashboard.dataCoverage.hasSolar) {
+    diagnostics.push({
+      id: 'solar',
+      label: 'Solar production',
+      entityId: 'sensor.solar_energy',
+      liveEntityId: 'sensor.solar_power',
+      status:
+        dashboard.totals.solarW > 0 || dashboard.totals.solarTodayKWh > 0
+          ? 'configured_numeric'
+          : 'configured_idle',
+      currentPowerW: dashboard.totals.solarW,
+      todayKWh: dashboard.totals.solarTodayKWh,
+    });
+  }
+
+  if (dashboard.dataCoverage.hasGas) {
+    diagnostics.push({
+      id: 'gas',
+      label: 'Gas',
+      entityId: 'sensor.gas_energy',
+      status: dashboard.totals.gasTodayKWh > 0 ? 'configured_numeric' : 'configured_idle',
+      todayKWh: dashboard.totals.gasTodayKWh,
+    });
+  }
+
+  return diagnostics;
+}
+
 function buildScenarioStory(id: string): Story {
   const scenario = getEnergyDashboardScenario(id);
   return {
     args: {
       dashboard: scenario.dashboard,
       range: scenario.dashboard.selectedRange,
+      sourceDiagnostics: buildScenarioSourceDiagnostics(scenario.dashboard),
     },
   };
 }

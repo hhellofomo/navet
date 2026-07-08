@@ -19,7 +19,7 @@ export function VacuumStatusMetrics({
   const { t } = useI18n();
 
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid gap-2 sm:grid-cols-3">
       <MetricCard
         icon={Battery}
         label={t('vacuum.settings.battery')}
@@ -29,14 +29,14 @@ export function VacuumStatusMetrics({
       />
       <MetricCard
         icon={Sparkles}
-        label={t('vacuum.cleanedArea')}
+        label={t('vacuum.metric.area')}
         value={cleanedArea}
         className="bg-white/7"
         style={sectionStyle}
       />
       <MetricCard
         icon={Wind}
-        label={t('vacuum.cleaningTime')}
+        label={t('vacuum.metric.runTime')}
         value={cleaningTime}
         className="bg-white/7"
         style={sectionStyle}

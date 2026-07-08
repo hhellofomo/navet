@@ -14,6 +14,7 @@ const SIZES: CardSize[] = [
   'large',
   'extra-large',
 ];
+const LIGHT_SIZES: CardSize[] = ['extra-small', 'small', 'medium'];
 const HVAC_SIZES: CardSize[] = ['small', 'medium'];
 
 function AllSizesPage() {
@@ -22,7 +23,7 @@ function AllSizesPage() {
       <section className="space-y-3">
         <h2 className="text-base font-semibold">Light</h2>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {SIZES.map((size) => (
+          {LIGHT_SIZES.map((size) => (
             <div key={`light-${size}`} className="space-y-1">
               <p className="text-xs uppercase tracking-wide opacity-70">{size}</p>
               <LightCard

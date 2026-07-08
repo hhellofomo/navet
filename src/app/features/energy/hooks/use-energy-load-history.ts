@@ -21,10 +21,44 @@ function formatBucketLabel(timestampMs: number, index: number, total: number) {
     .padStart(2, '0')}`;
 }
 
-function buildFallbackPoints(currentLoadW: number): EnergySeriesPoint[] {
+function hashSeed(seed: string): number {
+  let hash = 2166136261;
+  for (let index = 0; index < seed.length; index += 1) {
+    hash ^= seed.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function seededUnit(seed: number, index: number): number {
+  const next = Math.imul(seed ^ Math.imul(index + 1, 374761393), 668265263);
+  return ((next ^ (next >>> 13)) >>> 0) / 4294967295;
+}
+
+function buildFallbackPoints(currentLoadW: number, seedKey: string): EnergySeriesPoint[] {
+  if (currentLoadW <= 0) {
+    return Array.from({ length: FALLBACK_POINT_COUNT }, (_, index) => ({
+      label: index === FALLBACK_POINT_COUNT - 1 ? 'Now' : '',
+      value: 0,
+    }));
+  }
+
+  const seed = hashSeed(seedKey);
+  const phase = seededUnit(seed, 0) * Math.PI * 2;
+  const amplitude = 0.1 + seededUnit(seed, 1) * 0.14;
+  const slope = (seededUnit(seed, 2) - 0.5) * 0.24;
   return Array.from({ length: FALLBACK_POINT_COUNT }, (_, index) => ({
     label: index === FALLBACK_POINT_COUNT - 1 ? 'Now' : '',
-    value: Math.round(currentLoadW),
+    value: Math.max(
+      1,
+      Math.round(
+        currentLoadW *
+          (1 +
+            Math.sin(phase + index * 0.82) * amplitude +
+            Math.cos(phase * 0.7 + index * 0.41) * amplitude * 0.4 +
+            slope * (index / (FALLBACK_POINT_COUNT - 1) - 0.5))
+      )
+    ),
   }));
 }
 
@@ -37,8 +71,10 @@ export function useEnergyLoadHistory(
   const connection = useHomeAssistant(homeAssistantSelectors.connection);
 
   useEffect(() => {
+    const fallbackSeedKey = entityId ?? `load:${Math.round(fallbackCurrentLoadW)}`;
+
     if (!entityId) {
-      setPoints(buildFallbackPoints(fallbackCurrentLoadW));
+      setPoints(buildFallbackPoints(fallbackCurrentLoadW, fallbackSeedKey));
       return;
     }
 
@@ -47,14 +83,14 @@ export function useEnergyLoadHistory(
     async function fetchHistory() {
       const activeConnection = connection ?? homeAssistantService.getConnection();
       if (!activeConnection) {
-        setPoints(buildFallbackPoints(fallbackCurrentLoadW));
+        setPoints(buildFallbackPoints(fallbackCurrentLoadW, fallbackSeedKey));
         return;
       }
 
       try {
         const stats = await getPowerStatisticsHistory(activeConnection, resolvedEntityId);
         if (stats.length === 0) {
-          setPoints(buildFallbackPoints(fallbackCurrentLoadW));
+          setPoints(buildFallbackPoints(fallbackCurrentLoadW, fallbackSeedKey));
           return;
         }
 
@@ -70,7 +106,7 @@ export function useEnergyLoadHistory(
         );
       } catch (error) {
         console.error('[EnergyLoadHistory] Failed to fetch history:', error);
-        setPoints(buildFallbackPoints(fallbackCurrentLoadW));
+        setPoints(buildFallbackPoints(fallbackCurrentLoadW, fallbackSeedKey));
       }
     }
 

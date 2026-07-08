@@ -2,9 +2,11 @@ import type { HassEntity } from 'home-assistant-js-websocket';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { shallow } from 'zustand/shallow';
 import { useCameraRegistryDeviceTopology, useHomeAssistant } from '@/app/hooks';
+import { homeAssistantService } from '@/app/services/home-assistant.service';
 import { useAuth } from '@/app/stores/auth-store';
 import type { HomeAssistantStore } from '@/app/stores/home-assistant-store';
 import { authSelectors, homeAssistantSelectors } from '@/app/stores/selectors';
+import { CameraLiveViewer } from './camera-live-viewer';
 import { CameraSettingsDialog } from './camera-settings-dialog';
 import type { CameraCardProps } from './types';
 import { CameraCardView } from './view';
@@ -57,6 +59,23 @@ function resolveHomeAssistantImageUrl(
   return imageUrl.startsWith('/') && homeAssistantUrl ? `${homeAssistantUrl}${imageUrl}` : imageUrl;
 }
 
+function resolveCameraStreamPreviewUrl(snapshotUrl: string | undefined) {
+  if (!snapshotUrl?.includes('/api/camera_proxy/')) {
+    return undefined;
+  }
+
+  return snapshotUrl.replace('/api/camera_proxy/', '/api/camera_proxy_stream/');
+}
+
+function readFrontendStreamTypes(value: unknown): string[] {
+  if (!value || typeof value !== 'object') {
+    return [];
+  }
+
+  const raw = (value as { frontend_stream_types?: unknown }).frontend_stream_types;
+  return Array.isArray(raw) ? raw.filter((item): item is string => typeof item === 'string') : [];
+}
+
 const EMPTY_DEVICE_RECORD: Record<string, HassEntity | undefined> = {};
 
 export const CameraCardContainer = memo(function CameraCardContainer({
@@ -64,14 +83,19 @@ export const CameraCardContainer = memo(function CameraCardContainer({
   name,
   room,
   entityPicture: initialEntityPicture,
+  supportedFeatures: initialSupportedFeatures,
+  isStreamCapable: initialIsStreamCapable,
   size,
   isEditMode,
 }: CameraCardProps) {
   const config = useAuth(authSelectors.config);
   const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
+  const connected = useHomeAssistant(homeAssistantSelectors.connected);
   const { siblingIds: deviceEntityIds } = useCameraRegistryDeviceTopology(id);
   const [refreshKey, setRefreshKey] = useState(0);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [frontendStreamTypes, setFrontendStreamTypes] = useState<string[]>([]);
   const [now, setNow] = useState(() => Date.now());
 
   const liveAttrs = liveEntity?.attributes as Record<string, unknown> | undefined;
@@ -86,13 +110,55 @@ export const CameraCardContainer = memo(function CameraCardContainer({
   const snapshotUrl = baseSnapshotUrl
     ? `${baseSnapshotUrl}${baseSnapshotUrl.includes('?') ? '&' : '?'}_t=${refreshKey}`
     : undefined;
+  const streamPreviewUrl = resolveCameraStreamPreviewUrl(snapshotUrl);
 
   const isUnavailable = liveEntity?.state === 'unavailable';
   const isRunning = liveEntity
     ? liveEntity.state !== 'off' && !isUnavailable
     : Boolean(snapshotUrl);
+  const supportedFeatures =
+    typeof liveAttrs?.supported_features === 'number'
+      ? liveAttrs.supported_features
+      : typeof liveAttrs?.supported_features === 'string'
+        ? Number(liveAttrs.supported_features)
+        : initialSupportedFeatures;
+  const isStreamCapable =
+    frontendStreamTypes.length > 0 ||
+    (typeof supportedFeatures === 'number' && Number.isFinite(supportedFeatures)
+      ? (supportedFeatures & 2) === 2
+      : (initialIsStreamCapable ?? false));
+  const motionDetectionEnabled =
+    typeof liveAttrs?.motion_detection_enabled === 'boolean'
+      ? liveAttrs.motion_detection_enabled
+      : null;
   const statusChangedAt =
     parseTimestamp(liveEntity?.last_changed) ?? parseTimestamp(liveEntity?.last_updated);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    if (!connected) {
+      setFrontendStreamTypes([]);
+      return;
+    }
+
+    void homeAssistantService
+      .getCameraCapabilities(id)
+      .then((capabilities) => {
+        if (!isCancelled) {
+          setFrontendStreamTypes(readFrontendStreamTypes(capabilities));
+        }
+      })
+      .catch(() => {
+        if (!isCancelled) {
+          setFrontendStreamTypes([]);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [connected, id]);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -150,6 +216,16 @@ export const CameraCardContainer = memo(function CameraCardContainer({
     setRefreshKey((k) => k + 1);
   }, []);
 
+  const handleToggleMotionDetection = useCallback(() => {
+    if (motionDetectionEnabled === null) {
+      return;
+    }
+
+    void (motionDetectionEnabled
+      ? homeAssistantService.disableCameraMotionDetection(id)
+      : homeAssistantService.enableCameraMotionDetection(id));
+  }, [id, motionDetectionEnabled]);
+
   return (
     <>
       <CameraCardView
@@ -162,12 +238,34 @@ export const CameraCardContainer = memo(function CameraCardContainer({
         statusChangedAt={statusChangedAt}
         motionDetected={motionDetected}
         motionChangedAt={motionChangedAt}
+        motionDetectionEnabled={motionDetectionEnabled}
         now={now}
         size={size}
         isEditMode={isEditMode}
+        isStreamCapable={isStreamCapable}
+        frontendStreamTypes={frontendStreamTypes}
         onRefresh={handleRefresh}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenViewer={() => setIsViewerOpen(true)}
+        onToggleMotionDetection={handleToggleMotionDetection}
       />
+
+      {isViewerOpen && (
+        <CameraLiveViewer
+          isOpen={isViewerOpen}
+          onOpenChange={setIsViewerOpen}
+          name={name}
+          room={room}
+          snapshotUrl={snapshotUrl}
+          streamPreviewUrl={isStreamCapable ? streamPreviewUrl : undefined}
+          isUnavailable={isUnavailable}
+          isRunning={isRunning}
+          isStreamCapable={isStreamCapable}
+          frontendStreamTypes={frontendStreamTypes}
+          onRefresh={handleRefresh}
+          onOpenSettings={() => setIsSettingsOpen(true)}
+        />
+      )}
 
       {isSettingsOpen && (
         <CameraSettingsDialog

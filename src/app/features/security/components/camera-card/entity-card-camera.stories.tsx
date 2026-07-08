@@ -28,6 +28,8 @@ const meta = {
     name: 'Front Door Cam',
     room: 'Entrance',
     entityPicture: cameraSampleImage,
+    supportedFeatures: 2,
+    isStreamCapable: true,
     size: 'medium',
     isEditMode: false,
   },
@@ -67,6 +69,25 @@ export const Large: Story = {
 export const ExtraLarge: Story = {
   args: {
     size: 'extra-large',
+  },
+};
+
+export const SnapshotOnly: Story = {
+  args: {
+    id: 'camera.l10s_ultra_gen_2_map',
+    name: 'L10s Ultra Gen 2 Current Map',
+    room: 'Utility',
+    supportedFeatures: 0,
+    isStreamCapable: false,
+  },
+};
+
+export const Unavailable: Story = {
+  args: {
+    id: 'camera.garden',
+    name: 'Garden Cam',
+    room: 'Garden',
+    entityPicture: undefined,
   },
 };
 

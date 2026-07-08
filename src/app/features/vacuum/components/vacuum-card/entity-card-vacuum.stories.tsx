@@ -12,6 +12,18 @@ function VacuumCardStory(args: Omit<ComponentProps<typeof VacuumCard>, 'onSizeCh
   );
 }
 
+const baseVacuumArgs: Omit<ComponentProps<typeof VacuumCard>, 'onSizeChange'> = {
+  id: 'vacuum.robby',
+  name: 'Robby',
+  room: 'Ground Floor',
+  status: 'cleaning',
+  battery: 74,
+  cleanedArea: '42 m²',
+  cleaningTime: '38 min',
+  size: 'medium',
+  isEditMode: false,
+};
+
 const meta = {
   title: 'Cards/Entity/Vacuum',
   component: VacuumCardStory,
@@ -19,24 +31,25 @@ const meta = {
   argTypes: {
     size: {
       control: 'inline-radio',
-      options: ['small', 'medium', 'large'],
+      options: ['small', 'medium'],
+    },
+    status: {
+      control: 'select',
+      options: [
+        'cleaning',
+        'mopping',
+        'drying',
+        'returning',
+        'docked',
+        'charging',
+        'charging-complete',
+        'paused',
+        'idle',
+        'error',
+      ],
     },
   },
-  args: {
-    id: 'vacuum.robby',
-    name: 'Robby',
-    room: 'Ground Floor',
-    status: 'cleaning',
-    battery: 74,
-    cleaningProgress: 42,
-    cleanedArea: '42 m²',
-    cleaningTime: '38 min',
-    nextCleaning: 'Tomorrow 09:00',
-    waterLevel: 68,
-    binLevel: 34,
-    size: 'medium',
-    isEditMode: false,
-  },
+  args: baseVacuumArgs,
   parameters: { docs: { description: {} } },
 } satisfies Meta<typeof VacuumCardStory>;
 
@@ -56,7 +69,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+export const Cleaning: Story = {};
 
 export const Small: Story = {
   args: {
@@ -64,36 +77,42 @@ export const Small: Story = {
   },
 };
 
-export const Medium: Story = {
-  args: {
-    size: 'medium',
-  },
-};
-
-export const Large: Story = {
-  args: {
-    size: 'large',
-  },
-};
-
 export const Charging: Story = {
   args: {
-    status: 'docked',
+    status: 'charging',
     battery: 82,
-    nextCleaning: 'Fri 10:30',
-    waterLevel: 72,
-    binLevel: 28,
+    cleanedArea: '42 m²',
+    cleaningTime: '38 min',
     size: 'medium',
   },
 };
 
-export const FullyCharged: Story = {
+export const ChargingComplete: Story = {
   args: {
-    status: 'docked',
+    status: 'charging-complete',
     battery: 100,
-    nextCleaning: 'Sat 08:00',
-    waterLevel: 100,
-    binLevel: 12,
+    cleanedArea: '54 m²',
+    cleaningTime: '49 min',
+    size: 'medium',
+  },
+};
+
+export const Mopping: Story = {
+  args: {
+    status: 'mopping',
+    battery: 68,
+    cleanedArea: '36 m²',
+    cleaningTime: '31 min',
+    size: 'medium',
+  },
+};
+
+export const Drying: Story = {
+  args: {
+    status: 'drying',
+    battery: 94,
+    cleanedArea: '54 m²',
+    cleaningTime: '49 min',
     size: 'medium',
   },
 };
@@ -102,37 +121,19 @@ export const LowBattery: Story = {
   args: {
     status: 'idle',
     battery: 18,
-    cleaningProgress: 0,
-    nextCleaning: 'Tonight 21:00',
-    waterLevel: 46,
-    binLevel: 41,
+    cleanedArea: '0 m²',
+    cleaningTime: '0 min',
     size: 'medium',
   },
 };
 
-export const MissingLevels: Story = {
-  args: {
-    status: 'docked',
-    battery: 63,
-    cleaningProgress: 0,
-    nextCleaning: undefined,
-    waterLevel: undefined,
-    binLevel: undefined,
-    size: 'medium',
-  },
-};
-
-export const NeedsAttention: Story = {
+export const PausedAttention: Story = {
   args: {
     status: 'paused',
     battery: 56,
-    cleaningProgress: 64,
     cleanedArea: '51 m²',
     cleaningTime: '46 min',
-    nextCleaning: 'Today 18:00',
-    waterLevel: 9,
-    binLevel: 92,
-    size: 'large',
+    size: 'medium',
   },
 };
 

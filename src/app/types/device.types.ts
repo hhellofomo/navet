@@ -148,7 +148,17 @@ export interface SensorDevice extends BaseDevice {
 // Vacuum device
 export interface VacuumDevice extends BaseDevice {
   room: string;
-  status: 'cleaning' | 'returning' | 'docked' | 'paused' | 'idle';
+  status:
+    | 'cleaning'
+    | 'mopping'
+    | 'drying'
+    | 'returning'
+    | 'docked'
+    | 'charging'
+    | 'charging-complete'
+    | 'paused'
+    | 'idle'
+    | 'error';
   battery: number;
   cleanedArea?: string;
   cleaningTime?: string;
@@ -201,6 +211,13 @@ export interface CameraDevice extends BaseDevice {
   room: string;
   entityPicture?: string;
   state: string;
+  supportedFeatures?: number;
+  isStreamCapable?: boolean;
+  isStillImageOnly?: boolean;
+  lastChanged?: string;
+  lastUpdated?: string;
+  motionDetected?: boolean;
+  motionChangedAt?: string;
 }
 
 // Grouped Sensor device

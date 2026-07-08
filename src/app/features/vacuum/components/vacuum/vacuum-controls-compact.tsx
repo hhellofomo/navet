@@ -13,7 +13,6 @@ interface VacuumControlsCompactProps {
   onReturnHome: () => void;
   onOpenSettings: () => void;
   theme: ThemeType;
-  accentColorValue: string;
 }
 
 export function VacuumControlsCompact({
@@ -23,7 +22,6 @@ export function VacuumControlsCompact({
   onReturnHome,
   onOpenSettings,
   theme,
-  accentColorValue,
 }: VacuumControlsCompactProps) {
   const { t } = useI18n();
   return (
@@ -32,7 +30,7 @@ export function VacuumControlsCompact({
       size="medium"
       leftContent={
         <>
-          {currentStatus === 'cleaning' ? (
+          {currentStatus === 'cleaning' || currentStatus === 'mopping' ? (
             <RoundControlButton
               theme={theme}
               size="medium"
@@ -47,16 +45,12 @@ export function VacuumControlsCompact({
             <RoundControlButton
               theme={theme}
               size="medium"
-              variant="emphasis"
+              variant="soft"
               onClick={onStartCleaning}
               aria-label={t('vacuum.action.startCleaning')}
-              className="shadow-lg"
-              style={{
-                backgroundColor: accentColorValue,
-                boxShadow: `0 8px 18px ${accentColorValue}45`,
-              }}
+              className="transition-colors"
             >
-              <Play className="h-3.5 w-3.5 text-white" />
+              <Play className="h-3.5 w-3.5" />
             </RoundControlButton>
           )}
           <RoundControlButton

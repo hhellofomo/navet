@@ -1,6 +1,6 @@
-import { Bot, type LucideIcon, Map as MapIcon, Timer } from 'lucide-react';
+import { Battery, Bot, Clock3, type LucideIcon, Map as MapIcon } from 'lucide-react';
 import { memo } from 'react';
-import { BaseCard, CardMetric } from '@/app/components/primitives';
+import { BaseCard } from '@/app/components/primitives';
 import { EntityCardHeader } from '@/app/components/primitives/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/primitives/entity-card-header-icon';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
@@ -9,29 +9,26 @@ import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-st
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { cn } from '@/app/components/ui/utils';
 import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
-import type { ThemeType } from '@/app/hooks/use-theme';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { useVacuumControl } from '../vacuum/use-vacuum-control';
-import { VacuumControlsLarge } from '../vacuum/vacuum-controls-large';
 import { VacuumControlsMedium } from '../vacuum/vacuum-controls-medium';
 import { VacuumControlsSmall } from '../vacuum/vacuum-controls-small';
-import { resolveVacuumGlanceMetrics, type VacuumLevelMetric } from '../vacuum/vacuum-metrics';
+import { resolveVacuumGlanceMetrics } from '../vacuum/vacuum-metrics';
 import { VacuumSettingsDialog } from '../vacuum/vacuum-settings-dialog';
 import {
-  deriveVacuumProgressMetric,
+  getVacuumStatusLabelKey,
   getVacuumThemeStatus,
   normalizeVacuumStatus,
   type VacuumStatus,
 } from '../vacuum/vacuum-utils';
 
-type VacuumCardSize = 'small' | 'medium' | 'large';
+type VacuumCardSize = 'small' | 'medium';
 
 interface VacuumCardProps {
   id: string;
   name: string;
   status: VacuumStatus;
   battery: number;
-  cleaningProgress?: number;
   cleanedArea?: string;
   cleaningTime?: string;
   nextCleaning?: string;
@@ -44,7 +41,7 @@ interface VacuumCardProps {
 }
 
 function normalizeVacuumCardSize(size: CardSize): VacuumCardSize {
-  if (size === 'small' || size === 'medium' || size === 'large') {
+  if (size === 'small' || size === 'medium') {
     return size;
   }
 
@@ -68,125 +65,85 @@ function normalizeVacuumDisplayName(value: string): string {
   return trimmed;
 }
 
-function getStatusLabelKey(status: VacuumStatus) {
-  switch (status) {
-    case 'cleaning':
-      return 'vacuum.status.cleaning';
-    case 'returning':
-      return 'vacuum.status.returning';
-    case 'docked':
-      return 'vacuum.status.docked';
-    case 'paused':
-      return 'vacuum.status.paused';
-    default:
-      return 'vacuum.status.idle';
-  }
+interface VacuumMetricItem {
+  key: string;
+  icon: LucideIcon;
+  value: string;
+  unit?: string;
+  label: string;
 }
 
-function MetricPill({
-  Icon,
-  label,
-  value,
-  metric,
-  theme,
-  compact = false,
+function VacuumMetricGrid({
+  metrics,
+  accentClassName,
+  surfaceTextClassName,
+  size,
 }: {
-  Icon: LucideIcon;
-  label: string;
-  value: string;
-  metric?: VacuumLevelMetric;
-  theme: ThemeType;
-  compact?: boolean;
+  metrics: VacuumMetricItem[];
+  accentClassName: string;
+  surfaceTextClassName: string;
+  size: VacuumCardSize;
 }) {
-  const surface = getThemeSurfaceTokens(theme);
-  const hasPercentage = typeof metric?.percentage === 'number';
+  const isSmall = size === 'small';
+
+  if (isSmall) {
+    return (
+      <div className="w-full space-y-0.5">
+        {metrics.map((metric) => (
+          <div key={metric.key} className="flex items-center justify-between gap-2 text-xs">
+            <span className={cn(surfaceTextClassName, 'flex min-w-0 items-center gap-1')}>
+              <metric.icon className="h-3 w-3 shrink-0" aria-hidden />
+              <span className="truncate">{metric.label}</span>
+            </span>
+            <span className={cn('shrink-0 font-medium', accentClassName)}>
+              {metric.value}
+              {metric.unit ? ` ${metric.unit}` : ''}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
-    <div
-      className={cn(
-        'min-w-0 rounded-lg border border-white/10 bg-white/6 px-2.5 py-2 shadow-inner shadow-white/5',
-        theme === 'light' && 'border-slate-200/70 bg-white/70 shadow-none',
-        compact && 'rounded-md px-2 py-1'
-      )}
-    >
-      <div className="flex items-center gap-1.5">
-        <Icon
+    <div className="grid w-full grid-cols-3">
+      {metrics.map((metric, index) => (
+        <div
+          key={metric.key}
           className={cn(
-            compact ? 'h-3 w-3 shrink-0' : 'h-3.5 w-3.5 shrink-0',
-            metric?.isWarning ? 'text-amber-300' : surface.textSubtle
-          )}
-        />
-        <span
-          className={cn(
-            'truncate font-medium',
-            compact ? 'text-[0.6rem] leading-none' : 'text-[0.66rem]',
-            surface.textSubtle
+            'flex min-w-0 flex-col',
+            index > 0 && 'border-l border-white/10 pl-3',
+            index === 0 && 'pr-3',
+            index > 0 && index < metrics.length - 1 && 'pr-3'
           )}
         >
-          {label}
-        </span>
-      </div>
-      <div
-        className={cn(
-          'truncate font-semibold',
-          compact ? 'mt-0.5 text-xs leading-none' : 'mt-1 text-sm',
-          surface.textPrimary
-        )}
-      >
-        {value}
-      </div>
-      {hasPercentage && !compact ? (
-        <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-white/12">
-          <div
-            className={cn(
-              'h-full rounded-full',
-              metric?.isWarning ? 'bg-amber-300' : 'bg-white/72',
-              theme === 'light' && (metric?.isWarning ? 'bg-amber-500' : 'bg-slate-800/70')
-            )}
-            style={{ width: `${metric?.percentage ?? 0}%` }}
-          />
+          <span
+            className={cn('mb-1 flex items-center gap-1 truncate text-xs', surfaceTextClassName)}
+          >
+            <metric.icon className="h-3 w-3 shrink-0" aria-hidden />
+            <span className="truncate">{metric.label}</span>
+          </span>
+          <div>
+            <span className={cn('text-xl font-bold leading-none', accentClassName)}>
+              {metric.value}
+            </span>
+            {metric.unit ? (
+              <span className={cn('ml-1 text-sm', accentClassName)}>{metric.unit}</span>
+            ) : null}
+          </div>
         </div>
-      ) : null}
+      ))}
     </div>
   );
 }
 
-function VacuumRunStats({
-  cleanedArea,
-  cleaningTime,
-  progress,
-  theme,
-}: {
-  cleanedArea: string;
-  cleaningTime: string;
-  progress: number;
-  theme: ThemeType;
-}) {
-  const { t } = useI18n();
+function splitMetricValue(value: string): { value: string; unit?: string } {
+  const match = value.match(/^(.+?)\s+([^-\d\s].*)$/);
+  if (!match) {
+    return { value };
+  }
 
-  return (
-    <div className="grid grid-cols-3 gap-2">
-      <MetricPill
-        Icon={MapIcon}
-        label={t('vacuum.cleanedArea')}
-        value={cleanedArea}
-        theme={theme}
-      />
-      <MetricPill
-        Icon={Timer}
-        label={t('vacuum.cleaningTime')}
-        value={cleaningTime}
-        theme={theme}
-      />
-      <MetricPill
-        Icon={Bot}
-        label={t('vacuum.metric.progress')}
-        value={`${progress}%`}
-        metric={{ value: `${progress}%`, percentage: progress }}
-        theme={theme}
-      />
-    </div>
-  );
+  return { value: match[1], unit: match[2] };
 }
 
 export const VacuumCard = memo(function VacuumCard({
@@ -194,7 +151,6 @@ export const VacuumCard = memo(function VacuumCard({
   name,
   status,
   battery,
-  cleaningProgress,
   cleanedArea = '0 m²',
   cleaningTime = '0 min',
   nextCleaning,
@@ -221,7 +177,14 @@ export const VacuumCard = memo(function VacuumCard({
   const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
   const allEntities = useHomeAssistant(homeAssistantSelectors.entities);
   const entityRegistry = useHomeAssistant(homeAssistantSelectors.entityRegistry);
-  const liveStatus = normalizeVacuumStatus(liveEntity?.state, status);
+  const liveAttrs = liveEntity?.attributes as Record<string, unknown> | undefined;
+  const liveStatus = normalizeVacuumStatus(
+    (typeof liveAttrs?.status === 'string' && liveAttrs.status) ||
+      (typeof liveAttrs?.state === 'string' && liveAttrs.state) ||
+      (typeof liveAttrs?.activity === 'string' && liveAttrs.activity) ||
+      liveEntity?.state,
+    status
+  );
   const {
     currentStatus,
     isDialogOpen,
@@ -230,7 +193,6 @@ export const VacuumCard = memo(function VacuumCard({
     handlePause,
     handleReturnHome,
   } = useVacuumControl({ entityId: id, initialStatus: liveStatus });
-  const liveAttrs = liveEntity?.attributes as Record<string, unknown> | undefined;
   const liveName =
     typeof liveAttrs?.friendly_name === 'string' && liveAttrs.friendly_name.length > 0
       ? normalizeVacuumDisplayName(liveAttrs.friendly_name)
@@ -246,6 +208,12 @@ export const VacuumCard = memo(function VacuumCard({
     entityRegistry,
   });
   const liveBattery = glanceMetrics.battery;
+  const displayStatus: VacuumStatus =
+    currentStatus === 'docked' || currentStatus === 'charging'
+      ? liveBattery >= 100
+        ? 'charging-complete'
+        : 'charging'
+      : currentStatus;
   const liveRoom =
     typeof liveAttrs?.current_room === 'string' && liveAttrs.current_room.length > 0
       ? liveAttrs.current_room
@@ -270,32 +238,6 @@ export const VacuumCard = memo(function VacuumCard({
     typeof liveCleaningTimeMinutes === 'number'
       ? `${Math.max(0, Math.round(liveCleaningTimeMinutes))} min`
       : cleaningTime;
-  const areaBasedCleaningProgress = (() => {
-    const totalAreaValue =
-      parseNumberish(liveAttrs?.total_clean_area) ??
-      parseNumberish(liveAttrs?.clean_area_total) ??
-      parseNumberish(liveAttrs?.total_area);
-
-    if (
-      typeof liveCleanedAreaValue === 'number' &&
-      typeof totalAreaValue === 'number' &&
-      totalAreaValue > 0
-    ) {
-      return Math.max(0, Math.min(100, (liveCleanedAreaValue / totalAreaValue) * 100));
-    }
-
-    return undefined;
-  })();
-  const liveCleaningProgress =
-    parseNumberish(liveAttrs?.cleaning_progress) ??
-    parseNumberish(liveAttrs?.clean_progress) ??
-    parseNumberish(liveAttrs?.progress) ??
-    parseNumberish(liveAttrs?.cleaned_percentage) ??
-    parseNumberish(liveAttrs?.cleaning_percentage) ??
-    parseNumberish(liveAttrs?.clean_percent) ??
-    parseNumberish(liveAttrs?.completed_percentage) ??
-    areaBasedCleaningProgress ??
-    cleaningProgress;
   const liveFanSpeed = typeof liveAttrs?.fan_speed === 'string' ? liveAttrs.fan_speed : undefined;
   const liveFanSpeeds =
     readStringList(liveAttrs?.fan_speed_list) ??
@@ -315,26 +257,54 @@ export const VacuumCard = memo(function VacuumCard({
     readStringList(liveAttrs?.zones) ??
     readStringList(liveAttrs?.zone_names) ??
     readStringList(liveAttrs?.available_zones);
-  const { theme, colors } = useTheme();
+  const { theme, colors, accentColor } = useTheme();
   const cardShell = getCardShellSurfaceTokens(theme);
   const { t } = useI18n();
-  const isActive = currentStatus === 'cleaning' || currentStatus === 'returning';
+  const isActive =
+    displayStatus === 'cleaning' || displayStatus === 'mopping' || displayStatus === 'returning';
   const stateSurface = getCardStateSurfaceTokens(theme, isActive);
-  const vacuumThemeStatus = isActive ? getVacuumThemeStatus(currentStatus) : 'docked';
+  const vacuumThemeStatus = getVacuumThemeStatus(displayStatus);
   const cardColors = colors.vacuum[vacuumThemeStatus];
   const activeShellBackgroundClassName = isActive ? `bg-gradient-to-br ${cardColors.gradient}` : '';
   const frameClassName = `${cardShell.rootFrameClassName} ${activeShellBackgroundClassName} ${cardColors.border} ${stateSurface.containerClassName}`;
 
   const isSmall = isCompactCardSize(resolvedSize);
-  const isMedium = resolvedSize === 'medium';
-  const isLarge = resolvedSize === 'large';
-  const statusLabel = t(getStatusLabelKey(currentStatus));
-  const progressMetric = deriveVacuumProgressMetric({
-    status: currentStatus,
-    battery: liveBattery,
-    cleaningProgress: liveCleaningProgress,
-  });
+  const actionRowPaddingClassName = isSmall ? 'pt-2' : 'pt-4';
+  const metricStackClassName = cn('flex flex-1 flex-col justify-end', isSmall ? 'gap-2' : 'gap-3');
   const surface = getThemeSurfaceTokens(theme);
+  const statusLabel = t(getVacuumStatusLabelKey(displayStatus));
+  const headerTone =
+    displayStatus === 'returning'
+      ? 'purple'
+      : displayStatus === 'cleaning' || displayStatus === 'mopping'
+        ? 'primary'
+        : 'neutral';
+  const areaMetric = splitMetricValue(liveCleanedArea);
+  const runTimeMetric = splitMetricValue(liveCleaningTime);
+  const metricItems: VacuumMetricItem[] = [
+    {
+      key: 'battery',
+      icon: Battery,
+      value: String(liveBattery),
+      unit: '%',
+      label: t('vacuum.settings.battery'),
+    },
+    {
+      key: 'area',
+      icon: MapIcon,
+      value: areaMetric.value,
+      unit: areaMetric.unit,
+      label: t('vacuum.metric.area'),
+    },
+    {
+      key: 'runtime',
+      icon: Clock3,
+      value: runTimeMetric.value,
+      unit: runTimeMetric.unit,
+      label: t('vacuum.metric.runTime'),
+    },
+  ];
+  const subtitle = `${t('vacuum.subtitle')} · ${statusLabel}`;
   return (
     <div className="h-full w-full relative">
       <BaseCard
@@ -358,70 +328,33 @@ export const VacuumCard = memo(function VacuumCard({
         <div className="relative h-full flex flex-col">
           <EntityCardHeader
             title={liveName}
-            subtitle={t('vacuum.subtitle')}
+            subtitle={subtitle}
             layout="eyebrow-first"
             size={resolvedSize}
             accentColor={cardColors.accent}
-            tone={
-              currentStatus === 'returning'
-                ? 'purple'
-                : currentStatus === 'cleaning'
-                  ? 'primary'
-                  : 'neutral'
-            }
+            tone={headerTone}
             leading={
               <EntityCardHeaderIcon
                 IconComponent={Bot}
                 isActive={isActive}
                 size={resolvedSize}
                 baseColor={cardColors.accent}
-                tone={
-                  currentStatus === 'returning'
-                    ? 'purple'
-                    : currentStatus === 'cleaning'
-                      ? 'primary'
-                      : 'neutral'
-                }
+                tone={headerTone}
               />
             }
           />
 
           <div className="flex flex-1 flex-col">
-            <div className={cn('flex flex-1 flex-col justify-end', isSmall ? 'gap-3' : 'gap-3.5')}>
-              <div>
-                <div className="flex items-end justify-between gap-3">
-                  <CardMetric
-                    value={`${liveBattery}%`}
-                    label={t('vacuum.settings.battery')}
-                    size={isLarge ? 'xl' : 'sm'}
-                    isActive={isActive || liveBattery > 0}
-                    accentClassName={cardColors.accent}
-                    theme={theme}
-                    labelClassName={surface.textSubtle}
-                    className="min-w-0"
-                  />
-                  <div className="min-w-0 text-right">
-                    <div className={cn('truncate text-sm font-semibold', surface.textPrimary)}>
-                      {statusLabel}
-                    </div>
-                    <div className={cn('mt-1 truncate text-xs font-medium', surface.textSubtle)}>
-                      {liveRoom}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {isLarge ? (
-                <VacuumRunStats
-                  cleanedArea={liveCleanedArea}
-                  cleaningTime={liveCleaningTime}
-                  progress={progressMetric.progress}
-                  theme={theme}
-                />
-              ) : null}
+            <div className={metricStackClassName}>
+              <VacuumMetricGrid
+                metrics={metricItems}
+                accentClassName={cardColors.accent}
+                surfaceTextClassName={surface.textSubtle}
+                size={resolvedSize}
+              />
             </div>
 
-            <div className={cn(isMedium ? 'pt-2' : 'pt-4', isSmall && 'mt-auto')}>
+            <div className={cn(actionRowPaddingClassName, isSmall && 'mt-auto')}>
               {isSmall ? (
                 <VacuumControlsSmall
                   currentStatus={currentStatus}
@@ -430,9 +363,8 @@ export const VacuumCard = memo(function VacuumCard({
                   onReturnHome={handleReturnHome}
                   onOpenSettings={() => setIsDialogOpen(true)}
                   theme={theme}
-                  accentColorValue={cardColors.accent}
                 />
-              ) : isMedium ? (
+              ) : (
                 <VacuumControlsMedium
                   currentStatus={currentStatus}
                   onStartCleaning={handleStartCleaning}
@@ -440,17 +372,6 @@ export const VacuumCard = memo(function VacuumCard({
                   onReturnHome={handleReturnHome}
                   onOpenSettings={() => setIsDialogOpen(true)}
                   theme={theme}
-                  accentColorValue={cardColors.accent}
-                />
-              ) : (
-                <VacuumControlsLarge
-                  currentStatus={currentStatus}
-                  onStartCleaning={handleStartCleaning}
-                  onPause={handlePause}
-                  onReturnHome={handleReturnHome}
-                  onOpenSettings={() => setIsDialogOpen(true)}
-                  theme={theme}
-                  accentColorValue={cardColors.accent}
                 />
               )}
             </div>
@@ -469,8 +390,8 @@ export const VacuumCard = memo(function VacuumCard({
           name={liveName}
           room={liveRoom}
           theme={theme}
-          accentColorValue={cardColors.accent}
-          currentStatus={currentStatus}
+          accentColorValue={accentColor}
+          currentStatus={displayStatus}
           battery={liveBattery}
           cleanedArea={liveCleanedArea}
           cleaningTime={liveCleaningTime}
@@ -486,12 +407,6 @@ export const VacuumCard = memo(function VacuumCard({
           fanSpeeds={liveFanSpeeds}
           availableRooms={availableRooms}
           availableZones={availableZones}
-          surfaceGradientClassName={cardColors.gradient}
-          surfaceBorderClassName={theme !== 'dark' ? cardColors.border : undefined}
-          surfaceBackdropClassName={cardShell.backdropClassName}
-          surfaceStateClassName={stateSurface.containerClassName}
-          surfaceGlowClassName={isActive ? cardColors.glow : undefined}
-          surfaceOverlayClassName={stateSurface.overlayClassName ?? undefined}
         />
       ) : null}
     </div>

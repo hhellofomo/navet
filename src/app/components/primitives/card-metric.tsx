@@ -25,6 +25,7 @@ interface CardMetricProps {
   theme: ThemeType;
   /** Optional Tailwind class(es) for the label. Falls back to a muted secondary color. */
   labelClassName?: string;
+  valueClassName?: string;
   valueStyle?: CSSProperties;
   labelStyle?: CSSProperties;
   className?: string;
@@ -44,18 +45,21 @@ export function CardMetric({
   accentClassName,
   theme,
   labelClassName,
+  valueClassName,
   valueStyle,
   labelStyle,
   className = '',
 }: CardMetricProps) {
   const inactiveClassName = theme === 'light' ? 'text-slate-500' : 'text-white/72';
-  const valueClassName = `${sizeTokens[size]} ${isActive ? accentClassName : inactiveClassName}`;
+  const resolvedValueClassName = `${valueClassName ?? sizeTokens[size]} ${
+    isActive ? accentClassName : inactiveClassName
+  }`;
   const resolvedLabelClassName =
     labelClassName ?? (theme === 'light' ? 'text-slate-600' : 'text-white/76');
 
   return (
     <div className={className}>
-      <div className={valueClassName} style={valueStyle}>
+      <div className={resolvedValueClassName} style={valueStyle}>
         {value}
       </div>
       {label !== undefined && (

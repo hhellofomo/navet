@@ -1,8 +1,9 @@
 import { Home, Pause, Play } from 'lucide-react';
 import type { CSSProperties } from 'react';
-import { CardDialogChoicePill } from '@/app/components/patterns';
+import { CardDialogChoicePill, CardDialogSection } from '@/app/components/patterns';
 import { Button } from '@/app/components/primitives';
 import { useI18n } from '@/app/hooks';
+import type { VacuumStatus } from './vacuum-utils';
 
 type CleaningMode = 'auto' | 'spot' | 'edge' | 'room';
 
@@ -12,7 +13,7 @@ interface VacuumCleaningControlsProps {
   fanSpeed: string;
   onFanSpeedChange: (speed: string) => void;
   fanSpeedOptions: string[];
-  currentStatus: 'cleaning' | 'returning' | 'docked' | 'paused' | 'idle';
+  currentStatus: VacuumStatus;
   onStartCleaning: () => void;
   onPauseCleaning?: () => void;
   onReturnHome: () => void;
@@ -38,12 +39,14 @@ export function VacuumCleaningControls({
   theme,
 }: VacuumCleaningControlsProps) {
   const { t } = useI18n();
+  const isRunning = currentStatus === 'cleaning' || currentStatus === 'mopping';
 
-  const primaryActionLabel =
-    currentStatus === 'cleaning' ? t('vacuum.action.pause') : t('vacuum.action.startCleaning');
+  const primaryActionLabel = isRunning
+    ? t('vacuum.action.pause')
+    : t('vacuum.action.startCleaning');
 
   const handlePrimaryAction = () => {
-    if (currentStatus === 'cleaning') {
+    if (isRunning) {
       onPauseCleaning?.();
     } else {
       onStartCleaning();
@@ -51,60 +54,47 @@ export function VacuumCleaningControls({
   };
 
   return (
-    <>
-      <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr]">
-        <fieldset className="border-0 p-0">
-          <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-white/72">
-            {t('vacuum.settings.profile')}
-          </legend>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {(['auto', 'spot', 'edge', 'room'] as CleaningMode[]).map((mode) => (
-              <CardDialogChoicePill
-                key={mode}
-                active={cleaningMode === mode}
-                onClick={() => onCleaningModeChange(mode)}
-                style={cleaningMode === mode ? activePillStyle : undefined}
-              >
-                {t(`vacuum.mode.${mode}`)}
-              </CardDialogChoicePill>
-            ))}
-          </div>
-        </fieldset>
+    <div className="flex flex-col gap-5 mt-5">
+      <CardDialogSection label={t('vacuum.settings.profile')} className="mb-0">
+        <div className="flex flex-wrap gap-2">
+          {(['auto', 'spot', 'edge', 'room'] as CleaningMode[]).map((mode) => (
+            <CardDialogChoicePill
+              key={mode}
+              active={cleaningMode === mode}
+              onClick={() => onCleaningModeChange(mode)}
+              size="compact"
+              className="min-w-18"
+              style={cleaningMode === mode ? activePillStyle : undefined}
+            >
+              {t(`vacuum.mode.${mode}`)}
+            </CardDialogChoicePill>
+          ))}
+        </div>
+      </CardDialogSection>
 
-        <fieldset className="border-0 p-0">
-          <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-white/72">
-            {t('vacuum.settings.fanSpeed')}
-          </legend>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {fanSpeedOptions.map((speed) => (
-              <CardDialogChoicePill
-                key={speed}
-                active={fanSpeed === speed}
-                onClick={() => onFanSpeedChange(speed)}
-                style={fanSpeed === speed ? activePillStyle : undefined}
-              >
-                {speed}
-              </CardDialogChoicePill>
-            ))}
-          </div>
-        </fieldset>
-      </div>
+      <CardDialogSection label={t('vacuum.settings.fanSpeed')} className="mb-0">
+        <div className="flex flex-wrap gap-2">
+          {fanSpeedOptions.map((speed) => (
+            <CardDialogChoicePill
+              key={speed}
+              active={fanSpeed === speed}
+              onClick={() => onFanSpeedChange(speed)}
+              size="compact"
+              className="min-w-18"
+              style={fanSpeed === speed ? activePillStyle : undefined}
+            >
+              {speed}
+            </CardDialogChoicePill>
+          ))}
+        </div>
+      </CardDialogSection>
 
-      <fieldset className="mt-6 border-0 p-0">
-        <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-white/72">
-          {t('vacuum.settings.actions')}
-        </legend>
-        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+      <CardDialogSection label={t('vacuum.settings.actions')} className="mb-0">
+        <div className="grid gap-2 sm:grid-cols-2">
           <Button
             variant="primary"
             size="default"
-            leading={
-              currentStatus === 'cleaning' ? (
-                <Pause className="h-4 w-4" />
-              ) : (
-                <Play className="h-4 w-4" />
-              )
-            }
+            leading={isRunning ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
             onClick={handlePrimaryAction}
             style={{ backgroundColor: activeControlColor }}
           >
@@ -122,7 +112,7 @@ export function VacuumCleaningControls({
             {t('vacuum.action.returnToDock')}
           </Button>
         </div>
-      </fieldset>
-    </>
+      </CardDialogSection>
+    </div>
   );
 }

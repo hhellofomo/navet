@@ -55,6 +55,11 @@ export type HaEnergyEntityLike = {
 
 export type HaEnergyEntityMap = Record<string, HaEnergyEntityLike>;
 
+export interface HaEnergyEntityRegistryEntry {
+  entity_id: string;
+  device_id?: string | null;
+}
+
 // ─── API call ────────────────────────────────────────────────────────────────
 
 export async function getEnergyPrefs(connection: Connection): Promise<HaEnergyPrefs> {
@@ -116,6 +121,24 @@ function parsePowerEntityWatts(entity: HaEnergyEntityLike | undefined): number |
   return getEntityDeviceClass(entity) === 'power' ? raw : null;
 }
 
+function isLikelyPowerSensor(entityId: string, entity: HaEnergyEntityLike | undefined): boolean {
+  if (parsePowerEntityWatts(entity) === null) {
+    return false;
+  }
+
+  const friendlyName = String(entity?.attributes?.friendly_name ?? '').toLowerCase();
+  const haystack = `${entityId} ${friendlyName}`;
+
+  return (
+    getEntityDeviceClass(entity) === 'power' ||
+    getEntityUnit(entity) === 'W' ||
+    getEntityUnit(entity) === 'KW' ||
+    haystack.includes('power') ||
+    haystack.includes('demand') ||
+    haystack.includes('electrical_measurement')
+  );
+}
+
 function getPowerCandidateIds(energyEntityId: string): string[] {
   return [
     energyEntityId.replace('_summation_delivered', '_instantaneous_demand'),
@@ -139,10 +162,28 @@ function getPowerCandidateIds(energyEntityId: string): string[] {
 
 function inferRelatedPowerEntityId(
   energyEntityId: string | undefined,
-  entities: HaEnergyEntityMap
+  entities: HaEnergyEntityMap,
+  entityRegistry: HaEnergyEntityRegistryEntry[] = []
 ): string | undefined {
   if (!energyEntityId) {
     return undefined;
+  }
+
+  const energyDeviceId = entityRegistry.find(
+    (entry) => entry.entity_id === energyEntityId
+  )?.device_id;
+  if (energyDeviceId) {
+    const siblingPowerEntry = entityRegistry.find(
+      (entry) =>
+        entry.entity_id !== energyEntityId &&
+        entry.device_id === energyDeviceId &&
+        entry.entity_id.startsWith('sensor.') &&
+        isLikelyPowerSensor(entry.entity_id, entities[entry.entity_id])
+    );
+
+    if (siblingPowerEntry) {
+      return siblingPowerEntry.entity_id;
+    }
   }
 
   for (const candidate of getPowerCandidateIds(energyEntityId)) {
@@ -156,11 +197,13 @@ function inferRelatedPowerEntityId(
 
 function inferHomeLoadPowerEntityId(
   config: EnergySourceConfig,
-  entities: HaEnergyEntityMap
+  entities: HaEnergyEntityMap,
+  entityRegistry: HaEnergyEntityRegistryEntry[] = []
 ): string | undefined {
   const relatedGridPowerEntityId = inferRelatedPowerEntityId(
     config.gridImportEnergyEntityId,
-    entities
+    entities,
+    entityRegistry
   );
   if (relatedGridPowerEntityId) {
     return relatedGridPowerEntityId;
@@ -277,18 +320,20 @@ export function mapPrefsToConfig(prefs: HaEnergyPrefs): EnergySourceConfig {
 
 export function augmentConfigWithLivePowerEntities(
   config: EnergySourceConfig,
-  entities: HaEnergyEntityMap
+  entities: HaEnergyEntityMap,
+  entityRegistry: HaEnergyEntityRegistryEntry[] = []
 ): EnergySourceConfig {
   const gridImportPowerEntityId =
     config.gridImportPowerEntityId ??
-    inferRelatedPowerEntityId(config.gridImportEnergyEntityId, entities);
+    inferRelatedPowerEntityId(config.gridImportEnergyEntityId, entities, entityRegistry);
   const gridExportPowerEntityId =
     config.gridExportPowerEntityId ??
-    inferRelatedPowerEntityId(config.gridExportEnergyEntityId, entities);
+    inferRelatedPowerEntityId(config.gridExportEnergyEntityId, entities, entityRegistry);
   const solarPowerEntityId =
-    config.solarPowerEntityId ?? inferRelatedPowerEntityId(config.solarEnergyEntityId, entities);
+    config.solarPowerEntityId ??
+    inferRelatedPowerEntityId(config.solarEnergyEntityId, entities, entityRegistry);
   const homeLoadPowerEntityId =
-    config.homeLoadPowerEntityId ?? inferHomeLoadPowerEntityId(config, entities);
+    config.homeLoadPowerEntityId ?? inferHomeLoadPowerEntityId(config, entities, entityRegistry);
 
   return {
     ...config,
@@ -298,7 +343,9 @@ export function augmentConfigWithLivePowerEntities(
     homeLoadPowerEntityId,
     devices: config.devices.map((device) => ({
       ...device,
-      powerEntityId: device.powerEntityId ?? inferRelatedPowerEntityId(device.entityId, entities),
+      powerEntityId:
+        device.powerEntityId ??
+        inferRelatedPowerEntityId(device.entityId, entities, entityRegistry),
     })),
   };
 }

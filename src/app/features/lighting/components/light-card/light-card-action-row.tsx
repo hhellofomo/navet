@@ -53,18 +53,12 @@ export const LightCardActionRow = memo(function LightCardActionRow({
           isOn={isOn}
           currentTempColor={currentTempColor}
           isActive={isKelvinMode}
-          size={size}
           onClick={onKelvinToggle}
         />
       )}
 
       {supportsColorControl && (
-        <CustomColorTrigger
-          isOn={isOn}
-          currentColor={currentColor}
-          onColorChange={onColorChange}
-          size={size}
-        />
+        <CustomColorTrigger isOn={isOn} currentColor={currentColor} onColorChange={onColorChange} />
       )}
 
       <div className={`flex min-w-0 items-center ${gapClass}`}>

@@ -51,6 +51,10 @@ export interface HomeAssistantAutomationConfig {
   config: Record<string, unknown>;
 }
 
+export interface HomeAssistantCameraCapabilities {
+  frontend_stream_types?: string[];
+}
+
 export interface HAServiceEventMap {
   entities: HassEntities;
   config: HassConfig;
@@ -327,6 +331,22 @@ class HomeAssistantService {
    */
   async updateCamera(entityId: string, state: 'on' | 'off'): Promise<void> {
     await this.entityService.updateCamera(entityId, state);
+  }
+
+  async enableCameraMotionDetection(entityId: string): Promise<void> {
+    await this.entityService.enableCameraMotionDetection(entityId);
+  }
+
+  async disableCameraMotionDetection(entityId: string): Promise<void> {
+    await this.entityService.disableCameraMotionDetection(entityId);
+  }
+
+  async playCameraStream(entityId: string, mediaPlayerId: string): Promise<void> {
+    await this.entityService.playCameraStream(entityId, mediaPlayerId);
+  }
+
+  async getCameraCapabilities(entityId: string): Promise<HomeAssistantCameraCapabilities> {
+    return await this.entityService.getCameraCapabilities(entityId);
   }
 
   /**

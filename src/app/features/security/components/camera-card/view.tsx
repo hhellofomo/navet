@@ -1,4 +1,4 @@
-import { Camera, RefreshCw, Settings2 } from 'lucide-react';
+import { Camera, Eye, RefreshCw, Settings2, Video } from 'lucide-react';
 import { BaseCard } from '@/app/components/primitives';
 import { EntityCardHeader } from '@/app/components/primitives/entity-card-header';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
@@ -14,11 +14,16 @@ interface CameraCardViewProps {
   statusChangedAt: number | null;
   motionDetected: boolean;
   motionChangedAt: number | null;
+  motionDetectionEnabled: boolean | null;
   now: number;
   size: CardSize;
   isEditMode: boolean;
+  isStreamCapable: boolean;
+  frontendStreamTypes: string[];
   onRefresh: () => void;
   onOpenSettings: () => void;
+  onOpenViewer: () => void;
+  onToggleMotionDetection: () => void;
 }
 
 function formatElapsedCompact(now: number, since: number | null) {
@@ -54,11 +59,16 @@ export function CameraCardView({
   statusChangedAt,
   motionDetected,
   motionChangedAt,
+  motionDetectionEnabled,
   now,
   size,
   isEditMode,
+  isStreamCapable,
+  frontendStreamTypes,
   onRefresh,
   onOpenSettings,
+  onOpenViewer,
+  onToggleMotionDetection,
 }: CameraCardViewProps) {
   const { t } = useI18n();
   const isCompact = isCompactCardSize(size);
@@ -70,11 +80,18 @@ export function CameraCardView({
   const motionLabel = motionDetected ? t('camera.motion.detected') : t('camera.motion.clear');
   const statusElapsed = formatElapsedCompact(now, statusChangedAt);
   const motionElapsed = formatElapsedCompact(now, motionChangedAt);
+  const streamLabel =
+    frontendStreamTypes.length > 0
+      ? frontendStreamTypes.join('/').toUpperCase()
+      : isStreamCapable
+        ? t('camera.viewer.streamCapable')
+        : t('camera.viewer.snapshotOnly');
 
   return (
     <BaseCard
       size={size}
       fullBleed
+      interactive={!isEditMode}
       frameClassName="bg-zinc-900"
       data-entity-id={id}
       disableDefaultSheen
@@ -97,13 +114,25 @@ export function CameraCardView({
       }
       contentClassName="h-full"
     >
+      {!isEditMode ? (
+        <button
+          type="button"
+          onClick={onOpenViewer}
+          aria-label={t('camera.actions.openViewer')}
+          className="absolute inset-0 z-[1] cursor-pointer"
+        />
+      ) : null}
+
       {/* Refresh button (top-left, only when live and not in edit mode) */}
       {isRunning && !isEditMode && (
         <button
           type="button"
-          onClick={onRefresh}
+          onClick={(event) => {
+            event.stopPropagation();
+            onRefresh();
+          }}
           aria-label={t('camera.actions.refreshSnapshot')}
-          className="absolute left-3 top-3 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70"
+          className="absolute left-3 top-3 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70"
         >
           <RefreshCw className="h-3.5 w-3.5" />
         </button>
@@ -149,16 +178,46 @@ export function CameraCardView({
                 <span>{motionLabel}</span>
                 {motionElapsed ? <span className="text-current/70">{motionElapsed}</span> : null}
               </div>
+              {!isCompact ? (
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-black/35 px-3 py-1.5 font-medium text-white/78 backdrop-blur-sm">
+                  <Video className="h-3.5 w-3.5" />
+                  <span>{streamLabel}</span>
+                </div>
+              ) : null}
             </div>
           </div>
 
           {/* Action buttons */}
           {!isEditMode && (
             <div className="flex shrink-0 items-center gap-2">
+              {motionDetectionEnabled !== null ? (
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onToggleMotionDetection();
+                  }}
+                  aria-label={
+                    motionDetectionEnabled
+                      ? t('camera.actions.disableMotionDetection')
+                      : t('camera.actions.enableMotionDetection')
+                  }
+                  className={`flex h-7 w-7 items-center justify-center rounded-full text-white backdrop-blur-sm transition-colors ${
+                    motionDetectionEnabled
+                      ? 'bg-emerald-500/70 hover:bg-emerald-500/85'
+                      : 'bg-black/50 hover:bg-black/70'
+                  }`}
+                >
+                  <Eye className="h-3.5 w-3.5" />
+                </button>
+              ) : null}
               {/* Settings */}
               <button
                 type="button"
-                onClick={onOpenSettings}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onOpenSettings();
+                }}
                 aria-label={t('camera.actions.openSettings')}
                 className="flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-black/70"
               >

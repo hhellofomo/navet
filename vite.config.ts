@@ -26,6 +26,52 @@ function getPackageName(id: string) {
   return segments[0] ?? null
 }
 
+function normalizeModuleId(id: string) {
+  return id.split(path.sep).join('/')
+}
+
+function getAppChunkName(id: string) {
+  const moduleId = normalizeModuleId(id)
+
+  if (!moduleId.includes('/src/app/')) {
+    return undefined
+  }
+
+  if (
+    moduleId.includes('/src/app/features/energy/') ||
+    moduleId.includes('/src/app/hooks/ha-battery-sensor-rows')
+  ) {
+    return 'energy'
+  }
+
+  if (moduleId.includes('/src/app/features/settings/')) {
+    return 'settings'
+  }
+
+  if (
+    moduleId.includes('/src/app/features/dashboard/components/widgets/') ||
+    moduleId.includes('/src/app/components/shared/theme/dashboard-widget-surface-tokens')
+  ) {
+    return 'dashboard-widgets'
+  }
+
+  if (moduleId.includes('/src/app/features/dashboard/components/home-dashboard-overview-edit')) {
+    return 'home-dashboard-overview-edit'
+  }
+
+  if (
+    moduleId.includes('/src/app/components/layout/') ||
+    moduleId.includes('/src/app/components/shared/entity-room-selector') ||
+    moduleId.includes('/src/app/components/primitives/room-eyebrow') ||
+    moduleId.includes('/src/app/components/primitives/select') ||
+    moduleId.includes('/src/app/hooks/use-registry-device-topology')
+  ) {
+    return 'sections'
+  }
+
+  return undefined
+}
+
 function rssProxyPlugin() {
   const setNoStoreHeaders = (res: ServerResponse) => {
     res.setHeader('Cache-Control', 'no-store')
@@ -252,14 +298,21 @@ export default defineConfig(({ mode }) => {
     assetsInclude: ['**/*.svg'],
 
     build: {
+      chunkSizeWarningLimit: 500,
       rollupOptions: {
         output: {
           manualChunks(id) {
-            if (!id.includes('node_modules')) {
+            const appChunkName = getAppChunkName(id)
+            if (appChunkName) {
+              return appChunkName
+            }
+
+            const moduleId = normalizeModuleId(id)
+            if (!moduleId.includes('node_modules')) {
               return undefined
             }
 
-            const packageName = getPackageName(id)
+            const packageName = getPackageName(moduleId)
             if (!packageName) {
               return undefined
             }

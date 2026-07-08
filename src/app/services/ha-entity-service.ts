@@ -2,6 +2,7 @@ import type { Connection } from 'home-assistant-js-websocket';
 
 import type {
   HomeAssistantAutomationConfig,
+  HomeAssistantCameraCapabilities,
   HomeAssistantMediaSourceItem,
   HomeAssistantResolvedMediaSource,
 } from './home-assistant.service';
@@ -204,6 +205,35 @@ class HAEntityService {
       {},
       { entity_id: entityId }
     );
+  }
+
+  async enableCameraMotionDetection(entityId: string): Promise<void> {
+    await this.callService('camera', 'enable_motion_detection', {}, { entity_id: entityId });
+  }
+
+  async disableCameraMotionDetection(entityId: string): Promise<void> {
+    await this.callService('camera', 'disable_motion_detection', {}, { entity_id: entityId });
+  }
+
+  async playCameraStream(entityId: string, mediaPlayerId: string): Promise<void> {
+    await this.callService(
+      'camera',
+      'play_stream',
+      { media_player: mediaPlayerId, format: 'hls' },
+      { entity_id: entityId }
+    );
+  }
+
+  async getCameraCapabilities(entityId: string): Promise<HomeAssistantCameraCapabilities> {
+    const conn = this.connection();
+    if (!conn) {
+      throw new Error('Home Assistant is not connected');
+    }
+
+    return conn.sendMessagePromise({
+      type: 'camera/capabilities',
+      entity_id: entityId,
+    }) as Promise<HomeAssistantCameraCapabilities>;
   }
 
   /**

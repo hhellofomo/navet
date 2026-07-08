@@ -8,7 +8,7 @@ import {
   getThemeFocusRingClassName,
   navetRadiusTokens,
   navetTypographyTokens,
-} from '@/app/components/system/tokens';
+} from '@/app/components/system/tokens/foundations';
 import { cn } from '@/app/components/ui/utils';
 import { useTheme } from '@/app/hooks';
 
