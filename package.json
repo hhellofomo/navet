@@ -55,7 +55,7 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.15",
+    "@biomejs/biome": "^2.5.3",
     "@storybook/addon-a11y": "^10.3.6",
     "@storybook/addon-docs": "10.3.6",
     "@storybook/addon-vitest": "^10.3.6",
