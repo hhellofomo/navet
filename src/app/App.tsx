@@ -237,28 +237,29 @@ function Dashboard() {
  * Handles authentication, configuration, and routing
  */
 function AppContent() {
-  const { isAuthenticated } = useAuth();
-  const { isConfigured, config } = useConfig();
+  const { isAuthenticated, config: authConfig } = useAuth();
+  const { isConfigured, config: haConfig } = useConfig();
   const { connected, connecting, connect } = useHomeAssistantContext();
   
-  // Attempt to connect to Home Assistant when configured but not connected
+  // Attempt to connect to Home Assistant when authenticated but not connected
   useEffect(() => {
-    if (isConfigured && config && !connected && !connecting) {
+    // Use auth config if available, otherwise fall back to HA config
+    const configToUse = authConfig || haConfig;
+    
+    if (isAuthenticated && configToUse && !connected && !connecting) {
       connect({
-        hassUrl: config.url,
-        token: config.token
+        hassUrl: configToUse.url,
+        token: configToUse.token
       }).catch(err => {
         console.error('Failed to connect to Home Assistant:', err);
       });
     }
-  }, [isConfigured, config, connected, connecting, connect]);
+  }, [isAuthenticated, authConfig, haConfig, connected, connecting, connect]);
   
   return (
     <>
       <Toaster />
-      {!isConfigured ? (
-        <SetupWizard />
-      ) : !isAuthenticated ? (
+      {!isAuthenticated ? (
         <LoginPage />
       ) : (
         <Dashboard />
