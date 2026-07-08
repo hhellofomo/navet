@@ -6,6 +6,7 @@ export interface DeviceGridProps {
   orderedCardIds: string[];
   deviceMap: Map<string, DeviceWithType>;
   isEditMode: boolean;
+  isScrolling?: boolean;
   cardSizes: Record<string, CardSize>;
   updateCardSize: (id: string, size: CardSize) => void;
   customCards?: CustomCard[];

@@ -1,10 +1,6 @@
 import { Gauge, TrendingDown, TrendingUp } from 'lucide-react';
 import { memo } from 'react';
-import {
-  type CardSize,
-  CardSizeSelector,
-  isCompactCardSize,
-} from '@/app/components/shared/card-size-selector';
+import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
@@ -29,10 +25,9 @@ export const SensorCard = memo(function SensorCard({
   unit,
   icon = 'gauge',
   size,
-  onSizeChange,
-  isEditMode,
+  onSizeChange: _onSizeChange,
+  isEditMode: _isEditMode,
 }: SensorCardProps) {
-  const cardId = `sensor-${name.toLowerCase().replace(/ /g, '-')}`;
   const { theme } = useTheme();
   const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
@@ -55,13 +50,6 @@ export const SensorCard = memo(function SensorCard({
     <div
       className={`relative h-full backdrop-blur-xl rounded-3xl ${padding} border overflow-hidden ${shell.containerClassName}`}
     >
-      {isEditMode && (
-        <CardSizeSelector
-          currentSize={size}
-          onSizeChange={(newSize) => onSizeChange(cardId, newSize)}
-        />
-      )}
-
       <div className={`absolute inset-0 ${shell.glowClassName}`}></div>
 
       {shell.overlayClassName && <div className={`absolute inset-0 ${shell.overlayClassName}`} />}

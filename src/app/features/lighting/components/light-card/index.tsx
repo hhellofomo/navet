@@ -1,9 +1,5 @@
 import { memo } from 'react';
-import {
-  type CardSize,
-  CardSizeSelector,
-  isCompactCardSize,
-} from '@/app/components/shared/card-size-selector';
+import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import { useSettingsStore } from '@/app/stores';
@@ -33,7 +29,7 @@ export const LightCard = memo(function LightCard({
   initialBrightness = 0,
   initialTemp = 4000,
   size,
-  onSizeChange,
+  onSizeChange: _onSizeChange,
   isEditMode,
 }: LightCardProps) {
   const { theme } = useTheme();
@@ -64,13 +60,6 @@ export const LightCard = memo(function LightCard({
             style={{
               background: `radial-gradient(circle, ${controller.gradientColors.glow || 'transparent'} 0%, transparent 70%)`,
             }}
-          />
-        )}
-
-        {isEditMode && (
-          <CardSizeSelector
-            currentSize={size}
-            onSizeChange={(newSize) => onSizeChange(id, newSize)}
           />
         )}
 
@@ -174,35 +163,37 @@ export const LightCard = memo(function LightCard({
         </div>
       </div>
 
-      <LightSettingsDialog
-        entityId={id}
-        isOpen={controller.isOpen}
-        onOpenChange={controller.onOpenChange}
-        name={name}
-        room={room}
-        isOn={controller.isOn}
-        supportsColorTemperature={controller.supportsColorTemperature}
-        supportsColorControl={controller.supportsColorControl}
-        minColorTemp={controller.minColorTemp}
-        maxColorTemp={controller.maxColorTemp}
-        colorTemp={controller.colorTemp}
-        brightnessPresets={controller.brightnessPresets}
-        selectedColor={controller.selectedColor}
-        customColor={controller.customColor}
-        brightness={controller.brightness}
-        selectedIcon={controller.selectedIcon}
-        tempOptions={controller.tempOptions}
-        onTempChange={controller.onTempChange}
-        onTempCommit={controller.onTempCommit}
-        onColorChange={controller.onColorChange}
-        onCustomColorChange={controller.onCustomColorChange}
-        onBrightnessChange={controller.onBrightnessCommit}
-        applyBrightnessPresetsToAll={controller.applyBrightnessPresetsToAll}
-        onApplyBrightnessPresetsToAllChange={controller.onApplyBrightnessPresetsToAllChange}
-        onBrightnessPresetValueChange={controller.onBrightnessPresetValueChange}
-        onBrightnessPresetOrderChange={controller.onBrightnessPresetOrderChange}
-        onIconChange={controller.onIconChange}
-      />
+      {controller.isOpen ? (
+        <LightSettingsDialog
+          entityId={id}
+          isOpen={controller.isOpen}
+          onOpenChange={controller.onOpenChange}
+          name={name}
+          room={room}
+          isOn={controller.isOn}
+          supportsColorTemperature={controller.supportsColorTemperature}
+          supportsColorControl={controller.supportsColorControl}
+          minColorTemp={controller.minColorTemp}
+          maxColorTemp={controller.maxColorTemp}
+          colorTemp={controller.colorTemp}
+          brightnessPresets={controller.brightnessPresets}
+          selectedColor={controller.selectedColor}
+          customColor={controller.customColor}
+          brightness={controller.brightness}
+          selectedIcon={controller.selectedIcon}
+          tempOptions={controller.tempOptions}
+          onTempChange={controller.onTempChange}
+          onTempCommit={controller.onTempCommit}
+          onColorChange={controller.onColorChange}
+          onCustomColorChange={controller.onCustomColorChange}
+          onBrightnessChange={controller.onBrightnessCommit}
+          applyBrightnessPresetsToAll={controller.applyBrightnessPresetsToAll}
+          onApplyBrightnessPresetsToAllChange={controller.onApplyBrightnessPresetsToAllChange}
+          onBrightnessPresetValueChange={controller.onBrightnessPresetValueChange}
+          onBrightnessPresetOrderChange={controller.onBrightnessPresetOrderChange}
+          onIconChange={controller.onIconChange}
+        />
+      ) : null}
     </>
   );
 });

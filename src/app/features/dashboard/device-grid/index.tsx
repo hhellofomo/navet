@@ -3,6 +3,7 @@ import { memo, useCallback, useDeferredValue, useMemo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useSearch } from '@/app/hooks';
 import { DashboardCardItem } from '../components/dashboard-card-item';
+import { DashboardEditActions } from '../components/dashboard-edit-actions';
 import type { DeviceGridProps } from './types';
 
 /**
@@ -14,6 +15,7 @@ export const DeviceGrid = memo(function DeviceGrid({
   orderedCardIds,
   deviceMap,
   isEditMode,
+  isScrolling = false,
   cardSizes,
   updateCardSize,
   customCards = [],
@@ -75,29 +77,37 @@ export const DeviceGrid = memo(function DeviceGrid({
     [allCards]
   );
   return (
-    <SortableContext items={allCardIds} strategy={rectSortingStrategy}>
-      <div className="grid w-full grid-flow-row-dense grid-cols-2 gap-2 auto-rows-[87px] md:grid-cols-4 md:gap-3 xl:grid-cols-6 lg:gap-4 2xl:grid-cols-8">
-        {allCards.map((item) => {
-          if (item.type === 'device') {
-            const device = deviceMap.get(item.id);
-            if (!device) return null;
+    <DashboardEditActions
+      isEditMode={isEditMode}
+      onDeleteCard={onDeleteCard}
+      onRemoveEntity={onRemoveEntity}
+      onSizeChange={handleSizeChange}
+    >
+      <SortableContext items={allCardIds} strategy={rectSortingStrategy}>
+        <div className="grid w-full grid-flow-row-dense grid-cols-2 gap-2 auto-rows-[87px] md:grid-cols-4 md:gap-3 xl:grid-cols-6 lg:gap-4 2xl:grid-cols-8">
+          {allCards.map((item) => {
+            if (item.type === 'device') {
+              const device = deviceMap.get(item.id);
+              if (!device) return null;
 
-            const size = cardSizes[device.id] || (device.size as CardSize);
+              const size = cardSizes[device.id] || (device.size as CardSize);
 
-            return (
-              <DashboardCardItem
-                key={device.id}
-                id={device.id}
-                device={device}
-                size={size}
-                isEditMode={isEditMode}
-                handleSizeChange={handleSizeChange}
-                onRemoveEntity={onRemoveEntity}
-                allowEntityRemoval={allowEntityRemoval}
-                usesHideAction={usesHideAction}
-              />
-            );
-          } else {
+              return (
+                <DashboardCardItem
+                  key={device.id}
+                  id={device.id}
+                  device={device}
+                  size={size}
+                  isEditMode={isEditMode}
+                  renderLightweight={isScrolling && !isEditMode}
+                  handleSizeChange={handleSizeChange}
+                  onRemoveEntity={onRemoveEntity}
+                  allowEntityRemoval={allowEntityRemoval}
+                  usesHideAction={usesHideAction}
+                />
+              );
+            }
+
             const { card } = item;
             const size = cardSizes[card.id] || card.size;
 
@@ -108,6 +118,7 @@ export const DeviceGrid = memo(function DeviceGrid({
                 card={card}
                 size={size}
                 isEditMode={isEditMode}
+                renderLightweight={isScrolling && !isEditMode}
                 handleSizeChange={handleSizeChange}
                 onDeleteCard={onDeleteCard}
                 onUpdateCard={onUpdateCard}
@@ -116,10 +127,10 @@ export const DeviceGrid = memo(function DeviceGrid({
                 usesHideAction={usesHideAction}
               />
             );
-          }
-        })}
-      </div>
-    </SortableContext>
+          })}
+        </div>
+      </SortableContext>
+    </DashboardEditActions>
   );
 });
 

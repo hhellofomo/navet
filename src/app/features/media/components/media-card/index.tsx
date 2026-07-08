@@ -1,12 +1,8 @@
 import { lazy, memo, Suspense } from 'react';
-import {
-  type CardSize,
-  CardSizeSelector,
-  getCompactCardSize,
-} from '@/app/components/shared/card-size-selector';
+import { type CardSize, getCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { useI18n, useTheme } from '@/app/hooks';
+import { useTheme } from '@/app/hooks';
 import { MediaMediumVerticalView } from '../media/media-medium-vertical-view';
 import { MediaMediumView } from '../media/media-medium-view';
 import { MediaSmallView } from '../media/media-small-view';
@@ -49,35 +45,11 @@ export const MediaCard = memo(function MediaCard({
   durationSeconds: initialDurationSeconds,
   positionUpdatedAt: initialPositionUpdatedAt,
   size,
-  onSizeChange,
-  isEditMode,
+  onSizeChange: _onSizeChange,
+  isEditMode: _isEditMode,
 }: MediaCardProps) {
   const { theme, colors } = useTheme();
-  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
-  const mediaCardSizeOptions = [
-    {
-      value: 'small' as const,
-      label: t('media.size.small'),
-      description: '1 × 1',
-      dimensions: t('media.size.squareTile'),
-      preview: 'w-7 h-7',
-    },
-    {
-      value: 'medium' as const,
-      label: t('media.size.medium'),
-      description: '2 × 1',
-      dimensions: t('media.size.wideTile'),
-      preview: 'w-14 h-7',
-    },
-    {
-      value: 'large' as const,
-      label: t('media.size.large'),
-      description: '1 × 2',
-      dimensions: t('media.size.verticalTile'),
-      preview: 'w-7 h-14',
-    },
-  ];
   const mediaSize = getCompactCardSize(size);
   const {
     albumArt: resolvedAlbumArt,
@@ -141,16 +113,6 @@ export const MediaCard = memo(function MediaCard({
       <div
         className={`relative h-full rounded-3xl ${padding} border ${shellBorder} ${cardShadow} ${shellBg} ${shellBlur} ${stateSurface.containerClassName} overflow-hidden`}
       >
-        {isEditMode && (
-          <CardSizeSelector
-            currentSize={mediaSize}
-            triggerSize={mediaSize === 'large' ? 'medium' : mediaSize}
-            onSizeChange={(newSize) => onSizeChange(id, newSize)}
-            allowedSizes={['small', 'medium', 'large']}
-            options={mediaCardSizeOptions}
-          />
-        )}
-
         {shellOverlayClassName && (
           <div className={`absolute inset-0 ${shellOverlayClassName}`}></div>
         )}

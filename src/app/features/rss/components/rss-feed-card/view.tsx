@@ -1,6 +1,5 @@
 import { ChevronRight, Rss } from 'lucide-react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { CardSizeSelector } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { type PrimaryColor, type ThemeType, useI18n } from '@/app/hooks';
@@ -36,7 +35,7 @@ interface RSSFeedCardViewProps {
 export function RSSFeedCardView({
   inEditMode = false,
   size = 'medium',
-  onSizeChange,
+  onSizeChange: _onSizeChange,
   theme,
   primaryColor,
   colors,
@@ -103,10 +102,6 @@ export function RSSFeedCardView({
             />
           }
         />
-
-        {inEditMode && onSizeChange && (
-          <CardSizeSelector currentSize={size} onSizeChange={onSizeChange} />
-        )}
 
         {isEmpty ? (
           <div className="flex flex-1 flex-col justify-center text-left">

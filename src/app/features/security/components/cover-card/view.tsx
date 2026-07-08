@@ -4,11 +4,7 @@ import { ChevronDown, ChevronUp, Square } from 'lucide-react';
 import type { HTMLAttributes } from 'react';
 import { CardActionRow } from '@/app/components/shared/card-action-row';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
-import {
-  type CardSize,
-  CardSizeSelector,
-  isCompactCardSize,
-} from '@/app/components/shared/card-size-selector';
+import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
@@ -58,8 +54,8 @@ export function CoverCardView({
   deviceClass,
   deviceClassConfig,
   size,
-  isEditMode,
-  cardId,
+  isEditMode: _isEditMode,
+  cardId: _cardId,
   cardProps,
   cardColors,
   theme,
@@ -68,7 +64,7 @@ export function CoverCardView({
   settingsButtonProps,
   isSettingsOpen,
   setIsSettingsOpen,
-  onSizeChange,
+  onSizeChange: _onSizeChange,
   handlePositionChange,
   handleOpen,
   handleClose,
@@ -91,12 +87,6 @@ export function CoverCardView({
       {...cardProps}
       className={`relative h-full bg-gradient-to-br ${cardColors.gradient} backdrop-blur-xl rounded-3xl ${padding} border ${cardColors.border} overflow-hidden ${securitySurface.containerShadowClassName}`}
     >
-      {isEditMode && (
-        <CardSizeSelector
-          currentSize={size}
-          onSizeChange={(newSize) => onSizeChange(cardId, newSize)}
-        />
-      )}
       <div className={`absolute inset-0 bg-gradient-to-br ${cardColors.glow} to-transparent`}></div>
 
       {/* Light theme frosted overlay */}
@@ -320,78 +310,80 @@ export function CoverCardView({
       </div>
 
       {/* Device Class Settings Dialog */}
-      <Dialog.Root open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay
-            className={`fixed inset-0 z-50 animate-in fade-in ${surface.dialogBackdrop}`}
-          />
-          <Dialog.Content
-            className={`fixed top-1/2 left-1/2 z-50 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl border p-6 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in duration-200 ${securitySurface.dialogContentClassName}`}
-          >
-            <Dialog.Title className="text-xl font-semibold text-white mb-2">
-              {t('cover.settings.deviceType')}
-            </Dialog.Title>
-            <Dialog.Description className="text-sm text-gray-300 mb-6">
-              {t('cover.settings.description', { name })}
-            </Dialog.Description>
+      {isSettingsOpen ? (
+        <Dialog.Root open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+          <Dialog.Portal>
+            <Dialog.Overlay
+              className={`fixed inset-0 z-50 animate-in fade-in ${surface.dialogBackdrop}`}
+            />
+            <Dialog.Content
+              className={`fixed top-1/2 left-1/2 z-50 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl border p-6 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in duration-200 ${securitySurface.dialogContentClassName}`}
+            >
+              <Dialog.Title className="text-xl font-semibold text-white mb-2">
+                {t('cover.settings.deviceType')}
+              </Dialog.Title>
+              <Dialog.Description className="text-sm text-gray-300 mb-6">
+                {t('cover.settings.description', { name })}
+              </Dialog.Description>
 
-            <div className="mb-6">
-              <EntityRoomSelector entityId={entityId} label={t('common.room')} />
-            </div>
+              <div className="mb-6">
+                <EntityRoomSelector entityId={entityId} label={t('common.room')} />
+              </div>
 
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              {(Object.keys(deviceClassConfig) as DeviceClass[]).map((type) => {
-                const config = deviceClassConfig[type];
-                const Icon = config.icon;
-                const isSelected = deviceClass === type;
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                {(Object.keys(deviceClassConfig) as DeviceClass[]).map((type) => {
+                  const config = deviceClassConfig[type];
+                  const Icon = config.icon;
+                  const isSelected = deviceClass === type;
 
-                return (
+                  return (
+                    <button
+                      type="button"
+                      key={type}
+                      onClick={() => setDeviceClass(type)}
+                      className={`rounded-2xl border-2 p-4 transition-all duration-200 ${securitySurface.dialogOptionClassName(isSelected)}`}
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        <div
+                          className={`flex h-12 w-12 items-center justify-center rounded-full ${securitySurface.dialogOptionIconWrapClassName(isSelected)}`}
+                        >
+                          <Icon
+                            className={`h-6 w-6 ${securitySurface.dialogOptionIconClassName(isSelected)}`}
+                          />
+                        </div>
+                        <span
+                          className={`text-center text-xs font-medium ${securitySurface.dialogOptionTextClassName(isSelected)}`}
+                        >
+                          {t(config.labelKey)}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="flex gap-3">
+                <Dialog.Close asChild>
                   <button
                     type="button"
-                    key={type}
-                    onClick={() => setDeviceClass(type)}
-                    className={`rounded-2xl border-2 p-4 transition-all duration-200 ${securitySurface.dialogOptionClassName(isSelected)}`}
+                    className={`flex-1 rounded-xl py-2.5 text-sm font-medium text-white transition-colors ${securitySurface.dialogCancelButtonClassName}`}
                   >
-                    <div className="flex flex-col items-center gap-2">
-                      <div
-                        className={`flex h-12 w-12 items-center justify-center rounded-full ${securitySurface.dialogOptionIconWrapClassName(isSelected)}`}
-                      >
-                        <Icon
-                          className={`h-6 w-6 ${securitySurface.dialogOptionIconClassName(isSelected)}`}
-                        />
-                      </div>
-                      <span
-                        className={`text-center text-xs font-medium ${securitySurface.dialogOptionTextClassName(isSelected)}`}
-                      >
-                        {t(config.labelKey)}
-                      </span>
-                    </div>
+                    {t('common.cancel')}
                   </button>
-                );
-              })}
-            </div>
-
-            <div className="flex gap-3">
-              <Dialog.Close asChild>
-                <button
-                  type="button"
-                  className={`flex-1 rounded-xl py-2.5 text-sm font-medium text-white transition-colors ${securitySurface.dialogCancelButtonClassName}`}
-                >
-                  {t('common.cancel')}
-                </button>
-              </Dialog.Close>
-              <Dialog.Close asChild>
-                <button
-                  type="button"
-                  className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 rounded-xl text-white text-sm font-medium transition-colors"
-                >
-                  {t('common.done')}
-                </button>
-              </Dialog.Close>
-            </div>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+                </Dialog.Close>
+                <Dialog.Close asChild>
+                  <button
+                    type="button"
+                    className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 rounded-xl text-white text-sm font-medium transition-colors"
+                  >
+                    {t('common.done')}
+                  </button>
+                </Dialog.Close>
+              </div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      ) : null}
     </div>
   );
 }
