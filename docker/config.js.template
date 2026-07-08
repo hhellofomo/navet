@@ -1,0 +1,4 @@
+window.__NAVET_CONFIG__ = {
+  hassUrl: "${NAVET_HASS_URL}",
+  token: "${NAVET_HASS_TOKEN}"
+};

@@ -81,8 +81,8 @@ End:   #ea580c (Tailwind orange-600)
 ## 🔗 Related Documentation
 
 - **[BRANDING.md](BRANDING.md)** - Complete brand guidelines
-- **[docs/LOGO_SHOWCASE.md](docs/LOGO_SHOWCASE.md)** - Visual showcase with examples
-- **[public/README.md](public/README.md)** - Technical specifications
+- **[docs/LOGO_SHOWCASE.md](../LOGO_SHOWCASE.md)** - Visual showcase with examples
+- **[public/README.md](../../public/README.md)** - Technical specifications
 
 ---
 
