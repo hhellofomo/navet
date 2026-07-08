@@ -324,7 +324,15 @@ The Dashboard Builder (`/mock` section) lets users compose their Home screen fro
 | `flow` | All cards in a single responsive masonry grid — the simplest layout |
 | `sectioned` | Cards organised into named sections (rows and column groups) |
 
-Switching to `sectioned` mode auto-creates the first section if none exist. Sections can be renamed inline, removed individually, and split into column arrangements via "Add column".
+Switching to `sectioned` mode auto-creates the first section if none exist. Sections can be renamed inline, removed individually, and split into column arrangements via "Add column" or stacked vertically within the same column block via "Add below".
+
+### Section Stacking
+
+Sections support a `stackUnder` relationship: a section with `stackUnder` set to another section's ID is rendered directly below that parent section, sharing its column span, rather than flowing into the next row. This allows vertical stacks of sections inside a single column slot.
+
+- **Add below** — creates a new section stacked under the selected section
+- Stack membership is preserved when spans are reordered or sections are removed (orphaned children fall back to the nearest surviving ancestor or become top-level)
+- `getSectionBlock` / `mergeTopLevelSections` in `use-home-dashboard-layout.ts` manage block integrity
 
 ### Floating Library Panel
 
@@ -338,18 +346,18 @@ The card library is a draggable floating panel (`useLibraryPanel`) that overlays
 
 ### Section Partitioning
 
-Sections in `sectioned` mode are laid out in rows. The `partitionSectionRows` algorithm (exported from `use-home-dashboard-layout.ts`) enforces two hard constraints:
+Top-level sections in `sectioned` mode are laid out in rows. The `partitionSectionRows` algorithm (in `use-home-dashboard-layout.ts`) enforces two hard constraints:
 
 - Maximum **4 sections per row**
 - Maximum combined span of **8 columns** per row
 
-Each section carries a `HomeDashboardSectionSpan` value that controls how many grid columns it occupies. Sections that would overflow the row start a new row automatically.
+Each section carries a `HomeDashboardSectionSpan` value that controls how many grid columns it occupies. Sections that would overflow the row start a new row automatically. Stacked sections (`stackUnder` set) are excluded from row partitioning and rendered inside their parent's column block instead.
 
 ### Hook Architecture
 
 | Hook | Location | Responsibility |
 |---|---|---|
-| `useHomeDashboardEditor` | `hooks/use-home-dashboard-editor.ts` | Card map construction, library card list, section rows, flow card list, library search/filtering, summary stats |
+| `useHomeDashboardEditor` | `hooks/use-home-dashboard-editor.ts` | Card map construction, library card list, `sectionCards` (HomeEditorSection[]), flow card list, library search/filtering, summary stats |
 | `useDashboardDragState` | `hooks/use-dashboard-drag-state.ts` | dnd-kit sensors, active drag card/size, `handleDragOver`, `handleDragEnd`, drop-meta resolution |
 | `useLibraryPanel` | `hooks/use-library-panel.ts` | Floating panel position, drag-to-reposition, visibility/collapse toggles, resize-responsive repositioning |
 | `useHomeDashboardLayout` | `hooks/use-home-dashboard-layout.ts` | Persisted layout state — card IDs, section assignments, layout mode, hero visibility; exports `partitionSectionRows` |

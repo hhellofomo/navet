@@ -70,6 +70,7 @@ export type DashboardController = OnboardingController &
     setHomeLayoutMode: ReturnType<typeof useHomeDashboardLayout>['setMode'];
     addHomeSection: ReturnType<typeof useHomeDashboardLayout>['addSection'];
     addHomeColumnSection: ReturnType<typeof useHomeDashboardLayout>['addColumnSection'];
+    addHomeSectionBelow: ReturnType<typeof useHomeDashboardLayout>['addSectionBelow'];
     renameHomeSection: ReturnType<typeof useHomeDashboardLayout>['renameSection'];
     removeHomeSection: ReturnType<typeof useHomeDashboardLayout>['removeSection'];
     isEditMode: boolean;
@@ -268,6 +269,7 @@ export function useDashboardController(): DashboardController {
     setHomeLayoutMode: homeLayoutController.setMode,
     addHomeSection: homeLayoutController.addSection,
     addHomeColumnSection: homeLayoutController.addColumnSection,
+    addHomeSectionBelow: homeLayoutController.addSectionBelow,
     renameHomeSection: homeLayoutController.renameSection,
     removeHomeSection: homeLayoutController.removeSection,
     isEditMode,

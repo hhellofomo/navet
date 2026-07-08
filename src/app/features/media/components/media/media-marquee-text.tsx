@@ -1,10 +1,16 @@
+import { memo } from 'react';
+
 interface MediaMarqueeTextProps {
   text: string;
   className: string;
   threshold?: number;
 }
 
-export function MediaMarqueeText({ text, className, threshold = 22 }: MediaMarqueeTextProps) {
+export const MediaMarqueeText = memo(function MediaMarqueeText({
+  text,
+  className,
+  threshold = 22,
+}: MediaMarqueeTextProps) {
   const shouldMarquee = text.length > threshold;
 
   if (!shouldMarquee) {
@@ -20,12 +26,6 @@ export function MediaMarqueeText({ text, className, threshold = 22 }: MediaMarqu
         <span className="px-6 opacity-50">•</span>
         <span>{text}</span>
       </div>
-      <style>{`
-        @keyframes media-track-marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-      `}</style>
     </div>
   );
-}
+});

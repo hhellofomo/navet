@@ -592,12 +592,21 @@ export function useLightCardController({
       void syncLightWithHomeAssistant({
         state: nextIsOn ? 'on' : 'off',
         brightnessPct: nextIsOn ? brightnessToRestore : undefined,
-        kelvin: nextIsOn && !selectedColor ? rememberedColorTemp : undefined,
+        kelvin:
+          nextIsOn && supportsColorTemperature && !selectedColor ? rememberedColorTemp : undefined,
       }).catch(() => {
         setIsOn(!nextIsOn);
       });
     },
-    [brightness, id, maxColorTemp, minColorTemp, selectedColor, syncLightWithHomeAssistant]
+    [
+      brightness,
+      id,
+      maxColorTemp,
+      minColorTemp,
+      selectedColor,
+      supportsColorTemperature,
+      syncLightWithHomeAssistant,
+    ]
   );
 
   const handleSettingsClick = useCallback(() => {

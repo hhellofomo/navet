@@ -166,6 +166,7 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
               setHomeLayoutMode={controller.setHomeLayoutMode}
               addHomeSection={controller.addHomeSection}
               addHomeColumnSection={controller.addHomeColumnSection}
+              addHomeSectionBelow={controller.addHomeSectionBelow}
               renameHomeSection={controller.renameHomeSection}
               removeHomeSection={controller.removeHomeSection}
               onOpenAddCardDialog={controller.onOpenAddCardDialog}
