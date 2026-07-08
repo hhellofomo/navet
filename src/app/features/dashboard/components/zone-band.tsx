@@ -1,7 +1,8 @@
-import { memo } from 'react';
+import { type CSSProperties, memo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
+import { useBreakpointCols } from '@/app/hooks/use-breakpoint-cols';
 import type { TranslationKey } from '@/app/i18n';
 import type { DeviceWithType } from '@/app/types/device.types';
 import type { CustomCard } from '../stores/custom-cards-store';
@@ -35,9 +36,13 @@ export const ZoneBand = memo(function ZoneBand({
   const { t } = useI18n();
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
+  const colCount = useBreakpointCols();
 
   const gridContent = (
-    <div className="grid w-full auto-rows-[87px] grid-flow-row-dense grid-cols-2 gap-2 md:grid-cols-4 md:gap-3 lg:gap-4 xl:grid-cols-6 2xl:grid-cols-8">
+    <div
+      className="grid w-full auto-rows-[87px] grid-flow-row-dense gap-2 md:gap-3 lg:gap-4 [grid-template-columns:repeat(var(--zone-cols),minmax(0,1fr))]"
+      style={{ '--zone-cols': colCount } as CSSProperties}
+    >
       {orderedIds.map((id) => {
         const device = deviceMap.get(id);
         if (device) {
@@ -49,6 +54,7 @@ export const ZoneBand = memo(function ZoneBand({
               size={cardSizes[device.id] ?? (device.size as CardSize)}
               isEditMode={isEditMode}
               handleSizeChange={handleSizeChange}
+              zone={zone}
             />
           );
         }
@@ -64,6 +70,7 @@ export const ZoneBand = memo(function ZoneBand({
             size={cardSizes[card.id] ?? card.size}
             isEditMode={isEditMode}
             handleSizeChange={handleSizeChange}
+            zone={zone}
             onDeleteCard={onDeleteCard}
             onUpdateCard={onUpdateCard}
           />

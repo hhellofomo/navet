@@ -230,6 +230,7 @@ export const frMessages = {
   'dashboard.addCard.size.small': 'small',
   'dashboard.addCard.size.medium': 'medium',
   'dashboard.addCard.size.large': 'large',
+  'dashboard.addCard.size.hero': 'hero',
   'dashboard.addCard.templates.rss.name': 'Flux RSS',
   'dashboard.addCard.templates.rss.description':
     'Suivez les articles de vos fournisseurs de flux sélectionnés',

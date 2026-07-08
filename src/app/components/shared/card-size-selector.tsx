@@ -59,6 +59,13 @@ const sizes: {
     dimensions: 'Large tile',
     preview: 'w-14 h-14',
   },
+  {
+    value: 'hero',
+    label: 'Hero',
+    description: '6 × 3',
+    dimensions: 'Full-width feature',
+    preview: 'w-full h-10',
+  },
 ];
 
 export const CardSizeSelector = memo(function CardSizeSelector({
@@ -202,6 +209,8 @@ export function getCardSpanClass(size: CardSize): string {
       return 'col-span-2 row-span-2'; // 2 columns × 1 row
     case 'large':
       return 'col-span-2 row-span-4'; // 2 columns × 2 rows
+    case 'hero':
+      return 'col-span-6 row-span-3'; // 6 columns × 3 rows (12-col grid)
     default:
       return 'col-span-1 row-span-2';
   }

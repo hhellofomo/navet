@@ -26,6 +26,7 @@ export const RoundButton = memo(function RoundButton({
     small: 'w-7 h-7',
     medium: 'w-8 h-8',
     large: 'w-12 h-12',
+    hero: 'w-12 h-12',
   };
 
   const variantClasses = {

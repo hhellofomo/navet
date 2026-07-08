@@ -1,1 +1,1 @@
-export type CardSize = 'extra-small' | 'small' | 'medium' | 'large';
+export type CardSize = 'extra-small' | 'small' | 'medium' | 'large' | 'hero';

@@ -297,6 +297,13 @@ function getDefaultSizeOptions(): SizeOption[] {
       dimensions: '2 x 2',
       preview: 'h-14 w-14',
     },
+    {
+      value: 'hero',
+      label: 'Hero',
+      description: 'Full-width feature',
+      dimensions: '6 x 3',
+      preview: 'h-10 w-full',
+    },
   ];
 }
 

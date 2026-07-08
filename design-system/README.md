@@ -12,7 +12,7 @@ Comprehensive design system covering:
 - Icon sizing standards
 - Glass morphism effects
 - Interactive states and animations
-- Card size system (extra-small/small/medium/large)
+- Card size system (extra-small/small/medium/large/hero)
 - Accessibility guidelines
 - Component patterns
 - Best practices
@@ -106,12 +106,15 @@ Complete feature implementation guide:
 - **Small (1×1)**: Minimal info, quick toggle, `p-4`, one responsive grid column wide and two auto-rows tall
 - **Medium (2×1)**: Primary controls + info, `p-5`, two responsive grid columns wide and two auto-rows tall
 - **Large (2×2)**: Full controls + advanced features, `p-6`, two responsive grid columns wide and four auto-rows tall
+- **Hero (6×3)**: Full-width feature card for weather, calendars, photo, and RSS; only offered in the Overview zone
 
-Dashboard cards use an explicit responsive column grid:
+Room views use a fixed responsive column grid:
 - mobile: `grid-cols-2`
 - tablet (`md`): `grid-cols-4`
 - desktop (`xl`): `grid-cols-6`
 - large desktop (`2xl`): `grid-cols-8`
+
+The Home view zone bands use a 12-column CSS custom-property grid driven by `useBreakpointCols`, aligned with Tailwind breakpoints: `md` → 6 cols, `lg` → 8 cols, `xl` → 12 cols.
 
 Gaps scale from `gap-2` to `md:gap-3` to `lg:gap-4`, while `auto-rows-[87px]` keeps the card height math stable.
 

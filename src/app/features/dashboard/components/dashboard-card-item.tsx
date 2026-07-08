@@ -7,6 +7,7 @@ import { useSettingsStore } from '@/app/stores/settings-store';
 import type { DeviceWithType } from '@/app/types/device.types';
 import type { CustomCard } from '../stores/custom-cards-store';
 import { renderCard } from '../utils/card-renderer';
+import type { ZoneName } from '../zones/zone-types';
 import { DashboardResizeTrigger } from './dashboard-edit-actions';
 import { WidgetCard } from './widget-card';
 
@@ -17,6 +18,7 @@ interface DashboardCardItemProps {
   handleSizeChange: (id: string, size: CardSize) => void;
   device?: DeviceWithType;
   card?: CustomCard;
+  zone?: ZoneName;
   onDeleteCard?: (cardId: string) => void;
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
   onRemoveEntity?: (entityId: string) => void;
@@ -31,6 +33,7 @@ export const DashboardCardItem = memo(function DashboardCardItem({
   handleSizeChange,
   device,
   card,
+  zone,
   onDeleteCard,
   onUpdateCard,
   onRemoveEntity,
@@ -43,7 +46,7 @@ export const DashboardCardItem = memo(function DashboardCardItem({
   const spanClass =
     device?.type === 'media' && size === 'large' ? 'col-span-1 row-span-4' : getCardSpanClass(size);
   const editControlSize = device?.type === 'media' && size === 'large' ? 'medium' : size;
-  const allowedSizes = getAllowedSizes(device, card);
+  const allowedSizes = getAllowedSizes(device, card, zone);
   const cardContent = (
     <>
       {isEditMode && device && allowEntityRemoval && onRemoveEntity && (
@@ -95,8 +98,13 @@ export const DashboardCardItem = memo(function DashboardCardItem({
   );
 }, areDashboardCardItemPropsEqual);
 
-function getAllowedSizes(device?: DeviceWithType, card?: CustomCard): CardSize[] {
+function getAllowedSizes(device?: DeviceWithType, card?: CustomCard, zone?: ZoneName): CardSize[] {
+  const heroAllowed = zone === 'hero' || zone === undefined;
+
   if (card) {
+    if (heroAllowed && (card.type === 'photo' || card.type === 'rss')) {
+      return ['small', 'medium', 'large', 'hero'];
+    }
     return ['small', 'medium', 'large'];
   }
 
@@ -106,9 +114,9 @@ function getAllowedSizes(device?: DeviceWithType, card?: CustomCard): CardSize[]
     case 'grouped-sensors':
       return ['small', 'medium'];
     case 'calendars':
-      return ['small', 'medium', 'large'];
+      return heroAllowed ? ['small', 'medium', 'large', 'hero'] : ['small', 'medium', 'large'];
     case 'weather':
-      return ['large'];
+      return heroAllowed ? ['large', 'hero'] : ['large'];
     case 'switches':
       return ['extra-small', 'small'];
     case 'locks':
@@ -128,6 +136,7 @@ function areDashboardCardItemPropsEqual(
     previous.isEditMode === next.isEditMode &&
     previous.device === next.device &&
     previous.card === next.card &&
+    previous.zone === next.zone &&
     previous.handleSizeChange === next.handleSizeChange &&
     previous.onDeleteCard === next.onDeleteCard &&
     previous.onUpdateCard === next.onUpdateCard &&
