@@ -5,7 +5,8 @@ import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
-import { useI18n, useTheme } from '@/app/hooks';
+import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { useVacuumControl } from '../vacuum/use-vacuum-control';
 import { VacuumControlsLarge } from '../vacuum/vacuum-controls-large';
 import { VacuumControlsMedium } from '../vacuum/vacuum-controls-medium';
@@ -39,6 +40,16 @@ export const VacuumCard = memo(function VacuumCard({
   onSizeChange: _onSizeChange,
   isEditMode: _isEditMode,
 }: VacuumCardProps) {
+  const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
+  const liveState = liveEntity?.state;
+  const liveStatus: typeof status =
+    liveState === 'cleaning' ||
+    liveState === 'returning' ||
+    liveState === 'docked' ||
+    liveState === 'paused' ||
+    liveState === 'idle'
+      ? liveState
+      : status;
   const {
     currentStatus,
     isDialogOpen,
@@ -46,7 +57,10 @@ export const VacuumCard = memo(function VacuumCard({
     handleStartCleaning,
     handlePause,
     handleReturnHome,
-  } = useVacuumControl({ initialStatus: status });
+  } = useVacuumControl({ initialStatus: liveStatus });
+  const liveAttrs = liveEntity?.attributes as Record<string, unknown> | undefined;
+  const liveBattery =
+    typeof liveAttrs?.battery_level === 'number' ? liveAttrs.battery_level : battery;
   const { theme, colors } = useTheme();
   const cardShell = getCardShellSurfaceTokens(theme);
   const { t } = useI18n();
@@ -91,7 +105,7 @@ export const VacuumCard = memo(function VacuumCard({
             <div className={isMedium ? 'mt-auto' : ''}>
               <VacuumStatusDisplay
                 currentStatus={currentStatus}
-                battery={battery}
+                battery={liveBattery}
                 cleanedArea={cleanedArea}
                 cleaningTime={cleaningTime}
                 room={room}

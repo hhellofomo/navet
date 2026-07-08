@@ -6,9 +6,12 @@ import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header
 import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
 import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { useI18n, useTheme } from '@/app/hooks';
+import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
+import { formatSensorValue } from '@/app/hooks/ha-entity-utils';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 
 interface SensorCardProps {
+  id: string;
   name: string;
   room: string;
   value: string;
@@ -21,6 +24,7 @@ interface SensorCardProps {
 }
 
 export const SensorCard = memo(function SensorCard({
+  id,
   name,
   room,
   value,
@@ -33,6 +37,10 @@ export const SensorCard = memo(function SensorCard({
 }: SensorCardProps) {
   const { theme } = useTheme();
   const { t } = useI18n();
+  const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
+  const liveFormatted = liveEntity ? formatSensorValue(liveEntity) : null;
+  const liveValue = liveFormatted?.value ?? value;
+  const liveUnit = liveFormatted?.unit ?? unit;
   const cardShell = getCardShellSurfaceTokens(theme);
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
@@ -73,9 +81,9 @@ export const SensorCard = memo(function SensorCard({
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className={`${isSmall ? 'text-3xl' : 'text-4xl'} font-bold ${textPrimary}`}>
-              {value}
+              {liveValue}
               <span className={`${isSmall ? 'text-lg' : 'text-2xl'} ${accentColor} ml-1`}>
-                {unit}
+                {liveUnit}
               </span>
             </div>
           </div>

@@ -1,7 +1,8 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { useI18n, useTheme } from '@/app/hooks';
+import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { DEVICE_CLASS_CONFIG } from './constants';
 import type { CoverCardProps, CoverState, DeviceClass } from './types';
 import { CoverCardView } from './view';
@@ -32,6 +33,20 @@ export const CoverCardContainer = memo(function CoverCardContainer({
       }
     };
   }, []);
+  const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
+
+  useEffect(() => {
+    if (!liveEntity) return;
+    const attrs = liveEntity.attributes as Record<string, unknown>;
+    const livePosition = typeof attrs.current_position === 'number' ? attrs.current_position : null;
+    if (livePosition !== null) {
+      setPosition(livePosition);
+    }
+    const liveState = liveEntity.state as CoverState;
+    if (['open', 'closed', 'opening', 'closing'].includes(liveState)) {
+      setCoverState(liveState);
+    }
+  }, [liveEntity]);
   const { colors, theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
 

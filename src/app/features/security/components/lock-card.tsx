@@ -1,24 +1,36 @@
 import { DoorClosed, DoorOpen, Lock, Unlock } from 'lucide-react';
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
-import { useI18n, useTheme } from '@/app/hooks';
+import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { getSecurityCardSurfaceTokens } from './security-card-surface-tokens';
 
 interface LockCardProps {
+  id: string;
   name: string;
   room: string;
   initialState?: boolean; // true = locked, false = unlocked
 }
 
 export const LockCard = memo(function LockCard({
+  id,
   name,
   initialState = true,
 }: Omit<LockCardProps, 'room'>) {
   const [isLocked, setIsLocked] = useState(initialState);
+  const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
   const { t } = useI18n();
+
+  useEffect(() => {
+    if (liveEntity) {
+      setIsLocked(liveEntity.state === 'locked');
+      return;
+    }
+    setIsLocked(initialState);
+  }, [liveEntity, initialState]);
   const { theme, colors } = useTheme();
   const cardShell = getCardShellSurfaceTokens(theme);
   const securitySurface = getSecurityCardSurfaceTokens(theme);

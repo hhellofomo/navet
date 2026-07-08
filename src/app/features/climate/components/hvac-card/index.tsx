@@ -30,6 +30,7 @@ export const HVACCard = memo(function HVACCard({
 }: HVACCardProps) {
   const { t } = useI18n();
   const controller = useHVACCardController({
+    id,
     name,
     initialTemp,
     initialCurrentTemp,

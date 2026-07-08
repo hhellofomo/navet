@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useAuth } from '@/app/contexts/auth-context';
-import { useI18n } from '@/app/hooks';
+import { useHomeAssistant, useI18n } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 import {
   resolveHomeAssistantAbsoluteUrl,
   resolveHomeAssistantProxyUrl,
@@ -40,6 +41,7 @@ export function useMediaCardController({
 }: UseMediaCardControllerParams) {
   const { config: authConfig } = useAuth();
   const { t } = useI18n();
+  const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(entityId));
   const [state, setState] = useState(initialState);
   const [volume, setVolume] = useState(initialVolume);
   const [isMuted, setIsMuted] = useState(initialMuted);
@@ -49,16 +51,49 @@ export function useMediaCardController({
   const [durationSeconds, setDurationSeconds] = useState(initialDurationSeconds ?? 0);
   const [failedArtworkUrl, setFailedArtworkUrl] = useState<string | null>(null);
   const [resolvedAlbumArt, setResolvedAlbumArt] = useState<string | null>(null);
-  const artworkRequestKey = [entityId, artworkKey].filter(Boolean).join('::');
-  const fallbackArtwork = entityPicture
+
+  // Derive playback fields from liveEntity when available, fall back to initial props.
+  const liveAttrs = liveEntity?.attributes as Record<string, unknown> | undefined;
+  const liveEntityPicture =
+    typeof liveAttrs?.entity_picture === 'string' ? liveAttrs.entity_picture : entityPicture;
+  const liveArtworkKey =
+    typeof liveAttrs?.media_content_id === 'string' ? liveAttrs.media_content_id : artworkKey;
+  const artworkRequestKey = [entityId, liveArtworkKey].filter(Boolean).join('::');
+  const fallbackArtwork = liveEntityPicture
     ? import.meta.env.DEV
-      ? resolveHomeAssistantProxyUrl(entityPicture, authConfig?.url)
-      : resolveHomeAssistantAbsoluteUrl(entityPicture, authConfig?.url)
+      ? resolveHomeAssistantProxyUrl(liveEntityPicture, authConfig?.url)
+      : resolveHomeAssistantAbsoluteUrl(liveEntityPicture, authConfig?.url)
     : null;
 
   // Single effect syncs all HA-driven fields in one batch, producing one re-render per entity
   // update instead of 5–7 sequential re-renders from separate effects.
   useEffect(() => {
+    if (liveEntity) {
+      const attrs = liveEntity.attributes as Record<string, unknown>;
+      const rawState = liveEntity.state;
+      const nextState: typeof initialState =
+        rawState === 'playing' || rawState === 'paused' || rawState === 'idle' ? rawState : 'off';
+      const nextVolume =
+        typeof attrs.volume_level === 'number'
+          ? Math.round(attrs.volume_level * 100)
+          : initialVolume;
+      const nextMuted = attrs.is_volume_muted === true || nextVolume === 0;
+      const nextElapsed =
+        typeof attrs.media_position === 'number'
+          ? attrs.media_position
+          : (initialElapsedSeconds ?? 0);
+      const nextDuration =
+        typeof attrs.media_duration === 'number'
+          ? attrs.media_duration
+          : (initialDurationSeconds ?? 0);
+      setState(nextState);
+      setElapsedSeconds(nextElapsed);
+      setDurationSeconds(nextDuration);
+      setVolume(nextVolume);
+      if (nextVolume > 0) setPreviousVolume(nextVolume);
+      setIsMuted(nextMuted);
+      return;
+    }
     setState(initialState);
     setElapsedSeconds(initialElapsedSeconds ?? 0);
     setDurationSeconds(initialDurationSeconds ?? 0);
@@ -67,7 +102,14 @@ export function useMediaCardController({
       setPreviousVolume(initialVolume);
     }
     setIsMuted(initialMuted || initialVolume === 0);
-  }, [initialState, initialVolume, initialMuted, initialElapsedSeconds, initialDurationSeconds]);
+  }, [
+    liveEntity,
+    initialState,
+    initialVolume,
+    initialMuted,
+    initialElapsedSeconds,
+    initialDurationSeconds,
+  ]);
 
   // Artwork key changing means a new track — reset failed URL then resolve new artwork.
   useEffect(() => {
@@ -86,18 +128,27 @@ export function useMediaCardController({
       return;
     }
 
+    const positionUpdatedAt =
+      typeof liveAttrs?.media_position_updated_at === 'string'
+        ? liveAttrs.media_position_updated_at
+        : initialPositionUpdatedAt;
+    const baseElapsedSeconds =
+      typeof liveAttrs?.media_position === 'number'
+        ? liveAttrs.media_position
+        : (initialElapsedSeconds ?? 0);
+
     const getBaseElapsed = () => {
-      if (!initialPositionUpdatedAt) {
-        return initialElapsedSeconds ?? 0;
+      if (!positionUpdatedAt) {
+        return baseElapsedSeconds;
       }
 
-      const updatedAtMs = Date.parse(initialPositionUpdatedAt);
+      const updatedAtMs = Date.parse(positionUpdatedAt);
       if (Number.isNaN(updatedAtMs)) {
-        return initialElapsedSeconds ?? 0;
+        return baseElapsedSeconds;
       }
 
       const driftSeconds = Math.max(0, Math.floor((Date.now() - updatedAtMs) / 1000));
-      return (initialElapsedSeconds ?? 0) + driftSeconds;
+      return baseElapsedSeconds + driftSeconds;
     };
 
     const syncElapsed = () => {
@@ -114,7 +165,7 @@ export function useMediaCardController({
     return () => {
       window.clearInterval(timerId);
     };
-  }, [durationSeconds, initialElapsedSeconds, initialPositionUpdatedAt, isPlaying]);
+  }, [durationSeconds, liveAttrs, initialElapsedSeconds, initialPositionUpdatedAt, isPlaying]);
 
   const runAction = useCallback(async (action: () => Promise<void>, errorMessage: string) => {
     try {

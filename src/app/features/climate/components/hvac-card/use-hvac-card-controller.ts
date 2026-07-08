@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { useI18n, useTheme } from '@/app/hooks';
+import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 import type { HVACCardProps } from './hvac-card.types';
 
 export function useHVACCardController({
+  id,
   name,
   initialTemp = 21,
   initialCurrentTemp = 22,
@@ -16,6 +18,7 @@ export function useHVACCardController({
   size,
 }: Pick<
   HVACCardProps,
+  | 'id'
   | 'name'
   | 'initialTemp'
   | 'initialCurrentTemp'
@@ -34,26 +37,25 @@ export function useHVACCardController({
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { colors, theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
+  const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
 
+  // Single effect syncs all HA-driven fields in one batch when the entity updates.
   useEffect(() => {
+    if (liveEntity) {
+      const attrs = liveEntity.attributes as Record<string, unknown>;
+      setIsOn(liveEntity.state !== 'off');
+      setMode(typeof attrs.hvac_mode === 'string' ? attrs.hvac_mode : initialMode);
+      setAction(typeof attrs.hvac_action === 'string' ? attrs.hvac_action : initialAction);
+      if (typeof attrs.temperature === 'number') setTargetTemp(attrs.temperature);
+      if (typeof attrs.current_temperature === 'number') setCurrentTemp(attrs.current_temperature);
+      return;
+    }
     setTargetTemp(initialTemp);
-  }, [initialTemp]);
-
-  useEffect(() => {
     setCurrentTemp(initialCurrentTemp);
-  }, [initialCurrentTemp]);
-
-  useEffect(() => {
     setMode(initialMode);
-  }, [initialMode]);
-
-  useEffect(() => {
     setAction(initialAction);
-  }, [initialAction]);
-
-  useEffect(() => {
     setIsOn(initialState);
-  }, [initialState]);
+  }, [liveEntity, initialTemp, initialCurrentTemp, initialMode, initialAction, initialState]);
 
   const isSmall = isCompactCardSize(size);
   const isMedium = size === 'medium';
