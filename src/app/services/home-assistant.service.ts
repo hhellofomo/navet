@@ -1,4 +1,10 @@
-import type { Auth, Connection, HassConfig, HassEntities } from 'home-assistant-js-websocket';
+import type {
+	Auth,
+	Connection,
+	HassConfig,
+	HassEntities,
+	HassUser,
+} from 'home-assistant-js-websocket';
 import {
 	callService as callHassService,
 	createConnection,
@@ -9,6 +15,7 @@ import {
 	ERR_INVALID_AUTH,
 	ERR_INVALID_HTTPS_TO_HTTP,
 	getAuth,
+	getUser,
 	subscribeConfig,
 	subscribeEntities,
 } from 'home-assistant-js-websocket';
@@ -48,6 +55,7 @@ class HomeAssistantService {
 	private connection: Connection | null = null;
 	private config: HassConfig | null = null;
 	private entities: HassEntities | null = null;
+	private user: HassUser | null = null;
 	private areas: HomeAssistantAreaRegistryEntry[] = [];
 	private deviceRegistry: HomeAssistantDeviceRegistryEntry[] = [];
 	private entityRegistry: HomeAssistantEntityRegistryEntry[] = [];
@@ -77,6 +85,7 @@ class HomeAssistantService {
 			// Create connection
 			this.connection = await createConnection({ auth });
 			this.connected = true;
+			this.user = await getUser(this.connection);
 
 			await this.loadRegistries();
 
@@ -216,6 +225,10 @@ class HomeAssistantService {
 		return this.areas;
 	}
 
+	getUser(): HassUser | null {
+		return this.user;
+	}
+
 	getDeviceRegistry(): HomeAssistantDeviceRegistryEntry[] {
 		return this.deviceRegistry;
 	}
@@ -301,6 +314,7 @@ class HomeAssistantService {
 			this.connection.close();
 			this.connection = null;
 			this.connected = false;
+			this.user = null;
 			this.areas = [];
 			this.deviceRegistry = [];
 			this.entityRegistry = [];

@@ -1,12 +1,19 @@
 import { LogOut, Shield } from 'lucide-react';
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar';
+import { useHomeAssistantContext } from '@/app/contexts/home-assistant-context';
 import { useAuth } from '../../contexts/auth-context';
 import { type PrimaryColor, useTheme } from '../../contexts/theme-context';
 
-export const UserDropdown = memo(function UserDropdown() {
+interface UserDropdownProps {
+	avatarUrl?: string | null;
+}
+
+export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdownProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const { theme, primaryColor } = useTheme();
+	const { user } = useHomeAssistantContext();
 	const { logout } = useAuth();
 
 	// Get color value for inline styles
@@ -40,6 +47,7 @@ export const UserDropdown = memo(function UserDropdown() {
 
 	const handleLogout = () => {
 		if (confirm('Are you sure you want to logout?')) {
+			setIsOpen(false);
 			logout();
 		}
 	};
@@ -58,14 +66,18 @@ export const UserDropdown = memo(function UserDropdown() {
 			: theme === 'contrast'
 				? 'border-white/20'
 				: 'border-white/10';
-	const _hoverBg =
-		theme === 'light'
-			? 'hover:bg-gray-100'
-			: theme === 'contrast'
-				? 'hover:bg-white/10'
-				: 'hover:bg-white/5';
 	const itemBg =
 		theme === 'light' ? 'bg-gray-50' : theme === 'contrast' ? 'bg-black/30' : 'bg-white/5';
+
+	const fullName = user?.name?.trim() || 'User';
+	const initials = useMemo(() => {
+		const parts = fullName.split(/\s+/).filter(Boolean);
+		return parts
+			.slice(0, 2)
+			.map((part) => part[0]?.toUpperCase() ?? '')
+			.join('');
+	}, [fullName]);
+	const roleLabel = user?.is_owner ? 'Owner' : user?.is_admin ? 'Administrator' : 'User';
 
 	return (
 		<div className="relative" ref={dropdownRef}>
@@ -74,13 +86,18 @@ export const UserDropdown = memo(function UserDropdown() {
 				type="button"
 				onClick={() => setIsOpen(!isOpen)}
 				className="flex items-center gap-2 group cursor-pointer"
+				aria-label="Open user menu"
+				aria-expanded={isOpen}
 			>
-				<div
-					className="w-10 h-10 rounded-full flex items-center justify-center transition-transform group-hover:scale-105"
+				<Avatar
+					className="w-10 h-10 transition-transform group-hover:scale-105"
 					style={{ backgroundColor: getColorValue(primaryColor) }}
 				>
-					<span className="text-white text-sm font-semibold">VC</span>
-				</div>
+					{avatarUrl ? <AvatarImage src={avatarUrl} alt={fullName} /> : null}
+					<AvatarFallback className="bg-transparent text-white text-sm font-semibold">
+						{initials || 'U'}
+					</AvatarFallback>
+				</Avatar>
 			</button>
 
 			{/* Dropdown Menu */}
@@ -91,15 +108,18 @@ export const UserDropdown = memo(function UserDropdown() {
 					{/* User Info Section */}
 					<div className="p-4 border-b border-white/10">
 						<div className="flex items-center gap-3 mb-3">
-							<div
-								className="w-12 h-12 rounded-full flex items-center justify-center"
+							<Avatar
+								className="w-12 h-12"
 								style={{ backgroundColor: getColorValue(primaryColor) }}
 							>
-								<span className="text-white font-semibold">VC</span>
-							</div>
+								{avatarUrl ? <AvatarImage src={avatarUrl} alt={fullName} /> : null}
+								<AvatarFallback className="bg-transparent text-white font-semibold">
+									{initials || 'U'}
+								</AvatarFallback>
+							</Avatar>
 							<div>
-								<p className={`text-sm font-semibold ${textPrimary}`}>Vishal Chauhan</p>
-								<p className={`text-xs ${textMuted}`}>vishal@example.com</p>
+								<p className={`text-sm font-semibold ${textPrimary}`}>{fullName}</p>
+								<p className={`text-xs ${textMuted}`}>Connected to Home Assistant</p>
 							</div>
 						</div>
 
@@ -108,7 +128,7 @@ export const UserDropdown = memo(function UserDropdown() {
 							<Shield className={`w-4 h-4 ${textSecondary}`} />
 							<div>
 								<p className={`text-xs ${textMuted}`}>Role</p>
-								<p className={`text-sm font-medium ${textPrimary}`}>Administrator</p>
+								<p className={`text-sm font-medium ${textPrimary}`}>{roleLabel}</p>
 							</div>
 						</div>
 					</div>

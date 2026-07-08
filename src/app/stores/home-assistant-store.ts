@@ -1,4 +1,4 @@
-import type { Connection, HassConfig, HassEntities } from 'home-assistant-js-websocket';
+import type { Connection, HassConfig, HassEntities, HassUser } from 'home-assistant-js-websocket';
 import { createStore } from 'zustand/vanilla';
 import {
 	type HomeAssistantAreaRegistryEntry,
@@ -12,6 +12,7 @@ interface HomeAssistantState {
 	connected: boolean;
 	config: HassConfig | null;
 	entities: HassEntities | null;
+	user: HassUser | null;
 	areas: HomeAssistantAreaRegistryEntry[];
 	deviceRegistry: HomeAssistantDeviceRegistryEntry[];
 	entityRegistry: HomeAssistantEntityRegistryEntry[];
@@ -32,6 +33,7 @@ const initialState: HomeAssistantState = {
 	connected: false,
 	config: null,
 	entities: null,
+	user: null,
 	areas: [],
 	deviceRegistry: [],
 	entityRegistry: [],
@@ -53,6 +55,7 @@ export const homeAssistantStore = createStore<HomeAssistantStore>()((set, _get) 
 					connected: homeAssistantService.isConnected(),
 					config: homeAssistantService.getConfig(),
 					entities: homeAssistantService.getEntities(),
+					user: homeAssistantService.getUser(),
 					areas: homeAssistantService.getAreas(),
 					deviceRegistry: homeAssistantService.getDeviceRegistry(),
 					entityRegistry: homeAssistantService.getEntityRegistry(),
@@ -69,6 +72,7 @@ export const homeAssistantStore = createStore<HomeAssistantStore>()((set, _get) 
 				connected: homeAssistantService.isConnected(),
 				config: homeAssistantService.getConfig(),
 				entities: homeAssistantService.getEntities(),
+				user: homeAssistantService.getUser(),
 				areas: homeAssistantService.getAreas(),
 				deviceRegistry: homeAssistantService.getDeviceRegistry(),
 				entityRegistry: homeAssistantService.getEntityRegistry(),

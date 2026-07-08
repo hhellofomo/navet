@@ -1,5 +1,7 @@
 import { Bell, Search, X } from 'lucide-react';
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
+import { useAuth } from '@/app/contexts/auth-context';
+import { useHomeAssistantContext } from '@/app/contexts/home-assistant-context';
 import { useSearch } from '@/app/contexts/search-context';
 import { useTheme } from '@/app/contexts/theme-context';
 import { NotificationPanel } from '@/app/features/notifications/components/notification-panel';
@@ -9,6 +11,8 @@ import { UserDropdown } from './user-dropdown';
 
 export const Header = memo(function Header() {
 	const { theme } = useTheme();
+	const { config: authConfig } = useAuth();
+	const { entities, user } = useHomeAssistantContext();
 	const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 	const { searchQuery, setSearchQuery, setFilteredDeviceIds, clearSearch, isSearchActive } =
 		useSearch();
@@ -98,11 +102,47 @@ export const Header = memo(function Header() {
 		clearSearch();
 	};
 
+	const firstName = useMemo(() => {
+		const fullName = user?.name?.trim();
+		if (!fullName) {
+			return 'there';
+		}
+
+		return fullName.split(/\s+/)[0];
+	}, [user?.name]);
+
+	const avatarUrl = useMemo(() => {
+		const entityPicture = Object.values(entities ?? {}).find((entity) => {
+			if (!entity.entity_id.startsWith('person.')) {
+				return false;
+			}
+
+			const friendlyName = entity.attributes?.friendly_name;
+			return (
+				typeof friendlyName === 'string' &&
+				typeof user?.name === 'string' &&
+				friendlyName.trim().toLowerCase() === user.name.trim().toLowerCase()
+			);
+		})?.attributes?.entity_picture;
+
+		if (typeof entityPicture !== 'string' || !entityPicture) {
+			return null;
+		}
+
+		if (entityPicture.startsWith('http://') || entityPicture.startsWith('https://')) {
+			return entityPicture;
+		}
+
+		return authConfig ? `${authConfig.url}${entityPicture}` : entityPicture;
+	}, [authConfig, entities, user?.name]);
+
 	return (
 		<div className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-8 gap-4">
 			<div className="flex items-center gap-4 md:gap-6 flex-1">
 				<div>
-					<h1 className={`text-2xl md:text-4xl font-bold ${textPrimary} mb-1`}>Hello, Vishal!</h1>
+					<h1 className={`text-2xl md:text-4xl font-bold ${textPrimary} mb-1`}>
+						Hello, {firstName}!
+					</h1>
 					<p className={`${textSecondary} text-xs md:text-sm`}>
 						{formatDateWithTime(new Date())} | Week {getWeekNumber(new Date())}
 					</p>
@@ -146,7 +186,7 @@ export const Header = memo(function Header() {
 					/>
 				</div>
 
-				<UserDropdown />
+				<UserDropdown avatarUrl={avatarUrl} />
 			</div>
 		</div>
 	);
