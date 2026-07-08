@@ -155,17 +155,21 @@ describe('use-ha-devices helpers', () => {
     expect(indexes.primarySwitchEntityIdByDeviceId.get('device-2')).toBe('switch.bedroom_main');
   });
 
-  it('suppresses switches attached to climate or vacuum devices', () => {
+  it('suppresses switches attached to climate, water heater, or vacuum devices', () => {
     const entities: HassEntities = {
       'climate.hallway': createEntity('climate.hallway', 'heat'),
+      'water_heater.boiler': createEntity('water_heater.boiler', 'eco'),
       'vacuum.roborock': createEntity('vacuum.roborock', 'docked'),
       'switch.hallway_boost': createEntity('switch.hallway_boost', 'off'),
+      'switch.boiler_boost': createEntity('switch.boiler_boost', 'off'),
       'switch.roborock_child_lock': createEntity('switch.roborock_child_lock', 'off'),
     };
     const entityRegistryMap = createRegistryMap([
       { entity_id: 'climate.hallway', device_id: 'device-climate' },
+      { entity_id: 'water_heater.boiler', device_id: 'device-boiler' },
       { entity_id: 'vacuum.roborock', device_id: 'device-vacuum' },
       { entity_id: 'switch.hallway_boost', device_id: 'device-climate' },
+      { entity_id: 'switch.boiler_boost', device_id: 'device-boiler' },
       { entity_id: 'switch.roborock_child_lock', device_id: 'device-vacuum' },
     ]);
 
@@ -175,6 +179,13 @@ describe('use-ha-devices helpers', () => {
       shouldSkipSwitchDevice(
         'switch.hallway_boost',
         entityRegistryMap.get('switch.hallway_boost'),
+        indexes
+      )
+    ).toBe(true);
+    expect(
+      shouldSkipSwitchDevice(
+        'switch.boiler_boost',
+        entityRegistryMap.get('switch.boiler_boost'),
         indexes
       )
     ).toBe(true);

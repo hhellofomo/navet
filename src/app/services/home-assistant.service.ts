@@ -7,6 +7,10 @@ import HAConnectionService, {
 } from './ha-connection.service';
 import HAEntityService from './ha-entity-service';
 import HARegistryService from './ha-registry.service';
+import {
+  HomeAssistantPanelAdapter,
+  type HomeAssistantPanelHass,
+} from './home-assistant-panel-adapter';
 
 export type { HAConnectionEventMap, HAConnectionEventType, HomeAssistantConfiguration };
 
@@ -64,6 +68,7 @@ export interface HAServiceEventMap {
     entities: HomeAssistantEntityRegistryEntry[];
   };
   connection: { connected: boolean; connection: Connection | null; reconnecting: boolean };
+  error: { message: string };
 }
 
 export type HAServiceEventType = keyof HAServiceEventMap;
@@ -76,19 +81,38 @@ class HomeAssistantService {
   private connectionService: HAConnectionService;
   private registryService: HARegistryService;
   private entityService: HAEntityService;
+  private panelAdapter: HomeAssistantPanelAdapter | null = null;
 
   constructor() {
     this.connectionService = new HAConnectionService();
-    this.registryService = new HARegistryService(() => this.connectionService.getConnection());
-    this.entityService = new HAEntityService(() => this.connectionService.getConnection());
+    this.registryService = new HARegistryService(() => this.getConnection());
+    this.entityService = new HAEntityService(
+      () => this.getConnection(),
+      (domain, service, serviceData, target) =>
+        this.callService(domain, service, serviceData, target)
+    );
   }
 
   /**
    * Authenticate and establish connection to Home Assistant
    */
   async authenticate(configuration: HomeAssistantConfiguration): Promise<void> {
+    this.panelAdapter = null;
     await this.connectionService.authenticate(configuration);
     await this.registryService.loadRegistries();
+  }
+
+  /**
+   * Attach the Home Assistant frontend-provided hass object when Navet runs as a native panel.
+   */
+  setPanelHass(hass: HomeAssistantPanelHass): void {
+    if (this.panelAdapter) {
+      this.panelAdapter.update(hass);
+      return;
+    }
+
+    this.connectionService.disconnect();
+    this.panelAdapter = new HomeAssistantPanelAdapter(hass);
   }
 
   /**
@@ -100,7 +124,7 @@ class HomeAssistantService {
     callback: (data: HAServiceEventMap[K]) => void
   ): () => void {
     // Forward to connection service for connection-related events
-    if (event === 'connection' || event === 'config' || event === 'entities') {
+    if (event === 'connection' || event === 'config' || event === 'entities' || event === 'error') {
       return this.connectionService.addListener(event, callback);
     }
 
@@ -126,6 +150,10 @@ class HomeAssistantService {
    * Get current connection status
    */
   isConnected(): boolean {
+    if (this.panelAdapter) {
+      return true;
+    }
+
     return this.connectionService.isConnected();
   }
 
@@ -133,6 +161,10 @@ class HomeAssistantService {
    * Get Home Assistant configuration
    */
   getConfig(): HassConfig | null {
+    if (this.panelAdapter) {
+      return this.panelAdapter.getConfig();
+    }
+
     return this.connectionService.getConfig();
   }
 
@@ -140,6 +172,10 @@ class HomeAssistantService {
    * Get Home Assistant entities
    */
   getEntities(): HassEntities | null {
+    if (this.panelAdapter) {
+      return this.panelAdapter.getEntities();
+    }
+
     return this.connectionService.getEntities();
   }
 
@@ -147,6 +183,10 @@ class HomeAssistantService {
    * Get Home Assistant user
    */
   getUser(): HassUser | null {
+    if (this.panelAdapter) {
+      return this.panelAdapter.getUser();
+    }
+
     return this.connectionService.getUser();
   }
 
@@ -154,7 +194,21 @@ class HomeAssistantService {
    * Get connection object
    */
   getConnection(): Connection | null {
+    if (this.panelAdapter) {
+      return this.panelAdapter.getConnection();
+    }
+
     return this.connectionService.getConnection();
+  }
+
+  async loadRegistries(): Promise<void> {
+    if (this.panelAdapter) {
+      const { areas, devices, entities } = await this.panelAdapter.loadRegistries();
+      this.registryService.replaceRegistries(areas, devices, entities);
+      return;
+    }
+
+    await this.registryService.loadRegistries();
   }
 
   /**
@@ -198,6 +252,11 @@ class HomeAssistantService {
       device_id?: string | string[];
     }
   ): Promise<void> {
+    if (this.panelAdapter) {
+      await this.panelAdapter.callService(domain, service, serviceData, target);
+      return;
+    }
+
     await this.connectionService.callService(domain, service, serviceData, target);
   }
 
@@ -251,6 +310,13 @@ class HomeAssistantService {
    */
   async setClimateTemperature(entityId: string, temperature: number): Promise<void> {
     await this.entityService.setClimateTemperature(entityId, temperature);
+  }
+
+  /**
+   * Set climate HVAC mode
+   */
+  async setClimateHvacMode(entityId: string, hvacMode: string): Promise<void> {
+    await this.entityService.setClimateHvacMode(entityId, hvacMode);
   }
 
   /**
@@ -374,6 +440,7 @@ class HomeAssistantService {
    * Disconnect from Home Assistant
    */
   disconnect(): void {
+    this.panelAdapter = null;
     this.connectionService.disconnect();
   }
 }

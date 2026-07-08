@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
+import { isHomeAssistantPanelMode } from '@/app/runtime/app-mode';
 import {
   loadDashboardProfile,
   saveDashboardProfile,
@@ -52,6 +53,8 @@ export function useDashboardProfileSync() {
   const savingRef = useRef(false);
   const [profileLoadCompleted, setProfileLoadCompleted] = useState(false);
 
+  const panelMode = isHomeAssistantPanelMode();
+
   const applyRemoteProfile = useCallback(
     (profile: DashboardConfigPayload) => {
       const metadata = readSyncMetadata();
@@ -78,6 +81,10 @@ export function useDashboardProfileSync() {
   );
 
   useEffect(() => {
+    if (panelMode) {
+      return;
+    }
+
     if (loadCompletedRef.current) {
       return;
     }
@@ -106,9 +113,13 @@ export function useDashboardProfileSync() {
     return () => {
       cancelled = true;
     };
-  }, [applyRemoteProfile]);
+  }, [applyRemoteProfile, panelMode]);
 
   useEffect(() => {
+    if (panelMode) {
+      return;
+    }
+
     if (!profileLoadCompleted || !onboardingCompleted) {
       return;
     }
@@ -148,9 +159,13 @@ export function useDashboardProfileSync() {
     return () => {
       window.clearInterval(interval);
     };
-  }, [onboardingCompleted, profileLoadCompleted]);
+  }, [onboardingCompleted, panelMode, profileLoadCompleted]);
 
   useEffect(() => {
+    if (panelMode) {
+      return;
+    }
+
     if (!profileLoadCompleted || !onboardingCompleted) {
       return;
     }
@@ -172,5 +187,5 @@ export function useDashboardProfileSync() {
     return () => {
       window.clearInterval(interval);
     };
-  }, [applyRemoteProfile, onboardingCompleted, profileLoadCompleted]);
+  }, [applyRemoteProfile, onboardingCompleted, panelMode, profileLoadCompleted]);
 }

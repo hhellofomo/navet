@@ -13,6 +13,11 @@ function normalizeMediaText(value: string) {
   return value.trim().toLowerCase();
 }
 
+function getStringAttribute(attrs: Record<string, unknown> | undefined, key: string) {
+  const value = attrs?.[key];
+  return typeof value === 'string' && value.trim().length > 0 ? value : undefined;
+}
+
 export function useMediaDisplayFields({
   liveAttrs,
   entityPicture,
@@ -23,8 +28,7 @@ export function useMediaDisplayFields({
   nothingPlayingLabel,
   nothingPlayingDescription,
 }: UseMediaDisplayFieldsParams) {
-  const liveEntityPicture =
-    typeof liveAttrs?.entity_picture === 'string' ? liveAttrs.entity_picture : entityPicture;
+  const liveEntityPicture = getStringAttribute(liveAttrs, 'entity_picture') ?? entityPicture;
   const normalizedEntityName = normalizeMediaText(entityName);
   const initialTitleIsEntityName =
     initialTitle.trim().length > 0 && normalizeMediaText(initialTitle) === normalizedEntityName;
@@ -52,8 +56,16 @@ export function useMediaDisplayFields({
     (typeof liveAttrs?.app_name === 'string' && liveAttrs.app_name) ||
     (typeof liveAttrs?.source === 'string' && liveAttrs.source) ||
     fallbackArtist;
-  const liveArtworkKey =
-    typeof liveAttrs?.media_content_id === 'string' ? liveAttrs.media_content_id : artworkKey;
+  const liveArtworkKey = [
+    getStringAttribute(liveAttrs, 'entity_picture'),
+    getStringAttribute(liveAttrs, 'media_content_id'),
+    getStringAttribute(liveAttrs, 'media_title'),
+    getStringAttribute(liveAttrs, 'media_artist'),
+    getStringAttribute(liveAttrs, 'media_album_name'),
+    artworkKey,
+  ]
+    .filter(Boolean)
+    .join('::');
 
   return {
     displayArtist,
