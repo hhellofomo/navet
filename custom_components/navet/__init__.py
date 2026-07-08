@@ -47,6 +47,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         sidebar_title=PANEL_TITLE,
         sidebar_icon=PANEL_ICON,
         module_url=FRONTEND_MODULE_URL,
+        embed_iframe=True,
         config={"integration": DOMAIN},
     )
 
