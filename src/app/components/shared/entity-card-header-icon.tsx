@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { type ButtonHTMLAttributes, memo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 
 interface EntityCardHeaderIconProps {
@@ -21,6 +22,7 @@ export const EntityCardHeaderIcon = memo(function EntityCardHeaderIcon({
   onPointerDown,
 }: EntityCardHeaderIconProps) {
   const { theme, primaryColor } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const isExtraSmall = size === 'extra-small';
   const isCompact = isExtraSmall || size === 'small' || size === 'medium';
   const badgeSize = isExtraSmall ? 'h-7 w-7' : isCompact ? 'h-8 w-8' : 'h-10 w-10';
@@ -48,15 +50,22 @@ export const EntityCardHeaderIcon = memo(function EntityCardHeaderIcon({
     ? ''
     : theme === 'light'
       ? 'bg-gray-200 border border-gray-300/80'
-      : 'bg-white/5 border border-white/10';
+      : theme === 'glass'
+        ? 'bg-white/12 border border-white/16'
+        : 'bg-white/10 border border-white/14';
   const badgeStyle = isActive
     ? {
-        backgroundColor: theme === 'light' ? '#ffffff' : `${activeColor.text}cc`,
-        borderColor: `${activeColor.text}55`,
+        backgroundColor:
+          theme === 'light'
+            ? '#ffffff'
+            : theme === 'glass'
+              ? activeColor.bg.replace('0.24', '0.34')
+              : activeColor.bg.replace('0.24', '0.28'),
+        borderColor: theme === 'light' ? `${activeColor.text}55` : `${activeColor.text}66`,
         boxShadow:
           theme === 'light'
             ? `0 0 0 2px ${activeColor.text}22, 0 10px 28px ${activeColor.text}40`
-            : `0 0 0 2px ${activeColor.text}22, 0 12px 30px ${activeColor.text}45`,
+            : `0 0 0 1px ${activeColor.text}18, 0 12px 30px ${activeColor.text}22`,
       }
     : undefined;
 
@@ -64,13 +73,18 @@ export const EntityCardHeaderIcon = memo(function EntityCardHeaderIcon({
     <IconComponent
       aria-hidden="true"
       className={`${iconSize} transition-colors duration-500 ${
-        !isActive && theme === 'light' ? 'text-gray-600' : !isActive ? 'text-gray-500' : ''
+        !isActive && theme === 'light'
+          ? 'text-gray-700'
+          : !isActive
+            ? surface.textSecondary
+            : ''
       }`}
       style={
         isActive
           ? {
-              color: theme === 'light' ? activeColor.text : '#ffffff',
-              filter: theme === 'light' ? undefined : 'drop-shadow(0 1px 6px rgba(0, 0, 0, 0.35))',
+              color: activeColor.text,
+              filter:
+                theme === 'light' ? undefined : 'drop-shadow(0 1px 4px rgba(0, 0, 0, 0.18))',
             }
           : undefined
       }

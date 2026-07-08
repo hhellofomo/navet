@@ -1,6 +1,7 @@
 import { Droplets, Sun, Wind } from 'lucide-react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { WeatherIcon } from '@/app/features/weather';
 import { useTheme } from '@/app/hooks';
 
@@ -25,13 +26,12 @@ interface WeatherWidgetProps {
 
 export function WeatherWidget({ size = 'medium' }: WeatherWidgetProps) {
   const { theme, primaryColor } = useTheme();
-
-  const bgColor =
-    theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : 'bg-white/10';
-  const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
-  const border = theme === 'light' ? 'border-gray-200/50' : 'border-white/10';
+  const surface = getThemeSurfaceTokens(theme);
+  const bgColor = theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : surface.panel;
+  const textPrimary = surface.textPrimary;
+  const textSecondary = surface.textSecondary;
+  const border = theme === 'light' ? 'border-gray-200/50' : surface.border;
+  const subtleFill = theme === 'light' ? '#f3f4f6' : theme === 'contrast' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.08)';
 
   const displayForecast =
     size === 'extra-small' || size === 'small'
@@ -67,7 +67,7 @@ export function WeatherWidget({ size = 'medium' }: WeatherWidgetProps) {
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div
             className="p-3 rounded-xl"
-            style={{ backgroundColor: theme === 'light' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.05)' }}
+            style={{ backgroundColor: subtleFill }}
           >
             <div className="flex items-center gap-2 mb-1">
               <Wind className={`w-4 h-4 ${textSecondary}`} />
@@ -77,7 +77,7 @@ export function WeatherWidget({ size = 'medium' }: WeatherWidgetProps) {
           </div>
           <div
             className="p-3 rounded-xl"
-            style={{ backgroundColor: theme === 'light' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.05)' }}
+            style={{ backgroundColor: subtleFill }}
           >
             <div className="flex items-center gap-2 mb-1">
               <Droplets className={`w-4 h-4 ${textSecondary}`} />
@@ -98,9 +98,7 @@ export function WeatherWidget({ size = 'medium' }: WeatherWidgetProps) {
                 <p className={`text-sm font-medium ${textPrimary} w-12`}>{day.day}</p>
                 <div
                   className="w-8 h-8 rounded-lg flex items-center justify-center"
-                  style={{
-                    backgroundColor: theme === 'light' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.05)',
-                  }}
+                  style={{ backgroundColor: subtleFill }}
                 >
                   <WeatherIcon condition={day.condition} className="w-5 h-5" />
                 </div>

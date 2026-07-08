@@ -67,6 +67,14 @@
 - Do not move card rendering registration logic back into generic `src/app/utils/`.
 - Dashboard entity visibility, custom card state, card ordering, and room ordering should stay colocated with the dashboard feature.
 
+### Theming Rules
+
+- Do not let sections, cards, dialogs, or feature views invent their own light/dark/contrast/glass surface logic when shared theme tokens can express it.
+- Prefer `src/app/components/shared/theme/theme-surface-tokens.ts` for shared surface decisions such as panel backgrounds, borders, muted text, overlays, hover states, dialog backdrops, and input surfaces.
+- When updating a section or card, first check whether the styling should consume shared surface tokens instead of adding new `theme === 'light' ? ... : ...` branches inline.
+- Only keep local theme branches when the styling is truly feature-specific, for example domain accents or status colors that are not generic surfaces.
+- If a recurring theme pattern appears in more than one place, move it into a shared token/helper instead of copying the branch logic again.
+
 ### Documentation
 
 - When moving or renaming files that are referenced by docs, update the active docs in the same change.
@@ -76,6 +84,15 @@
   - `design-system/README.md`
   - `design-system/FEATURES.md`
 - Treat `docs/archive/status/*` as historical snapshots; do not rewrite them unless the task is explicitly about historical docs.
+
+### Branding and Logo Usage
+
+- Follow `docs/branding/BRANDING.md` when using Navet brand assets.
+- Use the existing logo files from `public/` as-is; do not restyle the logo itself.
+- Do not place the logo inside decorative pills, badges, or framed containers that change its presentation.
+- Do not add shadows, outlines, glows, recolors, or gradients directly to the logo.
+- If a scene needs more visual drama, add lighting or atmosphere around the logo, not on the logo.
+- Prefer neutral backgrounds and adequate clear space around the mark.
 
 ### Verification
 

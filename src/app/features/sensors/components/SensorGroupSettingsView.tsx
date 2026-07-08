@@ -2,6 +2,8 @@ import * as Dialog from '@radix-ui/react-dialog';
 import type { LucideIcon } from 'lucide-react';
 import { Gauge, Plus, Search, Trash2, X } from 'lucide-react';
 import type { Dispatch, ReactNode, RefObject, SetStateAction } from 'react';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import type { ThemeType } from '@/app/hooks/use-theme';
 import type { AvailableSensor, SensorGroupColorConfig } from './sensor-group-settings.types';
 import type { SensorIconType, SensorReading } from './sensors/sensor-types';
 
@@ -17,6 +19,7 @@ interface SensorGroupSettingsViewProps {
   setHighlightedIndex: Dispatch<SetStateAction<number>>;
   inputRef: RefObject<HTMLInputElement | null>;
   colors: SensorGroupColorConfig;
+  theme: ThemeType;
   filteredSensors: AvailableSensor[];
   iconMap: Record<SensorIconType, LucideIcon>;
   handleAddSensor: (sensor: AvailableSensor) => void;
@@ -39,6 +42,7 @@ export function SensorGroupSettingsView({
   setHighlightedIndex,
   inputRef,
   colors,
+  theme,
   filteredSensors,
   iconMap,
   handleAddSensor,
@@ -48,18 +52,29 @@ export function SensorGroupSettingsView({
   isSensorSelected,
   CustomScrollbar,
 }: SensorGroupSettingsViewProps) {
+  const surface = getThemeSurfaceTokens(theme);
+  const isGlass = theme === 'glass';
+
   return (
-    <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md h-[85vh] bg-gradient-to-br from-gray-900/95 to-gray-950/95 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl z-50 overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+    <Dialog.Content
+      className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md h-[85vh] rounded-3xl border shadow-2xl z-50 overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 ${
+        theme === 'light'
+          ? 'bg-gradient-to-br from-white via-gray-50/95 to-white'
+          : isGlass
+            ? 'bg-gradient-to-br from-white/14 via-slate-900/80 to-slate-950/88 backdrop-blur-2xl'
+            : 'bg-gradient-to-br from-gray-900/95 to-gray-950/95 backdrop-blur-xl'
+      } ${surface.border}`}
+    >
       <div className="flex-1 min-h-0 overflow-hidden">
         <div className="h-full overflow-y-auto overscroll-contain [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="p-8">
             {/* Dialog Header */}
             <div className="flex items-start justify-between mb-6">
               <div>
-                <Dialog.Title className="text-xl font-semibold text-white">
+                <Dialog.Title className={`text-xl font-semibold ${surface.textPrimary}`}>
                   {groupName} Settings
                 </Dialog.Title>
-                <Dialog.Description className="text-sm mt-1 text-gray-300">
+                <Dialog.Description className={`text-sm mt-1 ${surface.textSecondary}`}>
                   Manage sensors for this group
                 </Dialog.Description>
               </div>
@@ -68,9 +83,9 @@ export function SensorGroupSettingsView({
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all"
+                  className={`p-2 rounded-lg ${surface.subtleBg} ${surface.hoverBg} transition-all`}
                 >
-                  <X className="w-5 h-5 text-gray-300" />
+                  <X className={`w-5 h-5 ${surface.textSecondary}`} />
                 </button>
               </Dialog.Close>
             </div>
@@ -78,13 +93,13 @@ export function SensorGroupSettingsView({
             <div className="space-y-4">
               {/* Selected Sensors Section */}
               <div>
-                <h3 className="text-sm font-semibold text-white mb-3">
+                <h3 className={`text-sm font-semibold mb-3 ${surface.textPrimary}`}>
                   Selected Sensors ({selectedSensors.length}/{maxSensors})
                 </h3>
 
                 {selectedSensors.length === 0 ? (
-                  <div className="bg-white/5 rounded-2xl p-4 text-center">
-                    <p className="text-xs text-gray-300">Search and add sensors below</p>
+                  <div className={`rounded-2xl p-4 text-center ${surface.subtleBg}`}>
+                    <p className={`text-xs ${surface.textSecondary}`}>Search and add sensors below</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -93,7 +108,7 @@ export function SensorGroupSettingsView({
                       return (
                         <div
                           key={`${sensor.label}-${index}`}
-                          className="bg-white/5 rounded-2xl p-3 border border-white/10 flex items-center justify-between"
+                          className={`rounded-2xl p-3 border flex items-center justify-between ${surface.subtleBg} ${surface.border}`}
                         >
                           <div className="flex items-center gap-2 min-w-0 flex-1">
                             <div
@@ -102,10 +117,10 @@ export function SensorGroupSettingsView({
                               <Icon className={`w-4 h-4 ${colors.iconColor}`} />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="text-xs font-medium text-white truncate">
+                              <p className={`text-xs font-medium truncate ${surface.textPrimary}`}>
                                 {sensor.label}
                               </p>
-                              <p className="text-xs text-gray-300">
+                              <p className={`text-xs ${surface.textSecondary}`}>
                                 {sensor.value} {sensor.unit}
                               </p>
                             </div>
@@ -127,11 +142,13 @@ export function SensorGroupSettingsView({
 
               {/* Search and Autocomplete Section */}
               <div className="relative">
-                <h3 className="text-sm font-semibold text-white mb-3">Add Sensors</h3>
+                <h3 className={`text-sm font-semibold mb-3 ${surface.textPrimary}`}>Add Sensors</h3>
 
                 {/* Search Input */}
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
+                  <Search
+                    className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 ${surface.textSecondary}`}
+                  />
                   <input
                     ref={inputRef}
                     type="text"
@@ -181,7 +198,7 @@ export function SensorGroupSettingsView({
                       }
                     }}
                     placeholder="Search sensors..."
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+                    className={`w-full ${surface.inputBg} border ${surface.border} rounded-2xl pl-11 pr-4 py-3 text-sm ${surface.textPrimary} ${surface.placeholder} focus:outline-none focus:ring-2 focus:ring-white/20 transition-all`}
                     disabled={selectedSensors.length >= maxSensors}
                     autoComplete="off"
                   />
@@ -189,7 +206,9 @@ export function SensorGroupSettingsView({
 
                 {/* Autocomplete Dropdown */}
                 {isDropdownOpen && (
-                  <div className="mt-2 bg-gray-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-64">
+                  <div
+                    className={`mt-2 rounded-2xl shadow-2xl overflow-hidden max-h-64 border ${surface.panel} ${surface.border} ${isGlass ? 'backdrop-blur-2xl' : 'backdrop-blur-xl'}`}
+                  >
                     <CustomScrollbar>
                       {filteredSensors.length > 0 ? (
                         <div className="p-2">
@@ -234,9 +253,9 @@ export function SensorGroupSettingsView({
                                 disabled={isDisabled || isSelected}
                                 className={`w-full rounded-xl p-3 transition-colors flex items-center gap-3 text-left ${
                                   isSelected
-                                    ? 'bg-white/5 opacity-50 cursor-not-allowed'
+                                    ? `${surface.subtleBg} opacity-50 cursor-not-allowed`
                                     : isDisabled
-                                      ? 'bg-white/5 opacity-50 cursor-not-allowed'
+                                      ? `${surface.subtleBg} opacity-50 cursor-not-allowed`
                                       : isHighlighted
                                         ? `${colors.selected} border border-transparent`
                                         : `${colors.hover} border border-transparent`
@@ -248,17 +267,17 @@ export function SensorGroupSettingsView({
                                   <Icon className={`w-4 h-4 ${colors.iconColor}`} />
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                  <p className="text-xs font-medium text-white truncate">
+                                  <p className={`text-xs font-medium truncate ${surface.textPrimary}`}>
                                     {highlightMatch(sensor.label)}
                                   </p>
-                                  <p className="text-xs text-gray-300">
+                                  <p className={`text-xs ${surface.textSecondary}`}>
                                     {sensor.value} {sensor.unit} · {sensor.category}
                                   </p>
                                 </div>
                                 {isSelected ? (
-                                  <span className="text-xs text-gray-500 flex-shrink-0">Added</span>
+                                  <span className={`text-xs flex-shrink-0 ${surface.textMuted}`}>Added</span>
                                 ) : !isDisabled ? (
-                                  <Plus className="w-4 h-4 text-white/60 flex-shrink-0" />
+                                  <Plus className={`w-4 h-4 flex-shrink-0 ${surface.textMuted}`} />
                                 ) : null}
                               </button>
                             );
@@ -266,7 +285,9 @@ export function SensorGroupSettingsView({
                         </div>
                       ) : (
                         <div className="p-6 text-center">
-                          <p className="text-xs text-gray-300">No sensors match "{searchQuery}"</p>
+                          <p className={`text-xs ${surface.textSecondary}`}>
+                            No sensors match "{searchQuery}"
+                          </p>
                         </div>
                       )}
                     </CustomScrollbar>
@@ -279,11 +300,11 @@ export function SensorGroupSettingsView({
       </div>
 
       {/* Footer Actions */}
-      <div className="p-6 border-t border-white/10 flex gap-3">
+      <div className={`p-6 border-t flex gap-3 ${surface.border}`}>
         <button
           type="button"
           onClick={handleCancel}
-          className="flex-1 py-3 px-4 rounded-2xl bg-white/5 hover:bg-white/10 text-white font-medium transition-colors"
+          className={`flex-1 py-3 px-4 rounded-2xl ${surface.subtleBg} ${surface.hoverBg} ${surface.textPrimary} font-medium transition-colors`}
         >
           Cancel
         </button>

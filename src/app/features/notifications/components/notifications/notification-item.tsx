@@ -1,4 +1,4 @@
-import type { PrimaryColor } from '@/app/hooks';
+import type { PrimaryColor, ThemeType } from '@/app/hooks';
 import { getNotificationColor, getNotificationIcon } from './notification-utils';
 import type { Notification } from './use-notifications';
 
@@ -6,7 +6,7 @@ interface NotificationItemProps {
   notification: Notification;
   onMarkAsRead: (id: string) => void;
   onDelete: (id: string) => void;
-  theme: 'light' | 'dark' | 'contrast';
+  theme: ThemeType;
   primaryColor: PrimaryColor;
   getColorValue: (color: PrimaryColor) => string;
   formatTimestamp: (date: Date) => string;

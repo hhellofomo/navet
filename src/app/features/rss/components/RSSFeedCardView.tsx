@@ -1,6 +1,7 @@
 import { ChevronRight, Rss } from 'lucide-react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import type { PrimaryColor, ThemeType } from '@/app/hooks';
 import type { RSSItem } from './rss-feed-card.types';
 
@@ -39,6 +40,7 @@ export function RSSFeedCardView({
   largeArticles,
   handleArticleClick,
 }: RSSFeedCardViewProps) {
+  const surface = getThemeSurfaceTokens(theme);
   const colorMap = {
     orange: { strong: '#c2410c', base: '#f97316', soft: '#fed7aa' },
     blue: { strong: '#1d4ed8', base: '#3b82f6', soft: '#bfdbfe' },
@@ -51,12 +53,16 @@ export function RSSFeedCardView({
   } as const;
   const accentColor = colorMap[primaryColor];
   // Theme-aware colors
-  const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-white/60';
+  const textPrimary = surface.textPrimary;
+  const textSecondary = theme === 'light' ? 'text-gray-500' : surface.textMuted;
   const overlayBg =
-    theme === 'light' ? 'bg-white/60 backdrop-blur-sm' : 'bg-black/20 backdrop-blur-sm';
+    theme === 'light'
+      ? 'bg-white/60 backdrop-blur-sm'
+      : theme === 'glass'
+        ? 'bg-white/[0.03] backdrop-blur-sm'
+        : 'bg-black/20 backdrop-blur-sm';
   const dividerColor = theme === 'light' ? 'bg-gray-200' : 'bg-white/10';
-  const hoverBg = theme === 'light' ? 'hover:bg-gray-100/80' : 'hover:bg-white/5';
+  const hoverBg = theme === 'light' ? 'hover:bg-gray-100/80' : surface.hoverBg;
   const dotColor = theme === 'light' ? 'text-gray-300' : 'text-white/40';
   const excerptColor = theme === 'light' ? 'text-gray-500' : 'text-white/70';
   const readMoreColor = theme === 'light' ? 'text-gray-600' : 'text-white/80';
@@ -186,7 +192,9 @@ export function RSSFeedCardView({
                     {/* Thumbnail */}
                     {item.imageUrl && (
                       <div
-                        className={`w-20 h-20 rounded-lg ${theme === 'light' ? 'bg-gray-100' : 'bg-white/10'} overflow-hidden flex-shrink-0`}
+                        className={`w-20 h-20 rounded-lg ${
+                          theme === 'light' ? 'bg-gray-100' : theme === 'glass' ? 'bg-white/8' : 'bg-white/10'
+                        } overflow-hidden flex-shrink-0`}
                       >
                         <img
                           src={item.imageUrl}

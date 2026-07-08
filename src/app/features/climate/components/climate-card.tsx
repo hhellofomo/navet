@@ -1,6 +1,7 @@
 import { Thermometer } from 'lucide-react';
 import { memo, useState } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import { ClimateLargeView } from './climate/climate-large-view';
 import { ClimateMediumView } from './climate/climate-medium-view';
@@ -28,6 +29,7 @@ export const ClimateCard = memo(function ClimateCard({
 }: ClimateCardProps) {
   const [mode, setMode] = useState(initialMode);
   const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const {
     cardGradient,
     cardBorder,
@@ -45,6 +47,7 @@ export const ClimateCard = memo(function ClimateCard({
   const isMedium = size === 'medium';
   const padding = isSmall ? 'p-4' : 'p-5';
   const isOff = mode === 'off';
+  const isGlass = theme === 'glass';
   const resolvedIconBg = theme === 'light' && isOff ? 'bg-gray-300/70' : iconBg;
   const resolvedIconColor = theme === 'light' && isOff ? 'text-gray-600' : iconColor;
   const resolvedTextSecondary = theme === 'light' && isOff ? 'text-gray-600' : textSecondary;
@@ -63,7 +66,9 @@ export const ClimateCard = memo(function ClimateCard({
       <div className={`absolute inset-0 bg-gradient-to-br ${glowGradient} to-transparent`}></div>
 
       {/* Light theme frosted overlay */}
-      {theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
+      {(theme === 'light' || isGlass) && (
+        <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`} />
+      )}
 
       <div className="relative h-full flex flex-col">
         <div className={`flex items-start gap-3 ${isSmall ? 'mb-1' : 'mb-2'}`}>
@@ -78,7 +83,7 @@ export const ClimateCard = memo(function ClimateCard({
             >
               {name}
             </h3>
-            <p className="text-[10px] text-gray-300 truncate mt-0.5">Climate</p>
+            <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5`}>Climate</p>
           </div>
         </div>
 

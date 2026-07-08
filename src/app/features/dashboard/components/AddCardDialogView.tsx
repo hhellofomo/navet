@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import type { ThemeType } from '@/app/hooks';
 import type { CardTemplate, CardType } from './AddCardDialogContainer';
 
@@ -36,15 +37,16 @@ export function AddCardDialogView({
 }: AddCardDialogViewProps) {
   if (!open) return null;
 
-  const bgColor = theme === 'light' ? 'bg-white' : 'bg-gray-900';
-  const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
-  const borderColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
-  const cardBg = theme === 'light' ? 'bg-gray-50' : 'bg-white/5';
-  const hoverBg = theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10';
+  const surface = getThemeSurfaceTokens(theme);
+  const bgColor = theme === 'light' ? 'bg-white' : theme === 'contrast' ? 'bg-gray-900' : surface.panel;
+  const textColor = surface.textPrimary;
+  const mutedColor = surface.textSecondary;
+  const borderColor = surface.border;
+  const cardBg = surface.panelMuted;
+  const hoverBg = surface.hoverBg;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${surface.dialogBackdrop}`}>
       <div
         className={`${bgColor} rounded-2xl border ${borderColor} w-full max-w-2xl max-h-[80vh] overflow-y-auto`}
         style={{

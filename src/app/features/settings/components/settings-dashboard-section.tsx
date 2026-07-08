@@ -39,7 +39,6 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
     showRestartOnboardingConfirm,
     showRevealAllConfirm,
     styles,
-    theme,
     updateSettings,
   } = controller;
 
@@ -139,9 +138,6 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
                 type="button"
                 key={option.value}
                 onClick={() => updateSettings({ entityInteractionMode: option.value })}
-                className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
-                  isActive ? 'shadow-sm' : ''
-                }`}
                 style={
                   isActive
                     ? {
@@ -149,9 +145,12 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
                         color: '#ffffff',
                       }
                     : {
-                        color: theme === 'light' ? '#4b5563' : '#d1d5db',
+                        color: undefined,
                       }
                 }
+                className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
+                  isActive ? 'shadow-sm' : styles.chipTextColor
+                }`}
                 aria-pressed={isActive}
               >
                 {option.label}
@@ -163,7 +162,7 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
         <InteractionPreviewCard
           mode={entityInteractionMode}
           accentColor={styles.accentColor}
-          isLightTheme={theme === 'light'}
+          isLightTheme={styles.isLightTheme}
         />
       </SettingsItem>
 

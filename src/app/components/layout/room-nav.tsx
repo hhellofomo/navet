@@ -4,6 +4,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Check, Edit3, LayoutGrid, Lightbulb } from 'lucide-react';
 import { memo } from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 
 interface RoomNavProps {
@@ -30,6 +31,7 @@ export const RoomNav = memo(function RoomNav({
   addEntityLabel = 'Add Entity',
 }: RoomNavProps) {
   const { theme, primaryColor } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const visibleRooms = ['All', ...rooms];
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -39,24 +41,12 @@ export const RoomNav = memo(function RoomNav({
     })
   );
 
-  const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
-  const textPrimary =
-    theme === 'light' ? 'text-gray-900' : theme === 'contrast' ? 'text-white' : 'text-white';
-  const inactiveBg =
-    theme === 'light' ? 'bg-gray-100' : theme === 'contrast' ? 'bg-black/50' : 'bg-white/5';
-  const hoverBg =
-    theme === 'light'
-      ? 'hover:bg-gray-200'
-      : theme === 'contrast'
-        ? 'hover:bg-white/20'
-        : 'hover:bg-white/10';
-  const border =
-    theme === 'light'
-      ? 'border-gray-200'
-      : theme === 'contrast'
-        ? 'border-white/20'
-        : 'border-white/5';
+  const textSecondary = surface.textSecondary;
+  const textPrimary = surface.textPrimary;
+  const inactiveBg = surface.subtleBg;
+  const hoverBg = surface.hoverBg;
+  const border = surface.border;
+  const dividerClass = theme === 'light' ? 'bg-gray-200' : surface.border;
   const activeColorValue = getThemeColorValue(primaryColor);
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -123,16 +113,7 @@ export const RoomNav = memo(function RoomNav({
         )}
 
         {isEditMode && (
-          <div
-            aria-hidden="true"
-            className={`mx-1 h-6 w-px ${
-              theme === 'light'
-                ? 'bg-gray-200'
-                : theme === 'contrast'
-                  ? 'bg-white/20'
-                  : 'bg-white/10'
-            }`}
-          />
+          <div aria-hidden="true" className={`mx-1 h-6 w-px ${dividerClass}`} />
         )}
 
         <button

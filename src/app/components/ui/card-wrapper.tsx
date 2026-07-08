@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useTheme } from '@/app/hooks';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 
 interface CardWrapperProps {
   children: ReactNode;
@@ -37,6 +38,7 @@ export const CardWrapper = memo(function CardWrapper({
   interactionProps,
 }: CardWrapperProps) {
   const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const { className: interactionClassName, ...restInteractionProps } = interactionProps || {};
 
   return (
@@ -56,14 +58,13 @@ export const CardWrapper = memo(function CardWrapper({
           onClick(e);
         }
       }}
-      className={`relative h-full backdrop-blur-xl rounded-3xl border overflow-hidden transition-all duration-500 ${onClick && !isDisabled ? 'cursor-pointer' : ''} ${theme === 'light' && showShadow ? 'shadow-lg' : ''} ${interactionClassName || ''} ${className}`}
+      className={`relative h-full backdrop-blur-xl rounded-3xl border overflow-hidden transition-all duration-500 ${onClick && !isDisabled ? 'cursor-pointer' : ''} ${showShadow ? surface.cardShadow : ''} ${interactionClassName || ''} ${className}`}
       {...restInteractionProps}
     >
       {children}
-      {/* Light theme frosted overlay - rendered after children's glow layers for correct z-stacking */}
-      {theme === 'light' && (
+      {surface.lightOverlay && (
         <div
-          className={`absolute inset-0 z-[1] pointer-events-none ${lightOverlayClassName || 'bg-white/60'}`}
+          className={`absolute inset-0 z-[1] pointer-events-none ${lightOverlayClassName || surface.lightOverlay}`}
         />
       )}
     </div>

@@ -2,6 +2,7 @@ import { Check, Edit2, StickyNote } from 'lucide-react';
 import { useState } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 
 interface NoteWidgetProps {
@@ -12,16 +13,16 @@ interface NoteWidgetProps {
 
 export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetProps, 'size'>) {
   const { theme, primaryColor } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const [note, setNote] = useState(initialNote || 'Click to add a note...');
   const [isEditing, setIsEditing] = useState(false);
   const [tempNote, setTempNote] = useState(note);
 
-  const bgColor =
-    theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : 'bg-white/10';
-  const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
-  const border = theme === 'light' ? 'border-gray-200/50' : 'border-white/10';
+  const bgColor = theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : surface.panel;
+  const textPrimary = surface.textPrimary;
+  const textSecondary = surface.textSecondary;
+  const border = theme === 'light' ? 'border-gray-200/50' : surface.border;
+  const subtleFill = theme === 'light' ? '#f3f4f6' : theme === 'contrast' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.08)';
 
   const handleStartEdit = () => {
     setTempNote(note);
@@ -58,14 +59,14 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
         </div>
         <div className="flex-1 min-w-0">
           <h3 className={`text-sm font-semibold ${textPrimary}`}>Quick Note</h3>
-          <p className="text-[10px] text-gray-300 truncate mt-0.5">Widget</p>
+          <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5`}>Widget</p>
         </div>
         {!isEditing && (
           <button
             type="button"
             onClick={handleStartEdit}
             className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
-            style={{ backgroundColor: theme === 'light' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.05)' }}
+            style={{ backgroundColor: subtleFill }}
           >
             <Edit2 className={`w-4 h-4 ${textSecondary}`} />
           </button>
@@ -81,7 +82,7 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
               onChange={(e) => setTempNote(e.target.value)}
               className={`flex-1 p-3 rounded-xl text-sm resize-none focus:outline-none ${textPrimary}`}
               style={{
-                backgroundColor: theme === 'light' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.05)',
+                backgroundColor: subtleFill,
                 border: `2px solid ${getThemeColorValue(primaryColor)}`,
               }}
               placeholder="Write your note here..."
@@ -91,9 +92,7 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
                 type="button"
                 onClick={handleCancel}
                 className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${textSecondary}`}
-                style={{
-                  backgroundColor: theme === 'light' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.05)',
-                }}
+                style={{ backgroundColor: subtleFill }}
               >
                 Cancel
               </button>
@@ -117,7 +116,7 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
             className={`flex-1 p-3 rounded-xl text-sm cursor-pointer transition-colors text-left ${
               note === 'Click to add a note...' ? textSecondary : textPrimary
             }`}
-            style={{ backgroundColor: theme === 'light' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.05)' }}
+            style={{ backgroundColor: subtleFill }}
           >
             <p className="whitespace-pre-wrap">{note}</p>
           </button>

@@ -16,6 +16,7 @@ export const LockCard = memo(function LockCard({
 }: Omit<LockCardProps, 'room'>) {
   const [isLocked, setIsLocked] = useState(initialState);
   const { theme, colors } = useTheme();
+  const isGlass = theme === 'glass';
 
   const cardColors = isLocked ? colors.lock.locked : colors.lock.unlocked;
 
@@ -28,7 +29,9 @@ export const LockCard = memo(function LockCard({
       ></div>
 
       {/* Light theme frosted overlay */}
-      {theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
+      {(theme === 'light' || isGlass) && (
+        <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`} />
+      )}
 
       <div className="relative h-full flex flex-col">
         <EntityCardHeader
@@ -63,7 +66,19 @@ export const LockCard = memo(function LockCard({
 
           <div className="text-center mt-3">
             <div
-              className={`text-xs ${isLocked ? (theme === 'light' ? 'text-green-700' : 'text-green-400') : theme === 'light' ? 'text-red-700' : 'text-red-400'} transition-colors duration-500`}
+              className={`text-xs ${
+                isLocked
+                  ? theme === 'light'
+                    ? 'text-green-700'
+                    : isGlass
+                      ? 'text-green-200'
+                      : 'text-green-400'
+                  : theme === 'light'
+                    ? 'text-red-700'
+                    : isGlass
+                      ? 'text-red-200'
+                      : 'text-red-400'
+              } transition-colors duration-500`}
             >
               {isLocked ? 'Locked' : 'Unlocked'}
             </div>

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 
 interface EntityCardHeaderProps {
@@ -11,7 +12,8 @@ interface EntityCardHeaderProps {
 
 export function EntityCardHeader({ title, subtitle, size, leading }: EntityCardHeaderProps) {
   const { theme } = useTheme();
-  const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
+  const surface = getThemeSurfaceTokens(theme);
+  const textColor = surface.textPrimary;
   const isExtraSmall = size === 'extra-small';
   const isStandardCompact = size === 'small' || size === 'medium';
   const titleSize = isExtraSmall || isStandardCompact ? 'text-xs' : 'text-sm';
@@ -24,7 +26,7 @@ export function EntityCardHeader({ title, subtitle, size, leading }: EntityCardH
       {leading}
       <div className="min-w-0 flex-1">
         <h3 className={`truncate font-semibold ${titleSize} ${textColor}`}>{title}</h3>
-        <p className={`mt-0.5 truncate text-[10px] text-gray-300 ${subtitleMarginTop}`}>
+        <p className={`mt-0.5 truncate text-[10px] ${surface.textMuted} ${subtitleMarginTop}`}>
           {subtitle}
         </p>
       </div>

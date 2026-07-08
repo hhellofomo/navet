@@ -1,3 +1,4 @@
+import { DashboardArrivalReveal } from './components/dashboard-arrival-reveal';
 import { LoadingSpinner } from '@/app/components/shared/loading-spinner';
 import { DashboardOverlays } from './components/dashboard-overlays';
 import { DashboardSectionRouter } from './components/dashboard-section-router';
@@ -15,6 +16,11 @@ export function DashboardPage() {
 
   return (
     <>
+      <DashboardArrivalReveal
+        open={controller.showImportedDashboardReveal && controller.activeSection === 'home'}
+        onComplete={controller.onDismissImportedDashboardReveal}
+        variant={controller.dashboardArrivalVariant ?? 'import'}
+      />
       <DashboardSectionRouter controller={controller} />
       <DashboardOverlays controller={controller} />
     </>

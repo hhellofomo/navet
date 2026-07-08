@@ -1,6 +1,7 @@
 import { Sunrise, Sunset } from 'lucide-react';
 import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { CaptionValue } from '@/app/components/ui/caption-value';
 import { CardWrapper } from '@/app/components/ui/card-wrapper';
 import { useTheme } from '@/app/hooks';
@@ -59,6 +60,8 @@ export const WeatherCard = memo(function WeatherCard({
   isEditMode,
 }: WeatherCardProps) {
   const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
+  const isGlass = theme === 'glass';
   const isSmall = size === 'extra-small' || size === 'small';
   const isLarge = size === 'large';
 
@@ -76,15 +79,19 @@ export const WeatherCard = memo(function WeatherCard({
   const cardBg =
     theme === 'light'
       ? 'bg-gradient-to-br from-white to-slate-50/80 border-gray-200/80'
-      : 'bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-slate-700/30';
-  const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
-  const iconBg = theme === 'light' ? 'bg-blue-100' : 'bg-blue-500/20';
+      : isGlass
+        ? 'bg-gradient-to-br from-white/14 via-blue-200/10 to-white/[0.03] border-white/18'
+        : 'bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-slate-700/30';
+  const textPrimary = surface.textPrimary;
+  const textSecondary = theme === 'light' ? 'text-gray-500' : surface.textSecondary;
+  const iconBg = theme === 'light' ? 'bg-blue-100' : isGlass ? 'bg-blue-300/24 border border-blue-100/20' : 'bg-blue-500/24 border border-blue-300/18';
   const glowOverlay =
     theme === 'light'
       ? 'from-blue-50/30 via-transparent to-cyan-50/30'
+      : isGlass
+        ? 'from-white/10 via-blue-300/10 to-cyan-200/08'
       : 'from-blue-500/5 via-transparent to-cyan-500/5';
-  const dashedBorder = theme === 'light' ? 'border-gray-300' : 'border-slate-600';
+  const dashedBorder = theme === 'light' ? 'border-gray-300' : isGlass ? 'border-white/18' : 'border-slate-600';
 
   return (
     <CardWrapper className={`${cardBg} p-5`}>
@@ -107,7 +114,7 @@ export const WeatherCard = memo(function WeatherCard({
             >
               {location}
             </h3>
-            <p className="text-[10px] text-gray-300 truncate mt-0.5">Weather</p>
+            <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5`}>Weather</p>
             {!isSmall && <p className={`text-xs ${textSecondary}`}>{dateTime}</p>}
           </div>
           <div
@@ -177,7 +184,7 @@ export const WeatherCard = memo(function WeatherCard({
                     <WeatherIcon condition={day.condition} className="w-8 h-8 mx-auto mb-2" />
                     <div className={`text-xs font-medium ${textPrimary} mb-1`}>{day.high}°</div>
                     <div
-                      className={`text-xs ${theme === 'light' ? 'text-gray-300' : 'text-gray-500'}`}
+                      className={`text-xs ${theme === 'light' ? 'text-gray-300' : surface.textMuted}`}
                     >
                       {day.low}°
                     </div>

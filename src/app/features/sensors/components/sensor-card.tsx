@@ -3,6 +3,7 @@ import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 
 interface SensorCardProps {
@@ -28,6 +29,8 @@ export const SensorCard = memo(function SensorCard({
 }: SensorCardProps) {
   const cardId = `sensor-${name.toLowerCase().replace(/ /g, '-')}`;
   const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
+  const isGlass = theme === 'glass';
 
   // Size-specific styling
   const isSmall = size === 'extra-small' || size === 'small';
@@ -38,12 +41,16 @@ export const SensorCard = memo(function SensorCard({
 
   // Theme-aware colors
   const cardGradient =
-    theme === 'light' ? 'from-white to-teal-50/80' : 'from-teal-900/90 to-teal-950/95';
-  const cardBorder = theme === 'light' ? 'border-gray-200/80' : 'border-teal-700/30';
-  const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
-  const accentColor = theme === 'light' ? 'text-teal-700' : 'text-teal-400';
-  const glowGradient = theme === 'light' ? 'from-teal-50/40' : 'from-teal-500/5';
+    theme === 'light'
+      ? 'from-white to-teal-50/80'
+      : isGlass
+        ? 'from-white/16 via-teal-200/10 to-white/[0.03]'
+        : 'from-teal-900/90 to-teal-950/95';
+  const cardBorder = theme === 'light' ? 'border-gray-200/80' : isGlass ? surface.border : 'border-teal-700/30';
+  const textPrimary = surface.textPrimary;
+  const textSecondary = theme === 'light' ? 'text-gray-500' : surface.textSecondary;
+  const accentColor = theme === 'light' ? 'text-teal-700' : isGlass ? 'text-teal-200' : 'text-teal-400';
+  const glowGradient = theme === 'light' ? 'from-teal-50/40' : isGlass ? 'from-white/10 via-teal-300/10' : 'from-teal-500/5';
 
   return (
     <div
@@ -59,7 +66,9 @@ export const SensorCard = memo(function SensorCard({
       <div className={`absolute inset-0 bg-gradient-to-br ${glowGradient} to-transparent`}></div>
 
       {/* Light theme frosted overlay */}
-      {theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
+      {(theme === 'light' || isGlass) && (
+        <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`} />
+      )}
 
       <div className="relative h-full flex flex-col">
         <EntityCardHeader

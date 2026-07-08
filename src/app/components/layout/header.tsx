@@ -1,6 +1,7 @@
 import { Bell, CalendarDays, Clock3, Search, X } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useAuth } from '@/app/contexts/auth-context';
 import { NotificationPanel } from '@/app/features/notifications';
 import { useDevices, useHomeAssistant, useSearch, useTheme } from '@/app/hooks';
@@ -8,6 +9,7 @@ import { UserDropdown } from './user-dropdown';
 
 export const Header = memo(function Header() {
   const { theme, primaryColor } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const { config: authConfig } = useAuth();
   const { entities, user } = useHomeAssistant();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -74,24 +76,12 @@ export const Header = memo(function Header() {
     setFilteredDeviceIds(matchingIds);
   }, [searchQuery, devices, setFilteredDeviceIds]);
 
-  const textPrimary =
-    theme === 'light' ? 'text-gray-900' : theme === 'contrast' ? 'text-white' : 'text-white';
-  const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
-  const inputBg =
-    theme === 'light' ? 'bg-gray-100' : theme === 'contrast' ? 'bg-black/50' : 'bg-white/5';
-  const placeholder =
-    theme === 'light'
-      ? 'placeholder-gray-400'
-      : theme === 'contrast'
-        ? 'placeholder-gray-400'
-        : 'placeholder-gray-500';
-  const hoverBg =
-    theme === 'light'
-      ? 'hover:bg-gray-100'
-      : theme === 'contrast'
-        ? 'hover:bg-white/10'
-        : 'hover:bg-white/5';
+  const textPrimary = surface.textPrimary;
+  const textSecondary = surface.textSecondary;
+  const inputBg = surface.inputBg;
+  const placeholder = surface.placeholder;
+  const hoverBg = surface.hoverBg;
+  const dividerColor = surface.textMuted;
   const activeColorValue = getThemeColorValue(primaryColor);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -167,7 +157,7 @@ export const Header = memo(function Header() {
             <div className="flex items-center gap-1.5">
               <Clock3 className="h-3.5 w-3.5" />
               <span>{formattedDate}</span>
-              <span aria-hidden="true" className="text-gray-300">
+              <span aria-hidden="true" className={dividerColor}>
                 |
               </span>
               <span>{formattedTime}</span>

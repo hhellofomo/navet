@@ -2,11 +2,13 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Power, Settings2 } from 'lucide-react';
 import { memo } from 'react';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import type { SwitchCardProps } from './switch-card.types';
 import { useSwitchCardController } from './use-switch-card-controller';
 
 export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 'room'>) {
   const controller = useSwitchCardController(props);
+  const surface = getThemeSurfaceTokens(controller.theme);
 
   return (
     <>
@@ -22,7 +24,13 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
           className={`absolute inset-0 bg-gradient-to-br ${controller.cardColors.glow} to-transparent transition-all duration-500`}
         />
 
-        {controller.theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
+        {(controller.theme === 'light' || controller.theme === 'glass') && (
+          <div
+            className={`absolute inset-0 ${
+              controller.theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'
+            }`}
+          />
+        )}
 
         <div className="relative h-full flex flex-col">
           <div className="mb-2 flex items-start gap-3">
@@ -39,7 +47,7 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
               >
                 {props.name}
               </h3>
-              <p className="text-[10px] text-gray-300 truncate mt-0.5 text-left">
+              <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5 text-left`}>
                 {controller.entityType}
               </p>
             </div>
@@ -92,7 +100,13 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
             <div className="mt-6 space-y-4">
               {controller.hasMetrics && (
                 <div
-                  className={`rounded-2xl p-4 ${controller.theme === 'light' ? 'bg-gray-100' : 'bg-white/5'}`}
+                  className={`rounded-2xl p-4 ${
+                    controller.theme === 'light'
+                      ? 'bg-gray-100'
+                      : controller.theme === 'glass'
+                        ? 'bg-white/8'
+                        : 'bg-white/5'
+                  }`}
                 >
                   <p className={`text-xs uppercase tracking-[0.16em] ${controller.labelColor}`}>
                     Card Metric

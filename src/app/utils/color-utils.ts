@@ -1,3 +1,5 @@
+import type { ThemeType } from '@/app/hooks/use-theme';
+
 // Function to darken a color for gradient
 export const darkenColor = (color: string, amount: number): string => {
   const hex = color.replace('#', '');
@@ -19,7 +21,7 @@ interface GradientColors {
 export const getGradientColors = (
   isOn: boolean,
   selectedColor: string | null,
-  theme: 'dark' | 'light' | 'contrast' = 'dark'
+  theme: ThemeType = 'dark'
 ): GradientColors => {
   if (!isOn) {
     return theme === 'light'

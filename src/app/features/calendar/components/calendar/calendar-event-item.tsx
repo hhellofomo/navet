@@ -1,9 +1,10 @@
 import { Calendar as CalendarIcon, MapPin, Users, Video } from 'lucide-react';
+import type { ThemeType } from '@/app/hooks/use-theme';
 import type { CalendarEvent } from './types';
 
 interface CalendarEventItemProps {
   event: CalendarEvent;
-  theme: 'light' | 'dark' | 'contrast';
+  theme: ThemeType;
   textPrimary: string;
   textSecondary: string;
   hoverText: string;

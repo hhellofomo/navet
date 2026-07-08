@@ -48,12 +48,9 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
                   style={
                     isActive
                       ? {
-                          backgroundColor: styles.insetBg === 'bg-white' ? '#ffffff' : undefined,
+                          backgroundColor: styles.isLightTheme ? '#ffffff' : undefined,
                           border: `1px solid ${styles.accentColor}`,
-                          boxShadow:
-                            theme === 'light'
-                              ? '0 10px 30px rgba(15, 23, 42, 0.06)'
-                              : '0 10px 30px rgba(0, 0, 0, 0.18)',
+                          boxShadow: styles.elevatedShadow,
                         }
                       : undefined
                   }
@@ -89,7 +86,7 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
                 onClick={() => setPrimaryColor(option.value)}
                 className={`h-11 w-11 rounded-full transition-all duration-300 ${
                   isActive
-                    ? `ring-2 ${theme === 'light' ? 'ring-black/30' : 'ring-white/40'} ring-offset-2 ${theme === 'light' ? 'ring-offset-white' : 'ring-offset-gray-900'}`
+                    ? `ring-2 ${styles.ringClass} ring-offset-2 ${styles.ringOffsetClass}`
                     : 'hover:scale-110'
                 }`}
                 style={{ backgroundColor: option.color }}
@@ -116,7 +113,7 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
                 className="absolute inset-0"
                 style={{
                   background: `linear-gradient(135deg, ${styles.accentColor}55, ${styles.accentColor}10)`,
-                  mixBlendMode: theme === 'light' ? 'multiply' : 'screen',
+                  mixBlendMode: styles.mixBlendMode,
                 }}
               />
             </div>
@@ -124,9 +121,7 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
             <button
               type="button"
               onClick={handleRemoveWallpaper}
-              className={`absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full ${
-                theme === 'light' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
-              } shadow-lg transition-all hover:scale-110`}
+              className={`absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full ${styles.floatingButtonBg} ${styles.floatingButtonText} shadow-lg transition-all hover:scale-110`}
             >
               <X className="h-3.5 w-3.5" />
             </button>

@@ -1,6 +1,7 @@
 import { type ChangeEvent, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { PRIMARY_COLOR_OPTIONS, THEME_OPTIONS } from '@/app/constants/theme-options';
 import { useAuth } from '@/app/contexts/auth-context';
 import { useConfig } from '@/app/contexts/config-context';
@@ -26,12 +27,20 @@ export type SettingsSectionStyles = {
   cardBg: string;
   chipBg: string;
   chipHoverBg: string;
+  chipTextColor: string;
   dividerColor: string;
+  elevatedShadow: string;
+  floatingButtonBg: string;
+  floatingButtonText: string;
   hoverBg: string;
   iconBg: string;
+  isLightTheme: boolean;
   insetBg: string;
   lineColor: string;
+  mixBlendMode: 'multiply' | 'screen';
   mutedColor: string;
+  ringClass: string;
+  ringOffsetClass: string;
   softBg: string;
   subtleColor: string;
   textColor: string;
@@ -39,6 +48,7 @@ export type SettingsSectionStyles = {
 
 export function useSettingsSectionController() {
   const { theme, setTheme, primaryColor, setPrimaryColor, wallpaper, setWallpaper } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const { logout, config } = useAuth();
   const { clearConfig } = useConfig();
   const disableAnimations = useSettingsStore((state) => state.disableAnimations);
@@ -130,25 +140,44 @@ export function useSettingsSectionController() {
 
   const styles: SettingsSectionStyles = {
     accentColor: getThemeColorValue(primaryColor),
-    borderColor: theme === 'light' ? 'border-gray-200/80' : 'border-white/10',
+    borderColor: surface.borderStrong,
     cardBg:
-      theme === 'light' ? 'bg-white/92' : theme === 'contrast' ? 'bg-gray-950' : 'bg-gray-900/88',
-    chipBg: theme === 'light' ? 'bg-gray-100' : theme === 'contrast' ? 'bg-black/50' : 'bg-white/5',
+      theme === 'light'
+        ? 'bg-white/92'
+        : theme === 'contrast'
+          ? 'bg-gray-950'
+          : theme === 'glass'
+            ? 'bg-white/[0.10]'
+            : 'bg-gray-900/88',
+    chipBg: theme === 'contrast' ? 'bg-black/50' : surface.subtleBg,
     chipHoverBg:
       theme === 'light'
         ? 'hover:bg-gray-200'
         : theme === 'contrast'
           ? 'hover:bg-white/20'
+          : theme === 'glass'
+            ? 'hover:bg-white/16'
           : 'hover:bg-white/10',
-    dividerColor: theme === 'light' ? 'divide-gray-200/80' : 'divide-white/10',
-    hoverBg: theme === 'light' ? 'hover:bg-gray-100/90' : 'hover:bg-white/7',
-    iconBg: theme === 'light' ? 'bg-gray-100' : 'bg-white/6',
-    insetBg: theme === 'light' ? 'bg-white' : 'bg-black/20',
-    lineColor: theme === 'light' ? 'border-gray-200/80' : 'border-white/10',
-    mutedColor: theme === 'light' ? 'text-gray-700' : 'text-gray-300',
-    softBg: theme === 'light' ? 'bg-gray-50/90' : 'bg-white/[0.04]',
-    subtleColor: theme === 'light' ? 'text-gray-500' : 'text-gray-300',
-    textColor: theme === 'light' ? 'text-gray-900' : 'text-white',
+    chipTextColor: theme === 'light' ? 'text-gray-600' : surface.textSecondary,
+    dividerColor: surface.divider,
+    elevatedShadow:
+      theme === 'light'
+        ? '0 10px 30px rgba(15, 23, 42, 0.06)'
+        : '0 10px 30px rgba(0, 0, 0, 0.18)',
+    floatingButtonBg: theme === 'light' ? 'bg-gray-900' : 'bg-white',
+    floatingButtonText: theme === 'light' ? 'text-white' : 'text-gray-900',
+    hoverBg: theme === 'light' ? 'hover:bg-gray-100/90' : surface.hoverBg,
+    iconBg: surface.iconBg,
+    isLightTheme: theme === 'light',
+    insetBg: theme === 'light' ? 'bg-white' : theme === 'glass' ? 'bg-white/[0.06]' : 'bg-black/20',
+    lineColor: surface.borderStrong,
+    mixBlendMode: theme === 'light' ? 'multiply' : 'screen',
+    mutedColor: theme === 'light' ? 'text-gray-700' : surface.textSecondary,
+    ringClass: theme === 'light' ? 'ring-black/30' : 'ring-white/40',
+    ringOffsetClass: theme === 'light' ? 'ring-offset-white' : 'ring-offset-gray-900',
+    softBg: theme === 'light' ? 'bg-gray-50/90' : theme === 'glass' ? 'bg-white/[0.06]' : 'bg-white/[0.04]',
+    subtleColor: surface.textMuted,
+    textColor: surface.textPrimary,
   };
 
   return {
