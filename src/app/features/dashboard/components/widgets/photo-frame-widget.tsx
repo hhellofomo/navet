@@ -22,8 +22,6 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
   const bgColor =
     theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : 'bg-white/10';
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-400';
   const border = theme === 'light' ? 'border-gray-200/50' : 'border-white/10';
 
   const getColorValue = (color: string) => {

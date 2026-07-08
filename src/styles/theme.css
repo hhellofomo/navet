@@ -179,18 +179,16 @@
     line-height: 1.5;
   }
 
-  /* biome-ignore lint/complexity/noImportantStyles: This mode must override existing animation and scroll declarations globally. */
   html[data-no-animation="true"] {
-    scroll-behavior: auto !important;
+    scroll-behavior: auto;
   }
 
-  /* biome-ignore lint/complexity/noImportantStyles: This mode must disable all descendant animations and transitions regardless of component specificity. */
   html[data-no-animation="true"] *,
   html[data-no-animation="true"] *::before,
   html[data-no-animation="true"] *::after {
-    animation: none !important;
-    transition: none !important;
-    scroll-behavior: auto !important;
+    animation: none;
+    transition: none;
+    scroll-behavior: auto;
   }
 }
 
@@ -321,8 +319,7 @@
     animation: wiggle 0.3s ease-in-out infinite;
   }
 
-  /* biome-ignore lint/complexity/noImportantStyles: This must override the edit-mode wiggle animation while the selector popover is open. */
   [data-draggable-card="true"][data-size-selector-open="true"] {
-    animation: none !important;
+    animation: none;
   }
 }

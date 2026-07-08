@@ -1,5 +1,4 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import type { LucideIcon } from 'lucide-react';
 import { Plus, Search, Trash2, X } from 'lucide-react';
 import { memo, useCallback, useRef, useState } from 'react';
 import { CustomScrollbar } from '@/app/components/shared/custom-scrollbar';

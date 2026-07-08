@@ -3,7 +3,6 @@
  * Updated to use Zustand for state management with localStorage persistence
  */
 import { createContext, type ReactNode, useContext, useMemo } from 'react';
-import { shallow } from 'zustand/shallow';
 import { useThemeStore } from '../stores/theme-store';
 
 export type ThemeType = 'dark' | 'light' | 'contrast';

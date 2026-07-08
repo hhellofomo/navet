@@ -15,9 +15,9 @@ import { GroupedSensorCard } from '../features/sensors/components/grouped-sensor
 import { SensorCard } from '../features/sensors/components/sensor-card';
 import type { SensorReading } from '../features/sensors/components/sensors/sensor-types';
 import { VacuumCard } from '../features/vacuum/components/vacuum-card';
-import type { DeviceMetric } from '../types/device.types';
 import { WeatherCard } from '../features/weather/components/weather-card';
 import { WifiCard } from '../features/wifi/components/wifi-card';
+import type { DeviceMetric } from '../types/device.types';
 
 interface DeviceData {
   id: string;

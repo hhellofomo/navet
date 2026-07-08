@@ -1,4 +1,4 @@
-import type { DeviceCollection, DeviceWithType } from '../types/device.types';
+import type { Device, DeviceCollection, DeviceWithType } from '../types/device.types';
 
 /**
  * Device Service
@@ -6,6 +6,10 @@ import type { DeviceCollection, DeviceWithType } from '../types/device.types';
  * In production, this would make API calls
  */
 class DeviceService {
+  private withType(device: Device, type: keyof DeviceCollection): DeviceWithType {
+    return { ...device, type } as DeviceWithType;
+  }
+
   /**
    * Create a device map for quick lookups by ID
    */
@@ -13,8 +17,8 @@ class DeviceService {
     const deviceMap = new Map<string, DeviceWithType>();
 
     Object.entries(devices).forEach(([type, deviceArray]) => {
-      deviceArray.forEach((device: any) => {
-        deviceMap.set(device.id, { ...device, type: type as keyof DeviceCollection });
+      deviceArray.forEach((device) => {
+        deviceMap.set(device.id, this.withType(device, type as keyof DeviceCollection));
       });
     });
 
@@ -28,8 +32,8 @@ class DeviceService {
     const allDevices: DeviceWithType[] = [];
 
     Object.entries(devices).forEach(([type, deviceArray]) => {
-      deviceArray.forEach((device: any) => {
-        const deviceWithType = { ...device, type: type as keyof DeviceCollection };
+      deviceArray.forEach((device) => {
+        const deviceWithType = this.withType(device, type as keyof DeviceCollection);
 
         if ('room' in device && device.room === room) {
           allDevices.push(deviceWithType);
@@ -49,7 +53,7 @@ class DeviceService {
     const roomsSet = new Set<string>();
 
     Object.values(devices).forEach((deviceArray) => {
-      deviceArray.forEach((device: any) => {
+      deviceArray.forEach((device) => {
         if ('room' in device && device.room) {
           roomsSet.add(device.room);
         } else if ('location' in device && device.location) {

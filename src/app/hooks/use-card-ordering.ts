@@ -56,7 +56,9 @@ export const useCardOrdering = (
             .flat()
             .map((d) => d.id)
         );
-        customCards.forEach((card) => allDeviceIds.add(card.id));
+        customCards.forEach((card) => {
+          allDeviceIds.add(card.id);
+        });
         const isValid = Object.values(parsed).every(
           (orderArray: unknown) =>
             Array.isArray(orderArray) &&
@@ -79,7 +81,9 @@ export const useCardOrdering = (
         .flat()
         .map((device) => device.id)
     );
-    customCards.forEach((card) => allDeviceIds.add(card.id));
+    customCards.forEach((card) => {
+      allDeviceIds.add(card.id);
+    });
 
     setCardOrders((prev) => {
       const next = buildOrders();

@@ -4,8 +4,8 @@ import { useHomeAssistantContext } from '../contexts/home-assistant-context';
 import type {
   ClimateDevice,
   CoverDevice,
-  DeviceMetric,
   DeviceCollection,
+  DeviceMetric,
   LightDevice,
   LockDevice,
   PersonDevice,
@@ -454,7 +454,7 @@ export const useHADevices = (): DeviceCollection => {
           });
           break;
 
-        case 'switch':
+        case 'switch': {
           const entityEntry = entityRegistryMap.get(entityId);
           const deviceMetrics = entityEntry?.device_id
             ? switchMetricsByDeviceId.get(entityEntry.device_id)
@@ -484,6 +484,7 @@ export const useHADevices = (): DeviceCollection => {
             metrics: deviceMetrics,
           });
           break;
+        }
 
         case 'climate':
           climate.push({

@@ -1,5 +1,5 @@
-import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { memo } from 'react';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useTheme } from '../../../contexts/theme-context';
 import { RSSFeedCardView } from './RSSFeedCardView';
 
