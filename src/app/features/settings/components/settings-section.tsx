@@ -5,6 +5,7 @@ import {
   Heart,
   Image as ImageIcon,
   Info,
+  LayoutGrid,
   LogOut,
   Palette,
   Scale,
@@ -18,7 +19,12 @@ import { Switch } from '@/app/components/ui/switch';
 import { useAuth } from '@/app/contexts/auth-context';
 import { useConfig } from '@/app/contexts/config-context';
 import { type ThemeType, useTheme } from '@/app/contexts/theme-context';
-import { type PrimaryColor, useSettingsStore } from '@/app/stores';
+import {
+  type DashboardEntityMode,
+  type PrimaryColor,
+  useDashboardEntitiesStore,
+  useSettingsStore,
+} from '@/app/stores';
 
 export function SettingsSection() {
   const { theme, setTheme, primaryColor, setPrimaryColor, wallpaper, setWallpaper } = useTheme();
@@ -26,6 +32,8 @@ export function SettingsSection() {
   const { clearConfig } = useConfig();
   const disableAnimations = useSettingsStore((state) => state.disableAnimations);
   const updateSettings = useSettingsStore((state) => state.updateSettings);
+  const dashboardMode = useDashboardEntitiesStore((state) => state.mode);
+  const setDashboardMode = useDashboardEntitiesStore((state) => state.setMode);
   const [showLicense, setShowLicense] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [_showEditConnection, _setShowEditConnection] = useState(false);
@@ -296,6 +304,79 @@ export function SettingsSection() {
                 </label>
               )}
             </div>
+          </div>
+        </section>
+
+        {/* Dashboard Content Section */}
+        <section className={`${cardBg} rounded-2xl border ${borderColor} overflow-hidden`}>
+          <div className="p-4 border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <div
+                className={`w-8 h-8 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} flex items-center justify-center`}
+              >
+                <LayoutGrid className={`w-4 h-4 ${mutedColor}`} />
+              </div>
+              <div>
+                <h3 className={`text-sm font-semibold ${textColor}`}>Dashboard Content</h3>
+                <p className={`text-xs ${subtleColor}`}>
+                  Choose whether entities appear automatically or only when added manually
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 space-y-3">
+            {(
+              [
+                {
+                  value: 'auto',
+                  label: 'Auto',
+                  description: 'Show discovered entities automatically based on device type.',
+                },
+                {
+                  value: 'manual',
+                  label: 'Manual',
+                  description: 'Only show entities that you explicitly add to the dashboard.',
+                },
+              ] as Array<{
+                value: DashboardEntityMode;
+                label: string;
+                description: string;
+              }>
+            ).map((option) => (
+              <button
+                type="button"
+                key={option.value}
+                onClick={() => setDashboardMode(option.value)}
+                className={`w-full rounded-xl border p-3 text-left transition-all ${
+                  dashboardMode === option.value
+                    ? 'border-2'
+                    : `${borderColor} ${theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-white/5'}`
+                }`}
+                style={
+                  dashboardMode === option.value
+                    ? {
+                        backgroundColor: `${getColorValue(primaryColor)}14`,
+                        borderColor: getColorValue(primaryColor),
+                      }
+                    : {}
+                }
+              >
+                <p
+                  className={`text-sm font-medium ${
+                    dashboardMode === option.value ? '' : textColor
+                  }`}
+                  style={
+                    dashboardMode === option.value
+                      ? { color: getColorValue(primaryColor) }
+                      : undefined
+                  }
+                >
+                  {option.label}
+                </p>
+                <p className={`text-xs ${subtleColor} mt-1`}>{option.description}</p>
+              </button>
+            ))}
           </div>
         </section>
 

@@ -15,6 +15,8 @@ interface AllViewGridProps {
   customCards?: CustomCard[];
   onDeleteCard?: (cardId: string) => void;
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
+  onRemoveEntity?: (entityId: string) => void;
+  allowEntityRemoval?: boolean;
 }
 
 interface RoomSectionProps {
@@ -31,6 +33,8 @@ interface RoomSectionProps {
   handleSizeChange: (id: string, size: CardSize) => void;
   onDeleteCard?: (cardId: string) => void;
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
+  onRemoveEntity?: (entityId: string) => void;
+  allowEntityRemoval?: boolean;
 }
 
 const RoomSection = memo(function RoomSection({
@@ -47,6 +51,8 @@ const RoomSection = memo(function RoomSection({
   handleSizeChange,
   onDeleteCard,
   onUpdateCard,
+  onRemoveEntity,
+  allowEntityRemoval = false,
 }: RoomSectionProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isVisible, setIsVisible] = useState(isEditMode);
@@ -120,6 +126,8 @@ const RoomSection = memo(function RoomSection({
                     size={size}
                     isEditMode={isEditMode}
                     handleSizeChange={handleSizeChange}
+                    onRemoveEntity={onRemoveEntity}
+                    allowEntityRemoval={allowEntityRemoval}
                   />
                 );
               }
@@ -140,6 +148,8 @@ const RoomSection = memo(function RoomSection({
                   handleSizeChange={handleSizeChange}
                   onDeleteCard={onDeleteCard}
                   onUpdateCard={onUpdateCard}
+                  onRemoveEntity={onRemoveEntity}
+                  allowEntityRemoval={allowEntityRemoval}
                 />
               );
             })}
@@ -163,6 +173,8 @@ export const AllViewGrid = memo(function AllViewGrid({
   customCards = [],
   onDeleteCard,
   onUpdateCard,
+  onRemoveEntity,
+  allowEntityRemoval = false,
 }: AllViewGridProps) {
   const { isEditMode, cardSizes, updateCardSize } = useEditModeContext();
   const { isSearchActive, filteredDeviceIds } = useSearch();
@@ -260,6 +272,8 @@ export const AllViewGrid = memo(function AllViewGrid({
             handleSizeChange={handleSizeChange}
             onDeleteCard={onDeleteCard}
             onUpdateCard={onUpdateCard}
+            onRemoveEntity={onRemoveEntity}
+            allowEntityRemoval={allowEntityRemoval}
           />
         );
       })}

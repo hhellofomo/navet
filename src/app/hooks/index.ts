@@ -8,6 +8,7 @@ export { useCardOrdering } from './use-card-ordering';
 export { useCardState } from './use-card-state';
 export { useClickOutside } from './use-click-outside';
 export { useCustomCards } from './use-custom-cards';
+export { useDashboardDevices } from './use-dashboard-devices';
 export { useDebounce } from './use-debounce';
 export { useDeviceMap } from './use-device-map';
 export { useDevices, useRooms } from './use-devices';

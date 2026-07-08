@@ -5,12 +5,16 @@ interface EmptyStateProps {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   description: string;
+  actionLabel?: string;
+  onAction?: () => void;
 }
 
 export const EmptyState = memo(function EmptyState({
   icon: Icon,
   title,
   description,
+  actionLabel,
+  onAction,
 }: EmptyStateProps) {
   const { theme } = useTheme();
 
@@ -30,6 +34,15 @@ export const EmptyState = memo(function EmptyState({
         </div>
         <h2 className={`text-xl font-semibold ${textColor} mb-2`}>{title}</h2>
         <p className={`${descColor} text-sm leading-relaxed`}>{description}</p>
+        {actionLabel && onAction && (
+          <button
+            type="button"
+            onClick={onAction}
+            className="mt-6 px-4 py-2 rounded-xl bg-gray-900 text-white text-sm font-medium"
+          >
+            {actionLabel}
+          </button>
+        )}
       </div>
     </div>
   );

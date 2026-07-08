@@ -1,3 +1,4 @@
+import { X } from 'lucide-react';
 import { memo } from 'react';
 import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-size-selector';
 import { DraggableCard } from '@/app/components/shared/draggable-card';
@@ -16,6 +17,8 @@ interface DashboardCardItemProps {
   card?: CustomCard;
   onDeleteCard?: (cardId: string) => void;
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
+  onRemoveEntity?: (entityId: string) => void;
+  allowEntityRemoval?: boolean;
 }
 
 export const DashboardCardItem = memo(function DashboardCardItem({
@@ -28,9 +31,24 @@ export const DashboardCardItem = memo(function DashboardCardItem({
   card,
   onDeleteCard,
   onUpdateCard,
+  onRemoveEntity,
+  allowEntityRemoval = false,
 }: DashboardCardItemProps) {
   return (
     <DraggableCard id={id} index={index} isEditMode={isEditMode} className={getCardSpanClass(size)}>
+      {device && isEditMode && allowEntityRemoval && onRemoveEntity && (
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onRemoveEntity(id);
+          }}
+          className="absolute top-2 left-2 z-20 w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow-lg"
+          aria-label="Remove entity from dashboard"
+        >
+          <X className="w-4 h-4 text-white" />
+        </button>
+      )}
       {device
         ? renderCard({ device, size, handleSizeChange, isEditMode })
         : card && (
@@ -53,6 +71,8 @@ function areDashboardCardItemPropsEqual(
     previous.card === next.card &&
     previous.handleSizeChange === next.handleSizeChange &&
     previous.onDeleteCard === next.onDeleteCard &&
-    previous.onUpdateCard === next.onUpdateCard
+    previous.onUpdateCard === next.onUpdateCard &&
+    previous.onRemoveEntity === next.onRemoveEntity &&
+    previous.allowEntityRemoval === next.allowEntityRemoval
   );
 }

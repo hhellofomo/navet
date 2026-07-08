@@ -1,0 +1,193 @@
+import { Search, X } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useTheme } from '@/app/contexts/theme-context';
+import type { DeviceWithType } from '@/app/types/device.types';
+
+interface AddEntityDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onAddEntity: (entityId: string) => void;
+  currentRoom: string;
+  deviceMap: Map<string, DeviceWithType>;
+  addedEntityIds: string[];
+}
+
+const typeLabels: Record<string, string> = {
+  lights: 'Light',
+  hvac: 'HVAC',
+  climate: 'Climate',
+  power: 'Power',
+  media: 'Media',
+  weather: 'Weather',
+  wifi: 'Wi-Fi',
+  switches: 'Switch',
+  covers: 'Cover',
+  locks: 'Lock',
+  persons: 'Person',
+  sensors: 'Sensor',
+  vacuums: 'Vacuum',
+  rssFeeds: 'RSS Feed',
+  calendars: 'Calendar',
+  'grouped-sensors': 'Sensor Group',
+};
+
+function getDeviceRoom(device: DeviceWithType) {
+  if ('room' in device && typeof device.room === 'string') {
+    return device.room;
+  }
+
+  if ('location' in device && typeof device.location === 'string') {
+    return device.location;
+  }
+
+  return 'Unknown Room';
+}
+
+export function AddEntityDialog({
+  open,
+  onClose,
+  onAddEntity,
+  currentRoom,
+  deviceMap,
+  addedEntityIds,
+}: AddEntityDialogProps) {
+  const { theme, primaryColor } = useTheme();
+  const [query, setQuery] = useState('');
+
+  const bgColor = theme === 'light' ? 'bg-white' : 'bg-gray-900';
+  const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
+  const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+  const borderColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
+  const cardBg = theme === 'light' ? 'bg-gray-50' : 'bg-white/5';
+  const hoverBg = theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10';
+  const inputBg = theme === 'light' ? 'bg-gray-100' : 'bg-white/5';
+
+  const getColorValue = (color: string) => {
+    const colors: Record<string, string> = {
+      blue: '#3b82f6',
+      purple: '#a855f7',
+      pink: '#ec4899',
+      red: '#ef4444',
+      orange: '#f97316',
+      yellow: '#eab308',
+      green: '#22c55e',
+      teal: '#14b8a6',
+    };
+
+    return colors[color] || colors.blue;
+  };
+
+  const availableDevices = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    return Array.from(deviceMap.values())
+      .filter((device) => !addedEntityIds.includes(device.id))
+      .filter((device) => currentRoom === 'All' || getDeviceRoom(device) === currentRoom)
+      .filter((device) => {
+        if (!normalizedQuery) {
+          return true;
+        }
+
+        const label = typeof device.name === 'string' ? device.name : device.id;
+        const room = getDeviceRoom(device);
+        const type = typeLabels[device.type] ?? device.type;
+
+        return `${label} ${room} ${type}`.toLowerCase().includes(normalizedQuery);
+      })
+      .sort((left, right) => {
+        const leftRoom = getDeviceRoom(left);
+        const rightRoom = getDeviceRoom(right);
+        const roomComparison = leftRoom.localeCompare(rightRoom);
+
+        if (roomComparison !== 0) {
+          return roomComparison;
+        }
+
+        const leftName = typeof left.name === 'string' ? left.name : left.id;
+        const rightName = typeof right.name === 'string' ? right.name : right.id;
+        return leftName.localeCompare(rightName);
+      });
+  }, [addedEntityIds, currentRoom, deviceMap, query]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div
+        className={`${bgColor} rounded-2xl border ${borderColor} w-full max-w-2xl max-h-[80vh] overflow-hidden`}
+        style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)' }}
+      >
+        <div className="flex items-center justify-between p-6 border-b border-white/10">
+          <div>
+            <h2 className={`text-xl font-semibold ${textColor}`}>Add Entity</h2>
+            <p className={`text-sm ${mutedColor} mt-1`}>
+              {currentRoom === 'All'
+                ? 'Choose which Home Assistant entities should appear on the dashboard'
+                : `Choose entities for ${currentRoom}`}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className={`w-8 h-8 rounded-full ${cardBg} ${hoverBg} flex items-center justify-center transition-colors`}
+          >
+            <X className={`w-4 h-4 ${mutedColor}`} />
+          </button>
+        </div>
+
+        <div className="p-6 border-b border-white/10">
+          <div className="relative">
+            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${mutedColor}`} />
+            <input
+              type="text"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search entities"
+              className={`w-full rounded-xl border ${borderColor} ${inputBg} pl-10 pr-4 py-3 text-sm ${textColor} focus:outline-none`}
+              style={{ caretColor: getColorValue(primaryColor) }}
+            />
+          </div>
+        </div>
+
+        <div className="max-h-[420px] overflow-y-auto p-6 pt-4 space-y-3">
+          {availableDevices.length > 0 ? (
+            availableDevices.map((device) => {
+              const name = typeof device.name === 'string' ? device.name : device.id;
+              const room = getDeviceRoom(device);
+              const typeLabel = typeLabels[device.type] ?? device.type;
+
+              return (
+                <div
+                  key={device.id}
+                  className={`flex items-center justify-between gap-4 rounded-xl border ${borderColor} ${cardBg} p-4`}
+                >
+                  <div className="min-w-0">
+                    <p className={`text-sm font-medium ${textColor} truncate`}>{name}</p>
+                    <p className={`text-xs ${mutedColor} truncate mt-1`}>
+                      {typeLabel} · {room}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onAddEntity(device.id)}
+                    className="px-3 py-2 rounded-lg text-xs font-medium text-white"
+                    style={{ backgroundColor: getColorValue(primaryColor) }}
+                  >
+                    Add
+                  </button>
+                </div>
+              );
+            })
+          ) : (
+            <div className={`rounded-xl border ${borderColor} ${cardBg} p-8 text-center`}>
+              <p className={`text-sm font-medium ${textColor}`}>No entities available</p>
+              <p className={`text-xs ${mutedColor} mt-2`}>
+                Try another search or switch to a different room.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
