@@ -112,6 +112,7 @@ export const deMessages = {
   'settings.system.effectsQuality.high': 'Hoch',
   'settings.system.effectsQuality.medium': 'Mittel',
   'settings.system.effectsQuality.low': 'Niedrig',
+  'settings.system.effectsQuality.recommended': 'Empfohlen für dieses Gerät',
   'settings.system.connection.title': 'Verbindung',
   'settings.system.connection.description':
     'Prüfe das aktuelle Serverziel, öffne Home Assistant oder setze die gespeicherte Verbindung zurück.',

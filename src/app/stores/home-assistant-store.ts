@@ -42,72 +42,87 @@ const initialState: HomeAssistantState = {
   connecting: false,
 };
 
-export const homeAssistantStore = createStore<HomeAssistantStore>()((set, _get) => ({
-  ...initialState,
+// Debounce window for entity state updates. Multiple HA entity changes arriving
+// within this window are coalesced into a single Zustand set call, reducing
+// React reconciler pressure during bursts (automations, energy sensors, etc.).
+// The service always holds the latest HassEntities — only the notification is
+// deferred, so getEntities() at flush time returns the most recent snapshot.
+const ENTITY_DEBOUNCE_MS = 50;
 
-  connect: async (config: HomeAssistantConfiguration) => {
-    set({ connecting: true, error: null });
+export const homeAssistantStore = createStore<HomeAssistantStore>()((set, _get) => {
+  let entityDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
-    try {
-      // Subscribe to typed events — only update the slice of state that changed
-      const unsubscribe = homeAssistantService.addListener((event) => {
-        switch (event) {
-          case 'entities':
-            set({ entities: homeAssistantService.getEntities() });
-            break;
-          case 'config':
-            set({ config: homeAssistantService.getConfig() });
-            break;
-          case 'registries':
-            set({
-              areas: homeAssistantService.getAreas(),
-              deviceRegistry: homeAssistantService.getDeviceRegistry(),
-              entityRegistry: homeAssistantService.getEntityRegistry(),
-            });
-            break;
-          case 'connection':
-            set({
-              connected: homeAssistantService.isConnected(),
-              connection: homeAssistantService.getConnection(),
-              connecting: false,
-            });
-            break;
-        }
-      });
+  return {
+    ...initialState,
 
-      // Authenticate and connect
-      await homeAssistantService.authenticate(config);
+    connect: async (config: HomeAssistantConfiguration) => {
+      set({ connecting: true, error: null });
 
-      // Populate full initial state after connection
-      set({
-        connected: homeAssistantService.isConnected(),
-        config: homeAssistantService.getConfig(),
-        entities: homeAssistantService.getEntities(),
-        user: homeAssistantService.getUser(),
-        areas: homeAssistantService.getAreas(),
-        deviceRegistry: homeAssistantService.getDeviceRegistry(),
-        entityRegistry: homeAssistantService.getEntityRegistry(),
-        connection: homeAssistantService.getConnection(),
-        connecting: false,
-      });
+      try {
+        // Subscribe to typed events — only update the slice of state that changed
+        const unsubscribe = homeAssistantService.addListener((event) => {
+          switch (event) {
+            case 'entities':
+              if (entityDebounceTimer !== null) clearTimeout(entityDebounceTimer);
+              entityDebounceTimer = setTimeout(() => {
+                entityDebounceTimer = null;
+                set({ entities: homeAssistantService.getEntities() });
+              }, ENTITY_DEBOUNCE_MS);
+              break;
+            case 'config':
+              set({ config: homeAssistantService.getConfig() });
+              break;
+            case 'registries':
+              set({
+                areas: homeAssistantService.getAreas(),
+                deviceRegistry: homeAssistantService.getDeviceRegistry(),
+                entityRegistry: homeAssistantService.getEntityRegistry(),
+              });
+              break;
+            case 'connection':
+              set({
+                connected: homeAssistantService.isConnected(),
+                connection: homeAssistantService.getConnection(),
+                connecting: false,
+              });
+              break;
+          }
+        });
 
-      return unsubscribe;
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'Failed to connect',
-        connecting: false,
-        connected: false,
-      });
-      throw error;
-    }
-  },
+        // Authenticate and connect
+        await homeAssistantService.authenticate(config);
 
-  disconnect: () => {
-    homeAssistantService.disconnect();
-    set(initialState);
-  },
+        // Populate full initial state after connection
+        set({
+          connected: homeAssistantService.isConnected(),
+          config: homeAssistantService.getConfig(),
+          entities: homeAssistantService.getEntities(),
+          user: homeAssistantService.getUser(),
+          areas: homeAssistantService.getAreas(),
+          deviceRegistry: homeAssistantService.getDeviceRegistry(),
+          entityRegistry: homeAssistantService.getEntityRegistry(),
+          connection: homeAssistantService.getConnection(),
+          connecting: false,
+        });
 
-  clearError: () => {
-    set({ error: null });
-  },
-}));
+        return unsubscribe;
+      } catch (error) {
+        set({
+          error: error instanceof Error ? error.message : 'Failed to connect',
+          connecting: false,
+          connected: false,
+        });
+        throw error;
+      }
+    },
+
+    disconnect: () => {
+      homeAssistantService.disconnect();
+      set(initialState);
+    },
+
+    clearError: () => {
+      set({ error: null });
+    },
+  };
+});

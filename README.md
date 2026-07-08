@@ -80,7 +80,9 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 - **Offscreen Card Skipping** - Non-edit dashboard cards now use browser offscreen rendering hints to reduce `All` view scroll cost on large boards
 - **Virtualized Entity Picker** - The Add Entity dialog window-renders large Home Assistant entity lists
 - **Smart Re-renders** - Per-entity subscriptions mean each card reacts only to its own HA state changes; the device map rebuilds only when entities are added or removed, not on every state update
+- **Off-screen Skip** - Room sections use `content-visibility: auto` so the browser skips layout, paint, and compositing for rooms outside the viewport; single-room view batch-loads cards on idle frames
 - **Low-Power Mode** - Optional reduced-effects mode for slower devices, with cheaper glass rendering and contained light cards
+- **Auto Device Tier** - On first load, a micro-benchmark and hardware signals (CPU cores, memory) automatically select the right effects quality; RPi-class hardware gets low effects without any manual configuration; the Visual Quality setting in Appearance shows the recommended tier so users can see what was detected
 - **Local Config Backup** - Export and restore dashboard layout/preferences from a YAML file
 - **Tree-shakeable** - Only imports what's actually used
 
