@@ -1,5 +1,5 @@
 import { AlertCircle, Eye, EyeOff, Home, Key, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { FieldBlock } from '@/app/components/patterns';
 import { Button, Input } from '@/app/components/primitives';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
@@ -12,8 +12,9 @@ import { authSelectors, configSelectors } from '@/app/stores/selectors';
 import { getPublicAssetUrl } from '@/app/utils/public-assets';
 
 export function LoginPage() {
-  const [url, setUrl] = useState(() => getRuntimeConfig().hassUrl ?? '');
-  const [token, setToken] = useState('');
+  const initialUrl = useRef(getRuntimeConfig().hassUrl ?? '');
+  const urlInputRef = useRef<HTMLInputElement>(null);
+  const tokenInputRef = useRef<HTMLInputElement>(null);
   const [showToken, setShowToken] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +30,8 @@ export function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    const url = urlInputRef.current?.value ?? '';
+    const token = tokenInputRef.current?.value ?? '';
 
     // Validation
     if (!url.trim()) {
@@ -93,34 +96,13 @@ export function LoginPage() {
 
   return (
     <main className={`relative min-h-screen overflow-y-auto ${pageBackground}`}>
-      <style>{`
-        @keyframes navet-login-rise {
-          0% { opacity: 0; transform: translateY(18px) scale(0.96); filter: blur(10px); }
-          100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-        }
-
-        @keyframes navet-login-ring {
-          0% { opacity: 0.72; transform: scale(0.68); }
-          78%, 100% { opacity: 0; transform: scale(1.42); }
-        }
-      `}</style>
-      <div className="pointer-events-none absolute left-1/2 top-[28%] h-80 w-80 -translate-x-1/2 rounded-full bg-orange-500/18 blur-3xl" />
+      <div className="pointer-events-none absolute left-1/2 top-[28%] h-72 w-72 -translate-x-1/2 rounded-full bg-orange-500/10 blur-2xl" />
 
       <section className="relative mx-auto flex min-h-screen w-full max-w-3xl flex-col items-center justify-center px-4 py-5 text-center sm:px-6">
-        <div className="w-full [animation:navet-login-rise_0.9s_ease-out_both]">
+        <div className="w-full">
           <div className="mx-auto flex min-h-20 w-full max-w-[18rem] items-center justify-center">
             <div className="relative flex h-20 w-20 items-center justify-center">
-              {[
-                '[animation:navet-login-ring_4.6s_ease-out_infinite]',
-                '[animation:navet-login-ring_4.6s_ease-out_0.72s_infinite]',
-                '[animation:navet-login-ring_4.6s_ease-out_1.44s_infinite]',
-              ].map((ringClassName) => (
-                <span
-                  key={ringClassName}
-                  className={`absolute inset-0 rounded-full border border-orange-300/30 ${ringClassName}`}
-                />
-              ))}
-              <div className="absolute inset-0 rounded-full bg-orange-500/16 blur-2xl" />
+              <div className="absolute inset-0 rounded-full bg-orange-500/12 blur-xl" />
               <img src={logoSrc} alt="" className="relative z-10 h-20 w-20" />
             </div>
           </div>
@@ -141,7 +123,7 @@ export function LoginPage() {
 
           <form
             onSubmit={handleSubmit}
-            className={`relative mx-auto mt-7 w-full max-w-md overflow-hidden rounded-[28px] border ${loginPanelSurface} p-4 text-left backdrop-blur-2xl sm:p-5`}
+            className={`relative mx-auto mt-7 w-full max-w-md overflow-hidden rounded-[28px] border ${loginPanelSurface} p-4 text-left backdrop-blur-md sm:p-5`}
           >
             <div
               aria-hidden="true"
@@ -160,10 +142,10 @@ export function LoginPage() {
                 hintClassName={mutedColor}
               >
                 <Input
+                  ref={urlInputRef}
                   id="url"
                   type="text"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
+                  defaultValue={initialUrl.current}
                   placeholder={t('login.urlPlaceholder')}
                   leading={<Home className={`h-5 w-5 ${mutedColor}`} />}
                   inputClassName={fieldInputClassName}
@@ -178,10 +160,9 @@ export function LoginPage() {
                 hintClassName={mutedColor}
               >
                 <Input
+                  ref={tokenInputRef}
                   id="token"
                   type={showToken ? 'text' : 'password'}
-                  value={token}
-                  onChange={(e) => setToken(e.target.value)}
                   placeholder={t('login.tokenPlaceholder')}
                   leading={<Key className={`h-5 w-5 ${mutedColor}`} />}
                   trailing={

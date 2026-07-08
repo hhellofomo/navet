@@ -983,6 +983,10 @@ export const esMessages = {
   'notifications.empty.description': '¡Ya estás al día!',
   'errorDisplay.title': 'Error de conexión',
   'errorDisplay.retry': 'Reintentar conexión',
+  'errorDisplay.backToLogin': 'Volver al inicio de sesión',
+  'errorDisplay.connectionInterrupted': 'Conexión interrumpida',
+  'errorDisplay.connectionInterruptedDescription':
+    'Navet no pudo completar la sesión de Home Assistant. Comprueba la URL y el token guardados e inténtalo de nuevo.',
   'errorDisplay.commonIssues': 'Problemas comunes:',
   'errorDisplay.issue.1': 'El sistema del hogar inteligente no está en ejecución o no es accesible',
   'errorDisplay.issue.2': 'URL o token de acceso incorrecto',

@@ -138,10 +138,21 @@ class HAEntityService {
   }
 
   async setClimateTemperature(entityId: string, temperature: number): Promise<void> {
-    await this.callService('climate', 'set_temperature', { temperature }, { entity_id: entityId });
+    const domain = entityId.startsWith('water_heater.') ? 'water_heater' : 'climate';
+    await this.callService(domain, 'set_temperature', { temperature }, { entity_id: entityId });
   }
 
   async setClimateHvacMode(entityId: string, hvacMode: string): Promise<void> {
+    if (entityId.startsWith('water_heater.')) {
+      await this.callService(
+        'water_heater',
+        'set_operation_mode',
+        { operation_mode: hvacMode },
+        { entity_id: entityId }
+      );
+      return;
+    }
+
     await this.callService(
       'climate',
       'set_hvac_mode',

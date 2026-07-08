@@ -985,6 +985,10 @@ export const deMessages = {
   'notifications.empty.description': 'Alles erledigt!',
   'errorDisplay.title': 'Verbindungsfehler',
   'errorDisplay.retry': 'Verbindung erneut versuchen',
+  'errorDisplay.backToLogin': 'Zurueck zur Anmeldung',
+  'errorDisplay.connectionInterrupted': 'Verbindung unterbrochen',
+  'errorDisplay.connectionInterruptedDescription':
+    'Navet konnte die Home Assistant-Sitzung nicht abschliessen. Pruefe gespeicherte URL und Token und versuche es erneut.',
   'errorDisplay.commonIssues': 'Häufige Probleme:',
   'errorDisplay.issue.1': 'Das Smart-Home-System läuft nicht oder ist nicht erreichbar',
   'errorDisplay.issue.2': 'Falsche URL oder falsches Zugriffstoken',

@@ -2,10 +2,14 @@ import type { HassEntity } from 'home-assistant-js-websocket';
 import { describe, expect, it } from 'vitest';
 import { mapClimateDevice } from '../map-climate-device';
 
-function createClimateEntity(attributes: Record<string, unknown>): HassEntity {
+function createClimateEntity(
+  attributes: Record<string, unknown>,
+  entityId = 'climate.hallway',
+  state = 'heat'
+): HassEntity {
   return {
-    entity_id: 'climate.hallway',
-    state: 'heat',
+    entity_id: entityId,
+    state,
     attributes,
     last_changed: '2026-05-17T00:00:00.000Z',
     last_updated: '2026-05-17T00:00:00.000Z',
@@ -42,5 +46,51 @@ describe('mapClimateDevice', () => {
     );
 
     expect(device.supportedHvacModes).toEqual(['heat', 'cool']);
+  });
+
+  it('maps Home Assistant water heaters as climate card devices', () => {
+    const device = mapClimateDevice(
+      'water_heater.boiler',
+      createClimateEntity(
+        {
+          temperature: 55,
+          current_temperature: 48,
+          operation_list: ['eco', 'performance', 'off'],
+        },
+        'water_heater.boiler',
+        'eco'
+      ),
+      'Boiler',
+      'Utility'
+    );
+
+    expect(device).toEqual(
+      expect.objectContaining({
+        id: 'water_heater.boiler',
+        temperature: 55,
+        currentTemperature: 48,
+        mode: 'eco',
+        supportedHvacModes: ['eco', 'performance', 'off'],
+        serviceDomain: 'water_heater',
+      })
+    );
+  });
+
+  it('does not fall back to generic climate mode controls for water heaters', () => {
+    const device = mapClimateDevice(
+      'water_heater.boiler',
+      createClimateEntity(
+        {
+          temperature: 55,
+          current_temperature: 48,
+        },
+        'water_heater.boiler',
+        'eco'
+      ),
+      'Boiler',
+      'Utility'
+    );
+
+    expect(device.supportedHvacModes).toEqual([]);
   });
 });
