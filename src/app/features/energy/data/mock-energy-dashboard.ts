@@ -487,6 +487,17 @@ const defaultDashboard: EnergyDashboardModel = {
     tone: 'warn',
   },
   topConsumers: consumers,
+  dataCoverage: {
+    hasLiveLoad: true,
+    hasGridImport: true,
+    hasGridExport: true,
+    hasSolar: true,
+    hasBattery: true,
+    hasGas: true,
+    hasHotWater: true,
+    hasCost: true,
+    hasTrackedDevices: true,
+  },
   totals: {
     currentLoadW: 5100,
     solarW: 4200,

@@ -159,6 +159,22 @@ export interface EnergyConsumer {
   room?: string;
 }
 
+export type EnergySourceDiagnosticStatus =
+  | 'configured_numeric'
+  | 'configured_idle'
+  | 'configured_unavailable'
+  | 'not_configured';
+
+export interface EnergySourceDiagnostic {
+  id: string;
+  label: string;
+  entityId?: string;
+  liveEntityId?: string;
+  status: EnergySourceDiagnosticStatus;
+  currentPowerW?: number;
+  todayKWh?: number;
+}
+
 export interface EnergyInsight {
   id: string;
   severity: 'info' | 'warning' | 'critical';
@@ -178,6 +194,17 @@ export interface EnergyDashboardModel {
   insights: EnergyInsight[];
   whatChanged: EnergyWhatChanged;
   topConsumers: EnergyConsumer[];
+  dataCoverage: {
+    hasLiveLoad: boolean;
+    hasGridImport: boolean;
+    hasGridExport: boolean;
+    hasSolar: boolean;
+    hasBattery: boolean;
+    hasGas: boolean;
+    hasHotWater: boolean;
+    hasCost: boolean;
+    hasTrackedDevices: boolean;
+  };
   totals: {
     currentLoadW: number;
     solarW: number;
@@ -221,6 +248,8 @@ export interface EnergySourceConfig {
   solarEnergyEntityId?: string;
   gridImportEnergyEntityId?: string;
   gridExportEnergyEntityId?: string;
+  gasEnergyEntityId?: string;
+  hotWaterEnergyEntityId?: string;
 
   /** Individual appliance monitors */
   devices: EnergyDeviceSource[];

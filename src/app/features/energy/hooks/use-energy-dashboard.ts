@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useHomeAssistant } from '@/app/hooks';
 import {
   haBatterySensorRowsEqual,
@@ -7,11 +7,7 @@ import {
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { HEATING_CATEGORIES } from '../data/energy-constants';
 import { useEnergyDashboardStore } from '../stores/energy-dashboard-store';
-import type {
-  EnergyDashboardNode,
-  EnergySeriesPoint,
-  EnergySourceConfig,
-} from '../types/energy.types';
+import type { EnergyDashboardNode, EnergySeriesPoint } from '../types/energy.types';
 import { buildEnergyDashboardModel } from '../utils/build-energy-dashboard-model';
 import { useEnergyHaData } from './use-energy-ha-data';
 import { useEnergyLoadHistory } from './use-energy-load-history';
@@ -65,20 +61,22 @@ export function useEnergyDashboard() {
   const setSelectedNodeId = useEnergyDashboardStore((state) => state.setSelectedNodeId);
   const visibleWidgets = useEnergyDashboardStore((state) => state.visibleWidgets);
   const toggleWidgetVisibility = useEnergyDashboardStore((state) => state.toggleWidgetVisibility);
-  const sourceConfig = useEnergyDashboardStore((state) => state.sourceConfig);
-  const setSourceConfig = useEnergyDashboardStore((state) => state.setSourceConfig);
-  const clearSourceConfig = useEnergyDashboardStore((state) => state.clearSourceConfig);
   const isConnected = useHomeAssistant(homeAssistantSelectors.connected);
   const batteryDevices = useHomeAssistant(selectBatterySensorRowsFromHa, haBatterySensorRowsEqual);
 
-  const [showSetup, setShowSetup] = useState(false);
-
-  const { overview, isConfigured, currentLoadStatisticId } = useEnergyHaData(range);
+  const {
+    energySourceDiagnostics,
+    hasEnergyStatisticsLoaded,
+    overview,
+    isConfigured,
+    currentLoadStatisticId,
+    haSourceConfig,
+  } = useEnergyHaData(range);
   const recentLoadTrend = useEnergyLoadHistory(
     currentLoadStatisticId,
     overview.totals.currentLoadW
   );
-  const periodTotals = useEnergyStatisticsPeriods(sourceConfig?.gridImportEnergyEntityId);
+  const periodTotals = useEnergyStatisticsPeriods(haSourceConfig?.gridImportEnergyEntityId);
   const todayTotalUsageKWh = useMemo(
     () => getTodayUsageFromLoadTrend(recentLoadTrend, periodTotals.today),
     [recentLoadTrend, periodTotals.today]
@@ -156,9 +154,9 @@ export function useEnergyDashboard() {
         range,
         trend: recentLoadTrend,
         periodTotals,
-        sourceConfig,
+        sourceConfig: haSourceConfig,
       }),
-    [overview, periodTotals, range, recentLoadTrend, sourceConfig]
+    [overview, periodTotals, range, recentLoadTrend, haSourceConfig]
   );
 
   const selectedNode = useMemo<EnergyDashboardNode | null>(
@@ -166,13 +164,10 @@ export function useEnergyDashboard() {
     [dashboard.nodes, selectedNodeId]
   );
 
-  function handleSaveConfig(config: EnergySourceConfig) {
-    setSourceConfig(config);
-    setShowSetup(false);
-  }
-
   return {
     dashboard,
+    energySourceDiagnostics,
+    hasEnergyStatisticsLoaded,
     overview,
     range,
     setRange,
@@ -182,13 +177,7 @@ export function useEnergyDashboard() {
     toggleWidgetVisibility,
     isConnected,
     isConfigured,
-    sourceConfig,
     currentLoadStatisticId,
-    showSetup,
-    openSetup: () => setShowSetup(true),
-    closeSetup: () => setShowSetup(false),
-    handleSaveConfig,
-    clearSourceConfig,
     heatingConsumers,
     bathroomToiletConsumers,
     bathroomToiletTodayKWh,

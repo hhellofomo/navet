@@ -62,6 +62,25 @@ describe('buildEnergyDashboardModel', () => {
     expect(dashboard.nodes.find((node) => node.id === 'solar')?.status).toBe('idle');
   });
 
+  it('keeps solar visible from HA energy statistics without a live power sensor', () => {
+    const overview = getMockEnergyOverview('today');
+    overview.totals.solarW = 0;
+    overview.totals.solarTodayKWh = 6.8;
+
+    const dashboard = buildEnergyDashboardModel({
+      overview,
+      range: 'today',
+      trend: overview.trend,
+      periodTotals: { today: 14.2, week: 102.3, month: 441.2 },
+      sourceConfig: {
+        solarEnergyEntityId: 'sensor.solar_energy',
+        devices: [],
+      },
+    });
+
+    expect(dashboard.nodes.find((node) => node.id === 'solar')?.todayValue).toBe(6.8);
+  });
+
   it('returns peak mode summary for heavy grid import', () => {
     const overview = getMockEnergyOverview('today');
     overview.totals.importW = 2200;
@@ -156,6 +175,100 @@ describe('buildEnergyDashboardModel', () => {
     expect(
       getEnergyModeSummary(peakDashboard.mode, peakOverview, peakDashboard.totals.renewableSharePct)
     ).toContain('Grid import');
+  });
+
+  it('centers a grid-only HA dashboard on live load without unavailable categories', () => {
+    const overview = getMockEnergyOverview('today');
+    overview.totals.currentLoadW = 386;
+    overview.totals.importW = 386;
+    overview.totals.exportW = 0;
+    overview.totals.importTodayKWh = 4.2;
+    overview.totals.exportTodayKWh = 0;
+    overview.totals.solarW = 0;
+    overview.totals.solarTodayKWh = 0;
+    overview.totals.batteryPercent = 0;
+    overview.totals.batteryPowerW = 0;
+    overview.totals.gasTodayKWh = 0;
+    overview.totals.hotWaterTodayKWh = 0;
+    overview.totals.costToday = 0;
+    overview.totals.projectedMonthCost = 0;
+    overview.topConsumers = [
+      {
+        id: 'sensor.bathroom_floor_energy_usage',
+        name: 'Bathroom Energy Usage',
+        category: 'floor_heating',
+        powerEntityId: 'sensor.bathroom_floor_power',
+        powerW: 0,
+        energyKWh: 0,
+        shareOfLoad: 0,
+        costToday: 0,
+        status: 'idle',
+      },
+      {
+        id: 'sensor.toilet_energy_usage',
+        name: 'Toilet Energy Usage',
+        category: 'toilet_heater',
+        powerEntityId: 'sensor.toilet_power',
+        powerW: 0,
+        energyKWh: 0,
+        shareOfLoad: 0,
+        costToday: 0,
+        status: 'idle',
+      },
+    ];
+
+    const dashboard = buildEnergyDashboardModel({
+      overview,
+      range: 'today',
+      trend: overview.trend,
+      periodTotals: { today: 4.2, week: 0, month: 0 },
+      sourceConfig: {
+        gridImportEnergyEntityId: 'sensor.develco_zhemi101_summation_delivered',
+        gridImportPowerEntityId: 'sensor.develco_zhemi101_instantaneous_demand',
+        homeLoadPowerEntityId: 'sensor.develco_zhemi101_instantaneous_demand',
+        devices: [
+          {
+            entityId: 'sensor.bathroom_floor_energy_usage',
+            name: 'Bathroom Energy Usage',
+            category: 'floor_heating',
+            powerEntityId: 'sensor.bathroom_floor_power',
+          },
+          {
+            entityId: 'sensor.toilet_energy_usage',
+            name: 'Toilet Energy Usage',
+            category: 'toilet_heater',
+            powerEntityId: 'sensor.toilet_power',
+          },
+        ],
+      },
+    });
+
+    expect(dashboard.dataCoverage).toMatchObject({
+      hasLiveLoad: true,
+      hasGridImport: true,
+      hasGridExport: false,
+      hasSolar: false,
+      hasBattery: false,
+      hasGas: false,
+      hasHotWater: false,
+      hasCost: false,
+      hasTrackedDevices: true,
+    });
+    expect(dashboard.summary.map((metric) => metric.id)).toEqual([
+      'load',
+      'grid',
+      'today-grid',
+      'tracked-devices',
+    ]);
+    expect(dashboard.modeSummary).toBe(
+      'Live grid demand is steady and no HA Energy source changes are reported.'
+    );
+    expect(dashboard.nodes.map((node) => node.id)).toEqual(['home', 'grid']);
+    expect(dashboard.flows.map((flow) => flow.id)).toEqual(['grid-home']);
+    expect(dashboard.ranges.today.costBreakdown).toEqual([]);
+    expect(dashboard.ranges.week.totalUsageKWh).toBe(0);
+    expect(dashboard.ranges.week.energyBreakdown).toEqual([]);
+    expect(dashboard.topConsumers).toHaveLength(2);
   });
 });
 

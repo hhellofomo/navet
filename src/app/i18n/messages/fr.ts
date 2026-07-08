@@ -1145,7 +1145,10 @@ export const frMessages = {
   'charts.powerSparkline.useLabel': 'Usage : {value} W',
   'energy.setup.panelTitle': 'Connecter Home Assistant Energy',
   'energy.setup.panelDescription':
-    'Associez vos entites capteurs HA a chaque source d energie. L auto-detection lit votre configuration HA Energy - verifiez et corrigez les identifiants capteurs proposes avant de sauvegarder.',
+    'Configurez le tableau de bord Energie dans Home Assistant. Navet lit directement les preferences HA Energy et les statistiques recorder.',
+  'energy.sourcesFound.title': 'Sources Home Assistant Energy trouvees',
+  'energy.sourcesFound.description':
+    'Navet a trouve ces sources HA Energy en lecture seule et attend les statistiques recorder avant d afficher le tableau de bord.',
   'energy.setup.autoDetect.title': 'Auto-detection depuis HA Energy',
   'energy.setup.autoDetect.description':
     'Lit la configuration de votre tableau de bord Energy et pre-remplit les champs ci-dessous.',
@@ -1229,7 +1232,7 @@ export const frMessages = {
   'energy.widgets.consumers.title': 'Principaux consommateurs',
   'energy.widgets.consumers.eyebrow': 'Priorite d action',
   'energy.widgets.consumers.empty':
-    'Aucun appareil individuel configure. Ajoutez des moniteurs d appareil dans vos reglages HA Energy, puis relancez la detection automatique.',
+    'Aucun appareil individuel configure. Ajoutez des moniteurs d appareil dans Home Assistant Energy.',
   'energy.widgets.consumers.loadShare': '{value}% de la charge',
   'energy.widgets.consumers.kwhToday': '{value} kWh aujourd hui',
   'energy.widgets.storage.title': 'Stockage et solaire',

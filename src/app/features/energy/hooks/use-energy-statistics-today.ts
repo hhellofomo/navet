@@ -4,7 +4,6 @@ import { useHomeAssistant } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { getEnergyStatisticsToday } from '../services/energy-statistics-service';
-import type { EnergySourceConfig } from '../types/energy.types';
 
 const REFRESH_MS = ENERGY_STATISTICS_REFRESH_INTERVAL;
 
@@ -13,26 +12,24 @@ const REFRESH_MS = ENERGY_STATISTICS_REFRESH_INTERVAL;
  * Returns a map of entityId → kWh used today (0 when unavailable).
  * Refreshes every 5 minutes.
  */
-export function useEnergyStatisticsToday(
-  sourceConfig: EnergySourceConfig | null
-): Record<string, number> {
+interface EnergyStatisticsTodayState {
+  hasLoaded: boolean;
+  values: Record<string, number>;
+}
+
+export function useEnergyStatisticsToday(entityIds: string[]): EnergyStatisticsTodayState {
   const [todayKWh, setTodayKWh] = useState<Record<string, number>>({});
+  const [hasLoaded, setHasLoaded] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const connection = useHomeAssistant(homeAssistantSelectors.connection);
 
   useEffect(() => {
-    if (!sourceConfig) {
+    if (entityIds.length === 0) {
       setTodayKWh({});
+      setHasLoaded(false);
       return;
     }
-
-    const entityIds = [
-      sourceConfig.gridImportEnergyEntityId,
-      sourceConfig.solarEnergyEntityId,
-      ...sourceConfig.devices.map((d) => d.entityId),
-    ].filter((id): id is string => Boolean(id));
-
-    if (entityIds.length === 0) return;
+    setHasLoaded(false);
 
     async function fetchStats() {
       const activeConnection = connection ?? homeAssistantService.getConnection();
@@ -40,8 +37,10 @@ export function useEnergyStatisticsToday(
       try {
         const result = await getEnergyStatisticsToday(activeConnection, entityIds);
         setTodayKWh(result);
+        setHasLoaded(true);
       } catch (error) {
         console.error('[EnergyStatisticsToday] Failed to fetch today stats:', error);
+        setHasLoaded(true);
         // Dashboard remains useful without today stats
       }
     }
@@ -52,7 +51,7 @@ export function useEnergyStatisticsToday(
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [connection, sourceConfig]);
+  }, [connection, entityIds]);
 
-  return todayKWh;
+  return { hasLoaded, values: todayKWh };
 }

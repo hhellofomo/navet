@@ -1123,7 +1123,10 @@ export const enMessages = {
   'charts.powerSparkline.useLabel': 'Use: {value} W',
   'energy.setup.panelTitle': 'Connect to Home Assistant Energy',
   'energy.setup.panelDescription':
-    'Map your HA sensor entities to each energy source. Auto-detect reads your HA Energy configuration - review and correct the guessed sensor IDs before saving.',
+    'Configure the Energy dashboard in Home Assistant. Navet reads HA Energy preferences and recorder statistics directly.',
+  'energy.sourcesFound.title': 'Home Assistant Energy sources found',
+  'energy.sourcesFound.description':
+    'Navet found these read-only HA Energy sources and is waiting for recorder statistics before drawing the dashboard.',
   'energy.setup.autoDetect.title': 'Auto-detect from HA Energy',
   'energy.setup.autoDetect.description':
     'Reads your Energy dashboard configuration and pre-fills the fields below.',
@@ -1203,7 +1206,7 @@ export const enMessages = {
   'energy.widgets.consumers.title': 'Top consumers',
   'energy.widgets.consumers.eyebrow': 'Action priority',
   'energy.widgets.consumers.empty':
-    'No individual devices configured. Add device monitors in your HA Energy settings, then re-run auto-detect.',
+    'No individual devices configured. Add device monitors in your Home Assistant Energy settings.',
   'energy.widgets.consumers.loadShare': '{value}% of load',
   'energy.widgets.consumers.kwhToday': '{value} kWh today',
   'energy.widgets.storage.title': 'Storage and solar',

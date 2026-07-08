@@ -1,29 +1,28 @@
-import { Settings, Zap } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { memo } from 'react';
 import { DashboardEmptyState } from '@/app/components/patterns';
-import { useI18n } from '@/app/hooks';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { useI18n, useTheme } from '@/app/hooks';
 import { useEnergyDashboard } from '../hooks/use-energy-dashboard';
 import { EnergyDashboardPage } from './dashboard/energy-dashboard-page';
-import { EnergySetupWizard } from './energy-setup-wizard';
 
 export const EnergySection = memo(function EnergySection() {
   const { t } = useI18n();
+  const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const {
     dashboard,
+    energySourceDiagnostics,
+    hasEnergyStatisticsLoaded,
     range,
     setRange,
     isConnected,
     isConfigured,
-    sourceConfig,
-    showSetup,
-    openSetup,
-    closeSetup,
-    handleSaveConfig,
     selectedNode,
     setSelectedNodeId,
   } = useEnergyDashboard();
 
-  if (!isConnected && !showSetup) {
+  if (!isConnected) {
     return (
       <div className="flex h-full items-center justify-center p-6">
         <DashboardEmptyState
@@ -36,30 +35,55 @@ export const EnergySection = memo(function EnergySection() {
     );
   }
 
-  if (!isConfigured || showSetup) {
+  if (!isConfigured) {
     return (
-      <div className="space-y-6">
-        {!isConfigured && !showSetup ? (
-          <div className="flex h-full items-center justify-center p-6">
-            <DashboardEmptyState
-              icon={Zap}
-              title={t('energy.setup.panelTitle')}
-              description={t('energy.setup.panelDescription')}
-              actionIcon={Settings}
-              actionLabel={t('energy.demo.connect')}
-              onAction={openSetup}
-              className="w-full max-w-md"
-            />
-          </div>
-        ) : null}
+      <div className="flex h-full items-center justify-center p-6">
+        <DashboardEmptyState
+          icon={Zap}
+          title={t('energy.setup.panelTitle')}
+          description={t('energy.setup.panelDescription')}
+          className="w-full max-w-md"
+        />
+      </div>
+    );
+  }
 
-        {showSetup || !isConfigured ? (
-          <EnergySetupWizard
-            initialConfig={sourceConfig ?? undefined}
-            onSave={handleSaveConfig}
-            onCancel={showSetup ? closeSetup : undefined}
-          />
-        ) : null}
+  if (!hasEnergyStatisticsLoaded) {
+    return (
+      <div className="flex h-full items-center justify-center p-6">
+        <DashboardEmptyState
+          icon={Zap}
+          title={t('energy.sourcesFound.title')}
+          description={t('energy.sourcesFound.description')}
+          className="w-full max-w-2xl"
+        >
+          {energySourceDiagnostics.length > 0 ? (
+            <div className="grid max-h-56 gap-2 overflow-auto text-left">
+              {energySourceDiagnostics.slice(0, 8).map((source) => (
+                <div
+                  key={`${source.label}:${source.entityId}`}
+                  className={`rounded-2xl border px-3 py-2 ${surface.border} ${surface.subtleBg}`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className={`text-xs font-semibold ${surface.textSecondary}`}>
+                      {source.label}
+                    </div>
+                    <div className={`text-xs ${surface.textMuted}`}>
+                      {source.status === 'configured_unavailable'
+                        ? 'Unavailable'
+                        : source.status === 'configured_idle'
+                          ? 'Idle'
+                          : 'Available'}
+                    </div>
+                  </div>
+                  <div className={`truncate text-xs ${surface.textMuted}`}>
+                    {source.entityId ?? source.liveEntityId}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </DashboardEmptyState>
       </div>
     );
   }
@@ -71,7 +95,7 @@ export const EnergySection = memo(function EnergySection() {
       onRangeChange={setRange}
       selectedNodeId={selectedNode?.id ?? null}
       onNodeSelect={setSelectedNodeId}
-      onOpenSetup={openSetup}
+      sourceDiagnostics={energySourceDiagnostics}
     />
   );
 });

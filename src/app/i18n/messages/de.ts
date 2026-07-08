@@ -1144,7 +1144,10 @@ export const deMessages = {
   'charts.powerSparkline.useLabel': 'Verbrauch: {value} W',
   'energy.setup.panelTitle': 'Mit Home Assistant Energy verbinden',
   'energy.setup.panelDescription':
-    'Ordnen Sie Ihre HA-Sensorentitäten jeder Energiequelle zu. Die Auto-Erkennung liest Ihre HA-Energy-Konfiguration - überprüfen und korrigieren Sie die vermuteten Sensor-IDs vor dem Speichern.',
+    'Konfigurieren Sie das Energie-Dashboard in Home Assistant. Navet liest HA Energy-Einstellungen und Recorder-Statistiken direkt.',
+  'energy.sourcesFound.title': 'Home Assistant Energy-Quellen gefunden',
+  'energy.sourcesFound.description':
+    'Navet hat diese schreibgeschutzten HA Energy-Quellen gefunden und wartet auf Recorder-Statistiken, bevor das Dashboard gezeichnet wird.',
   'energy.setup.autoDetect.title': 'Automatisch aus HA Energy erkennen',
   'energy.setup.autoDetect.description':
     'Liest Ihre Energy-Dashboard-Konfiguration und füllt die Felder unten vorab aus.',
@@ -1227,7 +1230,7 @@ export const deMessages = {
   'energy.widgets.consumers.title': 'Top-Verbraucher',
   'energy.widgets.consumers.eyebrow': 'Aktionsprioritat',
   'energy.widgets.consumers.empty':
-    'Keine einzelnen Gerate konfiguriert. Fuge Geratemonitore in deinen HA-Energieeinstellungen hinzu und starte die Erkennung erneut.',
+    'Keine einzelnen Gerate konfiguriert. Fuge Geratemonitore in Home Assistant Energy hinzu.',
   'energy.widgets.consumers.loadShare': '{value}% der Last',
   'energy.widgets.consumers.kwhToday': '{value} kWh heute',
   'energy.widgets.storage.title': 'Speicher und Solar',
