@@ -99,9 +99,12 @@ The Navet logo represents **"the hub"** - a central node with 8 radiating connec
 
 ## License
 
-These logo files are part of the Navet project and are licensed under CC BY-NC 4.0.
+These logo files are **not** covered by the repository code license.
 
-See [BRANDING.md](../docs/branding/BRANDING.md) for complete brand guidelines.
+They are governed by Navet brand usage rules:
+
+- [../docs/branding/BRANDING.md](../docs/branding/BRANDING.md)
+- [../docs/branding/TRADEMARK_POLICY.md](../docs/branding/TRADEMARK_POLICY.md)
 
 ---
 

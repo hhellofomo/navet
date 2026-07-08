@@ -1,69 +1,33 @@
-# Creative Commons Attribution-NonCommercial 4.0 International
+# GNU Affero General Public License v3.0
 
-## Creative Commons Corporation ("Creative Commons") is not a law firm and does not provide legal services or legal advice.
+The source code in this repository is licensed under the **GNU Affero General Public License, version 3.0** (`AGPL-3.0-only`).
 
----
+This means you may use, study, modify, and redistribute the code under the terms of the AGPL-3.0. If you run a modified version of Navet for users over a network, you must also make the corresponding source code available to those users under the same license.
 
-## License
+The full license text is available from the Free Software Foundation:
 
-THE WORK (AS DEFINED BELOW) IS PROVIDED UNDER THE TERMS OF THIS CREATIVE COMMONS PUBLIC LICENSE ("CCPL" OR "LICENSE"). THE WORK IS PROTECTED BY COPYRIGHT AND/OR OTHER APPLICABLE LAW. ANY USE OF THE WORK OTHER THAN AS AUTHORIZED UNDER THIS LICENSE OR COPYRIGHT LAW IS PROHIBITED.
+- https://www.gnu.org/licenses/agpl-3.0-standalone.html
+- https://www.gnu.org/licenses/agpl-3.0.txt
 
-BY EXERCISING ANY RIGHTS TO THE WORK PROVIDED HERE, YOU ACCEPT AND AGREE TO BE BOUND BY THE TERMS OF THIS LICENSE.
+## Scope
 
----
+Unless a file says otherwise, this license applies to the source code in this repository.
 
-## Summary (Human-Readable)
+## Exclusions
 
-### You are free to:
+The AGPL-3.0 license does **not** grant rights to use the **Navet** name, logo, or other brand assets as trademarks or product identity.
 
-- **Share** — copy and redistribute the material in any medium or format
-- **Adapt** — remix, transform, and build upon the material
+Brand usage is governed separately by:
 
-The licensor cannot revoke these freedoms as long as you follow the license terms.
+- [docs/branding/TRADEMARK_POLICY.md](docs/branding/TRADEMARK_POLICY.md)
+- [docs/branding/BRANDING.md](docs/branding/BRANDING.md)
 
-### Under the following terms:
+## Third-Party Materials
 
-- **Attribution** — You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+Some third-party assets, dependencies, and examples may be subject to their own licenses. See:
 
-- **NonCommercial** — You may not use the material for commercial purposes. Commercial purposes include but are not limited to:
-  - Using the software in a commercial product or service
-  - Selling access to the software
-  - Using the software to generate revenue directly or indirectly
-  - Deploying the software for business operations in companies with more than 10 employees or annual revenue exceeding $250,000 USD
+- [docs/ATTRIBUTIONS.md](docs/ATTRIBUTIONS.md)
 
-- **No additional restrictions** — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+## Copyright
 
-### Commercial Use Exception:
-
-If you wish to use this software for commercial purposes, you must:
-
-1. Contact the project maintainers for written permission
-2. Obtain a separate commercial license agreement
-3. Attribution and acknowledgment of the original work must be maintained
-
-For commercial licensing inquiries, please open an issue in the project repository.
-
----
-
-## Notices:
-
-You do not have to comply with the license for elements of the material in the public domain or where your use is permitted by an applicable exception or limitation.
-
-No warranties are given. The license may not give you all of the permissions necessary for your intended use. For example, other rights such as publicity, privacy, or moral rights may limit how you use the material.
-
----
-
-## Full Legal Code
-
-For the full legal text of this license, please visit:
-https://creativecommons.org/licenses/by-nc/4.0/legalcode
-
----
-
-## Contact
-
-For questions about this license or commercial use inquiries, please open an issue in the project repository.
-
----
-
-Copyright © 2025 Navet Contributors
+Copyright © 2026 Navet Contributors

@@ -335,7 +335,7 @@ Your contributions make this project better! Whether it's code, documentation, b
 
 ## 📄 License
 
-By contributing, you agree that your contributions will be licensed under the same license as the project (CC BY-NC 4.0).
+By contributing, you agree that your contributions will be licensed under the same license as the project (`AGPL-3.0-only`).
 
 ---
 

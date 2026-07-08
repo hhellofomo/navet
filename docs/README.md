@@ -29,8 +29,9 @@ Complete documentation for the Navet smart home dashboard.
   - Current dashboard performance notes
 
 ### Legal & Terms
-- **[License](../LICENSE.md)** - CC BY-NC 4.0 license
-- **[Terms of Use](TERMS_OF_USE.md)** - Usage terms and restrictions
+- **[License](../LICENSE.md)** - AGPL-3.0 code license
+- **[Terms of Use](TERMS_OF_USE.md)** - License and brand usage summary
+- **[Trademark Policy](branding/TRADEMARK_POLICY.md)** - Navet name and logo usage rules
 - **[Attributions](ATTRIBUTIONS.md)** - Credits and third-party licenses
 
 ### Design & Branding
@@ -65,7 +66,7 @@ Complete documentation for the Navet smart home dashboard.
 → See [Design System](../design-system/README.md)
 
 **Check the license:**
-→ See [License](../LICENSE.md) and [Terms of Use](TERMS_OF_USE.md)
+→ See [License](../LICENSE.md), [Terms of Use](TERMS_OF_USE.md), and [Trademark Policy](branding/TRADEMARK_POLICY.md)
 
 **Learn about project history:**
 → See [Change History](archive/CHANGES.md)
@@ -125,7 +126,7 @@ docs/
 - **PWA / installability** → README.md
 - **Design** → design-system/
 - **Branding** → branding/
-- **Legal** → TERMS_OF_USE.md, LICENSE.md
+- **Legal** → TERMS_OF_USE.md, LICENSE.md, branding/TRADEMARK_POLICY.md
 - **History** → archive/CHANGES.md
 - **Credits** → ATTRIBUTIONS.md
 

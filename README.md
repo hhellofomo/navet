@@ -7,7 +7,7 @@
 <br />
 <br />
 
-![License](https://img.shields.io/badge/License-CC%20BY--NC%204.0-blue.svg)
+![License](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)
 ![React](https://img.shields.io/badge/React-18-blue)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.0-38bdf8)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178c6)
@@ -244,32 +244,31 @@ pnpm build
 
 ## 📄 License
 
-This project is licensed under the **Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)**.
+Navet source code is licensed under the **GNU Affero General Public License v3.0** (`AGPL-3.0-only`).
 
-### ✅ You CAN:
-- Use for personal, educational, or non-profit purposes
-- Modify and create derivative works
-- Share with others
+### What that means
+- You can use, modify, and redistribute the code under AGPL-3.0.
+- If you run a modified version for users over a network, you must make the corresponding source code available under the same license.
 
-### ❌ You CANNOT:
-- Use commercially or in business environments
-- Sell or offer as a paid service
-- Use in products that generate revenue
+### Branding is separate
+- The **Navet** name, logo, and brand assets are **not** licensed under AGPL.
+- The separate brand policy is about avoiding confusing or misleading use of the Navet identity, not restricting the AGPL code rights.
 
-**For commercial licensing inquiries, please contact the author.**
-
-See [LICENSE](LICENSE) and [TERMS_OF_USE.md](docs/TERMS_OF_USE.md) for full details.
+See:
+- [LICENSE.md](LICENSE.md)
+- [docs/TERMS_OF_USE.md](docs/TERMS_OF_USE.md)
+- [docs/branding/TRADEMARK_POLICY.md](docs/branding/TRADEMARK_POLICY.md)
 
 ## 🤝 Contributing
 
-Contributions are welcome! This is an open-source project under a non-commercial license.
+Contributions are welcome. This project is open source under AGPL-3.0, with a separate Navet trademark and brand policy.
 
 ### Documentation
 
 Complete documentation is available in the [`/docs`](docs/) folder:
 
 - **[Widget System](docs/WIDGETS.md)** - Custom widget documentation
-- **[Terms of Use](docs/TERMS_OF_USE.md)** - Legal and licensing
+- **[Terms of Use](docs/TERMS_OF_USE.md)** - License and brand usage summary
 - **[Attributions](docs/ATTRIBUTIONS.md)** - Credits and acknowledgments
 - **[Change History](docs/archive/CHANGES.md)** - Project history and migrations
 
@@ -303,7 +302,7 @@ Found a bug or have an idea? [Open an issue](https://github.com/awesomestvi/nave
 
 ## 🗺️ Roadmap
 
-- [x] Custom widgets (Calendar, News, Weather, Photo Frame, Notes)
+- [x] Custom widgets (Calendar, News, Photo Frame, Notes)
 - [x] Data persistence with localStorage
 - [x] Configuration UI with setup wizard
 - [x] Loading states and error handling
@@ -318,7 +317,7 @@ Found a bug or have an idea? [Open an issue](https://github.com/awesomestvi/nave
 - [ ] Scene management
 - [ ] Real calendar integration (Google Calendar, etc.)
 - [ ] Real news API integration
-- [ ] Real weather API integration
+- [x] Home Assistant weather entity and forecast integration
 - [ ] Energy dashboard
 
 ## 🙏 Acknowledgments
