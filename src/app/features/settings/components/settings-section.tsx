@@ -1,4 +1,5 @@
 import {
+  Download,
   ExternalLink,
   FileText,
   Github,
@@ -11,9 +12,10 @@ import {
   Scale,
   Server,
   Settings2,
+  Upload,
   X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Switch } from '@/app/components/ui/switch';
 import { useAuth } from '@/app/contexts/auth-context';
@@ -25,6 +27,7 @@ import {
   useDashboardEntitiesStore,
   useSettingsStore,
 } from '@/app/stores';
+import { exportDashboardConfig, importDashboardConfig } from '@/app/utils/dashboard-config';
 
 export function SettingsSection() {
   const { theme, setTheme, primaryColor, setPrimaryColor, wallpaper, setWallpaper } = useTheme();
@@ -37,6 +40,7 @@ export function SettingsSection() {
   const [showLicense, setShowLicense] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [_showEditConnection, _setShowEditConnection] = useState(false);
+  const importInputRef = useRef<HTMLInputElement | null>(null);
 
   // Get color value for inline styles
   const getColorValue = (color: PrimaryColor): string => {
@@ -127,6 +131,40 @@ export function SettingsSection() {
 
   const handleRemoveWallpaper = () => {
     setWallpaper(null);
+  };
+
+  const handleExportDashboardConfig = () => {
+    const payload = exportDashboardConfig();
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const dateStamp = new Date().toISOString().slice(0, 10);
+
+    link.href = url;
+    link.download = `navet-dashboard-config-${dateStamp}.json`;
+    link.click();
+
+    URL.revokeObjectURL(url);
+    toast.success('Dashboard config exported');
+  };
+
+  const handleImportDashboardConfig = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const content = await file.text();
+      const parsed = JSON.parse(content);
+      importDashboardConfig(parsed);
+      toast.success('Dashboard config imported. Reloading...');
+      window.setTimeout(() => {
+        window.location.reload();
+      }, 600);
+    } catch {
+      toast.error('Failed to import dashboard config');
+    } finally {
+      event.target.value = '';
+    }
   };
 
   // Theme colors
@@ -377,6 +415,71 @@ export function SettingsSection() {
                 <p className={`text-xs ${subtleColor} mt-1`}>{option.description}</p>
               </button>
             ))}
+          </div>
+        </section>
+
+        {/* Backup Section */}
+        <section className={`${cardBg} rounded-2xl border ${borderColor} overflow-hidden`}>
+          <div className="p-4 border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <div
+                className={`w-8 h-8 rounded-xl ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'} flex items-center justify-center`}
+              >
+                <FileText className={`w-4 h-4 ${mutedColor}`} />
+              </div>
+              <div>
+                <h3 className={`text-sm font-semibold ${textColor}`}>Dashboard Config</h3>
+                <p className={`text-xs ${subtleColor}`}>
+                  Export or restore your local dashboard layout and preferences
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 space-y-3">
+            <div
+              className={`rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} p-3`}
+            >
+              <p className={`text-sm font-medium ${textColor}`}>Local backup file</p>
+              <p className={`text-xs ${subtleColor} mt-1`}>
+                Includes theme, layout, card ordering, manual entity selection, custom widgets, and
+                light preset settings. Connection URL and token are not included.
+              </p>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-3">
+              <button
+                type="button"
+                onClick={handleExportDashboardConfig}
+                className={`flex-1 p-3 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} ${hoverBg} transition-all text-left flex items-center gap-3`}
+              >
+                <Download className={`w-4 h-4 ${mutedColor}`} />
+                <div>
+                  <p className={`text-sm font-medium ${textColor}`}>Export Config</p>
+                  <p className={`text-xs ${subtleColor}`}>Download a reusable JSON backup</p>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => importInputRef.current?.click()}
+                className={`flex-1 p-3 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} ${hoverBg} transition-all text-left flex items-center gap-3`}
+              >
+                <Upload className={`w-4 h-4 ${mutedColor}`} />
+                <div>
+                  <p className={`text-sm font-medium ${textColor}`}>Import Config</p>
+                  <p className={`text-xs ${subtleColor}`}>Restore a previously exported file</p>
+                </div>
+              </button>
+
+              <input
+                ref={importInputRef}
+                type="file"
+                accept="application/json"
+                className="hidden"
+                onChange={handleImportDashboardConfig}
+              />
+            </div>
           </div>
         </section>
 
