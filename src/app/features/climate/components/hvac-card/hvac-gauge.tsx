@@ -1,11 +1,11 @@
 import { memo } from 'react';
-import { useTheme } from '../../contexts/theme-context';
+import { useTheme } from '@/app/contexts/theme-context';
 import {
 	getHVACBackgroundGlowColor,
 	getHVACGaugeColor,
 	getHVACGlowColor,
 	getHVACTextShadow,
-} from '../../utils/hvac-styles';
+} from '@/app/utils/hvac-styles';
 
 interface HVACGaugeProps {
 	id: string;

@@ -1,12 +1,15 @@
 import * as Dialog from '@radix-ui/react-dialog';
+import type { LucideIcon } from 'lucide-react';
 import { memo } from 'react';
-import { BRIGHTNESS_PRESETS, PRESET_COLORS, TEMP_OPTIONS } from '../../constants/light-constants';
-import { IconPicker } from '../icon-picker';
-import { BrightnessPresets } from '../shared/brightness-presets';
-import { ColorSelectorSection } from '../shared/color-selector-section';
-import { ColorTemperatureSection } from '../shared/color-temperature-section';
-import { CustomScrollbar } from '../shared/custom-scrollbar';
-import { DialogHeader } from '../shared/dialog-header';
+import { BrightnessPresetEditor } from '@/app/components/shared/brightness-preset-editor';
+import { BrightnessPresets } from '@/app/components/shared/brightness-presets';
+import { ColorSelectorSection } from '@/app/components/shared/color-selector-section';
+import { ColorTemperatureSection } from '@/app/components/shared/color-temperature-section';
+import { CustomScrollbar } from '@/app/components/shared/custom-scrollbar';
+import { DialogHeader } from '@/app/components/shared/dialog-header';
+import { IconPicker } from '@/app/components/shared/icon-picker';
+import { PRESET_COLORS } from '@/app/constants/light-constants';
+import type { BrightnessPresetKey } from '@/app/stores/light-preset-store';
 
 interface LightSettingsDialogProps {
 	isOpen: boolean;
@@ -14,15 +17,31 @@ interface LightSettingsDialogProps {
 	name: string;
 	room: string;
 	isOn: boolean;
+	supportsColorTemperature: boolean;
+	supportsColorControl: boolean;
+	minColorTemp: number;
+	maxColorTemp: number;
+	tempOptions: Array<{ value: number; color: string; label: string }>;
+	brightnessPresets: Array<{
+		brightness: number;
+		icon: LucideIcon;
+		key: BrightnessPresetKey;
+		label: string;
+	}>;
 	colorTemp: number;
 	selectedColor: string | null;
 	customColor: string;
 	brightness: number;
 	selectedIcon: string;
 	onTempChange: (temp: number) => void;
+	onTempCommit?: (temp: number) => void;
 	onColorChange: (color: string) => void;
 	onCustomColorChange: (color: string) => void;
 	onBrightnessChange: (brightness: number) => void;
+	applyBrightnessPresetsToAll: boolean;
+	onApplyBrightnessPresetsToAllChange: (applyToAll: boolean) => void;
+	onBrightnessPresetValueChange: (key: BrightnessPresetKey, value: number) => void;
+	onBrightnessPresetOrderChange: (keys: BrightnessPresetKey[]) => void;
 	onIconChange: (icon: string) => void;
 }
 
@@ -32,15 +51,26 @@ export const LightSettingsDialog = memo(function LightSettingsDialog({
 	name,
 	room,
 	isOn,
+	supportsColorTemperature,
+	supportsColorControl,
+	minColorTemp,
+	maxColorTemp,
+	tempOptions,
+	brightnessPresets,
 	colorTemp,
 	selectedColor,
 	customColor,
 	brightness,
 	selectedIcon,
 	onTempChange,
+	onTempCommit,
 	onColorChange,
 	onCustomColorChange,
 	onBrightnessChange,
+	applyBrightnessPresetsToAll,
+	onApplyBrightnessPresetsToAllChange,
+	onBrightnessPresetValueChange,
+	onBrightnessPresetOrderChange,
 	onIconChange,
 }: LightSettingsDialogProps) {
 	return (
@@ -59,27 +89,50 @@ export const LightSettingsDialog = memo(function LightSettingsDialog({
 							<DialogHeader title="Light Settings" description={`${name} - ${room}`} isOn={isOn} />
 
 							<div className="space-y-8">
-								<ColorTemperatureSection
-									colorTemp={colorTemp}
-									isOn={isOn}
-									tempOptions={Array.from(TEMP_OPTIONS)}
-									onTempChange={onTempChange}
-								/>
+								{supportsColorTemperature && (
+									<ColorTemperatureSection
+										colorTemp={colorTemp}
+										isOn={isOn}
+										minTemp={minColorTemp}
+										maxTemp={maxColorTemp}
+										tempOptions={tempOptions}
+										onTempChange={onTempChange}
+										onTempCommit={onTempCommit}
+									/>
+								)}
 
-								<ColorSelectorSection
-									colors={Array.from(PRESET_COLORS)}
-									selectedColor={selectedColor}
-									customColor={customColor}
-									isOn={isOn}
-									onColorChange={onColorChange}
-									onCustomColorChange={onCustomColorChange}
-								/>
+								{supportsColorControl && (
+									<ColorSelectorSection
+										colors={Array.from(PRESET_COLORS)}
+										selectedColor={selectedColor}
+										customColor={customColor}
+										isOn={isOn}
+										onColorChange={onColorChange}
+										onCustomColorChange={onCustomColorChange}
+									/>
+								)}
 
 								<BrightnessPresets
-									presets={Array.from(BRIGHTNESS_PRESETS)}
+									presets={brightnessPresets}
 									currentBrightness={brightness}
 									isOn={isOn}
 									onBrightnessChange={onBrightnessChange}
+								/>
+
+								<BrightnessPresetEditor
+									presets={brightnessPresets}
+									isOn={isOn}
+									onPresetValueChange={onBrightnessPresetValueChange}
+									onPresetOrderChange={onBrightnessPresetOrderChange}
+									onScopeToggle={() =>
+										onApplyBrightnessPresetsToAllChange(!applyBrightnessPresetsToAll)
+									}
+									scopeLabel={applyBrightnessPresetsToAll ? 'All lights' : 'This light'}
+									scopeHint={
+										applyBrightnessPresetsToAll
+											? 'Click to edit presets for this light only'
+											: 'Click to apply preset changes to all lights'
+									}
 								/>
 
 								<IconPicker

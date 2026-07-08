@@ -108,14 +108,15 @@ export const AllViewGrid = memo(function AllViewGrid({
 						<div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-2 md:gap-3 lg:gap-4 auto-rows-[180px] md:auto-rows-[190px]">
 							{/* Render devices */}
 							{roomDevices.map((device, index) => {
-								const size = cardSizes[device.id];
+								const size = cardSizes[device.id] || (device.size as CardSize);
 
 								return (
 									<DraggableCard
 										key={device.id}
 										id={device.id}
 										index={index}
-										isEditMode={false} // Disable drag in All view
+										isEditMode={isEditMode}
+										isSortable={false}
 										className={getCardSpanClass(size)}
 									>
 										{renderCard({ device, size, handleSizeChange, isEditMode })}
@@ -132,7 +133,8 @@ export const AllViewGrid = memo(function AllViewGrid({
 										key={card.id}
 										id={card.id}
 										index={roomDevices.length + index}
-										isEditMode={false} // Disable drag in All view
+										isEditMode={isEditMode}
+										isSortable={false}
 										className={getCardSpanClass(size)}
 									>
 										<WidgetCard

@@ -61,7 +61,7 @@ export const DeviceGrid = memo(function DeviceGrid({
 						const device = deviceMap.get(item.id);
 						if (!device) return null;
 
-						const size = cardSizes[device.id];
+						const size = cardSizes[device.id] || (device.size as CardSize);
 
 						return (
 							<DraggableCard

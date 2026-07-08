@@ -1,19 +1,25 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
+import { useEditModeStore } from '../stores/edit-mode-store';
 
 /**
  * Custom hook for managing edit mode state
  * Provides toggle functionality for card editing mode
  */
-export const useEditMode = (initialState = false) => {
-	const [isEditMode, setIsEditMode] = useState(initialState);
+export const useEditMode = () => {
+	const isEditMode = useEditModeStore((state) => state.isEditMode);
+	const storeSetEditMode = useEditModeStore((state) => state.setEditMode);
+	const storeToggleEditMode = useEditModeStore((state) => state.toggleEditMode);
 
 	const toggleEditMode = useCallback(() => {
-		setIsEditMode((prev) => !prev);
-	}, []);
+		storeToggleEditMode();
+	}, [storeToggleEditMode]);
 
-	const setEditMode = useCallback((mode: boolean) => {
-		setIsEditMode(mode);
-	}, []);
+	const setEditMode = useCallback(
+		(mode: boolean) => {
+			storeSetEditMode(mode);
+		},
+		[storeSetEditMode]
+	);
 
 	return { isEditMode, toggleEditMode, setEditMode };
 };

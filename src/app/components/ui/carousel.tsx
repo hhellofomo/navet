@@ -114,7 +114,9 @@ function Carousel({
 				canScrollNext,
 			}}
 		>
-			<section
+			{/* biome-ignore lint/a11y/useSemanticElements: A div with region role is used here so aria-roledescription remains valid for the carousel container. */}
+			<div
+				role="region"
 				onKeyDownCapture={handleKeyDown}
 				className={cn('relative', className)}
 				aria-roledescription="carousel"
@@ -122,7 +124,7 @@ function Carousel({
 				{...props}
 			>
 				{children}
-			</section>
+			</div>
 		</CarouselContext.Provider>
 	);
 }

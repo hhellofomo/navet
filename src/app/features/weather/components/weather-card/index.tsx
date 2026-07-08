@@ -1,9 +1,9 @@
 import { Sunrise, Sunset } from 'lucide-react';
 import { memo } from 'react';
-import { useTheme } from '../../contexts/theme-context';
-import { type CardSize, CardSizeSelector } from '../card-size-selector';
-import { CaptionValue } from '../ui/caption-value';
-import { CardWrapper } from '../ui/card-wrapper';
+import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { CaptionValue } from '@/app/components/ui/caption-value';
+import { CardWrapper } from '@/app/components/ui/card-wrapper';
+import { useTheme } from '@/app/contexts/theme-context';
 import { type WeatherCondition, WeatherIcon } from './weather-icon';
 
 // Re-export types

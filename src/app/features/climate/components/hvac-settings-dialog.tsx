@@ -1,9 +1,9 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Flame, Power, Snowflake, Wind } from 'lucide-react';
 import { memo } from 'react';
-import { getHVACModeButtonColor } from '../utils/hvac-styles';
-import { CustomScrollbar } from './shared/custom-scrollbar';
-import { DialogHeader } from './shared/dialog-header';
+import { CustomScrollbar } from '@/app/components/shared/custom-scrollbar';
+import { DialogHeader } from '@/app/components/shared/dialog-header';
+import { getHVACModeButtonColor } from '@/app/utils/hvac-styles';
 
 interface HVACSettingsDialogProps {
 	isOpen: boolean;
