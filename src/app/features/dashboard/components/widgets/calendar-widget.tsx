@@ -69,7 +69,7 @@ export function CalendarWidget({ size = 'medium' }: CalendarWidgetProps) {
 				</div>
 				<div className="flex-1 min-w-0">
 					<h3 className={`text-sm font-semibold ${textPrimary}`}>Calendar</h3>
-					<p className={`text-xs ${textSecondary}`}>Upcoming events</p>
+					<p className="text-[10px] text-gray-400 truncate mt-0.5">Widget</p>
 				</div>
 			</div>
 

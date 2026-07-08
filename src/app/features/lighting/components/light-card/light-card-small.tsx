@@ -11,6 +11,7 @@ interface LightCardSmallProps {
 	name: string;
 	room: string;
 	brightness: number;
+	currentColor: string;
 	brightnessPresets: Array<{ brightness: number; icon: LucideIcon; key: string; label: string }>;
 	isOn: boolean;
 	IconComponent: LucideIcon;
@@ -24,6 +25,7 @@ interface LightCardSmallProps {
 export const LightCardSmall = memo(function LightCardSmall({
 	name,
 	brightness,
+	currentColor,
 	brightnessPresets,
 	isOn,
 	IconComponent,
@@ -42,7 +44,7 @@ export const LightCardSmall = memo(function LightCardSmall({
 		<>
 			<LightCardHeader name={name} isOn={isOn} IconComponent={IconComponent} size="small" />
 
-			<div className="flex-1 flex flex-col justify-end gap-2">
+			<div className="flex-1 flex flex-col justify-end gap-4">
 				<BrightnessSlider
 					value={brightness}
 					onChange={onBrightnessChange}
@@ -64,7 +66,12 @@ export const LightCardSmall = memo(function LightCardSmall({
 					/>
 
 					{supportsColorControl && (
-						<CustomColorTrigger isOn={isOn} onColorChange={onColorChange} size="small" />
+						<CustomColorTrigger
+							isOn={isOn}
+							currentColor={currentColor}
+							onColorChange={onColorChange}
+							size="small"
+						/>
 					)}
 
 					{/* Spacer */}
@@ -78,7 +85,7 @@ export const LightCardSmall = memo(function LightCardSmall({
 							e.stopPropagation();
 							onSettingsClick();
 						}}
-						className={`w-7 h-7 rounded-full ${buttonBg} transition-all flex items-center justify-center`}
+						className={`w-7 h-7 rounded-full ${buttonBg} transition-all flex items-center justify-center cursor-pointer`}
 					>
 						<Settings className={`w-3 h-3 ${buttonText}`} />
 					</button>

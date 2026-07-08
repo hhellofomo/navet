@@ -112,12 +112,17 @@ export const HVACCard = memo(function HVACCard({
 							>
 								{name}
 							</h3>
+							<p className="text-[10px] text-gray-400 truncate mt-0.5">HVAC</p>
 						</div>
 						<div
-							className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${cardColors.iconBg} flex items-center justify-center flex-shrink-0 transition-all duration-500`}
+							className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-500 ${
+								!isOn && theme === 'light' ? 'bg-gray-300/70' : cardColors.iconBg
+							}`}
 						>
 							<Wind
-								className={`${isSmall ? 'w-4 h-4' : 'w-5 h-5'} ${cardColors.accent} transition-colors duration-500`}
+								className={`${isSmall ? 'w-4 h-4' : 'w-5 h-5'} transition-colors duration-500 ${
+									!isOn && theme === 'light' ? 'text-gray-600' : cardColors.accent
+								}`}
 							/>
 						</div>
 					</div>

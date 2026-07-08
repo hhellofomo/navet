@@ -15,9 +15,10 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { LucideIcon } from 'lucide-react';
-import { ArrowRightLeft, GripVertical } from 'lucide-react';
+import { GripVertical } from 'lucide-react';
 import { memo } from 'react';
-import { Button } from '@/app/components/ui/button';
+import { Checkbox } from '@/app/components/ui/checkbox';
+import { Label } from '@/app/components/ui/label';
 import type { BrightnessPresetKey } from '@/app/stores/light-preset-store';
 
 interface BrightnessPresetEditorItem {
@@ -32,9 +33,8 @@ interface BrightnessPresetEditorProps {
 	isOn: boolean;
 	onPresetValueChange: (key: BrightnessPresetKey, value: number) => void;
 	onPresetOrderChange: (keys: BrightnessPresetKey[]) => void;
-	onScopeToggle?: () => void;
-	scopeLabel?: string;
-	scopeHint?: string;
+	onlyApplyToThisLight?: boolean;
+	onOnlyApplyToThisLightChange?: (checked: boolean) => void;
 }
 
 export const BrightnessPresetEditor = memo(function BrightnessPresetEditor({
@@ -42,9 +42,8 @@ export const BrightnessPresetEditor = memo(function BrightnessPresetEditor({
 	isOn,
 	onPresetValueChange,
 	onPresetOrderChange,
-	onScopeToggle,
-	scopeLabel,
-	scopeHint,
+	onlyApplyToThisLight = false,
+	onOnlyApplyToThisLightChange,
 }: BrightnessPresetEditorProps) {
 	const sensors = useSensors(
 		useSensor(PointerSensor, {
@@ -80,31 +79,40 @@ export const BrightnessPresetEditor = memo(function BrightnessPresetEditor({
 
 	return (
 		<div>
-			<div className="mb-4 flex items-center justify-between gap-3">
+			<div className="mb-4">
 				<span
 					className={`text-sm font-medium transition-colors duration-500 ${isOn ? 'text-gray-300' : 'text-gray-500'}`}
 				>
 					Edit Brightness Presets
 				</span>
-				{onScopeToggle && scopeLabel ? (
-					<Button
-						type="button"
-						variant="ghost"
-						size="sm"
-						onClick={onScopeToggle}
-						aria-label={scopeHint ? `${scopeLabel}. ${scopeHint}` : scopeLabel}
-						title={scopeHint ? `${scopeLabel}. ${scopeHint}` : scopeLabel}
-						className={`h-8 rounded-full border px-3 text-xs shadow-sm ${
-							isOn
-								? 'border-white/10 bg-white/5 text-gray-100 hover:bg-white/10 hover:text-white'
-								: 'border-white/10 bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white'
-						}`}
-					>
-						<ArrowRightLeft className="h-3.5 w-3.5" aria-hidden="true" />
-						{scopeLabel}
-					</Button>
-				) : null}
 			</div>
+
+			{onOnlyApplyToThisLightChange ? (
+				<div
+					className={`mb-4 flex items-start gap-3 rounded-2xl border px-4 py-3 ${
+						isOn ? 'border-white/10 bg-white/5' : 'border-white/10 bg-white/5'
+					}`}
+				>
+					<Checkbox
+						id="brightness-preset-scope"
+						checked={onlyApplyToThisLight}
+						onCheckedChange={(checked) => onOnlyApplyToThisLightChange(checked === true)}
+						aria-label="Only apply brightness preset changes to this light"
+						className="mt-0.5"
+					/>
+					<div className="min-w-0 flex-1">
+						<Label
+							htmlFor="brightness-preset-scope"
+							className={`text-sm ${isOn ? 'text-gray-100' : 'text-gray-300'}`}
+						>
+							Only apply to this light
+						</Label>
+						<p className={`mt-1 text-xs ${isOn ? 'text-gray-400' : 'text-gray-500'}`}>
+							Leave this off to update brightness preset values and ordering for all lights.
+						</p>
+					</div>
+				</div>
+			) : null}
 
 			<DndContext sensors={sensors} onDragEnd={handleDragEnd}>
 				<SortableContext items={presets.map((preset) => preset.key)} strategy={rectSortingStrategy}>

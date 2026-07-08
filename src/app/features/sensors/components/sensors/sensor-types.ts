@@ -3,6 +3,7 @@ import {
 	Activity,
 	Droplets,
 	Gauge,
+	PersonStanding,
 	Sun,
 	Thermometer,
 	TrendingDown,
@@ -20,7 +21,8 @@ export type SensorIconType =
 	| 'trend-down'
 	| 'activity'
 	| 'wind'
-	| 'sun';
+	| 'sun'
+	| 'motion';
 
 export interface SensorReading {
 	id: string;
@@ -51,4 +53,5 @@ export const iconMap: Record<SensorIconType, LucideIcon> = {
 	activity: Activity,
 	wind: Wind,
 	sun: Sun,
+	motion: PersonStanding,
 };

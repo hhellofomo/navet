@@ -88,6 +88,7 @@ export const settingsSelectors = {
 	temperatureUnit: (state: SettingsState) => state.temperatureUnit,
 	defaultView: (state: SettingsState) => state.defaultView,
 	compactMode: (state: SettingsState) => state.compactMode,
+	disableAnimations: (state: SettingsState) => state.disableAnimations,
 
 	// Actions
 	updateSettings: (state: SettingsState) => state.updateSettings,
@@ -98,6 +99,7 @@ export const settingsSelectors = {
 		use24HourTime: state.use24HourTime,
 		temperatureUnit: state.temperatureUnit,
 		compactMode: state.compactMode,
+		disableAnimations: state.disableAnimations,
 	}),
 	notificationSettings: (state: SettingsState) => ({
 		showNotifications: state.showNotifications,

@@ -43,12 +43,24 @@ export const DeviceGrid = memo(function DeviceGrid({
 	const displayedCardIds = isSearchActive
 		? orderedCardIds.filter((id) => filteredDeviceIds.includes(id))
 		: orderedCardIds;
+	const customCardMap = new Map(customCards.map((card) => [card.id, card]));
 
-	// Combine device cards and custom widget cards
-	const allCards = [
-		...displayedCardIds.map((id) => ({ type: 'device' as const, id })),
-		...customCards.map((card) => ({ type: 'widget' as const, card })),
-	];
+	// Combine device cards and custom widget cards using the shared ordering model.
+	const allCards = displayedCardIds
+		.map((id) => {
+			const device = deviceMap.get(id);
+			if (device) {
+				return { type: 'device' as const, id };
+			}
+
+			const card = customCardMap.get(id);
+			if (card) {
+				return { type: 'widget' as const, card };
+			}
+
+			return null;
+		})
+		.filter((item): item is NonNullable<typeof item> => item !== null);
 
 	// Get all IDs for SortableContext
 	const allCardIds = allCards.map((item) => (item.type === 'device' ? item.id : item.card.id));

@@ -14,6 +14,7 @@ interface LightCardLargeProps {
 	brightness: number;
 	brightnessPresets: Array<{ brightness: number; icon: LucideIcon; key: string; label: string }>;
 	selectedColor: string | null;
+	currentColor: string;
 	isOn: boolean;
 	IconComponent: LucideIcon;
 	supportsColorControl: boolean;
@@ -27,6 +28,7 @@ export const LightCardLarge = memo(function LightCardLarge({
 	brightness,
 	brightnessPresets,
 	selectedColor,
+	currentColor,
 	isOn,
 	IconComponent,
 	supportsColorControl,
@@ -80,7 +82,12 @@ export const LightCardLarge = memo(function LightCardLarge({
 									onColorChange={onColorChange}
 									size="large"
 								/>
-								<CustomColorTrigger isOn={isOn} onColorChange={onColorChange} size="large" />
+								<CustomColorTrigger
+									isOn={isOn}
+									currentColor={currentColor}
+									onColorChange={onColorChange}
+									size="large"
+								/>
 							</div>
 						</div>
 					</div>

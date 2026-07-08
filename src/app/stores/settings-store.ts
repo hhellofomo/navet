@@ -10,6 +10,7 @@ interface UserSettings {
 	temperatureUnit: 'celsius' | 'fahrenheit';
 	defaultView: 'all' | string;
 	compactMode: boolean;
+	disableAnimations: boolean;
 }
 
 interface SettingsState extends UserSettings {
@@ -26,6 +27,7 @@ const defaultSettings: UserSettings = {
 	temperatureUnit: 'fahrenheit',
 	defaultView: 'all',
 	compactMode: false,
+	disableAnimations: false,
 };
 
 export const useSettingsStore = create<SettingsState>()(

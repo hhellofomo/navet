@@ -2,7 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import type { LucideIcon } from 'lucide-react';
 import { Plus, Search, Trash2, X } from 'lucide-react';
 import type { RefObject } from 'react';
-import type { SensorIconType } from './grouped-sensor-card';
+import type { SensorIconType } from './sensors/sensor-types';
 
 interface SensorReading {
 	label: string;

@@ -15,6 +15,7 @@ import { GroupedSensorCard } from '../features/sensors/components/grouped-sensor
 import { SensorCard } from '../features/sensors/components/sensor-card';
 import type { SensorReading } from '../features/sensors/components/sensors/sensor-types';
 import { VacuumCard } from '../features/vacuum/components/vacuum-card';
+import type { DeviceMetric } from '../types/device.types';
 import { WeatherCard } from '../features/weather/components/weather-card';
 import { WifiCard } from '../features/wifi/components/wifi-card';
 
@@ -155,9 +156,12 @@ export const renderCard = ({
 				<SwitchCard
 					name={device.name as string}
 					initialState={device.state as boolean | undefined}
+					entityType={device.entityType as string | undefined}
 					power={device.power as number | undefined}
 					voltage={device.voltage as number | undefined}
 					energy={device.energy as number | undefined}
+					metrics={device.metrics as DeviceMetric[] | undefined}
+					isEditMode={isEditMode}
 				/>
 			);
 

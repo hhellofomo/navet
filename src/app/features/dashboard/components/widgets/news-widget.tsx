@@ -101,7 +101,7 @@ export function NewsWidget({ size = 'large' }: NewsWidgetProps) {
 				</div>
 				<div className="flex-1 min-w-0">
 					<h3 className={`text-sm font-semibold ${textPrimary}`}>News Feed</h3>
-					<p className={`text-xs ${textSecondary}`}>Latest headlines</p>
+					<p className="text-[10px] text-gray-400 truncate mt-0.5">Widget</p>
 				</div>
 			</div>
 

@@ -1,19 +1,8 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import type { LucideIcon } from 'lucide-react';
-import {
-	Activity,
-	Droplets,
-	Gauge,
-	Sun,
-	Thermometer,
-	TrendingDown,
-	TrendingUp,
-	Wind,
-	Zap,
-} from 'lucide-react';
 import { memo, useCallback, useRef, useState } from 'react';
 import { CustomScrollbar } from '../../shared/components/custom-scrollbar';
-import type { SensorIconType } from './grouped-sensor-card';
+import { iconMap, type SensorIconType } from './sensors/sensor-types';
 import { SensorGroupSettingsView } from './SensorGroupSettingsView';
 
 interface SensorReading {
@@ -41,18 +30,6 @@ interface SensorGroupSettingsContainerProps {
 	accentColor: 'teal' | 'blue' | 'purple' | 'amber' | 'emerald';
 	onSensorsUpdate: (sensors: SensorReading[]) => void;
 }
-
-const iconMap: Record<SensorIconType, LucideIcon> = {
-	zap: Zap,
-	thermometer: Thermometer,
-	droplets: Droplets,
-	gauge: Gauge,
-	'trend-up': TrendingUp,
-	'trend-down': TrendingDown,
-	activity: Activity,
-	wind: Wind,
-	sun: Sun,
-};
 
 // Available sensors that can be added
 const AVAILABLE_SENSORS: AvailableSensor[] = [

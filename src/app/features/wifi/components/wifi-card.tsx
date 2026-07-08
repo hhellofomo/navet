@@ -65,6 +65,7 @@ export const WifiCard = memo(function WifiCard({
 						>
 							Wi-Fi
 						</h3>
+						<p className="text-[10px] text-gray-400 truncate mt-0.5">Network</p>
 						{!isSmall && <p className={`text-xs ${textSecondary} truncate`}>{networkName}</p>}
 					</div>
 					<div

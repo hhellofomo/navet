@@ -11,6 +11,7 @@ interface LightCardMediumProps {
 	name: string;
 	room: string;
 	brightness: number;
+	currentColor: string;
 	brightnessPresets: Array<{ brightness: number; icon: LucideIcon; key: string; label: string }>;
 	isOn: boolean;
 	IconComponent: LucideIcon;
@@ -24,6 +25,7 @@ interface LightCardMediumProps {
 export const LightCardMedium = memo(function LightCardMedium({
 	name,
 	brightness,
+	currentColor,
 	brightnessPresets,
 	isOn,
 	IconComponent,
@@ -42,7 +44,7 @@ export const LightCardMedium = memo(function LightCardMedium({
 		<>
 			<LightCardHeader name={name} isOn={isOn} IconComponent={IconComponent} size="medium" />
 
-			<div className="flex-1 flex flex-col justify-end gap-2">
+			<div className="flex-1 flex flex-col justify-end gap-4">
 				{/* Brightness slider */}
 				<BrightnessSlider
 					value={brightness}
@@ -64,7 +66,12 @@ export const LightCardMedium = memo(function LightCardMedium({
 					/>
 
 					{supportsColorControl && (
-						<CustomColorTrigger isOn={isOn} onColorChange={onColorChange} size="medium" />
+						<CustomColorTrigger
+							isOn={isOn}
+							currentColor={currentColor}
+							onColorChange={onColorChange}
+							size="medium"
+						/>
 					)}
 
 					{/* Spacer */}
@@ -77,7 +84,7 @@ export const LightCardMedium = memo(function LightCardMedium({
 							e.stopPropagation();
 							onSettingsClick();
 						}}
-						className={`w-8 h-8 shrink-0 self-center rounded-full ${buttonBg} transition-all flex items-center justify-center`}
+						className={`w-8 h-8 shrink-0 self-center rounded-full ${buttonBg} transition-all flex items-center justify-center cursor-pointer`}
 					>
 						<Settings className={`w-3.5 h-3.5 ${buttonText}`} />
 					</button>

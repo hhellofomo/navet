@@ -49,6 +49,6 @@ export const useRooms = (devices: DeviceCollection): string[] => {
 			});
 		});
 
-		return Array.from(roomsSet).sort();
+		return Array.from(roomsSet);
 	}, [devices]);
 };

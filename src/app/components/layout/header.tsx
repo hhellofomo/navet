@@ -10,10 +10,11 @@ import { formatDateWithTime, getWeekNumber } from '@/app/utils';
 import { UserDropdown } from './user-dropdown';
 
 export const Header = memo(function Header() {
-	const { theme } = useTheme();
+	const { theme, primaryColor } = useTheme();
 	const { config: authConfig } = useAuth();
 	const { entities, user } = useHomeAssistantContext();
 	const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+	const [isSearchFocused, setIsSearchFocused] = useState(false);
 	const { searchQuery, setSearchQuery, setFilteredDeviceIds, clearSearch, isSearchActive } =
 		useSearch();
 	const devices = useDevices();
@@ -75,12 +76,6 @@ export const Header = memo(function Header() {
 			: theme === 'contrast'
 				? 'border-white/20'
 				: 'border-white/5';
-	const inputFocusBorder =
-		theme === 'light'
-			? 'focus:border-gray-300'
-			: theme === 'contrast'
-				? 'focus:border-white/40'
-				: 'focus:border-white/10';
 	const placeholder =
 		theme === 'light'
 			? 'placeholder-gray-400'
@@ -93,6 +88,21 @@ export const Header = memo(function Header() {
 			: theme === 'contrast'
 				? 'hover:bg-white/10'
 				: 'hover:bg-white/5';
+	const getColorValue = (color: typeof primaryColor) => {
+		const colors = {
+			orange: '#f97316',
+			blue: '#3b82f6',
+			green: '#22c55e',
+			purple: '#a855f7',
+			pink: '#ec4899',
+			red: '#ef4444',
+			yellow: '#eab308',
+			teal: '#14b8a6',
+		} as const;
+
+		return colors[color];
+	};
+	const activeColorValue = getColorValue(primaryColor);
 
 	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchQuery(e.target.value);
@@ -157,7 +167,14 @@ export const Header = memo(function Header() {
 						placeholder="Search devices"
 						value={searchQuery}
 						onChange={handleSearchChange}
-						className={`${inputBg} border ${inputBorder} rounded-lg pl-10 pr-10 py-2 text-sm ${textPrimary} ${placeholder} focus:outline-none ${inputFocusBorder} w-full md:w-64`}
+						onFocus={() => setIsSearchFocused(true)}
+						onBlur={() => setIsSearchFocused(false)}
+						className={`${inputBg} border rounded-lg pl-10 pr-10 py-2 text-sm ${textPrimary} ${placeholder} focus:outline-none w-full md:w-64`}
+						style={{
+							borderColor: isSearchFocused ? activeColorValue : undefined,
+							boxShadow: isSearchFocused ? `0 0 0 2px ${activeColorValue}22` : undefined,
+							caretColor: activeColorValue,
+						}}
 					/>
 					{isSearchActive && (
 						<button
@@ -177,7 +194,10 @@ export const Header = memo(function Header() {
 						className={`relative p-2 rounded-lg ${hoverBg} transition-colors`}
 					>
 						<Bell className={`w-5 h-5 ${textSecondary}`} />
-						<span className="absolute top-1 right-1 w-2 h-2 bg-orange-500 rounded-full"></span>
+						<span
+							className="absolute top-1 right-1 w-2 h-2 rounded-full"
+							style={{ backgroundColor: activeColorValue }}
+						></span>
 					</button>
 
 					<NotificationPanel

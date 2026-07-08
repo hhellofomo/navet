@@ -69,6 +69,7 @@ export const SensorCard = memo(function SensorCard({
 						>
 							{name}
 						</h3>
+						<p className="text-[10px] text-gray-400 truncate mt-0.5">Sensor</p>
 						{!isSmall && <p className={`text-xs ${textSecondary}`}>{room}</p>}
 					</div>
 					<div

@@ -81,6 +81,7 @@ export const PersonCard = memo(function PersonCard({
 						>
 							{name}
 						</h3>
+						<p className="text-[10px] text-gray-400 truncate mt-0.5">Person</p>
 						{!isSmall && <p className={`text-xs ${subTextColor}`}>{location}</p>}
 					</div>
 				</div>

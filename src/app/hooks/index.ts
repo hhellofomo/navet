@@ -18,4 +18,5 @@ export { useBreakpoints, useMediaQuery } from './use-media-query';
 // New reusable hooks
 export { usePersistedState } from './use-persisted-state';
 export { useRoomNavigation } from './use-room-navigation';
+export { useRoomOrdering } from './use-room-ordering';
 export { useToggle } from './use-toggle';
