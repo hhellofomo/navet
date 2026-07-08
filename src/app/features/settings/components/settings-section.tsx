@@ -40,9 +40,14 @@ export function SettingsSection() {
             });
           }}
         >
-          <TabList>
+          <TabList size="compact" className="md:gap-2 md:rounded-[28px] md:px-4 md:py-3">
             {navItems.map(({ id, label, icon: Icon }) => (
-              <TabTrigger key={id} value={id}>
+              <TabTrigger
+                key={id}
+                value={id}
+                size="compact"
+                className="md:h-10 md:min-h-10 md:px-4"
+              >
                 <Icon className="h-4 w-4" />
                 <span>{label}</span>
               </TabTrigger>

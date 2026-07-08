@@ -40,6 +40,7 @@ export default function HomeDashboardOverviewEdit({
   resizeHomeSection,
   onOpenAddCardDialog,
   onUpdateCard,
+  onToggleEditMode,
 }: HomeDashboardOverviewProps) {
   const { t } = useI18n();
   const { theme, accentColor } = useTheme();
@@ -141,7 +142,7 @@ export default function HomeDashboardOverviewEdit({
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="space-y-6 md:space-y-8">
+      <div className="space-y-4 md:space-y-6">
         <DashboardHeroSection
           accentColor={accentColor}
           surface={surface}
@@ -155,20 +156,33 @@ export default function HomeDashboardOverviewEdit({
           title={t('dashboard.homePersonal.title')}
           description={t('dashboard.homePersonal.description')}
           actions={
-            onOpenAddCardDialog ? (
-              <button
-                type="button"
-                onClick={handleAddCard}
-                className="inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium text-white transition-colors"
-                style={{
-                  borderColor: `${accentColor}66`,
-                  backgroundColor: accentColor,
-                  boxShadow: `0 14px 28px -18px ${accentColor}`,
-                }}
-              >
-                <Plus className="h-4 w-4" />
-                <span>{t('dashboard.roomNav.addCard')}</span>
-              </button>
+            onOpenAddCardDialog || onToggleEditMode ? (
+              <>
+                {onOpenAddCardDialog ? (
+                  <button
+                    type="button"
+                    onClick={handleAddCard}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-[13px] font-medium transition-colors md:gap-2 md:px-3 md:py-2 md:text-sm ${surface.border} ${surface.hoverBg}`}
+                  >
+                    <Plus className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                    <span className={surface.textPrimary}>{t('dashboard.roomNav.addCard')}</span>
+                  </button>
+                ) : null}
+                {onToggleEditMode ? (
+                  <button
+                    type="button"
+                    onClick={onToggleEditMode}
+                    className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-[13px] font-medium text-white transition-colors md:gap-2 md:px-3 md:py-2 md:text-sm"
+                    style={{
+                      borderColor: `${accentColor}66`,
+                      backgroundColor: accentColor,
+                      boxShadow: `0 14px 28px -18px ${accentColor}`,
+                    }}
+                  >
+                    <span>{t('dashboard.roomNav.doneEditing')}</span>
+                  </button>
+                ) : null}
+              </>
             ) : null
           }
           aside={
@@ -190,130 +204,100 @@ export default function HomeDashboardOverviewEdit({
           }
         />
 
-        <div>
-          <DashboardEditActions isEditMode={isEditMode} onRemoveFromLayout={removeHomeCard}>
-            <section
-              className={`rounded-[28px] border p-5 md:p-6 ${surface.border} ${surface.panel} ${surface.cardShadow}`}
-            >
-              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <h2 className={`text-xl font-semibold ${surface.textPrimary}`}>
-                    {t('dashboard.homePersonal.canvasTitle')}
-                  </h2>
-                  <p className={`mt-1 text-sm ${surface.textSecondary}`}>
-                    {homeLayout.mode === 'sectioned'
-                      ? t('dashboard.homePersonal.canvasSectioned')
-                      : t('dashboard.homePersonal.canvasFlow')}
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  {homeLayout.mode === 'sectioned' ? (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => addHomeSection()}
-                        className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium transition-colors ${surface.border} ${surface.hoverBg}`}
-                      >
-                        <Rows3 className="h-4 w-4" />
-                        <span className={surface.textPrimary}>
-                          {t('dashboard.homePersonal.addRow')}
-                        </span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => addHomeColumnSection()}
-                        className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium transition-colors ${surface.border} ${surface.hoverBg}`}
-                      >
-                        <Columns2 className="h-4 w-4" />
-                        <span className={surface.textPrimary}>
-                          {t('dashboard.homePersonal.addColumn')}
-                        </span>
-                      </button>
-                      <div className="hidden h-8 self-center w-px rounded-full bg-white/24 md:block" />
-                    </>
-                  ) : null}
-                  <div className="hidden items-center gap-2 md:flex">
-                    <ModeChip
-                      active={homeLayout.mode === 'sectioned'}
-                      icon={<LayoutPanelTop className="h-4 w-4" />}
-                      label={t('dashboard.homePersonal.mode.sectioned')}
-                      onClick={setModeSectioned}
-                      surface={surface}
-                      accentColor={accentColor}
-                    />
-                    <ModeChip
-                      active={homeLayout.mode === 'flow'}
-                      icon={<LayoutTemplate className="h-4 w-4" />}
-                      label={t('dashboard.homePersonal.mode.flow')}
-                      onClick={setModeFlow}
-                      surface={surface}
-                      accentColor={accentColor}
-                    />
-                  </div>
-                  <div className="md:hidden">
-                    <ModeChip
-                      active
-                      icon={
-                        homeLayout.mode === 'sectioned' ? (
-                          <LayoutPanelTop className="h-4 w-4" />
-                        ) : (
-                          <LayoutTemplate className="h-4 w-4" />
-                        )
-                      }
-                      label={
-                        homeLayout.mode === 'sectioned'
-                          ? t('dashboard.homePersonal.mode.flow')
-                          : t('dashboard.homePersonal.mode.sectioned')
-                      }
-                      onClick={toggleMode}
-                      surface={surface}
-                      accentColor={accentColor}
-                    />
-                  </div>
-                </div>
+        <DashboardEditActions isEditMode={isEditMode} onRemoveFromLayout={removeHomeCard}>
+          <section
+            className={`border-0 !bg-transparent p-0 !shadow-none md:rounded-[28px] md:border md:p-6 ${surface.border} ${surface.panel} ${surface.cardShadow}`}
+          >
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="hidden md:block">
+                <h2 className={`text-xl font-semibold ${surface.textPrimary}`}>
+                  {t('dashboard.homePersonal.canvasTitle')}
+                </h2>
+                <p className={`mt-1 text-sm ${surface.textSecondary}`}>
+                  {homeLayout.mode === 'sectioned'
+                    ? t('dashboard.homePersonal.canvasSectioned')
+                    : t('dashboard.homePersonal.canvasFlow')}
+                </p>
               </div>
 
-              <div className="mt-6 space-y-6">
+              <div className="flex flex-wrap items-center gap-2">
                 {homeLayout.mode === 'sectioned' ? (
-                  homeLayout.sections.length > 0 ? (
-                    <SectionCanvasGrid
-                      sections={sectionCards}
-                      sectionGridCols={sectionGridCols}
-                      activeSectionId={activeSectionId}
-                      activeDragColumn={activeDragColumn}
-                      activeDragSection={activeDragSection}
-                      activeDragCard={activeDragCard}
-                      accentColor={accentColor}
-                      allCards={allCards}
-                      cardSizes={cardSizes}
-                      updateCardSize={updateCardSize}
-                      isEditMode={isEditMode}
-                      onUpdateCard={onUpdateCard}
-                      onRemoveFromLayout={removeHomeCard}
-                      showHero={homeLayout.showHero}
-                      onSelectSection={selectSection}
-                      onOpenLibraryForSection={selectSection}
-                      onOpenAddCardDialog={onOpenAddCardDialog}
-                      onAddSectionBelow={addHomeSectionBelow}
-                      onRenameSection={renameHomeSection}
-                      onRemoveSection={removeHomeSection}
-                      onResizeSection={resizeHomeSection}
-                      isPortraitHome={isPortraitHome}
-                      surface={surface}
-                    />
-                  ) : (
-                    <EmptyCanvas
-                      label={t('dashboard.homePersonal.noSections')}
-                      description={t('dashboard.homePersonal.noSectionsDescription')}
-                      surface={surface}
-                    />
-                  )
-                ) : (
-                  <FlowCanvas
-                    cardIds={flowCards}
-                    gridCols={sectionGridCols}
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => addHomeSection()}
+                      className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium transition-colors ${surface.border} ${surface.hoverBg}`}
+                    >
+                      <Rows3 className="h-4 w-4" />
+                      <span className={surface.textPrimary}>
+                        {t('dashboard.homePersonal.addRow')}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => addHomeColumnSection()}
+                      className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium transition-colors ${surface.border} ${surface.hoverBg}`}
+                    >
+                      <Columns2 className="h-4 w-4" />
+                      <span className={surface.textPrimary}>
+                        {t('dashboard.homePersonal.addColumn')}
+                      </span>
+                    </button>
+                    <div className="hidden h-8 self-center w-px rounded-full bg-white/24 md:block" />
+                  </>
+                ) : null}
+                <div className="hidden items-center gap-2 md:flex">
+                  <ModeChip
+                    active={homeLayout.mode === 'sectioned'}
+                    icon={<LayoutPanelTop className="h-4 w-4" />}
+                    label={t('dashboard.homePersonal.mode.sectioned')}
+                    onClick={setModeSectioned}
+                    surface={surface}
+                    accentColor={accentColor}
+                  />
+                  <ModeChip
+                    active={homeLayout.mode === 'flow'}
+                    icon={<LayoutTemplate className="h-4 w-4" />}
+                    label={t('dashboard.homePersonal.mode.flow')}
+                    onClick={setModeFlow}
+                    surface={surface}
+                    accentColor={accentColor}
+                  />
+                </div>
+                <div className="md:hidden">
+                  <ModeChip
+                    active
+                    icon={
+                      homeLayout.mode === 'sectioned' ? (
+                        <LayoutPanelTop className="h-4 w-4" />
+                      ) : (
+                        <LayoutTemplate className="h-4 w-4" />
+                      )
+                    }
+                    label={
+                      homeLayout.mode === 'sectioned'
+                        ? t('dashboard.homePersonal.mode.flow')
+                        : t('dashboard.homePersonal.mode.sectioned')
+                    }
+                    onClick={toggleMode}
+                    surface={surface}
+                    accentColor={accentColor}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-6 md:mt-6">
+              {homeLayout.mode === 'sectioned' ? (
+                homeLayout.sections.length > 0 ? (
+                  <SectionCanvasGrid
+                    sections={sectionCards}
+                    sectionGridCols={sectionGridCols}
+                    activeSectionId={activeSectionId}
+                    activeDragColumn={activeDragColumn}
+                    activeDragSection={activeDragSection}
                     activeDragCard={activeDragCard}
+                    accentColor={accentColor}
                     allCards={allCards}
                     cardSizes={cardSizes}
                     updateCardSize={updateCardSize}
@@ -321,14 +305,42 @@ export default function HomeDashboardOverviewEdit({
                     onUpdateCard={onUpdateCard}
                     onRemoveFromLayout={removeHomeCard}
                     showHero={homeLayout.showHero}
-                    surface={surface}
+                    onSelectSection={selectSection}
+                    onOpenLibraryForSection={selectSection}
                     onOpenAddCardDialog={onOpenAddCardDialog}
+                    onAddSectionBelow={addHomeSectionBelow}
+                    onRenameSection={renameHomeSection}
+                    onRemoveSection={removeHomeSection}
+                    onResizeSection={resizeHomeSection}
+                    isPortraitHome={isPortraitHome}
+                    surface={surface}
                   />
-                )}
-              </div>
-            </section>
-          </DashboardEditActions>
-        </div>
+                ) : (
+                  <EmptyCanvas
+                    label={t('dashboard.homePersonal.noSections')}
+                    description={t('dashboard.homePersonal.noSectionsDescription')}
+                    surface={surface}
+                  />
+                )
+              ) : (
+                <FlowCanvas
+                  cardIds={flowCards}
+                  gridCols={sectionGridCols}
+                  activeDragCard={activeDragCard}
+                  allCards={allCards}
+                  cardSizes={cardSizes}
+                  updateCardSize={updateCardSize}
+                  isEditMode={isEditMode}
+                  onUpdateCard={onUpdateCard}
+                  onRemoveFromLayout={removeHomeCard}
+                  showHero={homeLayout.showHero}
+                  surface={surface}
+                  onOpenAddCardDialog={onOpenAddCardDialog}
+                />
+              )}
+            </div>
+          </section>
+        </DashboardEditActions>
       </div>
 
       <DragOverlay dropAnimation={null}>

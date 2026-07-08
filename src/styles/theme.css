@@ -219,6 +219,14 @@
     cursor: not-allowed;
   }
 
+  @media (pointer: coarse) {
+    :focus,
+    :focus-visible {
+      outline: none;
+      box-shadow: none;
+    }
+  }
+
   input {
     font-size: var(--text-base);
     font-weight: var(--font-weight-normal);
