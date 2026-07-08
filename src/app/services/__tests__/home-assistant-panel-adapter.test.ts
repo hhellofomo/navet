@@ -131,4 +131,39 @@ describe('HomeAssistantPanelAdapter', () => {
       adapter.getConnection().sendMessagePromise({ type: 'camera/capabilities' })
     ).resolves.toEqual({ ok: true });
   });
+
+  it('routes websocket subscriptions through the injected frontend connection', async () => {
+    const unsubscribe = vi.fn();
+    const subscribeMessage = vi.fn(async () => unsubscribe);
+    const adapter = new HomeAssistantPanelAdapter(
+      createPanelHass({
+        connection: {
+          subscribeMessage,
+        } as unknown as HomeAssistantPanelHass['connection'],
+      })
+    );
+    const callback = vi.fn();
+
+    await expect(
+      adapter.getConnection().subscribeMessage(callback, {
+        type: 'persistent_notification/subscribe',
+      })
+    ).resolves.toBe(unsubscribe);
+
+    expect(subscribeMessage).toHaveBeenCalledWith(
+      callback,
+      { type: 'persistent_notification/subscribe' },
+      undefined
+    );
+  });
+
+  it('exposes a subscription method even when Home Assistant omits the frontend connection', async () => {
+    const adapter = new HomeAssistantPanelAdapter(createPanelHass());
+
+    await expect(
+      adapter.getConnection().subscribeMessage(vi.fn(), {
+        type: 'persistent_notification/subscribe',
+      })
+    ).rejects.toThrow('Home Assistant panel connection cannot subscribe');
+  });
 });

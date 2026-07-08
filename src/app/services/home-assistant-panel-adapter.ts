@@ -1,4 +1,10 @@
-import type { Connection, HassConfig, HassEntities, HassUser } from 'home-assistant-js-websocket';
+import type {
+  Connection,
+  HassConfig,
+  HassEntities,
+  HassUser,
+  MessageBase,
+} from 'home-assistant-js-websocket';
 
 import type {
   HomeAssistantAreaRegistryEntry,
@@ -10,6 +16,7 @@ export interface HomeAssistantPanelHass {
   states: HassEntities;
   config: HassConfig;
   user?: HassUser;
+  connection?: Connection;
   callService: (
     domain: string,
     service: string,
@@ -49,6 +56,17 @@ export class HomeAssistantPanelAdapter {
   getConnection(): Connection {
     return {
       sendMessagePromise: (message: Record<string, unknown>) => this.hass.callWS(message),
+      subscribeMessage: <Result>(
+        callback: (result: Result) => void,
+        subscribeMessage: MessageBase,
+        options?: { resubscribe?: boolean; preCheck?: () => boolean | Promise<boolean> }
+      ) => {
+        if (this.hass.connection?.subscribeMessage) {
+          return this.hass.connection.subscribeMessage(callback, subscribeMessage, options);
+        }
+
+        return Promise.reject(new Error('Home Assistant panel connection cannot subscribe'));
+      },
     } as unknown as Connection;
   }
 
