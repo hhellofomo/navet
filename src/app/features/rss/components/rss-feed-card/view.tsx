@@ -1,8 +1,8 @@
 import { ChevronRight, Rss, Settings2 } from 'lucide-react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { type PrimaryColor, type ThemeType, useI18n } from '@/app/hooks';
 import { getRSSFeedCardSurfaceTokens } from './surface-tokens';
 import type { RSSItem } from './types';
@@ -22,6 +22,7 @@ interface RSSFeedCardViewProps {
   };
   isSmall: boolean;
   isMedium: boolean;
+  selectedFeedLabel: string;
   latestArticle: RSSItem | null;
   items: RSSItem[];
   handleArticleClick: (url: string) => void;
@@ -41,6 +42,7 @@ export function RSSFeedCardView({
   colors,
   isSmall,
   isMedium,
+  selectedFeedLabel,
   latestArticle,
   items,
   handleArticleClick,
@@ -52,6 +54,7 @@ export function RSSFeedCardView({
 }: RSSFeedCardViewProps) {
   const { t } = useI18n();
   const cardShell = getCardShellSurfaceTokens(theme);
+  const surface = getThemeSurfaceTokens(theme);
   const rssSurface = getRSSFeedCardSurfaceTokens(theme, primaryColor);
   const isEmpty = !latestArticle && !isLoading;
   const emptyMessage = !hasConfiguredProviders
@@ -83,25 +86,31 @@ export function RSSFeedCardView({
       {/* Content */}
       <div className="relative h-full flex flex-col p-4">
         {/* Header */}
-        <EntityCardHeader
-          title={t('rss.title')}
-          subtitle=""
-          size={size}
-          subtitleClassName="hidden"
-          leading={
-            <EntityCardHeaderIcon
-              IconComponent={Rss}
-              isActive={true}
-              size={size}
-              ariaLabel={t('rss.configureProviders')}
-              onPointerDown={(event) => event.stopPropagation()}
-              onClick={(event) => {
-                event.stopPropagation();
-                onOpenSettings();
-              }}
-            />
-          }
-        />
+        <div className="mb-2 flex items-start gap-3">
+          <EntityCardHeaderIcon
+            IconComponent={Rss}
+            isActive={true}
+            size={size}
+            ariaLabel={t('rss.configureProviders')}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              onOpenSettings();
+            }}
+          />
+          <div className="min-w-0 flex-1">
+            <h3
+              className={`truncate font-semibold ${size === 'small' || size === 'medium' ? 'text-xs' : 'text-sm'} ${surface.textPrimary}`}
+            >
+              {t('rss.title')}
+            </h3>
+            <p
+              className={`mt-0.5 whitespace-normal break-words text-[10px] leading-relaxed ${surface.textMuted}`}
+            >
+              {selectedFeedLabel}
+            </p>
+          </div>
+        </div>
 
         {isEmpty ? (
           <div className="flex flex-1 flex-col justify-center text-left">
@@ -156,15 +165,15 @@ export function RSSFeedCardView({
           </div>
         ) : isMedium ? (
           // Medium: compact list, scrollable
-          <div className="flex-1 overflow-y-auto">
-            <div className="space-y-3">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden">
+            <div className="space-y-3 pr-1">
               {items.map((item, index) => (
                 <a
                   key={item.id}
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`group/item -m-2 block cursor-pointer rounded-lg p-2 text-left no-underline transition-colors ${rssSurface.hoverClassName}`}
+                  className={`group/item -m-2 block min-w-0 cursor-pointer rounded-lg p-2 text-left no-underline transition-colors ${rssSurface.hoverClassName}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -190,15 +199,15 @@ export function RSSFeedCardView({
           </div>
         ) : (
           // Large: articles with images, scrollable
-          <div className="flex-1 overflow-y-auto">
-            <div className="space-y-2">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden">
+            <div className="space-y-2 pr-1">
               {items.map((item, index) => (
                 <a
                   key={item.id}
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`group/item -m-2 block cursor-pointer rounded-xl p-2 text-left no-underline transition-colors ${rssSurface.hoverClassName}`}
+                  className={`group/item -m-2 block min-w-0 cursor-pointer rounded-xl p-2 text-left no-underline transition-colors ${rssSurface.hoverClassName}`}
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -230,7 +239,7 @@ export function RSSFeedCardView({
                       </div>
                       {item.excerpt && (
                         <p
-                          className={`text-left text-xs line-clamp-1 ${rssSurface.excerptClassName}`}
+                          className={`text-left text-xs whitespace-normal break-words leading-relaxed ${rssSurface.excerptClassName}`}
                         >
                           {item.excerpt}
                         </p>

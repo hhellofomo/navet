@@ -18,11 +18,12 @@ import type { Section } from '@/app/navigation/sections';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import type { AllViewGrouping } from '../all-view-grid';
 import type { CardType } from '../components/add-card-dialog';
+import type { CustomCard } from '../stores/custom-cards-store';
 import { useDashboardEntitiesStore } from '../stores/dashboard-entities-store';
 import type { ZoneName } from '../zones/zone-types';
 import { useCardOrdering } from './use-card-ordering';
 import { useCardZones } from './use-card-zones';
-import { useCustomCards } from './use-custom-cards';
+import { HOME_WIDGET_ROOM, useCustomCards } from './use-custom-cards';
 import { useDashboardDerivedState } from './use-dashboard-derived-state';
 import { type DashboardDialogs, useDashboardDialogs } from './use-dashboard-dialogs';
 import { useHomeDashboardLayout } from './use-home-dashboard-layout';
@@ -56,7 +57,10 @@ export type DashboardController = OnboardingController &
     handleAddEntity: (entityId: string) => void;
     handleDeleteCard: (cardId: string) => void;
     handleRemoveEntity: (entityId: string) => void;
-    handleUpdateCard: (cardId: string, data: Record<string, unknown>) => void;
+    handleUpdateCard: (
+      cardId: string,
+      updates: Partial<Omit<CustomCard, 'id' | 'createdAt'>>
+    ) => void;
     hiddenEntityIds: string[];
     homeLayout: ReturnType<typeof useHomeDashboardLayout>['layout'];
     homeLayoutHydrated: boolean;
@@ -64,7 +68,6 @@ export type DashboardController = OnboardingController &
     removeHomeCard: ReturnType<typeof useHomeDashboardLayout>['removeCard'];
     moveHomeCard: ReturnType<typeof useHomeDashboardLayout>['moveCard'];
     setHomeLayoutMode: ReturnType<typeof useHomeDashboardLayout>['setMode'];
-    setHomeShowHero: ReturnType<typeof useHomeDashboardLayout>['setShowHero'];
     addHomeSection: ReturnType<typeof useHomeDashboardLayout>['addSection'];
     addHomeColumnSection: ReturnType<typeof useHomeDashboardLayout>['addColumnSection'];
     renameHomeSection: ReturnType<typeof useHomeDashboardLayout>['renameSection'];
@@ -126,6 +129,7 @@ export function useDashboardController(): DashboardController {
 
   const { activeRoom, changeRoom } = useRoomNavigation('All');
   const { addCard, removeCard, updateCard, getCardsForRoom } = useCustomCards();
+  const dialogs = useDashboardDialogs();
   const allCustomCards = getCardsForRoom('All');
   const { cardSizes, updateCardSize } = useCardState(devices);
   const { cardOrders } = useCardOrdering(devices, rooms, allCustomCards);
@@ -133,8 +137,8 @@ export function useDashboardController(): DashboardController {
   const { deviceMap } = useDeviceMap(devices);
   const { deviceMap: availableDeviceMap } = useDeviceMap(allDevices);
   const homeLayoutValidIds = useMemo(
-    () => [...deviceMap.keys(), ...allCustomCards.map((card) => card.id)],
-    [deviceMap, allCustomCards]
+    () => [...availableDeviceMap.keys(), ...allCustomCards.map((card) => card.id)],
+    [availableDeviceMap, allCustomCards]
   );
   const homeLayoutController = useHomeDashboardLayout(homeLayoutValidIds);
   const homeLayoutHydrated = useMemo(() => {
@@ -142,9 +146,18 @@ export function useDashboardController(): DashboardController {
       return true;
     }
 
-    const validHomeIdSet = new Set(homeLayoutValidIds);
-    return homeLayoutController.layout.cardIds.every((cardId) => validHomeIdSet.has(cardId));
-  }, [homeLayoutController.layout.cardIds, homeLayoutValidIds]);
+    // Use availableDeviceMap (all HA entities, unfiltered by hidden state) so that a blank
+    // dashboard with all entities hidden does not block hydration indefinitely.
+    const availableIdSet = new Set([
+      ...availableDeviceMap.keys(),
+      ...allCustomCards.map((card) => card.id),
+    ]);
+    if (availableIdSet.size === 0) {
+      return true;
+    }
+
+    return homeLayoutController.layout.cardIds.every((cardId) => availableIdSet.has(cardId));
+  }, [homeLayoutController.layout.cardIds, availableDeviceMap, allCustomCards]);
   const { addableEntityIds, allEntityIds, lightDeviceMap, lightRooms, orderedCardIds } =
     useDashboardDerivedState({
       activeRoom,
@@ -154,17 +167,44 @@ export function useDashboardController(): DashboardController {
       hiddenEntityIds,
       rooms,
     });
-  const dialogs = useDashboardDialogs();
   const onboarding = useOnboardingController({ allEntityIds, changeRoom });
 
   const customCards = getCardsForRoom(activeRoom);
 
   const handleAddCard = useCallback(
     (type: CardType, size: CardSize) => {
-      addCard(type, size, activeRoom);
-      toast.success(t('dashboard.feedback.widgetAdded', { type, room: activeRoom }));
+      const isHomeCanvasTarget = activeSection === 'home' && activeRoom === 'All' && isEditMode;
+      const newCard = addCard(type, size, isHomeCanvasTarget ? HOME_WIDGET_ROOM : activeRoom);
+      const targetRoomLabel = isHomeCanvasTarget ? t('dashboard.roomNav.all') : activeRoom;
+
+      if (isHomeCanvasTarget) {
+        if (homeLayoutController.layout.mode !== 'sectioned') {
+          homeLayoutController.addCard(newCard.id);
+        } else {
+          const targetSectionId =
+            (dialogs.addCardTargetSectionId &&
+              homeLayoutController.layout.sections.some(
+                (section) => section.id === dialogs.addCardTargetSectionId
+              ) &&
+              dialogs.addCardTargetSectionId) ||
+            homeLayoutController.layout.sections[0]?.id ||
+            homeLayoutController.addSection();
+
+          homeLayoutController.addCard(newCard.id, targetSectionId);
+        }
+      }
+
+      toast.success(t('dashboard.feedback.widgetAdded', { type, room: targetRoomLabel }));
     },
-    [activeRoom, addCard, t]
+    [
+      activeRoom,
+      activeSection,
+      addCard,
+      dialogs.addCardTargetSectionId,
+      homeLayoutController,
+      isEditMode,
+      t,
+    ]
   );
 
   const handleDeleteCard = useCallback(
@@ -192,8 +232,8 @@ export function useDashboardController(): DashboardController {
   );
 
   const handleUpdateCard = useCallback(
-    (cardId: string, data: Record<string, unknown>) => {
-      updateCard(cardId, { data });
+    (cardId: string, updates: Partial<Omit<CustomCard, 'id' | 'createdAt'>>) => {
+      updateCard(cardId, updates);
     },
     [updateCard]
   );
@@ -226,7 +266,6 @@ export function useDashboardController(): DashboardController {
     removeHomeCard: homeLayoutController.removeCard,
     moveHomeCard: homeLayoutController.moveCard,
     setHomeLayoutMode: homeLayoutController.setMode,
-    setHomeShowHero: homeLayoutController.setShowHero,
     addHomeSection: homeLayoutController.addSection,
     addHomeColumnSection: homeLayoutController.addColumnSection,
     renameHomeSection: homeLayoutController.renameSection,

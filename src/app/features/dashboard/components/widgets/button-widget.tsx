@@ -1,7 +1,8 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import { Settings2, X, Zap } from 'lucide-react';
+import { Settings2, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { DialogHeader } from '@/app/components/shared/device-editor';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useI18n, useTheme } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
@@ -55,17 +56,7 @@ function ButtonSettingsDialog({
         <Dialog.Content
           className={`fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl p-5 shadow-2xl ${surface.panelClassName}`}
         >
-          <div className="mb-4 flex items-center justify-between">
-            <Dialog.Title className={`text-base font-semibold ${surface.textPrimary}`}>
-              {t('widgets.button.configure')}
-            </Dialog.Title>
-            <Dialog.Description className="sr-only">
-              {t('widgets.button.configure')}
-            </Dialog.Description>
-            <Dialog.Close className={`rounded-full p-1 ${surface.textMuted} hover:opacity-70`}>
-              <X className="h-4 w-4" />
-            </Dialog.Close>
-          </div>
+          <DialogHeader title={t('widgets.button.configure')} isOn={theme !== 'light'} />
 
           <div className="space-y-3">
             <input

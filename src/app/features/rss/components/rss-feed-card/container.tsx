@@ -1,7 +1,10 @@
 import { memo, useState } from 'react';
 import { toast } from 'sonner';
 import { isCompactCardSize } from '@/app/components/shared/card-size-selector';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { HOME_WIDGET_ROOM } from '@/app/features/dashboard/stores/custom-cards-store';
 import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
+import { useDevices, useRooms } from '@/app/hooks/use-devices';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { RSSFeedSettingsDialog } from './settings-dialog';
 import type { RSSFeedCardProps } from './types';
@@ -14,12 +17,17 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
   inEditMode = false,
   size = 'medium',
   onSizeChange,
+  room,
+  onRoomChange,
 }: RSSFeedCardProps) {
   const entities = useHomeAssistant(homeAssistantSelectors.entities);
   const { theme, colors, primaryColor } = useTheme();
   const { t } = useI18n();
+  const allDevices = useDevices();
+  const rooms = useRooms(allDevices);
   const isSmall = isCompactCardSize(size);
   const isMedium = size === 'medium';
+  const primaryColorValue = getThemeColorValue(primaryColor);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const {
     providers,
@@ -28,6 +36,7 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
     setSelectedProviderIds,
     addProvider,
     removeProvider,
+    homeAssistantProviders,
     articleCount,
     setArticleCount,
   } = useRSSFeedSources(cardId);
@@ -43,46 +52,16 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
     }
   };
 
-  const handleDeleteSelectedProviders = () => {
-    const selectedDirectProviders = providers.filter(
-      (provider) => selectedProviderIds.includes(provider.id) && provider.type === 'url'
-    );
-
-    selectedDirectProviders.forEach((provider) => {
-      removeProvider(provider.id);
-    });
-
-    setSelectedProviderIds([]);
-
-    if (selectedProviderIds.length === 0) {
-      return;
-    }
-
-    const removedCount = selectedDirectProviders.length;
-    const deselectedCount = selectedProviderIds.length - removedCount;
-
-    if (removedCount > 0 && deselectedCount > 0) {
-      toast.success(
-        t('rss.feedback.deletedAndCleared', { feeds: removedCount, sources: deselectedCount })
-      );
-      return;
-    }
-
-    if (removedCount > 0) {
-      toast.success(
-        removedCount === 1
-          ? t('rss.feedback.deletedFeed.one', { count: removedCount })
-          : t('rss.feedback.deletedFeed.other', { count: removedCount })
-      );
-      return;
-    }
-
-    toast.success(
-      deselectedCount === 1
-        ? t('rss.feedback.clearedSource.one', { count: deselectedCount })
-        : t('rss.feedback.clearedSource.other', { count: deselectedCount })
-    );
-  };
+  const roomValue = room === 'All' || !room ? HOME_WIDGET_ROOM : room;
+  const roomLabel = roomValue === HOME_WIDGET_ROOM ? t('dashboard.roomNav.all') : roomValue;
+  const selectedFeedLabel =
+    selectedProviders.length > 0
+      ? selectedProviders.map((provider) => provider.name).join(', ')
+      : t('rss.title');
+  const roomOptions = [
+    { label: t('dashboard.roomNav.all'), value: HOME_WIDGET_ROOM },
+    ...rooms.map((entry) => ({ label: entry, value: entry })),
+  ];
 
   return (
     <>
@@ -95,6 +74,7 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
         colors={colors}
         isSmall={isSmall}
         isMedium={isMedium}
+        selectedFeedLabel={selectedFeedLabel}
         latestArticle={latestArticle}
         items={items}
         handleArticleClick={handleArticleClick}
@@ -109,8 +89,13 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
           isOpen={isSettingsOpen}
           onOpenChange={setIsSettingsOpen}
           title={t('rss.title')}
+          roomValue={roomValue}
+          roomLabel={roomLabel}
+          roomOptions={roomOptions}
           theme={theme}
+          primaryColorValue={primaryColorValue}
           providers={providers}
+          homeAssistantProviders={homeAssistantProviders}
           selectedProviderIds={selectedProviderIds}
           onSelectedProviderIdsChange={setSelectedProviderIds}
           onAddProvider={(name, feedUrl) => {
@@ -139,7 +124,7 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
           }}
           articleCount={articleCount}
           onArticleCountChange={setArticleCount}
-          onDeleteSelectedProviders={handleDeleteSelectedProviders}
+          onRoomChange={onRoomChange}
         />
       ) : null}
     </>

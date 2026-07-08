@@ -192,56 +192,30 @@ RSS and photo remain custom dashboard widgets. Weather and calendar are now prov
 
 ```tsx
 import { Icon } from 'lucide-react';
-import { useTheme } from '@/app/hooks/use-theme';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { useTheme } from '@/app/hooks';
 
 interface MyWidgetProps {
   size?: 'small' | 'medium' | 'large';
 }
 
 export function MyWidget({ size = 'medium' }: MyWidgetProps) {
-  const { theme, primaryColor } = useTheme();
-  
-  // Theme-aware colors
-  const bgColor = theme === 'light' 
-    ? 'bg-white/70' 
-    : theme === 'contrast' 
-    ? 'bg-black/50' 
-    : 'bg-white/10';
-    
-  const textPrimary = theme === 'light' 
-    ? 'text-gray-900' 
-    : 'text-white';
-    
-  const textSecondary = theme === 'light' 
-    ? 'text-gray-600' 
-    : theme === 'contrast' 
-    ? 'text-gray-300' 
-    : 'text-gray-400';
-    
-  const border = theme === 'light' 
-    ? 'border-gray-200/50' 
-    : 'border-white/10';
+  const { theme, accentColor } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
 
   return (
-    <div className={`${bgColor} backdrop-blur-xl rounded-2xl p-4 border ${border} h-full flex flex-col`}>
+    <div className={`rounded-[28px] p-4 border h-full flex flex-col ${surface.panel} ${surface.border}`}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
-        <div 
+        <div
           className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ 
-            backgroundColor: `${primaryColor}20`, 
-            color: primaryColor 
-          }}
+          style={{ backgroundColor: `${accentColor}20`, color: accentColor }}
         >
           <Icon className="w-5 h-5" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className={`text-sm font-semibold ${textPrimary}`}>
-            Widget Title
-          </h3>
-          <p className={`text-xs ${textSecondary}`}>
-            Subtitle
-          </p>
+          <h3 className={`text-sm font-semibold ${surface.textPrimary}`}>Widget Title</h3>
+          <p className={`text-xs ${surface.textSecondary}`}>Subtitle</p>
         </div>
       </div>
 
@@ -336,8 +310,8 @@ Custom hook for managing widget cards.
 ### Types
 
 ```typescript
-type CardType = 'rss' | 'photo' | 'note';
-type Size = 'small' | 'medium' | 'large';
+type CardType = 'rss' | 'photo' | 'note' | 'battery' | 'button';
+type Size = 'extra-small' | 'small' | 'medium' | 'large';
 
 interface CustomCard {
   id: string;
@@ -383,31 +357,6 @@ interface NoteWidgetProps {
   onNoteChange?: (note: string) => void;
 }
 ```
-
-## 🔮 Future Enhancements
-
-### Planned Features
-
-- [ ] Widget settings dialog for customization
-- [ ] Import/export widget configurations
-- [ ] Widget templates and presets
-- [x] RSS provider integration
-- [ ] Custom widget builder UI
-- [ ] Widget sharing between users
-- [ ] Advanced note features (markdown, checklist)
-- [ ] Photo frame with user uploads
-- [x] Multiple RSS providers per card
-
-### Community Contributions
-
-We welcome contributions for:
-- New widget types
-- Widget customization options
-- API integrations
-- Design improvements
-- Bug fixes and optimizations
-
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
 
 ## 🆘 Troubleshooting
 

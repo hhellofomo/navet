@@ -13,10 +13,10 @@ import {
   sortableKeyboardCoordinates,
   useSortable,
 } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import type { LucideIcon } from 'lucide-react';
 import { GripVertical } from 'lucide-react';
 import { memo } from 'react';
+import { getDndTransformStyle } from '@/app/components/shared/dnd-transform-style';
 import { Checkbox } from '@/app/components/ui/checkbox';
 import { Label } from '@/app/components/ui/label';
 import type { BrightnessPresetKey } from '@/app/features/lighting';
@@ -155,10 +155,7 @@ const BrightnessPresetEditorRow = memo(function BrightnessPresetEditorRow({
   return (
     <div
       ref={setNodeRef}
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition,
-      }}
+      style={getDndTransformStyle(transform, transition)}
       className="flex items-center gap-3"
     >
       <button

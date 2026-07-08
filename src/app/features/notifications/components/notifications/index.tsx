@@ -34,7 +34,8 @@ export function NotificationPanel({ isOpen, onClose, triggerRefs = [] }: Notific
 
       <div
         ref={panelRef}
-        className={`absolute inset-x-3 top-[calc(env(safe-area-inset-top,0px)+0.75rem)] max-h-[min(78vh,42rem)] overflow-hidden rounded-3xl md:inset-auto md:right-0 md:top-0 md:w-96 md:max-h-[60vh] md:rounded-2xl ${surface.panelClassName}`}
+        onPointerDown={(e) => e.stopPropagation()}
+        className={`absolute inset-x-3 top-[calc(env(safe-area-inset-top,0px)+0.75rem)] z-10 max-h-[min(78vh,42rem)] overflow-hidden rounded-3xl md:inset-auto md:right-0 md:top-0 md:z-auto md:w-96 md:max-h-[60vh] md:rounded-2xl ${surface.panelClassName}`}
       >
         <NotificationHeader
           onClose={onClose}

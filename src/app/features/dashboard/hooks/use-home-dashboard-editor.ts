@@ -34,6 +34,7 @@ const widgetTypeLabels: Record<CustomCard['type'], string> = {
 
 interface UseHomeDashboardEditorParams {
   deviceMap: Map<string, DeviceWithType>;
+  availableDeviceMap: Map<string, DeviceWithType>;
   allCustomCards: CustomCard[];
   homeLayout: HomeDashboardLayoutState;
   cardSizes: Record<string, CardSize>;
@@ -41,10 +42,12 @@ interface UseHomeDashboardEditorParams {
   addHomeCard: (cardId: string, sectionId?: string) => void;
   moveHomeCard: (activeId: string, overId: string | null, sectionId?: string) => void;
   addHomeSection: () => string;
+  onShowEntity: (entityId: string) => void;
 }
 
 export function useHomeDashboardEditor({
   deviceMap,
+  availableDeviceMap,
   allCustomCards,
   homeLayout,
   cardSizes,
@@ -52,6 +55,7 @@ export function useHomeDashboardEditor({
   addHomeCard,
   moveHomeCard,
   addHomeSection,
+  onShowEntity,
 }: UseHomeDashboardEditorParams) {
   const { t } = useI18n();
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
@@ -69,10 +73,14 @@ export function useHomeDashboardEditor({
     [allCards, homeLayout.cardIds]
   );
 
+  // Use selectedIds (cards actively rendered on the dashboard) rather than raw homeLayout.cardIds
+  // so that a card which is in the layout but currently hidden still appears in the library.
   const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
 
   const libraryCards = useMemo<LibraryCard[]>(() => {
-    const deviceCards: LibraryCard[] = [...deviceMap.values()].map((device) => ({
+    // Use availableDeviceMap (all HA entities, unfiltered by hidden state) so that hidden
+    // entities still appear in the library and can be added to the home layout.
+    const deviceCards: LibraryCard[] = [...availableDeviceMap.values()].map((device) => ({
       id: device.id,
       title: typeof device.name === 'string' ? device.name : device.id,
       subtitle: typeof device.room === 'string' ? device.room : '',
@@ -89,7 +97,7 @@ export function useHomeDashboardEditor({
       kind: 'widget',
     }));
     return [...deviceCards, ...widgetCards].filter((card) => !selectedIdSet.has(card.id));
-  }, [allCustomCards, deviceMap, selectedIdSet, t]);
+  }, [allCustomCards, availableDeviceMap, selectedIdSet, t]);
 
   const sectionIds = useMemo(
     () => new Set(homeLayout.sections.map((s) => s.id)),
@@ -135,17 +143,21 @@ export function useHomeDashboardEditor({
 
   const filteredLibraryCards = useMemo(() => {
     const normalizedQuery = libraryQuery.trim().toLowerCase();
-    if (!normalizedQuery) return libraryCards.slice(0, 5);
-    return libraryCards
-      .filter((card) =>
-        `${card.title} ${card.subtitle} ${card.meta} ${card.kind} ${card.id}`
-          .toLowerCase()
-          .includes(normalizedQuery)
-      )
-      .slice(0, 5);
+    if (!normalizedQuery) return libraryCards;
+    return libraryCards.filter((card) =>
+      `${card.title} ${card.subtitle} ${card.meta} ${card.kind} ${card.id}`
+        .toLowerCase()
+        .includes(normalizedQuery)
+    );
   }, [libraryCards, libraryQuery]);
 
   const handleAddFromLibrary = (cardId: string) => {
+    // If the entity is hidden (in availableDeviceMap but not in the filtered deviceMap),
+    // unhide it so it becomes visible once added to the home layout.
+    if (availableDeviceMap.has(cardId) && !deviceMap.has(cardId)) {
+      onShowEntity(cardId);
+    }
+
     if (homeLayout.mode !== 'sectioned') {
       addHomeCard(cardId);
       return;

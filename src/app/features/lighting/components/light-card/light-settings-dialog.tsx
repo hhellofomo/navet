@@ -7,6 +7,7 @@ import {
   ColorTemperatureSection,
   CustomScrollbar,
   DialogHeader,
+  DialogSectionRow,
   IconPicker,
 } from '@/app/components/shared/device-editor';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
@@ -106,14 +107,14 @@ export const LightSettingsDialog = memo(function LightSettingsDialog({
                 title={t('lighting.settings.title')}
                 description={`${name} - ${room}`}
                 isOn={isOn}
-                trailing={
-                  <EntityRoomSelector
-                    entityId={entityId}
-                    label={t('lighting.settings.room')}
-                    compact
-                  />
-                }
               />
+              <DialogSectionRow label={t('lighting.settings.room')}>
+                <EntityRoomSelector
+                  entityId={entityId}
+                  label={t('lighting.settings.room')}
+                  compact
+                />
+              </DialogSectionRow>
 
               <div className="space-y-8">
                 {supportsColorTemperature && (

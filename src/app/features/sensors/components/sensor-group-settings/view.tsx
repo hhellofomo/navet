@@ -1,7 +1,8 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import type { LucideIcon } from 'lucide-react';
-import { Gauge, Plus, Search, Trash2, X } from 'lucide-react';
+import { Gauge, Plus, Search, Trash2 } from 'lucide-react';
 import type { Dispatch, ReactNode, RefObject, SetStateAction } from 'react';
+import { DialogHeader, DialogSectionRow } from '@/app/components/shared/device-editor';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useI18n } from '@/app/hooks';
@@ -86,35 +87,18 @@ export function SensorGroupSettingsView({
         <div className="h-full overflow-y-auto overscroll-contain [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="p-8">
             {/* Dialog Header */}
-            <div className="flex items-start justify-between mb-6">
-              <div>
-                <Dialog.Title className={`text-xl font-semibold ${surface.textPrimary}`}>
-                  {t('sensors.groupSettings.title', { name: groupName })}
-                </Dialog.Title>
-                <Dialog.Description className={`text-sm mt-1 ${surface.textSecondary}`}>
-                  {t('sensors.groupSettings.description')}
-                </Dialog.Description>
-              </div>
-
-              <div className="ml-4 flex items-start gap-2">
-                <EntityRoomSelector
-                  entityId={entityId}
-                  label={t('sensors.groupSettings.room')}
-                  compact
-                  className="w-32"
-                />
-
-                <Dialog.Close asChild>
-                  <button
-                    type="button"
-                    onClick={handleCancel}
-                    className={`p-2 rounded-lg ${surface.subtleBg} ${surface.hoverBg} transition-all`}
-                  >
-                    <X className={`w-5 h-5 ${surface.textSecondary}`} />
-                  </button>
-                </Dialog.Close>
-              </div>
-            </div>
+            <DialogHeader
+              title={t('sensors.groupSettings.title', { name: groupName })}
+              description={t('sensors.groupSettings.description')}
+              isOn={theme !== 'light'}
+            />
+            <DialogSectionRow label={t('sensors.groupSettings.room')}>
+              <EntityRoomSelector
+                entityId={entityId}
+                label={t('sensors.groupSettings.room')}
+                compact
+              />
+            </DialogSectionRow>
 
             <div className="space-y-4">
               {/* Selected Sensors Section */}

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { isExtraSmallCardSize } from '@/app/components/shared/card-size-selector';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import { iconMap } from '@/app/features/sensors';
@@ -53,7 +54,7 @@ export function useSwitchCardController({
     };
   }, []);
   const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
-  const { colors, theme } = useTheme();
+  const { colors, theme, primaryColor } = useTheme();
   const { t } = useI18n();
   const resolvedEntityType = entityType || t('lighting.type.switch');
   const resolvedServiceDomain = serviceDomain || id.split('.')[0];
@@ -129,11 +130,21 @@ export function useSwitchCardController({
         return 2;
     }
   }, [size]);
+  const [hasExplicitMetricPreference, setHasExplicitMetricPreference] = useState<boolean>(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    return window.localStorage.getItem(metricPreferenceKey) !== null;
+  });
   const [selectedMetricLabels, setSelectedMetricLabels] = useState<string[]>(() =>
     normalizeStoredMetricLabels(storage.get<unknown>(metricPreferenceKey, []))
   );
 
   useEffect(() => {
+    setHasExplicitMetricPreference(
+      typeof window !== 'undefined' && window.localStorage.getItem(metricPreferenceKey) !== null
+    );
     setSelectedMetricLabels(
       normalizeStoredMetricLabels(storage.get<unknown>(metricPreferenceKey, []))
     );
@@ -143,7 +154,7 @@ export function useSwitchCardController({
     const availableMetricLabels = new Set(availableMetrics.map((metric) => metric.label));
     const nextLabels = selectedMetricLabels.filter((label) => availableMetricLabels.has(label));
 
-    if (nextLabels.length === 0) {
+    if (nextLabels.length === 0 && !hasExplicitMetricPreference) {
       const fallbackLabels = availableMetrics.slice(0, metricLimit).map((metric) => metric.label);
       if (!areMetricLabelListsEqual(selectedMetricLabels, fallbackLabels)) {
         setSelectedMetricLabels(fallbackLabels);
@@ -162,7 +173,7 @@ export function useSwitchCardController({
     if (!areMetricLabelListsEqual(selectedMetricLabels, nextLabels)) {
       setSelectedMetricLabels(nextLabels);
     }
-  }, [availableMetrics, metricLimit, selectedMetricLabels]);
+  }, [availableMetrics, hasExplicitMetricPreference, metricLimit, selectedMetricLabels]);
 
   useEffect(() => {
     storage.set(metricPreferenceKey, selectedMetricLabels);
@@ -194,6 +205,7 @@ export function useSwitchCardController({
     theme === 'light'
       ? 'bg-white/95 border-gray-200/80 text-gray-900'
       : 'bg-gray-950/95 border-white/10 text-white';
+  const accentColor = getThemeColorValue(primaryColor);
 
   const cardInteraction = useEntityCardInteractionController({
     ariaLabel: `${name} ${t('lighting.type.switch').toLowerCase()}`,
@@ -295,10 +307,10 @@ export function useSwitchCardController({
   };
 
   const handleMetricToggle = (metricLabel: string) => {
+    setHasExplicitMetricPreference(true);
     setSelectedMetricLabels((current) => {
       if (current.includes(metricLabel)) {
-        const next = current.filter((label) => label !== metricLabel);
-        return next.length > 0 ? next : current;
+        return current.filter((label) => label !== metricLabel);
       }
 
       if (current.length >= metricLimit) {
@@ -311,6 +323,7 @@ export function useSwitchCardController({
 
   return {
     availableMetrics,
+    accentColor,
     cardColors,
     cardInteraction,
     dialogSurface,

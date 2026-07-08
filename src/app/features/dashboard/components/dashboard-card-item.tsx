@@ -1,9 +1,9 @@
 import { useDraggable } from '@dnd-kit/core';
-import { CSS } from '@dnd-kit/utilities';
 import { EyeOff, X } from 'lucide-react';
 import { memo } from 'react';
 import { CardEditActionButton } from '@/app/components/shared/card-edit-action-button';
 import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-size-selector';
+import { getDndTransformStyle } from '@/app/components/shared/dnd-transform-style';
 import { settingsSelectors } from '@/app/stores/selectors';
 import { useSettingsStore } from '@/app/stores/settings-store';
 import type { DeviceWithType } from '@/app/types/device.types';
@@ -120,7 +120,7 @@ export const DashboardCardItem = memo(function DashboardCardItem({
       {...(draggable ? attributes : {})}
       {...(draggable ? listeners : {})}
       className={`relative h-full ${device?.type === 'lights' && ambientLightBleed ? '[contain:layout_style]' : '[contain:layout_style_paint]'} ${spanClass} ${isDragging ? 'opacity-40' : ''}`}
-      style={transform ? { transform: CSS.Translate.toString(transform) } : undefined}
+      style={getDndTransformStyle(transform)}
       data-card-nodrag={draggable ? undefined : 'true'}
       data-draggable-card="true"
       data-card-drag-surface={draggable ? 'true' : undefined}

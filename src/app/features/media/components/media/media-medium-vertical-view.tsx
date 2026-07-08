@@ -6,6 +6,7 @@ import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import { MediaArtworkSurface } from './media-artwork-surface';
 import { getMediaControlStyles } from './media-control-styles';
+import { MediaMarqueeText } from './media-marquee-text';
 import { formatMediaTime } from './media-time';
 import { MediaVisualizerButton } from './media-visualizer-button';
 import { useMediaArtworkColors, withAlpha } from './use-media-artwork-colors';
@@ -104,8 +105,12 @@ export function MediaMediumVerticalView({
 
           <div className="mt-auto flex items-center justify-between gap-4">
             <div className="min-w-0">
-              <div className={`truncate text-sm font-medium ${iconTone}`}>{title}</div>
-              <div className={`mt-0.5 truncate text-[13px] ${subtitleTone}`}>{artist}</div>
+              <MediaMarqueeText text={title} className={`text-sm font-medium ${iconTone}`} />
+              <MediaMarqueeText
+                text={artist}
+                className={`mt-0.5 text-[13px] ${subtitleTone}`}
+                threshold={24}
+              />
             </div>
 
             <div className="relative">

@@ -1,5 +1,5 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import { DialogHeader } from '@/app/components/shared/device-editor';
+import { DialogHeader, DialogSectionRow } from '@/app/components/shared/device-editor';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useI18n } from '@/app/hooks';
@@ -38,10 +38,9 @@ export function WeatherSettingsDialog({
             description={location}
             isOn={isOn}
           />
-
-          <div className={`rounded-2xl p-4 ${surface.subtleBg}`}>
-            <EntityRoomSelector entityId={entityId} label={t('common.room')} />
-          </div>
+          <DialogSectionRow label={t('common.room')}>
+            <EntityRoomSelector entityId={entityId} label={t('common.room')} compact />
+          </DialogSectionRow>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

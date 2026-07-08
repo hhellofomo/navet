@@ -4,6 +4,7 @@ import { useI18n } from '@/app/hooks';
 import type { RSSItem, RSSProvider } from './types';
 
 const RSS_PROXY_PATH = '/__navet_rss_proxy__';
+const rssFeedItemsCache = new Map<string, { items: RSSItem[]; error: string | null }>();
 
 const stripHtml = (value: string): string =>
   value
@@ -250,9 +251,11 @@ export function useRSSFeedItems(
   limit = 10
 ) {
   const { formatRelativeTime, t } = useI18n();
-  const [items, setItems] = useState<RSSItem[]>([]);
+  const cacheKey = `${providers.map((provider) => provider.id).join('|')}::${limit}`;
+  const cachedEntry = rssFeedItemsCache.get(cacheKey);
+  const [items, setItems] = useState<RSSItem[]>(() => cachedEntry?.items ?? []);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => cachedEntry?.error ?? null);
 
   useEffect(() => {
     if (providers.length === 0) {
@@ -294,10 +297,15 @@ export function useRSSFeedItems(
 
         const failedResults = results.filter((result) => result.status === 'rejected');
 
+        const nextError =
+          nextItems.length === 0 && failedResults.length > 0 ? t('rss.error.unableToLoad') : null;
+
+        rssFeedItemsCache.set(cacheKey, {
+          items: nextItems,
+          error: nextError,
+        });
         setItems(nextItems);
-        setError(
-          nextItems.length === 0 && failedResults.length > 0 ? t('rss.error.unableToLoad') : null
-        );
+        setError(nextError);
       } finally {
         if (!cancelled) {
           setIsLoading(false);
@@ -310,7 +318,7 @@ export function useRSSFeedItems(
     return () => {
       cancelled = true;
     };
-  }, [entities, formatRelativeTime, limit, providers, t]);
+  }, [cacheKey, entities, formatRelativeTime, limit, providers, t]);
 
   const latestArticle = items[0] ?? null;
 

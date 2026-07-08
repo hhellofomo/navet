@@ -4,7 +4,7 @@ import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
 import { useI18n, useSearch } from '@/app/hooks';
 import type { DeviceWithType } from '@/app/types/device.types';
 import { getDeviceRoomLabel, UNKNOWN_ROOM_LABEL } from '@/app/utils/device-location';
-import type { CustomCard } from '../stores/custom-cards-store';
+import { type CustomCard, HOME_WIDGET_ROOM } from '../stores/custom-cards-store';
 import type { AllViewGrouping, AllViewSectionData } from './types';
 
 interface UseAllViewGridParams {
@@ -81,7 +81,12 @@ export function useAllViewGrid({
   );
 
   const orderedRoomEntries = useMemo(() => {
-    const orderedRooms = Array.from(new Set([...rooms, ...customCards.map((card) => card.room)]));
+    const orderedRooms = Array.from(
+      new Set([
+        ...rooms,
+        ...customCards.map((card) => card.room).filter((room) => room !== HOME_WIDGET_ROOM),
+      ])
+    );
 
     return orderedRooms.map((room) => {
       const roomDevices = devicesByRoom[room] || [];

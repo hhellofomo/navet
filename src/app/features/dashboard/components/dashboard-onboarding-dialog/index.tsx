@@ -1,4 +1,4 @@
-import { ArrowLeft, Check, Download, Languages, Layers3, Palette, Sparkles } from 'lucide-react';
+import { ArrowLeft, Download, Languages, Layers3, Palette, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ThemeAppearancePicker } from '@/app/components/shared/theme/theme-appearance-picker';
 import {
@@ -205,54 +205,24 @@ export function DashboardOnboardingDialog({
             : undefined,
         }}
       >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className={`text-[11px] font-semibold uppercase tracking-[0.24em] ${mutedColor}`}>
-              {t('dashboard.onboarding.welcome')}
-            </p>
-            <h2 className={`mt-3 text-3xl font-semibold tracking-tight ${textColor}`}>
-              {step === 'route'
-                ? t('dashboard.onboarding.heading.route')
-                : step === 'localization'
-                  ? t('dashboard.onboarding.heading.localization')
-                  : t('dashboard.onboarding.heading.theme')}
-            </h2>
-            <p className={`mt-3 max-w-2xl text-sm leading-relaxed ${mutedColor}`}>
-              {step === 'route'
-                ? t('dashboard.onboarding.body.route')
-                : step === 'localization'
-                  ? t('dashboard.onboarding.body.localization')
-                  : t('dashboard.onboarding.body.theme')}
-            </p>
-          </div>
-          <div className="flex items-center gap-2 pt-1">
-            {['route', 'localization', 'theme'].map((item, index) => {
-              const isActive = step === item;
-              const isComplete =
-                (step === 'localization' && item === 'route') ||
-                (step === 'theme' && (item === 'route' || item === 'localization'));
-
-              return (
-                <div
-                  key={item}
-                  className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
-                    isActive ? '' : pillBg
-                  }`}
-                  style={
-                    isActive
-                      ? {
-                          backgroundColor: `${accentColor}20`,
-                          color: accentColor,
-                          border: `1px solid ${accentColor}44`,
-                        }
-                      : undefined
-                  }
-                >
-                  {isComplete ? <Check className="h-4 w-4" /> : index + 1}
-                </div>
-              );
-            })}
-          </div>
+        <div>
+          <p className={`text-[11px] font-semibold uppercase tracking-[0.24em] ${mutedColor}`}>
+            {t('dashboard.onboarding.welcome')}
+          </p>
+          <h2 className={`mt-3 text-3xl font-semibold tracking-tight ${textColor}`}>
+            {step === 'route'
+              ? t('dashboard.onboarding.heading.route')
+              : step === 'localization'
+                ? t('dashboard.onboarding.heading.localization')
+                : t('dashboard.onboarding.heading.theme')}
+          </h2>
+          <p className={`mt-3 max-w-2xl text-sm leading-relaxed ${mutedColor}`}>
+            {step === 'route'
+              ? t('dashboard.onboarding.body.route')
+              : step === 'localization'
+                ? t('dashboard.onboarding.body.localization')
+                : t('dashboard.onboarding.body.theme')}
+          </p>
         </div>
 
         {step === 'route' ? (

@@ -1,6 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import { Plus, Trash2, X } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { DialogHeader } from '@/app/components/shared/device-editor';
 import { useI18n, useTheme } from '@/app/hooks';
 import { getDashboardWidgetSurfaceTokens } from './widget-surface-tokens';
 
@@ -44,17 +45,7 @@ export function PhotoFrameSettingsDialog({
         <Dialog.Content
           className={`fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl p-5 shadow-2xl ${surface.panelClassName}`}
         >
-          <div className="mb-4 flex items-center justify-between">
-            <Dialog.Title className={`text-base font-semibold ${surface.textPrimary}`}>
-              {t('widgets.photoFrame.settings.title')}
-            </Dialog.Title>
-            <Dialog.Description className="sr-only">
-              {t('widgets.photoFrame.settings.title')}
-            </Dialog.Description>
-            <Dialog.Close className={`rounded-full p-1 ${surface.textMuted} hover:opacity-70`}>
-              <X className="h-4 w-4" />
-            </Dialog.Close>
-          </div>
+          <DialogHeader title={t('widgets.photoFrame.settings.title')} isOn={theme !== 'light'} />
 
           <div className="mb-3 flex gap-2">
             <input
