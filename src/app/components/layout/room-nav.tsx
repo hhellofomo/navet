@@ -3,8 +3,8 @@ import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dn
 import { CSS } from '@dnd-kit/utilities';
 import { Check, Edit3, LayoutGrid, Lightbulb } from 'lucide-react';
 import { memo } from 'react';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useTheme } from '@/app/hooks';
-import { getThemeColorValue } from '@/app/utils/theme-colors';
 
 interface RoomNavProps {
   rooms?: string[];

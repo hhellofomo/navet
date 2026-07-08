@@ -2,7 +2,7 @@ import { Flame, Snowflake, Wind } from 'lucide-react';
 import { memo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useTheme } from '@/app/hooks';
-import { getHVACModeButtonColor } from '@/app/utils/hvac-styles';
+import { getHVACModeButtonColor } from '../../utils/hvac-styles';
 
 interface HVACModeControlsProps {
   mode: string;

@@ -1,5 +1,5 @@
 import { memo, type ReactNode } from 'react';
-import { useTheme } from '../../hooks';
+import { useTheme } from '@/app/hooks';
 
 interface CaptionValueProps {
   caption: string;

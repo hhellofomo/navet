@@ -1,8 +1,8 @@
 import { memo, type ReactNode } from 'react';
 import { Header } from '@/app/components/layout/header';
 import { Sidebar } from '@/app/components/layout/sidebar';
-import { useTheme } from '../../hooks';
-import { getThemeColorValue } from '../../utils/theme-colors';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { useTheme } from '@/app/hooks';
 
 interface DashboardLayoutProps {
   children: ReactNode;

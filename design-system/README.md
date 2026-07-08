@@ -141,15 +141,15 @@ When creating a new card component:
 
 ### Key Files
 ```
-/src/app/components/          → Card components
-/src/app/components/sections.tsx → Section components (Security, Tasks, etc.)
-/src/app/components/settings-section.tsx → Settings page component
-/src/app/components/empty-state.tsx → Empty state component for sections
-/src/app/components/card-size-selector.tsx → Size selection logic
-/src/app/contexts/auth-context.tsx → Authentication state management
-/src/app/hooks/use-theme.ts      → Theme and color customization
-/src/app/hooks/use-navigation.ts → Section navigation state
+/src/app/components/shared/   → Shared UI building blocks
+/src/app/components/layout/sections.tsx → Dedicated non-home section views
+/src/app/features/dashboard/  → Dashboard layout, routing, and card registry
+/src/app/features/settings/   → Settings page and section implementations
+/src/app/features/lighting/   → Light cards, presets, and feature-owned stores
 /src/app/features/auth/login-page.tsx → Login interface
+/src/app/contexts/auth-context.tsx → Authentication state management
+/src/app/hooks/use-theme.ts   → Theme and color customization
+/src/app/hooks/use-navigation.ts → Section navigation state
 /src/styles/theme.css         → Design tokens and variables
 /src/styles/tailwind.css      → Tailwind configuration
 ```

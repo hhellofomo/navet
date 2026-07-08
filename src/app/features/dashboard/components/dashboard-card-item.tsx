@@ -6,9 +6,9 @@ import {
   getEditControlButtonClass,
   getEditControlLayout,
 } from '@/app/components/shared/edit-card-controls';
-import type { CustomCard } from '@/app/hooks/use-custom-cards';
 import type { DeviceWithType } from '@/app/types/device.types';
-import { renderCard } from '@/app/utils/card-renderer';
+import type { CustomCard } from '../stores/custom-cards-store';
+import { renderCard } from '../utils/card-renderer';
 import { WidgetCard } from './widget-card';
 
 interface DashboardCardItemProps {

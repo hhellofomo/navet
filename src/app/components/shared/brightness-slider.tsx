@@ -1,6 +1,6 @@
 import * as Slider from '@radix-ui/react-slider';
 import { memo } from 'react';
-import { useTheme } from '../../hooks';
+import { useTheme } from '@/app/hooks';
 import type { CardSize } from './card-size-selector';
 
 interface BrightnessSliderProps {

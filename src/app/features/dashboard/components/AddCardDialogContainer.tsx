@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '../../../hooks';
-import { getThemeColorValue } from '../../../utils/theme-colors';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { useTheme } from '@/app/hooks';
 import { AddCardDialogView } from './AddCardDialogView';
 
 interface AddCardDialogContainerProps {

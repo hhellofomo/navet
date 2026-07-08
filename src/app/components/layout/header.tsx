@@ -1,9 +1,9 @@
 import { Bell, CalendarDays, Clock3, Search, X } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useAuth } from '@/app/contexts/auth-context';
-import { NotificationPanel } from '@/app/features/notifications/components/notification-panel';
+import { NotificationPanel } from '@/app/features/notifications';
 import { useDevices, useHomeAssistant, useSearch, useTheme } from '@/app/hooks';
-import { getThemeColorValue } from '@/app/utils/theme-colors';
 import { UserDropdown } from './user-dropdown';
 
 export const Header = memo(function Header() {

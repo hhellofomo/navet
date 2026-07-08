@@ -1,4 +1,4 @@
-import type { Device, DeviceCollection, DeviceWithType } from '../types/device.types';
+import type { Device, DeviceCollection, DeviceWithType } from '@/app/types/device.types';
 
 type LocatableDevice = Device | DeviceWithType;
 export const UNKNOWN_ROOM_LABEL = 'Unknown Room';

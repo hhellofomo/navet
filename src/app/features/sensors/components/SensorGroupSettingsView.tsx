@@ -2,23 +2,8 @@ import * as Dialog from '@radix-ui/react-dialog';
 import type { LucideIcon } from 'lucide-react';
 import { Gauge, Plus, Search, Trash2, X } from 'lucide-react';
 import type { Dispatch, ReactNode, RefObject, SetStateAction } from 'react';
+import type { AvailableSensor, SensorGroupColorConfig } from './sensor-group-settings.types';
 import type { SensorIconType, SensorReading } from './sensors/sensor-types';
-
-interface AvailableSensor {
-  id: string;
-  label: string;
-  value: string;
-  unit: string;
-  icon: SensorIconType;
-  category: 'energy' | 'climate' | 'environmental' | 'other';
-}
-
-interface ColorConfig {
-  iconBg: string;
-  iconColor: string;
-  hover: string;
-  selected: string;
-}
 
 interface SensorGroupSettingsViewProps {
   groupName: string;
@@ -31,7 +16,7 @@ interface SensorGroupSettingsViewProps {
   highlightedIndex: number;
   setHighlightedIndex: Dispatch<SetStateAction<number>>;
   inputRef: RefObject<HTMLInputElement | null>;
-  colors: ColorConfig;
+  colors: SensorGroupColorConfig;
   filteredSensors: AvailableSensor[];
   iconMap: Record<SensorIconType, LucideIcon>;
   handleAddSensor: (sensor: AvailableSensor) => void;

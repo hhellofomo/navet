@@ -3,7 +3,7 @@ import { Flame, Power, Snowflake, Wind } from 'lucide-react';
 import { memo } from 'react';
 import { CustomScrollbar } from '@/app/components/shared/custom-scrollbar';
 import { DialogHeader } from '@/app/components/shared/dialog-header';
-import { getHVACModeButtonColor } from '@/app/utils/hvac-styles';
+import { getHVACModeButtonColor } from '../utils/hvac-styles';
 
 interface HVACSettingsDialogProps {
   isOpen: boolean;

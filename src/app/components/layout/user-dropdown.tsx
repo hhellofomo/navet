@@ -1,9 +1,9 @@
 import { LogOut, Shield } from 'lucide-react';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar';
+import { useAuth } from '@/app/contexts/auth-context';
 import { useHomeAssistant, useTheme } from '@/app/hooks';
-import { useAuth } from '../../contexts/auth-context';
-import { getThemeColorValue } from '../../utils/theme-colors';
 
 interface UserDropdownProps {
   avatarUrl?: string | null;

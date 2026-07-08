@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { useTheme } from '../../hooks';
+import { useTheme } from '@/app/hooks';
 
 interface ColorSelectorSectionProps {
   colors: string[];

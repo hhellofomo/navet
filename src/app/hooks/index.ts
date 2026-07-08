@@ -5,11 +5,9 @@
 
 export type { Section } from '../navigation/sections';
 export { isSection, NAVIGATION_SECTIONS } from '../navigation/sections';
-export { useCardOrdering } from './use-card-ordering';
 // Existing hooks
 export { useCardState } from './use-card-state';
 export { useClickOutside } from './use-click-outside';
-export { useCustomCards } from './use-custom-cards';
 export { useDashboardDevices } from './use-dashboard-devices';
 export { useDebounce } from './use-debounce';
 export { useDeviceMap } from './use-device-map';
@@ -22,7 +20,6 @@ export { useNavigation } from './use-navigation';
 // New reusable hooks
 export { usePersistedState } from './use-persisted-state';
 export { useRoomNavigation } from './use-room-navigation';
-export { useRoomOrdering } from './use-room-ordering';
 export { useSearch } from './use-search';
 export type { PrimaryColor, ThemeType } from './use-theme';
 export { useTheme } from './use-theme';

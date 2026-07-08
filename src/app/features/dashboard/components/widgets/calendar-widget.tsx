@@ -1,7 +1,7 @@
 import { Calendar as CalendarIcon, Clock } from 'lucide-react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useTheme } from '@/app/hooks';
-import { getThemeColorValue } from '@/app/utils/theme-colors';
 
 interface CalendarEvent {
   id: string;

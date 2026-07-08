@@ -175,7 +175,7 @@ setActiveSection('lights');
 
 ### Settings Page
 
-**Location**: `/src/app/components/settings-section.tsx`
+**Location**: `/src/app/features/settings/components/settings-section.tsx`
 
 Full-page settings interface with card-based organization.
 
@@ -239,7 +239,7 @@ Full-page settings interface with card-based organization.
 
 ### Empty State Component
 
-**Location**: `/src/app/components/empty-state.tsx`
+**Location**: `/src/app/components/shared/empty-state.tsx`
 
 Beautiful placeholder screens for sections without data.
 

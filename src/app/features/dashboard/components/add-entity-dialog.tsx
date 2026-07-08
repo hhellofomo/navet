@@ -1,10 +1,10 @@
 import { Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
 import { useTheme } from '@/app/hooks';
 import type { DeviceWithType } from '@/app/types/device.types';
 import { getDeviceRoomLabel } from '@/app/utils/device-location';
-import { getThemeColorValue } from '@/app/utils/theme-colors';
 
 interface AddEntityDialogProps {
   open: boolean;

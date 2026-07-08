@@ -21,7 +21,7 @@ Root Directory:
 ├── README.md              ← Main entry point
 ├── LICENSE.md             ← Legal
 ├── CONTRIBUTING.md        ← Contribution guide
-├── BRANDING.md            ← Brand identity
+├── docs/branding/BRANDING.md ← Brand identity
 ├── /docs                  ← All other documentation
 │   ├── README.md          ← Documentation index
 │   ├── WIDGETS.md         ← Widget guide
@@ -86,7 +86,7 @@ Root Directory:
 - **README.md** - Main project documentation
 - **LICENSE.md** - CC BY-NC 4.0 license
 - **CONTRIBUTING.md** - Contribution guidelines
-- **BRANDING.md** - Brand identity guide
+- **docs/branding/BRANDING.md** - Brand identity guide
 
 ## 🎨 Benefits
 

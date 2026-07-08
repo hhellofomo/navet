@@ -2,9 +2,9 @@ import { Clipboard, FlaskConical, Lightbulb, Lock, Tv, Video } from 'lucide-reac
 import { memo } from 'react';
 import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-size-selector';
 import { DEVICES } from '@/app/data/mock-devices';
+import { renderCard } from '@/app/features/dashboard';
 import { useDeviceMap, useTheme } from '@/app/hooks';
 import type { DeviceWithType } from '@/app/types/device.types';
-import { renderCard } from '@/app/utils/card-renderer';
 import { EmptyState } from '../shared/empty-state';
 
 export function SecuritySection() {
