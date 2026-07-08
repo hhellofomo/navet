@@ -1,4 +1,4 @@
-import { Bell, Search, X } from 'lucide-react';
+import { Bell, CalendarDays, Clock3, Search, X } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/app/contexts/auth-context';
 import { useHomeAssistantContext } from '@/app/contexts/home-assistant-context';
@@ -6,7 +6,6 @@ import { useSearch } from '@/app/contexts/search-context';
 import { useTheme } from '@/app/contexts/theme-context';
 import { NotificationPanel } from '@/app/features/notifications/components/notification-panel';
 import { useDevices } from '@/app/hooks';
-import { formatDateWithTime, getWeekNumber } from '@/app/utils';
 import { UserDropdown } from './user-dropdown';
 
 export const Header = memo(function Header() {
@@ -147,9 +146,20 @@ export const Header = memo(function Header() {
           <h1 className={`text-2xl md:text-4xl font-bold ${textPrimary} mb-1`}>
             Hello, {firstName}!
           </h1>
-          <p className={`${textSecondary} text-xs md:text-sm`}>
-            {formatDateWithTime(new Date())} | Week {getWeekNumber(new Date())}
-          </p>
+          <div className={`${textSecondary} flex flex-wrap items-center gap-3 text-xs md:text-sm`}>
+            <div className="flex items-center gap-1.5">
+              <Clock3 className="h-3.5 w-3.5" />
+              <span>March 7, 2026</span>
+              <span aria-hidden="true" className="text-gray-400">
+                |
+              </span>
+              <span>Saturday</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <CalendarDays className="h-3.5 w-3.5" />
+              <span>Week 11</span>
+            </div>
+          </div>
         </div>
       </div>
 
