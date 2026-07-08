@@ -401,6 +401,18 @@ class HomeAssistantService {
   }
 
   /**
+   * Turn a camera entity on or off.
+   */
+  async updateCamera(entityId: string, state: 'on' | 'off'): Promise<void> {
+    await this.callService(
+      'camera',
+      state === 'on' ? 'turn_on' : 'turn_off',
+      {},
+      { entity_id: entityId }
+    );
+  }
+
+  /**
    * Close the connection
    */
   disconnect(): void {

@@ -15,6 +15,7 @@ export const DEVICE_TYPE_LABEL_KEYS: Record<keyof DeviceCollection, TranslationK
   sensors: 'deviceType.sensor',
   vacuums: 'deviceType.vacuum',
   calendars: 'deviceType.calendar',
+  cameras: 'deviceType.camera',
   'grouped-sensors': 'deviceType.sensorGroup',
 };
 

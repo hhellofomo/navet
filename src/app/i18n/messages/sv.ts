@@ -640,6 +640,9 @@ export const svMessages = {
   'sidebar.mock': 'Dashboard-byggare',
   'sidebar.settings': 'Inställningar',
   'sidebar.brandLogoAlt': 'Varumärkeslogotyp',
+  'sections.security.title': 'Säkerhetskameror',
+  'sections.security.singular': 'kamera',
+  'sections.security.plural': 'kameror',
   'sections.security.emptyTitle': 'Inga säkerhetskameror',
   'sections.security.emptyDescription':
     'Du har inga säkerhetskameror konfigurerade än. Lägg till kameror för att övervaka ditt hem.',
@@ -689,6 +692,7 @@ export const svMessages = {
   'deviceType.helper': 'Hjälpare',
   'deviceType.vacuum': 'Dammsugare',
   'deviceType.calendar': 'Kalender',
+  'deviceType.camera': 'Kamera',
   'deviceType.sensorGroup': 'Sensorgrupp',
   'common.close': 'Stäng',
   'common.loading': 'Laddar...',
@@ -802,4 +806,7 @@ export const svMessages = {
   'iconPicker.circleDot': 'Cirkelpunkt',
   'iconPicker.circleDashed': 'Streckad cirkel',
   'iconPicker.orbit': 'Omloppsbana',
+  'camera.settings.title': 'Kamerakontroller',
+  'camera.settings.room': 'Rum',
+  'camera.settings.noControls': 'Inga kontroller tillgängliga för denna kamera.',
 } as const;

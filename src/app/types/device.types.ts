@@ -155,6 +155,13 @@ export interface CalendarDevice extends BaseDevice {
   }>;
 }
 
+// Camera device
+export interface CameraDevice extends BaseDevice {
+  room: string;
+  entityPicture?: string;
+  state: string;
+}
+
 // Grouped Sensor device
 export interface GroupedSensorDevice extends BaseDevice {
   room: string;
@@ -183,7 +190,8 @@ export type Device =
   | SensorDevice
   | VacuumDevice
   | CalendarDevice
-  | GroupedSensorDevice;
+  | GroupedSensorDevice
+  | CameraDevice;
 
 // Device collection
 export interface DeviceCollection {
@@ -200,6 +208,7 @@ export interface DeviceCollection {
   sensors: SensorDevice[];
   vacuums: VacuumDevice[];
   calendars: CalendarDevice[];
+  cameras: CameraDevice[];
   'grouped-sensors': GroupedSensorDevice[];
 }
 

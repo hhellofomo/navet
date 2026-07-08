@@ -17,6 +17,7 @@ export const DEVICES: DeviceCollection = {
   locks: [],
   persons: [],
   sensors: [],
+  cameras: [],
   'grouped-sensors': [
     {
       id: 'energy-sensors-1',

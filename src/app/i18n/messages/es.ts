@@ -646,6 +646,9 @@ export const esMessages = {
   'sidebar.mock': 'Constructor del panel',
   'sidebar.settings': 'Ajustes',
   'sidebar.brandLogoAlt': 'Logotipo de la marca',
+  'sections.security.title': 'Cámaras de seguridad',
+  'sections.security.singular': 'cámara',
+  'sections.security.plural': 'cámaras',
   'sections.security.emptyTitle': 'No hay cámaras de seguridad',
   'sections.security.emptyDescription':
     'Todavía no tienes cámaras de seguridad configuradas. Agrega cámaras para vigilar tu hogar.',
@@ -695,6 +698,7 @@ export const esMessages = {
   'deviceType.helper': 'Asistente',
   'deviceType.vacuum': 'Aspiradora',
   'deviceType.calendar': 'Calendario',
+  'deviceType.camera': 'Cámara',
   'deviceType.sensorGroup': 'Grupo de sensores',
   'common.close': 'Cerrar',
   'common.loading': 'Cargando...',
@@ -808,4 +812,7 @@ export const esMessages = {
   'iconPicker.circleDot': 'Circulo con punto',
   'iconPicker.circleDashed': 'Circulo discontinuo',
   'iconPicker.orbit': 'Orbita',
+  'camera.settings.title': 'Controles de cámara',
+  'camera.settings.room': 'Habitación',
+  'camera.settings.noControls': 'No hay controles disponibles para esta cámara.',
 } as const;

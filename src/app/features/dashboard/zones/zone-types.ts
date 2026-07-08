@@ -25,6 +25,7 @@ export const ZONE_DEFAULTS_BY_DEVICE_TYPE: Record<string, ZoneName> = {
   locks: 'actions',
   covers: 'actions',
   persons: 'actions',
+  cameras: 'hero',
   // Status — monitoring and climate
   climate: 'status',
   hvac: 'status',

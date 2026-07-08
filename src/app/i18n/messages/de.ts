@@ -645,6 +645,9 @@ export const deMessages = {
   'sidebar.mock': 'Dashboard-Builder',
   'sidebar.settings': 'Einstellungen',
   'sidebar.brandLogoAlt': 'Markenlogo',
+  'sections.security.title': 'Sicherheitskameras',
+  'sections.security.singular': 'Kamera',
+  'sections.security.plural': 'Kameras',
   'sections.security.emptyTitle': 'Keine Sicherheitskameras',
   'sections.security.emptyDescription':
     'Es sind noch keine Sicherheitskameras konfiguriert. Fügen Sie Kameras hinzu, um Ihr Zuhause zu überwachen.',
@@ -694,6 +697,7 @@ export const deMessages = {
   'deviceType.helper': 'Helfer',
   'deviceType.vacuum': 'Staubsauger',
   'deviceType.calendar': 'Kalender',
+  'deviceType.camera': 'Kamera',
   'deviceType.sensorGroup': 'Sensorgruppe',
   'common.close': 'Schließen',
   'common.loading': 'Wird geladen...',
@@ -807,4 +811,7 @@ export const deMessages = {
   'iconPicker.circleDot': 'Kreis mit Punkt',
   'iconPicker.circleDashed': 'Gestrichelter Kreis',
   'iconPicker.orbit': 'Orbit',
+  'camera.settings.title': 'Kamerasteuerung',
+  'camera.settings.room': 'Raum',
+  'camera.settings.noControls': 'Keine Steuerungselemente für diese Kamera verfügbar.',
 } as const;
