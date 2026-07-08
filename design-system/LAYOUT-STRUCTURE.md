@@ -16,7 +16,7 @@ App Container
     ├── Room Navigation Tabs
     │   └── Customize / Add Entity / Add Card / Done Editing
     └── Device Grid (Main Content)
-        └── Dynamic Card Grid
+        └── Dynamic Card Grid / empty-state recovery actions
 ```
 
 ---

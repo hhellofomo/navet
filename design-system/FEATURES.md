@@ -293,7 +293,7 @@ Beautiful placeholder screens for sections without data.
 
 ### First-Time User Flow
 1. **Login Page** → Enter Home Assistant URL and token
-2. **Onboarding Dialog** → Choose start with all entities or a blank dashboard
+2. **Onboarding Dialog** → Choose start with all entities, a blank dashboard, or import a config file
 3. **Dashboard** → See current entities and rooms
 4. **Explore Sections** → Navigate to different sections via sidebar/bottom nav
 5. **Customize** → Go to Settings → Change theme and color
@@ -366,6 +366,7 @@ Theme, navigation, search, and Home Assistant access use direct hook modules ins
 - `ha_dashboard_primary_color` - Primary color preference
 - `ha-dashboard-navigation` - Active section and current room
 - `navet-dashboard-entities` - Removed entity ids and onboarding state
+- Restarting onboarding should always return the user to Home / All before reopening the wizard
 
 ### CSS Variables
 
@@ -447,7 +448,7 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 2. Create section component in /components/sections.tsx
 3. Add icon and route to Sidebar component
 4. Include in mobile bottom navigation (if appropriate)
-5. Implement empty state if no data available
+5. Implement empty state if no data available, with the primary recovery action visible when possible
 6. Test at all breakpoints
 
 ### When Adding Theme-Dependent Styling

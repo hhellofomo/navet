@@ -43,7 +43,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 ### 🛠️ Functionality
 - **Edit Mode** - Drag-and-drop card reordering and resizing
 - **Custom Widgets** - Add Calendar, News, Weather, Photo Frame, and Quick Note widgets
-- **Entity Visibility Control** - Start with all entities or a blank board, then add/remove entities as needed
+- **Entity Visibility Control** - Start with all entities, a blank board, or import a saved config, then add/remove entities as needed
 - **Search & Filter** - Real-time search filters dashboard view
 - **All View** - See all devices grouped by room
 - **Notifications** - System notifications panel
@@ -166,12 +166,15 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 
 #### Dashboard Content
 - On first launch, choose whether to start with all discovered entities or a blank dashboard
+- You can also import a previously exported dashboard config directly from onboarding
 - After onboarding, use **Add Entity** and **Remove Entity** to curate the board
 - This is useful for excluding helper, diagnostic, or duplicate Home Assistant entities without switching between dashboard modes
 - The empty dashboard state now exposes **Add Entity** directly so blank dashboards do not dead-end
+- Restarting onboarding from Settings sends you back to the Home dashboard and reopens the onboarding dialog
 
 #### Dashboard Config
 - In **Settings -> Dashboard Config**, export your local dashboard setup to a JSON file
+- The same config file can be imported later either from Settings or directly from first-run onboarding
 - Import that file later on the same machine or another device to restore:
   - theme and wallpaper
   - room order and card order

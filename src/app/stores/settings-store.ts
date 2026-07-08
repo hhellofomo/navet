@@ -3,7 +3,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 export type EntityInteractionMode = 'control-first' | 'toggle-first';
 
-interface UserSettings {
+export interface UserSettings {
   username: string;
   email: string;
   showNotifications: boolean;
@@ -21,7 +21,7 @@ interface SettingsState extends UserSettings {
   resetSettings: () => void;
 }
 
-const defaultSettings: UserSettings = {
+export const defaultSettings: UserSettings = {
   username: 'User',
   email: '',
   showNotifications: true,

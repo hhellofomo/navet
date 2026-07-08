@@ -30,6 +30,7 @@ import { LoadingProvider } from './contexts/loading-context';
 import { LoginPage } from './features/auth/login-page';
 import { AllViewGrid } from './features/dashboard/all-view-grid';
 import type { CardType } from './features/dashboard/components/AddCardDialogContainer';
+import { AddEntityDialog } from './features/dashboard/components/add-entity-dialog';
 import { DashboardLayout } from './features/dashboard/dashboard-layout';
 import { DeviceGrid } from './features/dashboard/device-grid';
 import {
@@ -46,6 +47,7 @@ import {
 import { useCustomCards } from './hooks/use-custom-cards';
 import { useDevices, useRooms } from './hooks/use-devices';
 import { useDashboardEntitiesStore, useSettingsStore } from './stores';
+import { importDashboardConfigFromFile } from './utils/dashboard-config';
 import { getDeviceRoom, getDeviceRoomLabel } from './utils/device-location';
 
 const AddCardDialog = lazy(async () => {
@@ -53,10 +55,6 @@ const AddCardDialog = lazy(async () => {
   return { default: module.AddCardDialogContainer };
 });
 
-const AddEntityDialog = lazy(async () => {
-  const module = await import('./features/dashboard/components/add-entity-dialog');
-  return { default: module.AddEntityDialog };
-});
 const DashboardOnboardingDialog = lazy(async () => {
   const module = await import('./features/dashboard/components/dashboard-onboarding-dialog');
   return { default: module.DashboardOnboardingDialog };
@@ -72,7 +70,7 @@ const SettingsSection = lazy(async () => {
  * The main dashboard view after authentication
  */
 function Dashboard() {
-  const { activeSection } = useNavigation();
+  const { activeSection, setActiveSection } = useNavigation();
   const { connected, connecting, error } = useHomeAssistant();
   const [devicesLoaded, setDevicesLoaded] = useState(false);
   const [showAddCardDialog, setShowAddCardDialog] = useState(false);
@@ -106,6 +104,10 @@ function Dashboard() {
   const { deviceMap } = useDeviceMap(devices);
   const { deviceMap: availableDeviceMap } = useDeviceMap(allDevices);
   const allEntityIds = useMemo(() => Array.from(availableDeviceMap.keys()), [availableDeviceMap]);
+  const addableEntityIds = useMemo(
+    () => (hiddenEntityIds.length > 0 ? hiddenEntityIds : allEntityIds),
+    [allEntityIds, hiddenEntityIds]
+  );
   const lightDeviceMap = useMemo(
     () => new Map(Array.from(deviceMap.entries()).filter(([, device]) => device.type === 'lights')),
     [deviceMap]
@@ -215,6 +217,30 @@ function Dashboard() {
     [hideAutoEntity]
   );
 
+  const handleImportDashboardConfig = useCallback(async (file: File) => {
+    try {
+      await importDashboardConfigFromFile(file);
+      toast.success('Dashboard config imported. Reloading...');
+      window.setTimeout(() => {
+        window.location.reload();
+      }, 600);
+    } catch {
+      toast.error('Failed to import dashboard config');
+    }
+  }, []);
+
+  const handleChooseAllEntities = useCallback(() => {
+    setActiveSection('home');
+    changeRoom('All');
+    completeOnboarding(allEntityIds, false);
+  }, [allEntityIds, changeRoom, completeOnboarding, setActiveSection]);
+
+  const handleChooseBlankDashboard = useCallback(() => {
+    setActiveSection('home');
+    changeRoom('All');
+    completeOnboarding(allEntityIds, true);
+  }, [allEntityIds, changeRoom, completeOnboarding, setActiveSection]);
+
   // Handle updating a card
   const handleUpdateCard = useCallback(
     (cardId: string, data: Record<string, unknown>) => {
@@ -281,6 +307,7 @@ function Dashboard() {
                 ? 'All light entities have been removed from the dashboard.'
                 : 'No Home Assistant light entities are currently available.'
             }
+            actionIcon={Lightbulb}
             actionLabel={hiddenEntityIds.length > 0 ? 'Add Entity' : undefined}
             onAction={hiddenEntityIds.length > 0 ? () => setShowAddEntityDialog(true) : undefined}
           />
@@ -334,7 +361,7 @@ function Dashboard() {
           onToggleEditMode={toggleEditMode}
           onMoveRoom={moveRoom}
           onAddCard={() => setShowAddCardDialog(true)}
-          onAddEntity={hiddenEntityIds.length > 0 ? () => setShowAddEntityDialog(true) : undefined}
+          onAddEntity={addableEntityIds.length > 0 ? () => setShowAddEntityDialog(true) : undefined}
           addEntityLabel="Add Entity"
         />
 
@@ -378,8 +405,9 @@ function Dashboard() {
             icon={Lightbulb}
             title="No Visible Entities"
             description="Your dashboard is empty. Add entities from your hidden list or add custom cards to start building it."
-            actionLabel={hiddenEntityIds.length > 0 ? 'Add Entity' : undefined}
-            onAction={hiddenEntityIds.length > 0 ? () => setShowAddEntityDialog(true) : undefined}
+            actionIcon={Lightbulb}
+            actionLabel={addableEntityIds.length > 0 ? 'Add Entity' : undefined}
+            onAction={addableEntityIds.length > 0 ? () => setShowAddEntityDialog(true) : undefined}
           />
         )}
 
@@ -395,27 +423,30 @@ function Dashboard() {
         )}
 
         {showAddEntityDialog && (
-          <Suspense fallback={null}>
-            <AddEntityDialog
-              open={showAddEntityDialog}
-              onClose={() => setShowAddEntityDialog(false)}
-              onAddEntity={handleAddEntity}
-              currentRoom={activeRoom}
-              deviceMap={availableDeviceMap}
-              addedEntityIds={[]}
-              visibleEntityIds={hiddenEntityIds}
-              title="Add Entity"
-              description="Add Home Assistant entities back to the dashboard."
-              actionLabel="Add"
-            />
-          </Suspense>
+          <AddEntityDialog
+            open={showAddEntityDialog}
+            onClose={() => setShowAddEntityDialog(false)}
+            onAddEntity={handleAddEntity}
+            currentRoom={activeRoom}
+            deviceMap={availableDeviceMap}
+            addedEntityIds={[]}
+            visibleEntityIds={addableEntityIds}
+            title="Add Entity"
+            description={
+              hiddenEntityIds.length > 0
+                ? 'Add Home Assistant entities back to the dashboard.'
+                : 'Choose Home Assistant entities to add to the dashboard.'
+            }
+            actionLabel="Add"
+          />
         )}
         {!onboardingCompleted && allEntityIds.length > 0 && (
           <Suspense fallback={null}>
             <DashboardOnboardingDialog
               open
-              onChooseAll={() => completeOnboarding(allEntityIds, false)}
-              onChooseBlank={() => completeOnboarding(allEntityIds, true)}
+              onChooseAll={handleChooseAllEntities}
+              onChooseBlank={handleChooseBlankDashboard}
+              onImportConfig={handleImportDashboardConfig}
             />
           </Suspense>
         )}
