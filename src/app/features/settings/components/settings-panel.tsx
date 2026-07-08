@@ -1,6 +1,8 @@
 import { Info, LogOut, Palette, Server, X } from 'lucide-react';
-import { useAuth } from '../contexts/auth-context';
-import { type PrimaryColor, type ThemeType, useTheme } from '../contexts/theme-context';
+import { PRIMARY_COLOR_OPTIONS, THEME_OPTIONS } from '../../../constants/theme-options';
+import { useAuth } from '../../../contexts/auth-context';
+import { useTheme } from '../../../hooks';
+import { getThemeColorValue } from '../../../utils/theme-colors';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -12,50 +14,6 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
   const { logout, config } = useAuth();
 
   if (!isOpen) return null;
-
-  // Get color value for inline styles
-  const getColorValue = (color: PrimaryColor): string => {
-    const colors: Record<PrimaryColor, string> = {
-      orange: '#f97316',
-      blue: '#3b82f6',
-      green: '#22c55e',
-      purple: '#a855f7',
-      pink: '#ec4899',
-      red: '#ef4444',
-      yellow: '#eab308',
-      teal: '#14b8a6',
-    };
-    return colors[color];
-  };
-
-  const themeOptions: Array<{ value: ThemeType; label: string; description: string }> = [
-    {
-      value: 'dark',
-      label: 'Dark',
-      description: 'Subtle gradients with muted colors',
-    },
-    {
-      value: 'light',
-      label: 'Light',
-      description: 'Bright pastels with soft accents',
-    },
-    {
-      value: 'contrast',
-      label: 'High Contrast',
-      description: 'Vibrant colors for better visibility',
-    },
-  ];
-
-  const colorOptions: Array<{ value: PrimaryColor; label: string; color: string }> = [
-    { value: 'orange', label: 'Orange', color: '#f97316' },
-    { value: 'blue', label: 'Blue', color: '#3b82f6' },
-    { value: 'green', label: 'Green', color: '#22c55e' },
-    { value: 'purple', label: 'Purple', color: '#a855f7' },
-    { value: 'pink', label: 'Pink', color: '#ec4899' },
-    { value: 'red', label: 'Red', color: '#ef4444' },
-    { value: 'yellow', label: 'Yellow', color: '#eab308' },
-    { value: 'teal', label: 'Teal', color: '#14b8a6' },
-  ];
 
   const handleLogout = () => {
     if (confirm('Are you sure you want to logout?')) {
@@ -140,7 +98,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                     Theme Mode
                   </label>
                   <div className="space-y-2">
-                    {themeOptions.map((option) => (
+                    {THEME_OPTIONS.map((option) => (
                       <button
                         type="button"
                         key={option.value}
@@ -152,8 +110,8 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                         style={
                           theme === option.value
                             ? {
-                                backgroundColor: `${getColorValue(primaryColor)}1a`,
-                                borderColor: getColorValue(primaryColor),
+                                backgroundColor: `${getThemeColorValue(primaryColor)}1a`,
+                                borderColor: getThemeColorValue(primaryColor),
                               }
                             : {}
                         }
@@ -162,7 +120,9 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                           <span
                             className={`font-medium text-sm ${theme === option.value ? '' : textColor}`}
                             style={
-                              theme === option.value ? { color: getColorValue(primaryColor) } : {}
+                              theme === option.value
+                                ? { color: getThemeColorValue(primaryColor) }
+                                : {}
                             }
                           >
                             {option.label}
@@ -170,7 +130,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                           {theme === option.value && (
                             <div
                               className="w-5 h-5 rounded-full flex items-center justify-center"
-                              style={{ backgroundColor: getColorValue(primaryColor) }}
+                              style={{ backgroundColor: getThemeColorValue(primaryColor) }}
                             >
                               <div className="w-2 h-2 rounded-full bg-white" />
                             </div>
@@ -194,7 +154,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
                     Choose a color that will be used for active states throughout your dashboard
                   </p>
                   <div className="grid grid-cols-6 gap-3">
-                    {colorOptions.map((option) => (
+                    {PRIMARY_COLOR_OPTIONS.map((option) => (
                       <button
                         type="button"
                         key={option.value}

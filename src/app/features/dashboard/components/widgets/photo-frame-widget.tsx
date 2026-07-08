@@ -2,7 +2,8 @@ import { ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
 import { useState } from 'react';
 import { ImageWithFallback } from '@/app/components/figma/ImageWithFallback';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
+import { getThemeColorValue } from '@/app/utils/theme-colors';
 
 const mockPhotos = [
   'https://images.unsplash.com/photo-1767858702764-39693c994ee1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYW1pbHklMjB2YWNhdGlvbiUyMGJlYWNofGVufDF8fHx8MTc3MjY4ODE4OXww&ixlib=rb-4.1.0&q=80&w=1080',
@@ -25,20 +26,6 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
   const border = theme === 'light' ? 'border-gray-200/50' : 'border-white/10';
 
-  const getColorValue = (color: string) => {
-    const colors: Record<string, string> = {
-      blue: '#007AFF',
-      purple: '#AF52DE',
-      pink: '#FF2D55',
-      red: '#FF3B30',
-      orange: '#FF9500',
-      yellow: '#FFCC00',
-      green: '#34C759',
-      teal: '#5AC8FA',
-    };
-    return colors[color] || colors.blue;
-  };
-
   const nextPhoto = () => {
     setCurrentIndex((prev) => (prev + 1) % mockPhotos.length);
   };
@@ -56,8 +43,8 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
         <div
           className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
           style={{
-            backgroundColor: `${getColorValue(primaryColor)}20`,
-            color: getColorValue(primaryColor),
+            backgroundColor: `${getThemeColorValue(primaryColor)}20`,
+            color: getThemeColorValue(primaryColor),
           }}
         >
           <ImageIcon className="w-5 h-5" />
@@ -109,7 +96,7 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
               style={{
                 backgroundColor:
                   index === currentIndex
-                    ? getColorValue(primaryColor)
+                    ? getThemeColorValue(primaryColor)
                     : theme === 'light'
                       ? '#d1d5db'
                       : 'rgba(255, 255, 255, 0.3)',

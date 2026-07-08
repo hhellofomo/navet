@@ -5,11 +5,20 @@ import { DialogHeader } from '@/app/components/shared/dialog-header';
 interface VacuumSettingsDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  onStartCleaning: () => void;
+  onReturnHome: () => void;
   name: string;
   theme: 'light' | 'dark' | 'contrast';
 }
 
-export function VacuumSettingsDialog({ isOpen, onClose, name, theme }: VacuumSettingsDialogProps) {
+export function VacuumSettingsDialog({
+  isOpen,
+  onClose,
+  onStartCleaning,
+  onReturnHome,
+  name,
+  theme,
+}: VacuumSettingsDialogProps) {
   const bgColor = theme === 'light' ? 'bg-white' : 'bg-gray-900';
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
   const borderColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
@@ -21,7 +30,13 @@ export function VacuumSettingsDialog({ isOpen, onClose, name, theme }: VacuumSet
         <Dialog.Content
           className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md rounded-2xl border ${borderColor} ${bgColor} shadow-2xl z-50 overflow-hidden`}
         >
-          <DialogHeader title={`${name} Settings`} onClose={onClose} theme={theme} />
+          <div className="p-6 pb-0">
+            <DialogHeader
+              title={`${name} Settings`}
+              description="Adjust cleaning behavior and quick actions."
+              isOn={theme !== 'light'}
+            />
+          </div>
 
           <div className="p-6 space-y-6">
             {/* Cleaning Modes */}
@@ -62,6 +77,7 @@ export function VacuumSettingsDialog({ isOpen, onClose, name, theme }: VacuumSet
               <div className="space-y-2">
                 <button
                   type="button"
+                  onClick={onStartCleaning}
                   className="w-full py-3 bg-blue-500 hover:bg-blue-600 rounded-xl text-white font-medium transition-colors flex items-center justify-center gap-2"
                 >
                   <Play className="w-4 h-4" />
@@ -69,6 +85,7 @@ export function VacuumSettingsDialog({ isOpen, onClose, name, theme }: VacuumSet
                 </button>
                 <button
                   type="button"
+                  onClick={onReturnHome}
                   className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white font-medium transition-colors flex items-center justify-center gap-2"
                 >
                   <Home className="w-4 h-4" />

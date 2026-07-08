@@ -1,6 +1,6 @@
 import { lazy, memo, Suspense } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 import albumArt from '@/assets/847d39d7e328a23edbec0f0c53ec4c57b6f1d6fb.png';
 import { MediaLargeView } from './media/media-large-view';
 import { MediaMediumView } from './media/media-medium-view';

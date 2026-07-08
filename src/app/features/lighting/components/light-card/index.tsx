@@ -6,8 +6,7 @@ import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-si
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { DEFAULT_LIGHT_ICON, LIGHT_ICON_MAP } from '@/app/constants/icon-map';
 import { TEMP_OPTIONS } from '@/app/constants/light-constants';
-import { useHomeAssistantContext } from '@/app/contexts/home-assistant-context';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useHomeAssistant, useTheme } from '@/app/hooks';
 import { useBrightnessPresets } from '@/app/hooks/use-brightness-presets';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 import { useLightMemoryStore } from '@/app/stores/light-memory-store';
@@ -51,7 +50,7 @@ export const LightCard = memo(function LightCard({
   const [isOpen, setIsOpen] = useState(false);
   const [applyBrightnessPresetsToAll, setApplyBrightnessPresetsToAll] = useState(true);
   const [selectedIcon, setSelectedIcon] = useState(DEFAULT_LIGHT_ICON);
-  const { connection, entities } = useHomeAssistantContext();
+  const { connection, entities } = useHomeAssistant();
   const { theme } = useTheme();
   const brightnessPresets = useBrightnessPresets(id);
   const rememberLightState = useLightMemoryStore((state) => state.rememberState);

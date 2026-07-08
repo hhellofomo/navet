@@ -24,16 +24,11 @@ import { RenderProfiler } from './components/shared/render-profiler';
 import { Toaster } from './components/ui/sonner';
 import { AuthProvider, useAuth } from './contexts/auth-context';
 import { ConfigProvider, useConfig } from './contexts/config-context';
-import { EditModeProvider } from './contexts/edit-mode-context';
 import { ErrorProvider } from './contexts/error-context';
-import { HomeAssistantProvider, useHomeAssistantContext } from './contexts/home-assistant-context';
 import { LoadingProvider } from './contexts/loading-context';
-import { NavigationProvider, useNavigation } from './contexts/navigation-context';
-import { SearchProvider } from './contexts/search-context';
-import { ThemeProvider } from './contexts/theme-context';
 import { LoginPage } from './features/auth/login-page';
 import { AllViewGrid } from './features/dashboard/all-view-grid';
-import type { CardType } from './features/dashboard/components/add-card-dialog';
+import type { CardType } from './features/dashboard/components/AddCardDialogContainer';
 import { DashboardLayout } from './features/dashboard/dashboard-layout';
 import { DeviceGrid } from './features/dashboard/device-grid';
 import {
@@ -42,16 +37,19 @@ import {
   useDashboardDevices,
   useDeviceMap,
   useEditMode,
+  useHomeAssistant,
+  useNavigation,
   useRoomNavigation,
   useRoomOrdering,
 } from './hooks';
 import { useCustomCards } from './hooks/use-custom-cards';
 import { useDevices, useRooms } from './hooks/use-devices';
 import { useDashboardEntitiesStore, useSettingsStore } from './stores';
+import { getDeviceRoom } from './utils/device-location';
 
 const AddCardDialog = lazy(async () => {
-  const module = await import('./features/dashboard/components/add-card-dialog');
-  return { default: module.AddCardDialog };
+  const module = await import('./features/dashboard/components/AddCardDialogContainer');
+  return { default: module.AddCardDialogContainer };
 });
 
 const AddEntityDialog = lazy(async () => {
@@ -70,7 +68,7 @@ const SettingsSection = lazy(async () => {
  */
 function Dashboard() {
   const { activeSection } = useNavigation();
-  const { connected, connecting, error } = useHomeAssistantContext();
+  const { connected, connecting, error } = useHomeAssistant();
   const [devicesLoaded, setDevicesLoaded] = useState(false);
   const [showAddCardDialog, setShowAddCardDialog] = useState(false);
   const [showAddEntityDialog, setShowAddEntityDialog] = useState(false);
@@ -109,9 +107,7 @@ function Dashboard() {
     (cardId: string) => {
       const device = deviceMap.get(cardId);
       if (device) {
-        return ('room' in device ? device.room : 'location' in device ? device.location : null) as
-          | string
-          | null;
+        return getDeviceRoom(device);
       }
 
       const customCard = allCustomCards.find((card) => card.id === cardId);
@@ -122,8 +118,9 @@ function Dashboard() {
   const lightRooms = useMemo(() => {
     const roomsWithLights = new Set<string>();
     lightDeviceMap.forEach((device) => {
-      if ('room' in device && device.room) {
-        roomsWithLights.add(device.room);
+      const room = getDeviceRoom(device);
+      if (room) {
+        roomsWithLights.add(room);
       }
     });
     return roomOrder.filter((room) => roomsWithLights.has(room));
@@ -219,17 +216,6 @@ function Dashboard() {
     [updateCard]
   );
 
-  // Edit mode context value
-  const editModeContextValue = useMemo(
-    () => ({
-      isEditMode,
-      toggleEditMode,
-      cardSizes,
-      updateCardSize,
-    }),
-    [isEditMode, toggleEditMode, cardSizes, updateCardSize]
-  );
-
   // Show loading state during initial load
   if (!devicesLoaded) {
     const message = connecting ? 'Connecting to Home Assistant...' : 'Loading devices...';
@@ -269,11 +255,16 @@ function Dashboard() {
     return (
       <DashboardLayout>
         {lightDeviceMap.size > 0 ? (
-          <EditModeProvider value={editModeContextValue}>
-            <RenderProfiler id="LightsSection">
-              <AllViewGrid deviceMap={lightDeviceMap} rooms={lightRooms} cardOrders={cardOrders} />
-            </RenderProfiler>
-          </EditModeProvider>
+          <RenderProfiler id="LightsSection">
+            <AllViewGrid
+              deviceMap={lightDeviceMap}
+              rooms={lightRooms}
+              cardOrders={cardOrders}
+              isEditMode={isEditMode}
+              cardSizes={cardSizes}
+              updateCardSize={updateCardSize}
+            />
+          </RenderProfiler>
         ) : (
           <EmptyState
             icon={Lightbulb}
@@ -313,93 +304,95 @@ function Dashboard() {
 
   // Default home section
   return (
-    <EditModeProvider value={editModeContextValue}>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-      >
-        <DashboardLayout>
-          <RoomNav
-            rooms={roomOrder}
-            activeRoom={activeRoom}
-            onRoomChange={changeRoom}
-            isEditMode={isEditMode}
-            onToggleEditMode={toggleEditMode}
-            onMoveRoom={moveRoom}
-            onAddCard={() => setShowAddCardDialog(true)}
-            onAddEntity={
-              dashboardMode === 'manual' ? () => setShowAddEntityDialog(true) : undefined
-            }
-          />
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+    >
+      <DashboardLayout>
+        <RoomNav
+          rooms={roomOrder}
+          activeRoom={activeRoom}
+          onRoomChange={changeRoom}
+          isEditMode={isEditMode}
+          onToggleEditMode={toggleEditMode}
+          onMoveRoom={moveRoom}
+          onAddCard={() => setShowAddCardDialog(true)}
+          onAddEntity={dashboardMode === 'manual' ? () => setShowAddEntityDialog(true) : undefined}
+        />
 
-          {activeRoom === 'All' ? (
-            <RenderProfiler id="AllViewGrid">
-              <AllViewGrid
-                deviceMap={deviceMap}
-                rooms={roomOrder}
-                cardOrders={cardOrders}
-                customCards={customCards}
-                onDeleteCard={handleDeleteCard}
-                onUpdateCard={handleUpdateCard}
-                onRemoveEntity={handleRemoveEntity}
-                allowEntityRemoval={dashboardMode === 'manual'}
-              />
-            </RenderProfiler>
-          ) : (
-            <RenderProfiler id={`DeviceGrid:${activeRoom}`}>
-              <DeviceGrid
-                orderedCardIds={orderedCardIds}
-                deviceMap={deviceMap}
-                customCards={customCards}
-                onDeleteCard={handleDeleteCard}
-                onUpdateCard={handleUpdateCard}
-                onRemoveEntity={handleRemoveEntity}
-                allowEntityRemoval={dashboardMode === 'manual'}
-              />
-            </RenderProfiler>
+        {activeRoom === 'All' ? (
+          <RenderProfiler id="AllViewGrid">
+            <AllViewGrid
+              deviceMap={deviceMap}
+              rooms={roomOrder}
+              cardOrders={cardOrders}
+              isEditMode={isEditMode}
+              cardSizes={cardSizes}
+              updateCardSize={updateCardSize}
+              customCards={customCards}
+              onDeleteCard={handleDeleteCard}
+              onUpdateCard={handleUpdateCard}
+              onRemoveEntity={handleRemoveEntity}
+              allowEntityRemoval={dashboardMode === 'manual'}
+            />
+          </RenderProfiler>
+        ) : (
+          <RenderProfiler id={`DeviceGrid:${activeRoom}`}>
+            <DeviceGrid
+              orderedCardIds={orderedCardIds}
+              deviceMap={deviceMap}
+              isEditMode={isEditMode}
+              cardSizes={cardSizes}
+              updateCardSize={updateCardSize}
+              customCards={customCards}
+              onDeleteCard={handleDeleteCard}
+              onUpdateCard={handleUpdateCard}
+              onRemoveEntity={handleRemoveEntity}
+              allowEntityRemoval={dashboardMode === 'manual'}
+            />
+          </RenderProfiler>
+        )}
+
+        {dashboardMode === 'manual' &&
+          deviceMap.size === 0 &&
+          customCards.length === 0 &&
+          activeRoom === 'All' && (
+            <EmptyState
+              icon={Lightbulb}
+              title="No Entities Added"
+              description="Switch to edit mode and add only the Home Assistant entities you want on the dashboard."
+              actionLabel={isEditMode ? 'Add Entity' : undefined}
+              onAction={isEditMode ? () => setShowAddEntityDialog(true) : undefined}
+            />
           )}
 
-          {dashboardMode === 'manual' &&
-            deviceMap.size === 0 &&
-            customCards.length === 0 &&
-            activeRoom === 'All' && (
-              <EmptyState
-                icon={Lightbulb}
-                title="No Entities Added"
-                description="Switch to edit mode and add only the Home Assistant entities you want on the dashboard."
-                actionLabel={isEditMode ? 'Add Entity' : undefined}
-                onAction={isEditMode ? () => setShowAddEntityDialog(true) : undefined}
-              />
-            )}
+        {showAddCardDialog && (
+          <Suspense fallback={null}>
+            <AddCardDialog
+              open={showAddCardDialog}
+              onClose={() => setShowAddCardDialog(false)}
+              onAddCard={handleAddCard}
+              currentRoom={activeRoom}
+            />
+          </Suspense>
+        )}
 
-          {showAddCardDialog && (
-            <Suspense fallback={null}>
-              <AddCardDialog
-                open={showAddCardDialog}
-                onClose={() => setShowAddCardDialog(false)}
-                onAddCard={handleAddCard}
-                currentRoom={activeRoom}
-              />
-            </Suspense>
-          )}
-
-          {showAddEntityDialog && (
-            <Suspense fallback={null}>
-              <AddEntityDialog
-                open={showAddEntityDialog}
-                onClose={() => setShowAddEntityDialog(false)}
-                onAddEntity={handleAddEntity}
-                currentRoom={activeRoom}
-                deviceMap={availableDeviceMap}
-                addedEntityIds={manualEntityIds}
-              />
-            </Suspense>
-          )}
-        </DashboardLayout>
-      </DndContext>
-    </EditModeProvider>
+        {showAddEntityDialog && (
+          <Suspense fallback={null}>
+            <AddEntityDialog
+              open={showAddEntityDialog}
+              onClose={() => setShowAddEntityDialog(false)}
+              onAddEntity={handleAddEntity}
+              currentRoom={activeRoom}
+              deviceMap={availableDeviceMap}
+              addedEntityIds={manualEntityIds}
+            />
+          </Suspense>
+        )}
+      </DashboardLayout>
+    </DndContext>
   );
 }
 
@@ -410,7 +403,7 @@ function Dashboard() {
 function AppContent() {
   const { isAuthenticated, config: authConfig } = useAuth();
   const { config: haConfig } = useConfig();
-  const { connected, connecting, connect } = useHomeAssistantContext();
+  const { connected, connecting, connect } = useHomeAssistant();
   const disableAnimations = useSettingsStore((state) => state.disableAnimations);
 
   // Attempt to connect to Home Assistant when authenticated but not connected
@@ -444,26 +437,18 @@ function AppContent() {
 
 /**
  * Main App Component
- * Provides all context providers
+ * Provides app shell providers.
  */
 export default function App() {
   return (
-    <ThemeProvider>
-      <ConfigProvider>
-        <LoadingProvider>
-          <ErrorProvider>
-            <AuthProvider>
-              <SearchProvider>
-                <NavigationProvider>
-                  <HomeAssistantProvider>
-                    <AppContent />
-                  </HomeAssistantProvider>
-                </NavigationProvider>
-              </SearchProvider>
-            </AuthProvider>
-          </ErrorProvider>
-        </LoadingProvider>
-      </ConfigProvider>
-    </ThemeProvider>
+    <ConfigProvider>
+      <LoadingProvider>
+        <ErrorProvider>
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
+        </ErrorProvider>
+      </LoadingProvider>
+    </ConfigProvider>
   );
 }

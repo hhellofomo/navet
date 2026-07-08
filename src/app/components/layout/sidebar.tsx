@@ -1,7 +1,7 @@
 import { Clipboard, Home, Lightbulb, Lock, Settings, Tv, Video } from 'lucide-react';
 import { memo } from 'react';
-import { type Section, useNavigation } from '@/app/contexts/navigation-context';
-import { useTheme } from '@/app/contexts/theme-context';
+import { type Section, useNavigation, useTheme } from '@/app/hooks';
+import { getThemeColorValue } from '@/app/utils/theme-colors';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 
 export const Sidebar = memo(function Sidebar() {
@@ -11,21 +11,7 @@ export const Sidebar = memo(function Sidebar() {
   const bgColor = theme === 'light' ? 'bg-white border-gray-200' : 'bg-[#0a0a0a] border-white/5';
   const inactiveColor =
     theme === 'light' ? 'text-gray-300 hover:text-gray-900' : 'text-gray-600 hover:text-gray-300';
-  const getColorValue = (color: typeof primaryColor) => {
-    const colors = {
-      orange: '#f97316',
-      blue: '#3b82f6',
-      green: '#22c55e',
-      purple: '#a855f7',
-      pink: '#ec4899',
-      red: '#ef4444',
-      yellow: '#eab308',
-      teal: '#14b8a6',
-    } as const;
-
-    return colors[color];
-  };
-  const activeColorValue = getColorValue(primaryColor);
+  const activeColorValue = getThemeColorValue(primaryColor);
 
   const menuItems = [
     {

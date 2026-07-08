@@ -1,0 +1,15 @@
+import { useNavigationStore } from '../stores/navigation-store';
+
+export type Section = 'home' | 'security' | 'tasks' | 'locks' | 'lights' | 'media' | 'settings';
+
+interface NavigationState {
+  activeSection: Section;
+  setActiveSection: (section: Section) => void;
+}
+
+export function useNavigation(): NavigationState {
+  const activeSection = useNavigationStore((state) => state.activeSection);
+  const setActiveSection = useNavigationStore((state) => state.setActiveSection);
+
+  return { activeSection, setActiveSection };
+}

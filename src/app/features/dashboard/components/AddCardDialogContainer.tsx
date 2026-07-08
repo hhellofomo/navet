@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '../../../contexts/theme-context';
+import { useTheme } from '../../../hooks';
+import { getThemeColorValue } from '../../../utils/theme-colors';
 import { AddCardDialogView } from './AddCardDialogView';
 
 interface AddCardDialogContainerProps {
@@ -12,7 +13,7 @@ interface AddCardDialogContainerProps {
 
 export type CardType = 'calendar' | 'news' | 'weather' | 'photo' | 'note';
 
-interface CardTemplate {
+export interface CardTemplate {
   id: CardType;
   name: string;
   description: string;
@@ -124,20 +125,7 @@ export function AddCardDialogContainer({
   const { theme, primaryColor } = useTheme();
   const [selectedType, setSelectedType] = useState<CardType | null>(null);
   const [selectedSize, setSelectedSize] = useState<CardSize>('medium');
-
-  const getColorValue = (color: string) => {
-    const colors: Record<string, string> = {
-      blue: '#007AFF',
-      purple: '#AF52DE',
-      pink: '#FF2D55',
-      red: '#FF3B30',
-      orange: '#FF9500',
-      yellow: '#FFCC00',
-      green: '#34C759',
-      teal: '#5AC8FA',
-    };
-    return colors[color] || colors.blue;
-  };
+  const resolveColorValue = (color: string) => getThemeColorValue(color as typeof primaryColor);
 
   const handleAdd = () => {
     if (selectedType) {
@@ -163,7 +151,7 @@ export function AddCardDialogContainer({
       selectedSize={selectedSize}
       setSelectedSize={setSelectedSize}
       selectedTemplate={selectedTemplate}
-      getColorValue={getColorValue}
+      getColorValue={resolveColorValue}
       handleAdd={handleAdd}
     />
   );

@@ -1,17 +1,18 @@
 import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 import { useVacuumControl } from './vacuum/use-vacuum-control';
 import { VacuumControlsLarge } from './vacuum/vacuum-controls-large';
 import { VacuumControlsMedium } from './vacuum/vacuum-controls-medium';
 import { VacuumControlsSmall } from './vacuum/vacuum-controls-small';
 import { VacuumSettingsDialog } from './vacuum/vacuum-settings-dialog';
 import { VacuumStatusDisplay } from './vacuum/vacuum-status-display';
+import { getVacuumThemeStatus, type VacuumStatus } from './vacuum/vacuum-utils';
 
 interface VacuumCardProps {
   id: string;
   name: string;
-  status: 'cleaning' | 'returning' | 'docked' | 'paused' | 'idle';
+  status: VacuumStatus;
   battery: number;
   cleanedArea?: string;
   cleaningTime?: string;
@@ -46,8 +47,8 @@ export const VacuumCard = memo(function VacuumCard({
   // Size-specific styling with intelligent layout adaptation
   const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
-  const _isLarge = size === 'large';
   const padding = isSmall ? 'p-4' : 'p-5';
+  const vacuumColors = colors.vacuum[getVacuumThemeStatus(currentStatus)];
 
   const cardGradient =
     theme === 'light' ? 'from-white to-gray-50/80' : 'from-gray-900/90 to-gray-950/95';
@@ -85,10 +86,10 @@ export const VacuumCard = memo(function VacuumCard({
             </div>
             <div
               className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${
-                colors.vacuum.iconBg
+                vacuumColors.iconBg
               } flex items-center justify-center flex-shrink-0`}
             >
-              <div className={`w-4 h-4 rounded-full ${colors.vacuum.accent}`}></div>
+              <div className={`w-4 h-4 rounded-full ${vacuumColors.accent}`}></div>
             </div>
           </div>
 

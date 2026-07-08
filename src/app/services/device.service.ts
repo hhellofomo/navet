@@ -1,4 +1,5 @@
 import type { Device, DeviceCollection, DeviceWithType } from '../types/device.types';
+import { getAllRooms, getDeviceRoom } from '../utils/device-location';
 
 /**
  * Device Service
@@ -17,7 +18,7 @@ class DeviceService {
     const deviceMap = new Map<string, DeviceWithType>();
 
     Object.entries(devices).forEach(([type, deviceArray]) => {
-      deviceArray.forEach((device) => {
+      (deviceArray as Device[]).forEach((device: Device) => {
         deviceMap.set(device.id, this.withType(device, type as keyof DeviceCollection));
       });
     });
@@ -32,12 +33,10 @@ class DeviceService {
     const allDevices: DeviceWithType[] = [];
 
     Object.entries(devices).forEach(([type, deviceArray]) => {
-      deviceArray.forEach((device) => {
+      (deviceArray as Device[]).forEach((device: Device) => {
         const deviceWithType = this.withType(device, type as keyof DeviceCollection);
 
-        if ('room' in device && device.room === room) {
-          allDevices.push(deviceWithType);
-        } else if ('location' in device && device.location === room) {
+        if (getDeviceRoom(device) === room) {
           allDevices.push(deviceWithType);
         }
       });
@@ -50,19 +49,7 @@ class DeviceService {
    * Get all unique rooms from devices
    */
   getAllRooms(devices: DeviceCollection): string[] {
-    const roomsSet = new Set<string>();
-
-    Object.values(devices).forEach((deviceArray) => {
-      deviceArray.forEach((device) => {
-        if ('room' in device && device.room) {
-          roomsSet.add(device.room);
-        } else if ('location' in device && device.location) {
-          roomsSet.add(device.location);
-        }
-      });
-    });
-
-    return Array.from(roomsSet).sort();
+    return getAllRooms(devices);
   }
 
   /**

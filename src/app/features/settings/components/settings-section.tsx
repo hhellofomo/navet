@@ -18,17 +18,19 @@ import {
 import { type ReactNode, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { InteractionPreviewCard } from '@/app/components/shared/interaction-preview-card';
+import { PRIMARY_COLOR_OPTIONS, THEME_OPTIONS } from '@/app/constants/theme-options';
 import { useAuth } from '@/app/contexts/auth-context';
 import { useConfig } from '@/app/contexts/config-context';
-import { type ThemeType, useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 import {
   type DashboardEntityMode,
   type EntityInteractionMode,
-  type PrimaryColor,
   useDashboardEntitiesStore,
   useSettingsStore,
 } from '@/app/stores';
 import { exportDashboardConfig, importDashboardConfig } from '@/app/utils/dashboard-config';
+import { readFileAsDataUrl, validateImageFile } from '@/app/utils/image-upload';
+import { getThemeColorValue } from '@/app/utils/theme-colors';
 
 type SectionNavItem = {
   id: string;
@@ -127,49 +129,6 @@ export function SettingsSection() {
   const [showTerms, setShowTerms] = useState(false);
   const importInputRef = useRef<HTMLInputElement | null>(null);
 
-  const getColorValue = (color: PrimaryColor): string => {
-    const colors: Record<PrimaryColor, string> = {
-      orange: '#f97316',
-      blue: '#3b82f6',
-      green: '#22c55e',
-      purple: '#a855f7',
-      pink: '#ec4899',
-      red: '#ef4444',
-      yellow: '#eab308',
-      teal: '#14b8a6',
-    };
-    return colors[color];
-  };
-
-  const themeOptions: Array<{ value: ThemeType; label: string; description: string }> = [
-    {
-      value: 'dark',
-      label: 'Dark',
-      description: 'Subtle gradients with muted colors',
-    },
-    {
-      value: 'light',
-      label: 'Light',
-      description: 'Bright pastels with soft accents',
-    },
-    {
-      value: 'contrast',
-      label: 'High Contrast',
-      description: 'Vibrant colors for better visibility',
-    },
-  ];
-
-  const colorOptions: Array<{ value: PrimaryColor; label: string; color: string }> = [
-    { value: 'orange', label: 'Orange', color: '#f97316' },
-    { value: 'blue', label: 'Blue', color: '#3b82f6' },
-    { value: 'green', label: 'Green', color: '#22c55e' },
-    { value: 'purple', label: 'Purple', color: '#a855f7' },
-    { value: 'pink', label: 'Pink', color: '#ec4899' },
-    { value: 'red', label: 'Red', color: '#ef4444' },
-    { value: 'yellow', label: 'Yellow', color: '#eab308' },
-    { value: 'teal', label: 'Teal', color: '#14b8a6' },
-  ];
-
   const navItems: SectionNavItem[] = [
     { id: 'appearance', label: 'Appearance', icon: Palette },
     { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
@@ -196,26 +155,21 @@ export function SettingsSection() {
     }
   };
 
-  const handleWallpaperUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleWallpaperUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file');
+    const validationError = validateImageFile(file);
+    if (validationError) {
+      alert(validationError);
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Image size should be less than 5MB');
-      return;
+    try {
+      setWallpaper(await readFileAsDataUrl(file));
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to read image file');
     }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      setWallpaper(result);
-    };
-    reader.readAsDataURL(file);
   };
 
   const handleRemoveWallpaper = () => {
@@ -256,7 +210,7 @@ export function SettingsSection() {
     }
   };
 
-  const accentColor = getColorValue(primaryColor);
+  const accentColor = getThemeColorValue(primaryColor);
   const cardBg =
     theme === 'light' ? 'bg-white/92' : theme === 'contrast' ? 'bg-gray-950' : 'bg-gray-900/88';
   const softBg = theme === 'light' ? 'bg-gray-50/90' : 'bg-white/[0.04]';
@@ -346,7 +300,7 @@ export function SettingsSection() {
           >
             <div className={`rounded-[28px] p-2 ${softBg}`}>
               <div className="grid gap-2 md:grid-cols-3">
-                {themeOptions.map((option) => {
+                {THEME_OPTIONS.map((option) => {
                   const isActive = theme === option.value;
                   return (
                     <button
@@ -392,7 +346,7 @@ export function SettingsSection() {
             subtleColor={subtleColor}
           >
             <div className="flex flex-wrap items-center gap-3">
-              {colorOptions.map((option) => {
+              {PRIMARY_COLOR_OPTIONS.map((option) => {
                 const isActive = primaryColor === option.value;
                 return (
                   <button

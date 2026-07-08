@@ -1,7 +1,10 @@
 import { Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { useTheme } from '@/app/contexts/theme-context';
+import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
+import { useTheme } from '@/app/hooks';
 import type { DeviceWithType } from '@/app/types/device.types';
+import { getDeviceRoom, getDeviceRoomLabel } from '@/app/utils/device-location';
+import { getThemeColorValue } from '@/app/utils/theme-colors';
 
 interface AddEntityDialogProps {
   open: boolean;
@@ -10,37 +13,6 @@ interface AddEntityDialogProps {
   currentRoom: string;
   deviceMap: Map<string, DeviceWithType>;
   addedEntityIds: string[];
-}
-
-const typeLabels: Record<string, string> = {
-  lights: 'Light',
-  hvac: 'HVAC',
-  climate: 'Climate',
-  power: 'Power',
-  media: 'Media',
-  weather: 'Weather',
-  wifi: 'Wi-Fi',
-  switches: 'Switch',
-  covers: 'Cover',
-  locks: 'Lock',
-  persons: 'Person',
-  sensors: 'Sensor',
-  vacuums: 'Vacuum',
-  rssFeeds: 'RSS Feed',
-  calendars: 'Calendar',
-  'grouped-sensors': 'Sensor Group',
-};
-
-function getDeviceRoom(device: DeviceWithType) {
-  if ('room' in device && typeof device.room === 'string') {
-    return device.room;
-  }
-
-  if ('location' in device && typeof device.location === 'string') {
-    return device.location;
-  }
-
-  return 'Unknown Room';
 }
 
 export function AddEntityDialog({
@@ -62,21 +34,6 @@ export function AddEntityDialog({
   const hoverBg = theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10';
   const inputBg = theme === 'light' ? 'bg-gray-100' : 'bg-white/5';
 
-  const getColorValue = (color: string) => {
-    const colors: Record<string, string> = {
-      blue: '#3b82f6',
-      purple: '#a855f7',
-      pink: '#ec4899',
-      red: '#ef4444',
-      orange: '#f97316',
-      yellow: '#eab308',
-      green: '#22c55e',
-      teal: '#14b8a6',
-    };
-
-    return colors[color] || colors.blue;
-  };
-
   const availableDevices = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
@@ -89,14 +46,14 @@ export function AddEntityDialog({
         }
 
         const label = typeof device.name === 'string' ? device.name : device.id;
-        const room = getDeviceRoom(device);
-        const type = typeLabels[device.type] ?? device.type;
+        const room = getDeviceRoomLabel(device);
+        const type = getDeviceTypeLabel(device.type);
 
         return `${label} ${room} ${type}`.toLowerCase().includes(normalizedQuery);
       })
       .sort((left, right) => {
-        const leftRoom = getDeviceRoom(left);
-        const rightRoom = getDeviceRoom(right);
+        const leftRoom = getDeviceRoomLabel(left);
+        const rightRoom = getDeviceRoomLabel(right);
         const roomComparison = leftRoom.localeCompare(rightRoom);
 
         if (roomComparison !== 0) {
@@ -144,7 +101,7 @@ export function AddEntityDialog({
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search entities"
               className={`w-full rounded-xl border ${borderColor} ${inputBg} pl-10 pr-4 py-3 text-sm ${textColor} focus:outline-none`}
-              style={{ caretColor: getColorValue(primaryColor) }}
+              style={{ caretColor: getThemeColorValue(primaryColor) }}
             />
           </div>
         </div>
@@ -153,8 +110,8 @@ export function AddEntityDialog({
           {availableDevices.length > 0 ? (
             availableDevices.map((device) => {
               const name = typeof device.name === 'string' ? device.name : device.id;
-              const room = getDeviceRoom(device);
-              const typeLabel = typeLabels[device.type] ?? device.type;
+              const room = getDeviceRoomLabel(device);
+              const typeLabel = getDeviceTypeLabel(device.type);
 
               return (
                 <div
@@ -171,7 +128,7 @@ export function AddEntityDialog({
                     type="button"
                     onClick={() => onAddEntity(device.id)}
                     className="px-3 py-2 rounded-lg text-xs font-medium text-white"
-                    style={{ backgroundColor: getColorValue(primaryColor) }}
+                    style={{ backgroundColor: getThemeColorValue(primaryColor) }}
                   >
                     Add
                   </button>

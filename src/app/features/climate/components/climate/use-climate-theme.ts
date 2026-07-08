@@ -1,4 +1,4 @@
-import type { ThemeType } from '../../contexts/theme-context';
+import type { ThemeType } from '@/app/hooks';
 
 interface ClimateThemeColors {
   cardGradient: string;

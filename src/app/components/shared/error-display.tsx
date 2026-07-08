@@ -1,7 +1,7 @@
 import { AlertTriangle, RefreshCw, X } from 'lucide-react';
 import { memo } from 'react';
 import { useError } from '../../contexts/error-context';
-import { useTheme } from '../../contexts/theme-context';
+import { useTheme } from '../../hooks';
 
 interface ErrorDisplayProps {
   onRetry?: () => void;

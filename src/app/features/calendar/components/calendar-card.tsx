@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 import { CalendarDateDisplay } from './calendar/calendar-date-display';
 import { CalendarLargeView } from './calendar/calendar-large-view';
 import { CalendarMediumView } from './calendar/calendar-medium-view';

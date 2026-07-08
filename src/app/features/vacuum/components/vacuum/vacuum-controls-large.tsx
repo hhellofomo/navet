@@ -1,7 +1,8 @@
 import { Home, Pause, Play, Settings2 } from 'lucide-react';
+import type { VacuumStatus } from './vacuum-utils';
 
 interface VacuumControlsLargeProps {
-  currentStatus: 'cleaning' | 'returning' | 'docked' | 'paused' | 'idle';
+  currentStatus: VacuumStatus;
   onStartCleaning: () => void;
   onPause: () => void;
   onReturnHome: () => void;

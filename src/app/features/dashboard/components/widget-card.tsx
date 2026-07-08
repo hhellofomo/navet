@@ -1,6 +1,5 @@
 import { X } from 'lucide-react';
 import { lazy, Suspense } from 'react';
-import { useEditModeContext } from '@/app/contexts/edit-mode-context';
 import type { CustomCard } from '@/app/stores';
 
 const CalendarWidget = lazy(async () => {
@@ -30,6 +29,7 @@ const WeatherWidget = lazy(async () => {
 
 interface WidgetCardProps {
   card: CustomCard;
+  isEditMode: boolean;
   onDelete?: (cardId: string) => void;
   onUpdate?: (cardId: string, data: Record<string, unknown>) => void;
 }
@@ -38,9 +38,7 @@ function WidgetFallback() {
   return <div className="h-full rounded-2xl border border-white/10 bg-white/5 animate-pulse" />;
 }
 
-export function WidgetCard({ card, onDelete, onUpdate }: WidgetCardProps) {
-  const { isEditMode } = useEditModeContext();
-
+export function WidgetCard({ card, isEditMode, onDelete, onUpdate }: WidgetCardProps) {
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onDelete && confirm('Delete this widget?')) {
@@ -70,11 +68,7 @@ export function WidgetCard({ card, onDelete, onUpdate }: WidgetCardProps) {
       break;
     case 'note':
       widgetContent = (
-        <NoteWidget
-          size={card.size}
-          initialNote={card.data?.note as string}
-          onNoteChange={handleNoteChange}
-        />
+        <NoteWidget initialNote={card.data?.note as string} onNoteChange={handleNoteChange} />
       );
       break;
     default:

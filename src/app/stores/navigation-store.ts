@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type { Section } from '../contexts/navigation-context';
+import type { Section } from '../hooks';
 
 interface NavigationState {
   currentRoom: string;

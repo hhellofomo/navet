@@ -1,22 +1,15 @@
 import { arrayMove } from '@dnd-kit/sortable';
 import { useCallback, useEffect, useState } from 'react';
-
-const ROOM_ORDER_STORAGE_KEY = 'ha-dashboard-room-order';
+import { STORAGE_KEYS } from '../constants/storage-keys';
+import { storage } from '../utils/storage';
 
 export const useRoomOrdering = (rooms: string[]) => {
   const [roomOrder, setRoomOrder] = useState<string[]>(() => {
-    const stored = localStorage.getItem(ROOM_ORDER_STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.every((room) => typeof room === 'string')) {
-          const preserved = parsed.filter((room) => rooms.includes(room));
-          const additions = rooms.filter((room) => !preserved.includes(room));
-          return [...preserved, ...additions];
-        }
-      } catch {
-        // Fall through to default room order.
-      }
+    const stored = storage.get<string[] | null>(STORAGE_KEYS.roomOrder, null);
+    if (Array.isArray(stored) && stored.every((room) => typeof room === 'string')) {
+      const preserved = stored.filter((room) => rooms.includes(room));
+      const additions = rooms.filter((room) => !preserved.includes(room));
+      return [...preserved, ...additions];
     }
 
     return rooms;
@@ -37,7 +30,7 @@ export const useRoomOrdering = (rooms: string[]) => {
   }, [rooms]);
 
   useEffect(() => {
-    localStorage.setItem(ROOM_ORDER_STORAGE_KEY, JSON.stringify(roomOrder));
+    storage.set(STORAGE_KEYS.roomOrder, roomOrder);
   }, [roomOrder]);
 
   const moveRoom = useCallback((activeRoom: string, overRoom: string) => {

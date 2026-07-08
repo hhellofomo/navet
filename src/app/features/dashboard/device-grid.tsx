@@ -1,8 +1,7 @@
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { memo, useCallback, useDeferredValue, useMemo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { useEditModeContext } from '../../contexts/edit-mode-context';
-import { useSearch } from '../../contexts/search-context';
+import { useSearch } from '../../hooks';
 import type { CustomCard } from '../../hooks/use-custom-cards';
 import type { DeviceWithType } from '../../types/device.types';
 import { DashboardCardItem } from './components/dashboard-card-item';
@@ -10,6 +9,9 @@ import { DashboardCardItem } from './components/dashboard-card-item';
 interface DeviceGridProps {
   orderedCardIds: string[];
   deviceMap: Map<string, DeviceWithType>;
+  isEditMode: boolean;
+  cardSizes: Record<string, CardSize>;
+  updateCardSize: (id: string, size: CardSize) => void;
   customCards?: CustomCard[];
   onDeleteCard?: (cardId: string) => void;
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
@@ -25,13 +27,15 @@ interface DeviceGridProps {
 export const DeviceGrid = memo(function DeviceGrid({
   orderedCardIds,
   deviceMap,
+  isEditMode,
+  cardSizes,
+  updateCardSize,
   customCards = [],
   onDeleteCard,
   onUpdateCard,
   onRemoveEntity,
   allowEntityRemoval = false,
 }: DeviceGridProps) {
-  const { isEditMode, cardSizes, updateCardSize } = useEditModeContext();
   const { isSearchActive, filteredDeviceIds } = useSearch();
   const deferredFilteredDeviceIds = useDeferredValue(filteredDeviceIds);
 

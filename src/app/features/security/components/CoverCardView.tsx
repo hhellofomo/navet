@@ -3,7 +3,7 @@ import * as Slider from '@radix-ui/react-slider';
 import { ChevronDown, ChevronUp, Settings2, Square } from 'lucide-react';
 import type { CardSize } from '../../../components/shared/card-size-selector';
 import { CardSizeSelector } from '../../../components/shared/card-size-selector';
-import type { ThemeType } from '../../../contexts/theme-context';
+import type { ThemeType } from '../../../hooks';
 
 type DeviceClass =
   | 'blind'

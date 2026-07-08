@@ -1,7 +1,8 @@
 import { memo, type ReactNode } from 'react';
 import { Header } from '@/app/components/layout/header';
 import { Sidebar } from '@/app/components/layout/sidebar';
-import { useTheme } from '../../contexts/theme-context';
+import { useTheme } from '../../hooks';
+import { getThemeColorValue } from '../../utils/theme-colors';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -17,21 +18,6 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
 
   const bgColor = theme === 'light' ? 'bg-gray-50' : 'bg-[#0a0a0a]';
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-
-  // Get primary color value for wallpaper blend
-  const getColorValue = (color: typeof primaryColor): string => {
-    const colors = {
-      orange: '#f97316',
-      blue: '#3b82f6',
-      green: '#22c55e',
-      purple: '#a855f7',
-      pink: '#ec4899',
-      red: '#ef4444',
-      yellow: '#eab308',
-      teal: '#14b8a6',
-    };
-    return colors[color];
-  };
 
   return (
     <div className={`min-h-screen ${bgColor} ${textColor} relative`}>
@@ -55,8 +41,8 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
             style={{
               background:
                 theme === 'light'
-                  ? `linear-gradient(135deg, ${getColorValue(primaryColor)}50, ${getColorValue(primaryColor)}30, transparent 70%)`
-                  : `linear-gradient(135deg, ${getColorValue(primaryColor)}40, ${getColorValue(primaryColor)}20, transparent 60%)`,
+                  ? `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}50, ${getThemeColorValue(primaryColor)}30, transparent 70%)`
+                  : `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}40, ${getThemeColorValue(primaryColor)}20, transparent 60%)`,
               mixBlendMode: theme === 'light' ? 'multiply' : 'color',
             }}
           />

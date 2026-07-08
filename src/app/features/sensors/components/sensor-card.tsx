@@ -1,7 +1,7 @@
 import { Gauge, TrendingDown, TrendingUp } from 'lucide-react';
 import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 
 interface SensorCardProps {
   name: string;

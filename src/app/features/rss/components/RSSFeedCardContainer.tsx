@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '../../../contexts/theme-context';
+import { useTheme } from '../../../hooks';
 import { RSSFeedCardView } from './RSSFeedCardView';
 
 interface RSSItem {

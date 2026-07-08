@@ -3,7 +3,8 @@ import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dn
 import { CSS } from '@dnd-kit/utilities';
 import { Check, Edit3, Plus } from 'lucide-react';
 import { memo } from 'react';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
+import { getThemeColorValue } from '@/app/utils/theme-colors';
 
 interface RoomNavProps {
   rooms?: string[];
@@ -54,21 +55,7 @@ export const RoomNav = memo(function RoomNav({
       : theme === 'contrast'
         ? 'border-white/20'
         : 'border-white/5';
-  const getColorValue = (color: typeof primaryColor) => {
-    const colors = {
-      orange: '#f97316',
-      blue: '#3b82f6',
-      green: '#22c55e',
-      purple: '#a855f7',
-      pink: '#ec4899',
-      red: '#ef4444',
-      yellow: '#eab308',
-      teal: '#14b8a6',
-    } as const;
-
-    return colors[color];
-  };
-  const activeColorValue = getColorValue(primaryColor);
+  const activeColorValue = getThemeColorValue(primaryColor);
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) {

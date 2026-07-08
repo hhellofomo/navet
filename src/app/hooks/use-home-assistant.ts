@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
+import { useStore } from 'zustand';
 import type { HomeAssistantConfiguration } from '../services/home-assistant.service';
 import { homeAssistantStore } from '../stores/home-assistant-store';
 
@@ -7,15 +8,7 @@ import { homeAssistantStore } from '../stores/home-assistant-store';
  * Provides state and actions for connecting to Home Assistant
  */
 export const useHomeAssistant = () => {
-  const [state, setState] = useState(() => homeAssistantStore.getState());
-
-  useEffect(() => {
-    // Subscribe to store changes
-    const unsubscribe = homeAssistantStore.subscribe(setState);
-
-    // Cleanup subscription on unmount
-    return unsubscribe;
-  }, []);
+  const state = useStore(homeAssistantStore);
 
   const connect = useCallback(async (config: HomeAssistantConfiguration) => {
     return await homeAssistantStore.getState().connect(config);
@@ -30,10 +23,7 @@ export const useHomeAssistant = () => {
   }, []);
 
   return {
-    // State
     ...state,
-
-    // Actions
     connect,
     disconnect,
     clearError,

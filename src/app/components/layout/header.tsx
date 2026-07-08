@@ -1,17 +1,15 @@
 import { Bell, CalendarDays, Clock3, Search, X } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/app/contexts/auth-context';
-import { useHomeAssistantContext } from '@/app/contexts/home-assistant-context';
-import { useSearch } from '@/app/contexts/search-context';
-import { useTheme } from '@/app/contexts/theme-context';
 import { NotificationPanel } from '@/app/features/notifications/components/notification-panel';
-import { useDevices } from '@/app/hooks';
+import { useDevices, useHomeAssistant, useSearch, useTheme } from '@/app/hooks';
+import { getThemeColorValue } from '@/app/utils/theme-colors';
 import { UserDropdown } from './user-dropdown';
 
 export const Header = memo(function Header() {
   const { theme, primaryColor } = useTheme();
   const { config: authConfig } = useAuth();
-  const { entities, user } = useHomeAssistantContext();
+  const { entities, user } = useHomeAssistant();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const { searchQuery, setSearchQuery, setFilteredDeviceIds, clearSearch, isSearchActive } =
@@ -30,14 +28,16 @@ export const Header = memo(function Header() {
     const matchingIds: string[] = [];
 
     // Search through all device types
-    const searchInDevices = <T extends Record<string, string | number | boolean | undefined>>(
+    const searchInDevices = <T extends { id: string }>(
       deviceArray: T[] | undefined,
       searchFields: (keyof T)[]
     ) => {
       deviceArray?.forEach((device) => {
         const matches = searchFields.some((field) => {
           const value = device[field];
-          return value && String(value).toLowerCase().includes(query);
+          return (
+            value !== undefined && value !== null && String(value).toLowerCase().includes(query)
+          );
         });
         if (matches) {
           matchingIds.push(device.id);
@@ -54,7 +54,7 @@ export const Header = memo(function Header() {
     searchInDevices(devices.media, ['name', 'room']);
     searchInDevices(devices.persons, ['name', 'location']);
     searchInDevices(devices.sensors, ['name', 'room']);
-    searchInDevices(devices.vacuums, ['name', 'location']);
+    searchInDevices(devices.vacuums, ['name', 'room']);
     searchInDevices(devices.climate, ['name']);
     searchInDevices(devices.weather, ['name', 'location']);
     searchInDevices(devices.power, ['name']);
@@ -81,21 +81,7 @@ export const Header = memo(function Header() {
       : theme === 'contrast'
         ? 'hover:bg-white/10'
         : 'hover:bg-white/5';
-  const getColorValue = (color: typeof primaryColor) => {
-    const colors = {
-      orange: '#f97316',
-      blue: '#3b82f6',
-      green: '#22c55e',
-      purple: '#a855f7',
-      pink: '#ec4899',
-      red: '#ef4444',
-      yellow: '#eab308',
-      teal: '#14b8a6',
-    } as const;
-
-    return colors[color];
-  };
-  const activeColorValue = getColorValue(primaryColor);
+  const activeColorValue = getThemeColorValue(primaryColor);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);

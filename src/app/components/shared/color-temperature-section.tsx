@@ -1,6 +1,6 @@
 import * as Slider from '@radix-ui/react-slider';
 import { memo } from 'react';
-import { useTheme } from '../../contexts/theme-context';
+import { useTheme } from '../../hooks';
 
 interface ColorTemperature {
   value: number;

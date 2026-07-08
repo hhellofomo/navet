@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 import {
   getHVACBackgroundGlowColor,
   getHVACGaugeColor,

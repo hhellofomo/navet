@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { type ButtonHTMLAttributes, memo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 
 interface EntityCardHeaderIconProps {
   IconComponent: LucideIcon;

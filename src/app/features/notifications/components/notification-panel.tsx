@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 import { NotificationEmptyState } from './notifications/notification-empty-state';
 import { NotificationHeader } from './notifications/notification-header';
 import { NotificationItem } from './notifications/notification-item';

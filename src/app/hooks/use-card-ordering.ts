@@ -1,21 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
+import { STORAGE_KEYS } from '../constants/storage-keys';
+import type { Device, DeviceCollection } from '../types/device.types';
+import { getDeviceRoom } from '../utils/device-location';
+import { storage } from '../utils/storage';
 import type { CustomCard } from './use-custom-cards';
-
-interface Device {
-  id: string;
-  room?: string;
-  location?: string;
-  [key: string]: string | number | boolean | undefined;
-}
-
-const CARD_ORDERS_STORAGE_KEY = 'ha-dashboard-card-orders';
 
 /**
  * Custom hook for managing card ordering within rooms via drag-and-drop
  * Handles initialization and updates of card positions with localStorage persistence
  */
 export const useCardOrdering = (
-  devices: Record<string, Device[]>,
+  devices: DeviceCollection,
   rooms: string[],
   customCards: CustomCard[] = []
 ) => {
@@ -27,10 +22,8 @@ export const useCardOrdering = (
     rooms.forEach((room) => {
       const roomCards: string[] = [];
       Object.values(devices).forEach((deviceArray) => {
-        deviceArray.forEach((device) => {
-          if ('room' in device && device.room === room) {
-            roomCards.push(device.id);
-          } else if ('location' in device && device.location === room) {
+        (deviceArray as Device[]).forEach((device: Device) => {
+          if (getDeviceRoom(device) === room) {
             roomCards.push(device.id);
           }
         });
@@ -47,30 +40,23 @@ export const useCardOrdering = (
   }, [devices, rooms, safeCustomCards]);
 
   const [cardOrders, setCardOrders] = useState<Record<string, string[]>>(() => {
-    // Try to load from localStorage first
-    const stored = localStorage.getItem(CARD_ORDERS_STORAGE_KEY);
+    const stored = storage.get<Record<string, string[]> | null>(STORAGE_KEYS.cardOrders, null);
     if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        // Validate that stored orders still match current devices
-        const allDeviceIds = new Set(
-          Object.values(devices)
-            .flat()
-            .map((d) => d.id)
-        );
-        safeCustomCards.forEach((card) => {
-          allDeviceIds.add(card.id);
-        });
-        const isValid = Object.values(parsed).every(
-          (orderArray: unknown) =>
-            Array.isArray(orderArray) &&
-            orderArray.every((id) => typeof id === 'string' && allDeviceIds.has(id))
-        );
-        if (isValid) {
-          return parsed;
-        }
-      } catch {
-        // Fall through to default
+      const allDeviceIds = new Set(
+        Object.values(devices)
+          .flat()
+          .map((d) => d.id)
+      );
+      safeCustomCards.forEach((card) => {
+        allDeviceIds.add(card.id);
+      });
+      const isValid = Object.values(stored).every(
+        (orderArray) =>
+          Array.isArray(orderArray) &&
+          orderArray.every((id) => typeof id === 'string' && allDeviceIds.has(id))
+      );
+      if (isValid) {
+        return stored;
       }
     }
 
@@ -122,7 +108,7 @@ export const useCardOrdering = (
 
   // Persist to localStorage whenever cardOrders changes
   useEffect(() => {
-    localStorage.setItem(CARD_ORDERS_STORAGE_KEY, JSON.stringify(cardOrders));
+    storage.set(STORAGE_KEYS.cardOrders, cardOrders);
   }, [cardOrders]);
 
   const moveCard = useCallback((room: string, dragIndex: number, hoverIndex: number) => {

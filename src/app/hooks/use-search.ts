@@ -1,10 +1,5 @@
-import type { ReactNode } from 'react';
 import { useSearchStore } from '../stores/search-store';
 import { searchSelectors } from '../stores/selectors';
-
-export function SearchProvider({ children }: { children: ReactNode }) {
-  return children;
-}
 
 export function useSearch() {
   const searchQuery = useSearchStore(searchSelectors.searchQuery);

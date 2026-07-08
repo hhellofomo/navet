@@ -16,8 +16,13 @@ export { useEditMode } from './use-edit-mode';
 export { useHomeAssistant } from './use-home-assistant';
 export { useInterval } from './use-interval';
 export { useBreakpoints, useMediaQuery } from './use-media-query';
+export type { Section } from './use-navigation';
+export { useNavigation } from './use-navigation';
 // New reusable hooks
 export { usePersistedState } from './use-persisted-state';
 export { useRoomNavigation } from './use-room-navigation';
 export { useRoomOrdering } from './use-room-ordering';
+export { useSearch } from './use-search';
+export type { PrimaryColor, ThemeType } from './use-theme';
+export { useTheme } from './use-theme';
 export { useToggle } from './use-toggle';

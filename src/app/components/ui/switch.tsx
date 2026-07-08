@@ -2,7 +2,7 @@
 
 import * as SwitchPrimitive from '@radix-ui/react-switch';
 import type * as React from 'react';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 
 import { cn } from './utils';
 

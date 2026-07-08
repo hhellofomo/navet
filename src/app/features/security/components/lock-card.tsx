@@ -1,6 +1,6 @@
 import { DoorClosed, DoorOpen, Lock, Unlock } from 'lucide-react';
 import { memo, useState } from 'react';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 
 interface LockCardProps {
   name: string;

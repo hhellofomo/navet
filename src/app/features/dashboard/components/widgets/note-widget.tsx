@@ -1,7 +1,8 @@
 import { Check, Edit2, StickyNote } from 'lucide-react';
 import { useState } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
+import { getThemeColorValue } from '@/app/utils/theme-colors';
 
 interface NoteWidgetProps {
   size?: CardSize;
@@ -21,20 +22,6 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
   const textSecondary =
     theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
   const border = theme === 'light' ? 'border-gray-200/50' : 'border-white/10';
-
-  const getColorValue = (color: string) => {
-    const colors: Record<string, string> = {
-      blue: '#007AFF',
-      purple: '#AF52DE',
-      pink: '#FF2D55',
-      red: '#FF3B30',
-      orange: '#FF9500',
-      yellow: '#FFCC00',
-      green: '#34C759',
-      teal: '#5AC8FA',
-    };
-    return colors[color] || colors.blue;
-  };
 
   const handleStartEdit = () => {
     setTempNote(note);
@@ -63,8 +50,8 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
         <div
           className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
           style={{
-            backgroundColor: `${getColorValue(primaryColor)}20`,
-            color: getColorValue(primaryColor),
+            backgroundColor: `${getThemeColorValue(primaryColor)}20`,
+            color: getThemeColorValue(primaryColor),
           }}
         >
           <StickyNote className="w-5 h-5" />
@@ -95,7 +82,7 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
               className={`flex-1 p-3 rounded-xl text-sm resize-none focus:outline-none ${textPrimary}`}
               style={{
                 backgroundColor: theme === 'light' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.05)',
-                border: `2px solid ${getColorValue(primaryColor)}`,
+                border: `2px solid ${getThemeColorValue(primaryColor)}`,
               }}
               placeholder="Write your note here..."
             />
@@ -114,7 +101,7 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
                 type="button"
                 onClick={handleSave}
                 className="flex-1 py-2 rounded-lg text-xs font-medium text-white transition-colors"
-                style={{ backgroundColor: getColorValue(primaryColor) }}
+                style={{ backgroundColor: getThemeColorValue(primaryColor) }}
               >
                 <div className="flex items-center justify-center gap-1">
                   <Check className="w-3 h-3" />

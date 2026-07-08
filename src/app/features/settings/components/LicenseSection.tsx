@@ -1,5 +1,5 @@
 import { ExternalLink, FileText, Scale } from 'lucide-react';
-import type { ThemeType } from '../../../contexts/theme-context';
+import type { ThemeType } from '../../../hooks';
 
 interface LicenseSectionProps {
   theme: ThemeType;

@@ -1,9 +1,9 @@
 import { LogOut, Shield } from 'lucide-react';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar';
-import { useHomeAssistantContext } from '@/app/contexts/home-assistant-context';
+import { useHomeAssistant, useTheme } from '@/app/hooks';
 import { useAuth } from '../../contexts/auth-context';
-import { type PrimaryColor, useTheme } from '../../contexts/theme-context';
+import { getThemeColorValue } from '../../utils/theme-colors';
 
 interface UserDropdownProps {
   avatarUrl?: string | null;
@@ -13,23 +13,8 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { theme, primaryColor } = useTheme();
-  const { user } = useHomeAssistantContext();
+  const { user } = useHomeAssistant();
   const { logout } = useAuth();
-
-  // Get color value for inline styles
-  const getColorValue = (color: PrimaryColor): string => {
-    const colors: Record<PrimaryColor, string> = {
-      orange: '#f97316',
-      blue: '#3b82f6',
-      green: '#22c55e',
-      purple: '#a855f7',
-      pink: '#ec4899',
-      red: '#ef4444',
-      yellow: '#eab308',
-      teal: '#14b8a6',
-    };
-    return colors[color];
-  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -91,7 +76,7 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
       >
         <Avatar
           className="w-10 h-10 transition-transform group-hover:scale-105"
-          style={{ backgroundColor: getColorValue(primaryColor) }}
+          style={{ backgroundColor: getThemeColorValue(primaryColor) }}
         >
           {avatarUrl ? <AvatarImage src={avatarUrl} alt={fullName} /> : null}
           <AvatarFallback className="bg-transparent text-white text-sm font-semibold">
@@ -110,7 +95,7 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
             <div className="flex items-center gap-3 mb-3">
               <Avatar
                 className="w-12 h-12"
-                style={{ backgroundColor: getColorValue(primaryColor) }}
+                style={{ backgroundColor: getThemeColorValue(primaryColor) }}
               >
                 {avatarUrl ? <AvatarImage src={avatarUrl} alt={fullName} /> : null}
                 <AvatarFallback className="bg-transparent text-white font-semibold">

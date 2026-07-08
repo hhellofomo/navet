@@ -1,6 +1,7 @@
 import { Calendar as CalendarIcon, Clock } from 'lucide-react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/contexts/theme-context';
+import { useTheme } from '@/app/hooks';
+import { getThemeColorValue } from '@/app/utils/theme-colors';
 
 interface CalendarEvent {
   id: string;
@@ -32,20 +33,6 @@ export function CalendarWidget({ size = 'medium' }: CalendarWidgetProps) {
     theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
   const border = theme === 'light' ? 'border-gray-200/50' : 'border-white/10';
 
-  const getColorValue = (color: string) => {
-    const colors: Record<string, string> = {
-      blue: '#007AFF',
-      purple: '#AF52DE',
-      pink: '#FF2D55',
-      red: '#FF3B30',
-      orange: '#FF9500',
-      yellow: '#FFCC00',
-      green: '#34C759',
-      teal: '#5AC8FA',
-    };
-    return colors[color] || colors.blue;
-  };
-
   const displayEvents =
     size === 'extra-small' || size === 'small'
       ? mockEvents.slice(0, 2)
@@ -62,8 +49,8 @@ export function CalendarWidget({ size = 'medium' }: CalendarWidgetProps) {
         <div
           className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
           style={{
-            backgroundColor: `${getColorValue(primaryColor)}20`,
-            color: getColorValue(primaryColor),
+            backgroundColor: `${getThemeColorValue(primaryColor)}20`,
+            color: getThemeColorValue(primaryColor),
           }}
         >
           <CalendarIcon className="w-5 h-5" />
