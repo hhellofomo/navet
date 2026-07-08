@@ -143,7 +143,7 @@ Assistant pulls `ghcr.io/awesomestvi/{arch}-navet-addon:dev`.
 Typical flow:
 
 1. Push changes to the repository
-2. Run the **Publish Home Assistant Add-on** GitHub Actions workflow manually
+2. Merge or push to `main` and wait for **Publish Home Assistant Add-on** to publish the `dev` image
 3. In Home Assistant, open Settings -> Add-ons -> Add-on Store
 4. Refresh the custom add-on repository
 5. Open the `Navet Dev` add-on
@@ -157,9 +157,8 @@ For Home Assistant add-on updates:
 
 1. Update files in this repo
 2. Bump `addons/navet/config.yaml` version
-3. Open a pull request and let `.github/workflows/publish-addon.yml` build the add-on image without
-   pushing it
-4. Merge to `main` and wait for the workflow to publish the matching add-on image tag
+3. Merge to `main` and wait for the workflow to publish the `dev` add-on image for testing
+4. Push a public beta prerelease tag and wait for the workflow to publish the matching add-on image tag
 5. Refresh the add-on repository in Home Assistant
 6. Rebuild or reinstall the add-on
 
