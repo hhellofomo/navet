@@ -1,5 +1,5 @@
 import { Calendar as CalendarIcon, Clock } from 'lucide-react';
-import { useTheme } from '../../contexts/theme-context';
+import { useTheme } from '@/app/contexts/theme-context';
 
 interface CalendarEvent {
 	id: string;

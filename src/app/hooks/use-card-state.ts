@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { CardSize } from '../components/card-size-selector';
+import type { CardSize } from '../components/shared/card-size-selector';
 
 interface Device {
 	id: string;

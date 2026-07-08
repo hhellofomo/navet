@@ -3,6 +3,7 @@
  * Updated to use Zustand for state management with localStorage persistence
  */
 import { createContext, type ReactNode, useContext, useMemo } from 'react';
+import { shallow } from 'zustand/shallow';
 import { useThemeStore } from '../stores/theme-store';
 
 export type ThemeType = 'dark' | 'light' | 'contrast';
@@ -585,23 +586,13 @@ interface ThemeProviderProps {
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 	// Use Zustand store as the source of truth with optimized selectors
-	const { theme, primaryColor, wallpaper } = useThemeStore(
-		(state) => ({
-			theme: state.theme,
-			primaryColor: state.primaryColor,
-			wallpaper: state.wallpaper,
-		}),
-		shallow
-	);
+	const theme = useThemeStore((state) => state.theme);
+	const primaryColor = useThemeStore((state) => state.primaryColor);
+	const wallpaper = useThemeStore((state) => state.wallpaper);
 
-	const { setTheme, setPrimaryColor, setWallpaper } = useThemeStore(
-		(state) => ({
-			setTheme: state.setTheme,
-			setPrimaryColor: state.setPrimaryColor,
-			setWallpaper: state.setWallpaper,
-		}),
-		shallow
-	);
+	const setTheme = useThemeStore((state) => state.setTheme);
+	const setPrimaryColor = useThemeStore((state) => state.setPrimaryColor);
+	const setWallpaper = useThemeStore((state) => state.setWallpaper);
 
 	// Memoize the colors to avoid unnecessary recalculations
 	const colors = useMemo(() => generateThemeColors(theme, primaryColor), [theme, primaryColor]);

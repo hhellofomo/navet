@@ -1,6 +1,6 @@
 import { Check, Edit2, StickyNote } from 'lucide-react';
 import { useState } from 'react';
-import { useTheme } from '../../contexts/theme-context';
+import { useTheme } from '@/app/contexts/theme-context';
 
 interface NoteWidgetProps {
 	size?: 'small' | 'medium' | 'large';

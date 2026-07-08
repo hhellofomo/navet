@@ -17,9 +17,13 @@ export interface EditModeState {
 	toggleEditMode: () => void;
 }
 
+import type { Section } from '../contexts/navigation-context';
+
 export interface NavigationState {
 	currentRoom: string;
+	activeSection: Section;
 	setCurrentRoom: (room: string) => void;
+	setActiveSection: (section: Section) => void;
 }
 
 export interface SearchState {

@@ -13,7 +13,7 @@ class DeviceService {
 		const deviceMap = new Map<string, DeviceWithType>();
 
 		Object.entries(devices).forEach(([type, deviceArray]) => {
-			deviceArray.forEach((device) => {
+			deviceArray.forEach((device: any) => {
 				deviceMap.set(device.id, { ...device, type: type as keyof DeviceCollection });
 			});
 		});
@@ -28,7 +28,7 @@ class DeviceService {
 		const allDevices: DeviceWithType[] = [];
 
 		Object.entries(devices).forEach(([type, deviceArray]) => {
-			deviceArray.forEach((device) => {
+			deviceArray.forEach((device: any) => {
 				const deviceWithType = { ...device, type: type as keyof DeviceCollection };
 
 				if ('room' in device && device.room === room) {
@@ -49,7 +49,7 @@ class DeviceService {
 		const roomsSet = new Set<string>();
 
 		Object.values(devices).forEach((deviceArray) => {
-			deviceArray.forEach((device) => {
+			deviceArray.forEach((device: any) => {
 				if ('room' in device && device.room) {
 					roomsSet.add(device.room);
 				} else if ('location' in device && device.location) {
