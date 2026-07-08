@@ -494,9 +494,9 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 - CSS variables for dynamic color changes
 - Memoized components prevent unnecessary re-renders
 
-### Dashboard Room Reordering
-- Room pill drag reordering uses local state during the drag — the global store is written only once on drop, eliminating per-event re-renders and localStorage writes
-- Card drag-and-drop has been removed; cards are ordered via the card ordering store
+### Dashboard Layout
+- Rooms display in their natural Home Assistant area order; drag-and-drop room reordering has been removed
+- Cards are ordered via the card ordering store
 - `contain: layout style` on card wrappers reduces cross-card style recalculation during scroll
 
 ### Edit Mode Performance
@@ -526,7 +526,7 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 ## Future Enhancements
 
 ### Shipped since initial docs
-- [x] Drag & drop room reordering (via `@dnd-kit`); card drag removed in favour of card ordering store
+- [x] Card ordering store (drag-and-drop for both cards and rooms has been removed)
 - [x] Export/import dashboard YAML config
 - [x] PWA installation support
 

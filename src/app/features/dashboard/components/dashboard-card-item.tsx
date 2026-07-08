@@ -2,6 +2,8 @@ import { EyeOff, X } from 'lucide-react';
 import { memo } from 'react';
 import { CardEditActionButton } from '@/app/components/shared/card-edit-action-button';
 import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-size-selector';
+import { settingsSelectors } from '@/app/stores/selectors';
+import { useSettingsStore } from '@/app/stores/settings-store';
 import type { DeviceWithType } from '@/app/types/device.types';
 import type { CustomCard } from '../stores/custom-cards-store';
 import { renderCard } from '../utils/card-renderer';
@@ -35,6 +37,7 @@ export const DashboardCardItem = memo(function DashboardCardItem({
   allowEntityRemoval = false,
   usesHideAction = false,
 }: DashboardCardItemProps) {
+  const ambientLightBleed = useSettingsStore(settingsSelectors.ambientLightBleed);
   const RemoveActionIcon = usesHideAction ? EyeOff : X;
   const removeAriaLabel = 'Remove entity from dashboard';
   const spanClass =
@@ -89,7 +92,7 @@ export const DashboardCardItem = memo(function DashboardCardItem({
 
   return (
     <div
-      className={`relative h-full [contain:layout_style_paint] ${spanClass}`}
+      className={`relative h-full ${device?.type === 'lights' && ambientLightBleed ? '[contain:layout_style]' : '[contain:layout_style_paint]'} ${spanClass}`}
       data-draggable-card="true"
     >
       {cardContent}

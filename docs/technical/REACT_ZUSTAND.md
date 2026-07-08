@@ -163,6 +163,30 @@ only iterates `orderedIds` that belong to *this* section when checking `deviceMa
 whose devices are unmodified skip re-rendering entirely when another section's device
 updates.
 
+**Per-entity selectors** — `homeAssistantSelectors.entity(id)` returns a selector that extracts a
+single entity by ID. Since `home-assistant-js-websocket` preserves entity object references for
+unchanged entities, Zustand's `Object.is` check means a card only re-renders when *its own* entity
+changes — not when any other entity in the house updates. Use this in card controllers instead of
+`homeAssistantSelectors.entities` + index lookup.
+
+```ts
+// Good — re-renders only when light.living_room changes
+const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
+
+// Avoid — re-renders on every entity update in the house
+const entities = useHomeAssistant(homeAssistantSelectors.entities);
+const liveEntity = entities?.[id];
+```
+
+**`useDeferredValue` for bulk entity consumers** — Hooks that process the full entity collection
+(device builders, RSS source scanners, notification watchers) should wrap their `entities`
+subscription in `useDeferredValue`. React will prioritize user interactions over the rebuild and
+schedule it during idle time:
+
+```ts
+const entities = useDeferredValue(useHomeAssistant(homeAssistantSelectors.entities));
+```
+
 **`useCardOrdering` identity key** — Card ordering only needs to rebuild when device IDs
 or room assignments change, not on every HA state update (temperature, brightness, etc.).
 A `deviceIdentityKey` string (`id:room` pairs joined) is computed from `devices` and used
@@ -174,6 +198,17 @@ re-render (the `isEditMode` prop changes) and mounts ~200 new DOM nodes (remove 
 buttons per card). Wrapping the `toggleEditMode` call in `startTransition` marks the
 update as non-urgent, keeping the UI responsive on low-end hardware (RPi) while React
 processes the batch in the background.
+
+**`content-visibility: auto` on room sections (low quality mode only)** — When
+`effectsQuality === 'low'`, each `RoomSection` wrapper gets `content-visibility: auto` and
+`contain-intrinsic-block-size` set to the estimated section height. This tells the browser to
+skip layout and paint for offscreen sections entirely. Omitted in high/medium quality modes
+because `content-visibility: auto` creates a containment context that clips ambient light
+bleed effects.
+
+**`contain: layout style paint` on card wrappers** — Applied to all cards except light cards
+when `ambientLightBleed` is enabled; `paint` containment clips glow effects to the card
+border-box, so light cards in bleed mode use `contain: layout style` only.
 
 **Stable event handlers** — Where multiple sibling elements share the same logical action
 (icon picker grid, brightness preset buttons), a single `useCallback`-memoized handler is

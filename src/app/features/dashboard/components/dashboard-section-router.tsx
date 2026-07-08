@@ -47,13 +47,12 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     isEditMode,
     lightDeviceMap,
     lightRooms,
-    onMoveRoom,
     onSetAllViewGrouping,
     onOpenAddCardDialog,
     onOpenAddEntityDialog,
     onToggleEditMode,
     orderedCardIds,
-    roomOrder,
+    rooms,
     updateCardSize,
   } = controller;
   const sectionStackProps = {
@@ -135,14 +134,13 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     sectionContent = (
       <div {...sectionStackProps}>
         <RoomNav
-          rooms={roomOrder}
+          rooms={rooms}
           activeRoom={activeRoom}
           onRoomChange={changeRoom}
           allViewGrouping={allViewGrouping}
           isEditMode={isEditMode}
           onAllViewGroupingChange={onSetAllViewGrouping}
           onToggleEditMode={onToggleEditMode}
-          onMoveRoom={onMoveRoom}
           onAddCard={onOpenAddCardDialog}
           onAddEntity={addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
           addEntityLabel={t('dashboard.addEntity.title')}
@@ -152,7 +150,7 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
           <RenderProfiler id="AllViewGrid">
             <AllViewGrid
               deviceMap={deviceMap}
-              rooms={roomOrder}
+              rooms={rooms}
               cardOrders={cardOrders}
               isEditMode={isEditMode}
               cardSizes={cardSizes}

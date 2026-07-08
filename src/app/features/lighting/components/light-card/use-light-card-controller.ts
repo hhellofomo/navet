@@ -92,13 +92,13 @@ export function useLightCardController({
   const [applyBrightnessPresetsToAll, setApplyBrightnessPresetsToAll] = useState(true);
   const [selectedIcon, setSelectedIcon] = useState(DEFAULT_LIGHT_ICON);
   const connection = useHomeAssistant(homeAssistantSelectors.connection);
-  const entities = useHomeAssistant(homeAssistantSelectors.entities);
+  // Per-entity selector: only re-renders this card when its own entity changes.
+  const liveEntity = useHomeAssistant(homeAssistantSelectors.entity(id));
   const { t } = useI18n();
   const brightnessPresets = useBrightnessPresets(id);
   const rememberLightState = useLightMemoryStore((state) => state.rememberState);
   const setBrightnessPresetValue = useLightPresetStore((state) => state.setBrightnessPresetValue);
   const setBrightnessPresetOrder = useLightPresetStore((state) => state.setBrightnessPresetOrder);
-  const liveEntity = entities?.[id];
   const rememberedLightState = useLightMemoryStore.getState().getRememberedState(id);
   const lastBrightnessRef = useRef(
     rememberedLightState?.brightness ?? (initialBrightness > 0 ? initialBrightness : 100)
