@@ -96,9 +96,15 @@ For Home Assistant OS or supervised installations:
    ```yaml
    hass_url: http://homeassistant.local:8123
    token: your-long-lived-access-token
+   dashboard_config_url: ""
    ```
 
 5. Start the add-on and open Navet from the Home Assistant sidebar.
+
+Set `dashboard_config_url` to a Navet dashboard YAML export if you want fresh browsers or Home
+Assistant companion-app WebViews to bootstrap the same dashboard instead of starting from onboarding.
+After first launch, Docker and add-on deployments also keep the entered session and dashboard layout
+changes in shared same-origin storage so other browsers can pick them up.
 
 ### Standalone Docker Compose
 
@@ -116,6 +122,11 @@ services:
     environment:
       NAVET_HASS_URL: http://homeassistant.local:8123
       NAVET_HASS_TOKEN: your-long-lived-access-token
+    volumes:
+      - navet-data:/data
+
+volumes:
+  navet-data:
 ```
 
 Start Navet:
@@ -140,6 +151,9 @@ docker compose up -d
 `NAVET_HASS_TOKEN` is injected into Docker and add-on runtime config so those deployments can start
 without the login form. Do not expose it in a public static build, Vite client variable, or
 checked-in file, and use a least-privilege Home Assistant token for shared dashboard devices.
+`NAVET_DASHBOARD_CONFIG_URL` can point fresh browsers at a Navet dashboard YAML export to restore the
+same layout on first launch.
+Docker and add-on deployments persist ongoing session and dashboard profile sync at `/data`.
 
 Before publishing or sharing any hosted build, review the
 [public launch security checklist](docs/PUBLIC_LAUNCH_SECURITY.md).

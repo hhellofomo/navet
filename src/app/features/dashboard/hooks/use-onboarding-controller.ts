@@ -1,12 +1,17 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
+import { getRuntimeConfig } from '@/app/config/runtime-config';
 import { ALL_ROOMS_ID } from '@/app/constants/rooms';
 import { useI18n, useNavigation } from '@/app/hooks';
-import { importDashboardConfigFromFile } from '@/app/utils/dashboard-config';
+import {
+  importDashboardConfigFromFile,
+  importDashboardConfigFromUrl,
+} from '@/app/utils/dashboard-config';
 import { useDashboardEntitiesStore } from '../stores/dashboard-entities-store';
 
 type OnboardingTransition = 'all' | 'blank' | 'import' | null;
+const RUNTIME_CONFIG_IMPORT_ATTEMPT_KEY = 'navet-runtime-dashboard-config-import-attempt';
 
 interface UseOnboardingControllerOptions {
   allEntityIds: string[];
@@ -48,6 +53,32 @@ export function useOnboardingController({
   const [dashboardArrivalVariant, setDashboardArrivalVariant] =
     useState<OnboardingTransition>(null);
   const [showImportedDashboardReveal, setShowImportedDashboardReveal] = useState(false);
+  const runtimeConfigImportStarted = useRef(false);
+
+  useEffect(() => {
+    const dashboardConfigUrl = getRuntimeConfig().dashboardConfigUrl;
+
+    if (
+      onboardingCompleted ||
+      allEntityIds.length === 0 ||
+      !dashboardConfigUrl ||
+      runtimeConfigImportStarted.current ||
+      sessionStorage.getItem(RUNTIME_CONFIG_IMPORT_ATTEMPT_KEY) === dashboardConfigUrl
+    ) {
+      return;
+    }
+
+    runtimeConfigImportStarted.current = true;
+    sessionStorage.setItem(RUNTIME_CONFIG_IMPORT_ATTEMPT_KEY, dashboardConfigUrl);
+
+    void importDashboardConfigFromUrl(dashboardConfigUrl)
+      .then(() => {
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error('[OnboardingController] Runtime dashboard config import failed:', error);
+      });
+  }, [allEntityIds.length, onboardingCompleted]);
 
   const handleChooseAllEntities = useCallback(() => {
     setActiveSection('home');

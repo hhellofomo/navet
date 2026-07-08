@@ -7,14 +7,18 @@ NGINX_CONF="/etc/nginx/http.d/default.conf"
 
 HASS_URL="$(bashio::config 'hass_url')"
 HASS_TOKEN="$(bashio::config 'token')"
+DASHBOARD_CONFIG_URL="$(bashio::config 'dashboard_config_url')"
+
+mkdir -p /data
+chown nginx:nginx /data 2>/dev/null || true
 
 if [[ -n "${HASS_URL}" && ! "${HASS_URL}" =~ ^https?:// ]]; then
   echo "hass_url must be empty or start with http:// or https://" >&2
   exit 1
 fi
 
-if [[ "${HASS_URL}${HASS_TOKEN}" == *\"* || "${HASS_URL}${HASS_TOKEN}" == *\'* || "${HASS_URL}${HASS_TOKEN}" == *";"* ]]; then
-  echo "hass_url and token must not contain quotes or semicolons" >&2
+if [[ "${HASS_URL}${HASS_TOKEN}${DASHBOARD_CONFIG_URL}" == *\"* || "${HASS_URL}${HASS_TOKEN}${DASHBOARD_CONFIG_URL}" == *\'* || "${HASS_URL}${HASS_TOKEN}${DASHBOARD_CONFIG_URL}" == *";"* ]]; then
+  echo "hass_url, token, and dashboard_config_url must not contain quotes or semicolons" >&2
   exit 1
 fi
 
@@ -22,11 +26,14 @@ HASS_URL_JS="${HASS_URL//\\/\\\\}"
 HASS_URL_JS="${HASS_URL_JS//\"/\\\"}"
 HASS_TOKEN_JS="${HASS_TOKEN//\\/\\\\}"
 HASS_TOKEN_JS="${HASS_TOKEN_JS//\"/\\\"}"
+DASHBOARD_CONFIG_URL_JS="${DASHBOARD_CONFIG_URL//\\/\\\\}"
+DASHBOARD_CONFIG_URL_JS="${DASHBOARD_CONFIG_URL_JS//\"/\\\"}"
 
 cat > "${CONFIG_FILE}" <<EOF
 window.__NAVET_CONFIG__ = {
   hassUrl: "${HASS_URL_JS}",
-  hassToken: "${HASS_TOKEN_JS}"
+  hassToken: "${HASS_TOKEN_JS}",
+  dashboardConfigUrl: "${DASHBOARD_CONFIG_URL_JS}"
 };
 EOF
 
@@ -45,6 +52,8 @@ server {
   index index.html;
 
   include /etc/nginx/snippets/navet-security-headers.conf;
+  include /etc/nginx/snippets/navet-session-store.conf;
+  include /etc/nginx/snippets/navet-profile-store.conf;
 
   location /__navet_ha_proxy__/ {
     if (\$uri ~ "\.\.") {
