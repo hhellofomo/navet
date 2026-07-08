@@ -13,10 +13,10 @@ import type {
 import {
   BATTERY_DISCHARGE_THRESHOLD_W,
   BATTERY_PERCENT_DECIMALS,
-  ENERGY_METRIC_DECIMALS,
   PEAK_IMPORT_THRESHOLD_W,
   SOLAR_RENEWABLE_RATIO,
 } from './energy-constants';
+import { formatEnergyValue, roundEnergyValue } from './energy-formatters';
 
 interface BuildEnergyDashboardModelParams {
   overview: EnergyOverview;
@@ -35,15 +35,6 @@ export interface EnergyMotionPreferences {
   lowPowerMode: boolean;
   effectsQuality: 'high' | 'medium' | 'low';
   prefersReducedMotion: boolean;
-}
-
-function round(value: number, digits = ENERGY_METRIC_DECIMALS) {
-  const factor = 10 ** digits;
-  return Math.round(value * factor) / factor;
-}
-
-function formatMetricValue(value: number, digits = ENERGY_METRIC_DECIMALS) {
-  return round(value, digits).toFixed(digits);
 }
 
 export function normalizeEnergyRange(range: EnergyRange | 'live' | 'day'): EnergyRange {
@@ -92,7 +83,7 @@ export function getEnergyModeSummary(
   renewableSharePct: number
 ) {
   if (mode === 'peak') {
-    const importKw = Math.round((overview.totals.importW / 1000) * 10) / 10;
+    const importKw = roundEnergyValue(overview.totals.importW / 1000);
     return `Grid import is carrying ${importKw} kW while high-demand loads overlap.`;
   }
 
@@ -142,9 +133,9 @@ function buildNodes(
       id: 'home',
       label: 'Home',
       icon: 'home',
-      value: round(overview.totals.currentLoadW / 1000),
+      value: roundEnergyValue(overview.totals.currentLoadW / 1000),
       unit: 'kW',
-      todayValue: round(overview.totals.importTodayKWh + overview.totals.solarTodayKWh),
+      todayValue: roundEnergyValue(overview.totals.importTodayKWh + overview.totals.solarTodayKWh),
       todayUnit: 'kWh',
       status: getNodeStatus(overview.totals.currentLoadW, true),
     },
@@ -155,9 +146,9 @@ function buildNodes(
       id: 'solar',
       label: 'Solar',
       icon: 'solar',
-      value: round(overview.totals.solarW / 1000),
+      value: roundEnergyValue(overview.totals.solarW / 1000),
       unit: 'kW',
-      todayValue: round(overview.totals.solarTodayKWh),
+      todayValue: roundEnergyValue(overview.totals.solarTodayKWh),
       todayUnit: 'kWh',
       status: getNodeStatus(overview.totals.solarW, true),
     });
@@ -168,11 +159,13 @@ function buildNodes(
       id: 'grid',
       label: 'Grid',
       icon: 'grid',
-      value: round(
+      value: roundEnergyValue(
         (overview.totals.exportW > 0 ? overview.totals.exportW : overview.totals.importW) / 1000
       ),
       unit: 'kW',
-      todayValue: round(overview.totals.exportTodayKWh ?? overview.totals.importTodayKWh),
+      todayValue: roundEnergyValue(
+        overview.totals.exportTodayKWh ?? overview.totals.importTodayKWh
+      ),
       todayUnit: 'kWh',
       status: getNodeStatus(Math.max(overview.totals.importW, overview.totals.exportW), true),
     });
@@ -183,7 +176,7 @@ function buildNodes(
       id: 'battery',
       label: 'Battery',
       icon: 'battery',
-      value: round(overview.totals.batteryPercent),
+      value: roundEnergyValue(overview.totals.batteryPercent),
       unit: '%',
       status:
         overview.totals.batteryPercent <= 15
@@ -197,9 +190,9 @@ function buildNodes(
       id: 'gas',
       label: 'Gas',
       icon: 'gas',
-      value: round(overview.totals.gasTodayKWh),
+      value: roundEnergyValue(overview.totals.gasTodayKWh),
       unit: 'kWh',
-      todayValue: round(overview.totals.gasTodayKWh),
+      todayValue: roundEnergyValue(overview.totals.gasTodayKWh),
       todayUnit: 'kWh',
       status: getNodeStatus(overview.totals.gasTodayKWh, true),
     });
@@ -210,9 +203,9 @@ function buildNodes(
       id: 'renewable',
       label: 'Low-carbon',
       icon: 'renewable',
-      value: round(renewableSharePct),
+      value: roundEnergyValue(renewableSharePct),
       unit: '%',
-      todayValue: round(overview.totals.solarTodayKWh),
+      todayValue: roundEnergyValue(overview.totals.solarTodayKWh),
       todayUnit: 'kWh',
       status: getNodeStatus(renewableSharePct, true),
     });
@@ -224,15 +217,15 @@ function buildNodes(
 function buildFlows(overview: EnergyOverview, nodes: EnergyDashboardNode[]): EnergyFlow[] {
   const visible = new Set(nodes.map((node) => node.id));
   const flows: EnergyFlow[] = [];
-  const solarKw = round(overview.totals.solarW / 1000, 2);
-  const importKw = round(overview.totals.importW / 1000, 2);
-  const exportKw = round(overview.totals.exportW / 1000, 2);
-  const batteryPowerKw = round(Math.abs((overview.totals.batteryPowerW ?? 0) / 1000), 2);
-  const gasKw = round(
+  const solarKw = roundEnergyValue(overview.totals.solarW / 1000, 2);
+  const importKw = roundEnergyValue(overview.totals.importW / 1000, 2);
+  const exportKw = roundEnergyValue(overview.totals.exportW / 1000, 2);
+  const batteryPowerKw = roundEnergyValue(Math.abs((overview.totals.batteryPowerW ?? 0) / 1000), 2);
+  const gasKw = roundEnergyValue(
     overview.totals.gasTodayKWh > 0 ? Math.min(overview.totals.gasTodayKWh / 8, 2) : 0,
     2
   );
-  const renewableKw = round(Math.min(solarKw, overview.totals.currentLoadW / 1000), 2);
+  const renewableKw = roundEnergyValue(Math.min(solarKw, overview.totals.currentLoadW / 1000), 2);
 
   const pushFlow = (
     flow: EnergyFlow,
@@ -376,11 +369,11 @@ function buildDaySnapshotBase(
   );
 
   return {
-    totalUsageKWh: round(todayUsage, 1),
-    solarProductionKWh: round(overview.totals.solarTodayKWh, 1),
-    gridImportKWh: round(overview.totals.importTodayKWh, 1),
-    gridExportKWh: round(overview.totals.exportTodayKWh ?? 0, 1),
-    estimatedCost: round(overview.totals.costToday || todayUsage * 0.34, 2),
+    totalUsageKWh: roundEnergyValue(todayUsage, 1),
+    solarProductionKWh: roundEnergyValue(overview.totals.solarTodayKWh, 1),
+    gridImportKWh: roundEnergyValue(overview.totals.importTodayKWh, 1),
+    gridExportKWh: roundEnergyValue(overview.totals.exportTodayKWh ?? 0, 1),
+    estimatedCost: roundEnergyValue(overview.totals.costToday || todayUsage * 0.34, 2),
   };
 }
 
@@ -395,26 +388,29 @@ function buildNowSnapshot(
     liveConsumption:
       trend.length > 0
         ? trend
-        : [{ label: 'Now', value: round(overview.totals.currentLoadW / 1000, 1) }],
+        : [{ label: 'Now', value: roundEnergyValue(overview.totals.currentLoadW / 1000, 1) }],
     energyBreakdown: [
       {
         id: 'solar',
         label: 'Solar',
-        value: round(overview.totals.solarW / 1000, 1),
+        value: roundEnergyValue(overview.totals.solarW / 1000, 1),
         unit: 'kWh',
         tone: 'solar',
       },
       {
         id: 'battery',
         label: 'Battery',
-        value: round(Math.abs((overview.totals.batteryPowerW ?? 0) / 1000), 1),
+        value: roundEnergyValue(Math.abs((overview.totals.batteryPowerW ?? 0) / 1000), 1),
         unit: 'kWh',
         tone: 'battery',
       },
       {
         id: 'grid',
         label: 'Grid',
-        value: round(Math.max(overview.totals.importW, overview.totals.exportW) / 1000, 1),
+        value: roundEnergyValue(
+          Math.max(overview.totals.importW, overview.totals.exportW) / 1000,
+          1
+        ),
         unit: 'kWh',
         tone: 'grid',
       },
@@ -423,22 +419,22 @@ function buildNowSnapshot(
       {
         id: 'heating',
         label: 'Heating',
-        value: round(overview.totals.hotWaterTodayKWh * 0.12, 2),
+        value: roundEnergyValue(overview.totals.hotWaterTodayKWh * 0.12, 2),
         unit: '$',
         tone: 'cost',
       },
       {
         id: 'live',
         label: 'Live load',
-        value: round((overview.totals.currentLoadW / 1000) * 0.18, 2),
+        value: roundEnergyValue((overview.totals.currentLoadW / 1000) * 0.18, 2),
         unit: '$',
         tone: 'cost',
       },
     ],
     batteryForecast: [
-      { label: '1h', value: Math.max(0, round(overview.totals.batteryPercent - 6)) },
-      { label: '3h', value: Math.max(0, round(overview.totals.batteryPercent - 12)) },
-      { label: '6h', value: Math.max(0, round(overview.totals.batteryPercent - 18)) },
+      { label: '1h', value: Math.max(0, roundEnergyValue(overview.totals.batteryPercent - 6)) },
+      { label: '3h', value: Math.max(0, roundEnergyValue(overview.totals.batteryPercent - 12)) },
+      { label: '6h', value: Math.max(0, roundEnergyValue(overview.totals.batteryPercent - 18)) },
     ],
   };
 }
@@ -458,14 +454,14 @@ function buildTodaySnapshot(
       {
         id: 'gas',
         label: 'Gas',
-        value: round(overview.totals.gasTodayKWh, 1),
+        value: roundEnergyValue(overview.totals.gasTodayKWh, 1),
         unit: 'kWh',
         tone: 'gas',
       },
       {
         id: 'battery',
         label: 'Battery',
-        value: round(Math.abs((overview.totals.batteryPowerW ?? 0) / 1000) * 4, 1),
+        value: roundEnergyValue(Math.abs((overview.totals.batteryPowerW ?? 0) / 1000) * 4, 1),
         unit: 'kWh',
         tone: 'battery',
       },
@@ -475,15 +471,15 @@ function buildTodaySnapshot(
       {
         id: 'hot-water',
         label: 'Hot water',
-        value: round(overview.totals.hotWaterTodayKWh * 0.18, 2),
+        value: roundEnergyValue(overview.totals.hotWaterTodayKWh * 0.18, 2),
         unit: '$',
         tone: 'cost',
       },
     ],
     batteryForecast: [
-      { label: '22:00', value: Math.max(0, round(overview.totals.batteryPercent - 8)) },
-      { label: '02:00', value: Math.max(0, round(overview.totals.batteryPercent - 16)) },
-      { label: '06:00', value: Math.max(0, round(overview.totals.batteryPercent - 24)) },
+      { label: '22:00', value: Math.max(0, roundEnergyValue(overview.totals.batteryPercent - 8)) },
+      { label: '02:00', value: Math.max(0, roundEnergyValue(overview.totals.batteryPercent - 16)) },
+      { label: '06:00', value: Math.max(0, roundEnergyValue(overview.totals.batteryPercent - 24)) },
     ],
   };
 }
@@ -502,39 +498,39 @@ function buildWeekSnapshot(
 
   return {
     id: 'week',
-    totalUsageKWh: round(weekUsage, 1),
-    solarProductionKWh: round(weekSolar, 1),
-    gridImportKWh: round(weekGridImport, 1),
-    gridExportKWh: round(weekGridExport, 1),
-    estimatedCost: round(weekCost, 2),
+    totalUsageKWh: roundEnergyValue(weekUsage, 1),
+    solarProductionKWh: roundEnergyValue(weekSolar, 1),
+    gridImportKWh: roundEnergyValue(weekGridImport, 1),
+    gridExportKWh: roundEnergyValue(weekGridExport, 1),
+    estimatedCost: roundEnergyValue(weekCost, 2),
     liveConsumption: [
-      { label: 'Mon', value: round(day.totalUsageKWh * 0.94, 1) },
-      { label: 'Tue', value: round(day.totalUsageKWh * 0.9, 1) },
-      { label: 'Wed', value: round(day.totalUsageKWh * 1.03, 1) },
-      { label: 'Thu', value: round(day.totalUsageKWh * 0.96, 1) },
-      { label: 'Fri', value: round(day.totalUsageKWh * 1.08, 1) },
-      { label: 'Sat', value: round(day.totalUsageKWh * 1.01, 1) },
-      { label: 'Sun', value: round(day.totalUsageKWh * 0.98, 1) },
+      { label: 'Mon', value: roundEnergyValue(day.totalUsageKWh * 0.94, 1) },
+      { label: 'Tue', value: roundEnergyValue(day.totalUsageKWh * 0.9, 1) },
+      { label: 'Wed', value: roundEnergyValue(day.totalUsageKWh * 1.03, 1) },
+      { label: 'Thu', value: roundEnergyValue(day.totalUsageKWh * 0.96, 1) },
+      { label: 'Fri', value: roundEnergyValue(day.totalUsageKWh * 1.08, 1) },
+      { label: 'Sat', value: roundEnergyValue(day.totalUsageKWh * 1.01, 1) },
+      { label: 'Sun', value: roundEnergyValue(day.totalUsageKWh * 0.98, 1) },
     ],
     energyBreakdown: [
       {
         id: 'solar',
         label: 'Solar',
-        value: round(weekSolar, 1),
+        value: roundEnergyValue(weekSolar, 1),
         unit: 'kWh',
         tone: 'solar',
       },
       {
         id: 'grid',
         label: 'Grid import',
-        value: round(weekGridImport, 1),
+        value: roundEnergyValue(weekGridImport, 1),
         unit: 'kWh',
         tone: 'grid',
       },
       {
         id: 'battery',
         label: 'Battery',
-        value: round(batteryPowerKw * 26, 1),
+        value: roundEnergyValue(batteryPowerKw * 26, 1),
         unit: 'kWh',
         tone: 'battery',
       },
@@ -543,24 +539,27 @@ function buildWeekSnapshot(
       {
         id: 'cost',
         label: 'Energy cost',
-        value: round(weekCost, 2),
+        value: roundEnergyValue(weekCost, 2),
         unit: '$',
         tone: 'cost',
       },
       {
         id: 'heating',
         label: 'Heating',
-        value: round(weekCost * 2.2, 2),
+        value: roundEnergyValue(weekCost * 2.2, 2),
         unit: '$',
         tone: 'cost',
         alert: true,
       },
     ],
     batteryForecast: [
-      { label: 'Mon', value: round(overview.totals.batteryPercent, 0) },
-      { label: 'Wed', value: Math.max(0, round(overview.totals.batteryPercent - 8, 0)) },
-      { label: 'Fri', value: Math.max(0, round(overview.totals.batteryPercent - 5, 0)) },
-      { label: 'Sun', value: Math.max(0, round(overview.totals.batteryPercent - 10, 0)) },
+      { label: 'Mon', value: roundEnergyValue(overview.totals.batteryPercent, 0) },
+      { label: 'Wed', value: Math.max(0, roundEnergyValue(overview.totals.batteryPercent - 8, 0)) },
+      { label: 'Fri', value: Math.max(0, roundEnergyValue(overview.totals.batteryPercent - 5, 0)) },
+      {
+        label: 'Sun',
+        value: Math.max(0, roundEnergyValue(overview.totals.batteryPercent - 10, 0)),
+      },
     ],
   };
 }
@@ -579,36 +578,36 @@ function buildMonthSnapshot(
 
   return {
     id: 'month',
-    totalUsageKWh: round(monthUsage, 1),
-    solarProductionKWh: round(monthSolar, 1),
-    gridImportKWh: round(monthGridImport, 1),
-    gridExportKWh: round(monthGridExport, 1),
-    estimatedCost: round(monthCost, 2),
+    totalUsageKWh: roundEnergyValue(monthUsage, 1),
+    solarProductionKWh: roundEnergyValue(monthSolar, 1),
+    gridImportKWh: roundEnergyValue(monthGridImport, 1),
+    gridExportKWh: roundEnergyValue(monthGridExport, 1),
+    estimatedCost: roundEnergyValue(monthCost, 2),
     liveConsumption: [
-      { label: 'W1', value: round(day.totalUsageKWh * 6.7, 1) },
-      { label: 'W2', value: round(day.totalUsageKWh * 7.0, 1) },
-      { label: 'W3', value: round(day.totalUsageKWh * 6.8, 1) },
-      { label: 'W4', value: round(day.totalUsageKWh * 7.2, 1) },
+      { label: 'W1', value: roundEnergyValue(day.totalUsageKWh * 6.7, 1) },
+      { label: 'W2', value: roundEnergyValue(day.totalUsageKWh * 7.0, 1) },
+      { label: 'W3', value: roundEnergyValue(day.totalUsageKWh * 6.8, 1) },
+      { label: 'W4', value: roundEnergyValue(day.totalUsageKWh * 7.2, 1) },
     ],
     energyBreakdown: [
       {
         id: 'solar',
         label: 'Solar',
-        value: round(monthSolar, 1),
+        value: roundEnergyValue(monthSolar, 1),
         unit: 'kWh',
         tone: 'solar',
       },
       {
         id: 'grid',
         label: 'Grid import',
-        value: round(monthGridImport, 1),
+        value: roundEnergyValue(monthGridImport, 1),
         unit: 'kWh',
         tone: 'grid',
       },
       {
         id: 'battery',
         label: 'Battery',
-        value: round(batteryPowerKw * 108, 1),
+        value: roundEnergyValue(batteryPowerKw * 108, 1),
         unit: 'kWh',
         tone: 'battery',
       },
@@ -617,24 +616,24 @@ function buildMonthSnapshot(
       {
         id: 'cost',
         label: 'Energy cost',
-        value: round(monthCost, 2),
+        value: roundEnergyValue(monthCost, 2),
         unit: '$',
         tone: 'cost',
       },
       {
         id: 'heating',
         label: 'Heating',
-        value: round(monthCost * 8.7, 2),
+        value: roundEnergyValue(monthCost * 8.7, 2),
         unit: '$',
         tone: 'cost',
         alert: true,
       },
     ],
     batteryForecast: [
-      { label: 'W1', value: round(overview.totals.batteryPercent, 0) },
-      { label: 'W2', value: Math.max(0, round(overview.totals.batteryPercent - 6, 0)) },
-      { label: 'W3', value: Math.max(0, round(overview.totals.batteryPercent - 3, 0)) },
-      { label: 'W4', value: Math.max(0, round(overview.totals.batteryPercent - 8, 0)) },
+      { label: 'W1', value: roundEnergyValue(overview.totals.batteryPercent, 0) },
+      { label: 'W2', value: Math.max(0, roundEnergyValue(overview.totals.batteryPercent - 6, 0)) },
+      { label: 'W3', value: Math.max(0, roundEnergyValue(overview.totals.batteryPercent - 3, 0)) },
+      { label: 'W4', value: Math.max(0, roundEnergyValue(overview.totals.batteryPercent - 8, 0)) },
     ],
   };
 }
@@ -697,29 +696,29 @@ function buildSummary(
 
   const batteryCaption =
     overview.totals.batteryPowerW && overview.totals.batteryPowerW > 0
-      ? `% at ${formatMetricValue(overview.totals.batteryPowerW / 1000)} kW charge`
+      ? `% at ${formatEnergyValue(overview.totals.batteryPowerW / 1000)} kW charge`
       : overview.totals.batteryPowerW && overview.totals.batteryPowerW < 0
-        ? `% at ${formatMetricValue(Math.abs(overview.totals.batteryPowerW) / 1000)} kW discharge`
+        ? `% at ${formatEnergyValue(Math.abs(overview.totals.batteryPowerW) / 1000)} kW discharge`
         : '% steady';
 
   const summary: EnergyDashboardModel['summary'] = [
     {
       id: 'load',
       label: 'Home consumption',
-      value: formatMetricValue(overview.totals.currentLoadW / 1000),
+      value: formatEnergyValue(overview.totals.currentLoadW / 1000),
       caption: 'kW live',
     },
     {
       id: 'solar',
       label: 'Solar production',
-      value: formatMetricValue(overview.totals.solarW / 1000),
+      value: formatEnergyValue(overview.totals.solarW / 1000),
       caption: overview.totals.solarW > 0 ? 'kW now' : 'kW idle',
       tone: overview.totals.solarW > 0 ? 'good' : 'default',
     },
     {
       id: 'grid',
       label: 'Grid',
-      value: formatMetricValue(
+      value: formatEnergyValue(
         (overview.totals.exportW > 0 ? overview.totals.exportW : overview.totals.importW) / 1000
       ),
       caption: overview.totals.exportW > 0 ? 'kW export' : 'kW import',
@@ -728,7 +727,7 @@ function buildSummary(
     {
       id: 'battery',
       label: 'Battery',
-      value: formatMetricValue(overview.totals.batteryPercent, 0),
+      value: formatEnergyValue(overview.totals.batteryPercent, 0),
       caption: batteryCaption,
       tone: batteryTone,
     },
@@ -738,7 +737,7 @@ function buildSummary(
     summary.push({
       id: 'gas',
       label: 'Gas usage',
-      value: formatMetricValue(overview.totals.gasTodayKWh),
+      value: formatEnergyValue(overview.totals.gasTodayKWh),
       caption: 'kWh today',
     });
   }
@@ -747,7 +746,7 @@ function buildSummary(
     summary.push({
       id: 'renewable',
       label: 'Low-carbon share',
-      value: formatMetricValue(renewableSharePct, 0),
+      value: formatEnergyValue(renewableSharePct, 0),
       caption: '% today',
       tone: 'good',
     });
@@ -770,9 +769,10 @@ function buildTotals(overview: EnergyOverview, renewableSharePct: number) {
     exportTodayKWh: overview.totals.exportTodayKWh ?? 0,
     solarTodayKWh: overview.totals.solarTodayKWh,
     gasTodayKWh: overview.totals.gasTodayKWh,
-    renewableSharePct: round(renewableSharePct, 0),
-    costToday: overview.totals.costToday || round(importTodayPlusGas * 0.34, 2),
-    projectedMonthCost: overview.totals.projectedMonthCost || round(importTodayPlusGas * 9.4, 2),
+    renewableSharePct: roundEnergyValue(renewableSharePct, 0),
+    costToday: overview.totals.costToday || roundEnergyValue(importTodayPlusGas * 0.34, 2),
+    projectedMonthCost:
+      overview.totals.projectedMonthCost || roundEnergyValue(importTodayPlusGas * 9.4, 2),
   };
 }
 

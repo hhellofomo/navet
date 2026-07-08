@@ -139,6 +139,10 @@ export function normalizeMetric(
   return null;
 }
 
+export function formatMetricNumber(value: number): string {
+  return Number.isInteger(value) ? `${value}` : value.toFixed(1);
+}
+
 export function formatSensorValue(entity: {
   state: unknown;
   attributes?: Record<string, unknown>;

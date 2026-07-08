@@ -12,6 +12,7 @@ export { getName, resolveEntityRoom } from './entity-location';
 export { formatEntityType, formatMediaEntityType, helperLabelForDomain } from './i18n-formatters';
 export { brightnessToPercent, normalizeKelvin } from './light-utils';
 export {
+  formatMetricNumber,
   formatSensorValue,
   getMetricLabel,
   inferMetricIcon,

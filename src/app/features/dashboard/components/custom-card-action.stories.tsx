@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { getStoryDocsDescription } from '@/app/storybook/story-docs';
-import { buildCustomCard, CustomWidgetStoryFrame } from '../stories/custom-card-story-helpers';
+import { buildCustomCard, CustomWidgetStoryFrame } from '@/app/storybook/story-frames';
 
 type ActionStoryArgs = {
   size: Extract<CardSize, 'tiny' | 'extra-small' | 'small'>;

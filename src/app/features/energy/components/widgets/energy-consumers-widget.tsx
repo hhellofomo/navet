@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
 import type { EnergyConsumer } from '../../types/energy.types';
+import { formatEnergyPercent, formatEnergyValue } from '../../utils/energy-formatters';
 import { EnergyWidgetShell } from '../energy-widget-shell';
 
 interface EnergyConsumersWidgetProps {
@@ -37,14 +38,14 @@ export const EnergyConsumersWidget = memo(function EnergyConsumersWidget({
                 <div className={`mt-1 text-xs ${surface.textSecondary}`}>
                   {consumer.room} •{' '}
                   {t('energy.widgets.consumers.loadShare', {
-                    value: (consumer.shareOfLoad * 100).toFixed(0),
+                    value: formatEnergyPercent(consumer.shareOfLoad * 100),
                   })}
                 </div>
               </div>
               <div className="text-right">
                 {consumer.powerW > 0 ? (
                   <div className={`text-sm font-semibold ${surface.textPrimary}`}>
-                    {(consumer.powerW / 1000).toFixed(1)} kW
+                    {formatEnergyValue(consumer.powerW / 1000)} kW
                   </div>
                 ) : null}
                 {consumer.energyKWh > 0 ? (
@@ -52,7 +53,7 @@ export const EnergyConsumersWidget = memo(function EnergyConsumersWidget({
                     className={`text-sm font-semibold ${consumer.powerW > 0 ? surface.textSecondary : surface.textPrimary}`}
                   >
                     {t('energy.widgets.consumers.kwhToday', {
-                      value: consumer.energyKWh.toFixed(2),
+                      value: formatEnergyValue(consumer.energyKWh, 2),
                     })}
                   </div>
                 ) : null}

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ArrowRight, Layers3 } from 'lucide-react';
 import { getThemeSurfaceTokens } from '@/app/components/system/tokens';
-import { DASHBOARD_CARD_TYPES } from '@/app/features/dashboard/utils/card-renderer';
+import { DASHBOARD_CARD_TYPES } from '@/app/features/dashboard';
 import { useTheme } from '@/app/hooks';
 import { getStoryDocsDescription } from '@/app/storybook/story-docs';
 

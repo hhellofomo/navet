@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { homeAssistantStore } from '@/app/stores/home-assistant-store';
 import { getStoryDocsDescription } from '@/app/storybook/story-docs';
-import { buildCustomCard, CustomWidgetStoryFrame } from '../stories/custom-card-story-helpers';
+import { buildCustomCard, CustomWidgetStoryFrame } from '@/app/storybook/story-frames';
 
 const sampleBatteryEntities: HassEntities = {
   'sensor.front_door_sensor_battery': {
