@@ -1,9 +1,10 @@
 import * as Popover from '@radix-ui/react-popover';
 import { Maximize2 } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
-import { getEditControlButtonClass, getEditControlLayout } from './edit-card-controls';
+import { CardEditActionButton } from './card-edit-action-button';
+import type { CardSize } from './card-size';
 
-export type CardSize = 'extra-small' | 'small' | 'medium' | 'large';
+export type { CardSize } from './card-size';
 
 interface CardSizeSelectorProps {
   currentSize: CardSize;
@@ -56,7 +57,6 @@ export const CardSizeSelector = memo(function CardSizeSelector({
 }: CardSizeSelectorProps) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const { topRightPosition, buttonSize: triggerSize, iconSize } = getEditControlLayout(currentSize);
 
   const availableSizes = allowedSizes
     ? sizes.filter((size) => allowedSizes.includes(size.value))
@@ -82,16 +82,14 @@ export const CardSizeSelector = memo(function CardSizeSelector({
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <button
+        <CardEditActionButton
           ref={triggerRef}
-          type="button"
-          className={`absolute ${topRightPosition} z-50 ${triggerSize} ${getEditControlButtonClass()} group cursor-pointer`}
+          cardSize={currentSize}
+          Icon={Maximize2}
+          placement="top-right"
+          className="z-50 group cursor-pointer"
           onClick={(e) => e.stopPropagation()}
-        >
-          <Maximize2
-            className={`${iconSize} text-white group-hover:scale-110 transition-transform`}
-          />
-        </button>
+        />
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content

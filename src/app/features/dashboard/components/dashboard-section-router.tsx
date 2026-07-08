@@ -31,6 +31,7 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     activeRoom,
     activeSection,
     addableEntityIds,
+    allViewGrouping,
     cardOrders,
     cardSizes,
     changeRoom,
@@ -45,7 +46,9 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     isEditMode,
     lightDeviceMap,
     lightRooms,
+    onExportDashboardConfig,
     onMoveRoom,
+    onSetAllViewGrouping,
     onOpenAddCardDialog,
     onOpenAddEntityDialog,
     onToggleEditMode,
@@ -90,6 +93,7 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
               cardOrders={cardOrders}
               isEditMode={isEditMode}
               cardSizes={cardSizes}
+              grouping="custom"
               updateCardSize={updateCardSize}
             />
           </RenderProfiler>
@@ -151,7 +155,10 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
           rooms={roomOrder}
           activeRoom={activeRoom}
           onRoomChange={changeRoom}
+          allViewGrouping={allViewGrouping}
           isEditMode={isEditMode}
+          onAllViewGroupingChange={onSetAllViewGrouping}
+          onExportConfig={onExportDashboardConfig}
           onToggleEditMode={onToggleEditMode}
           onMoveRoom={onMoveRoom}
           onAddCard={onOpenAddCardDialog}
@@ -167,6 +174,7 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
               cardOrders={cardOrders}
               isEditMode={isEditMode}
               cardSizes={cardSizes}
+              grouping={allViewGrouping}
               updateCardSize={updateCardSize}
               customCards={customCards}
               onDeleteCard={handleDeleteCard}

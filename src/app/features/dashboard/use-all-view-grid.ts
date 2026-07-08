@@ -1,15 +1,17 @@
 import { useCallback, useDeferredValue, useMemo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
 import { useSearch } from '@/app/hooks';
 import type { DeviceWithType } from '@/app/types/device.types';
-import { getDeviceRoomLabel } from '@/app/utils/device-location';
-import type { RoomSectionData } from './all-view-grid.types';
+import { getDeviceRoomLabel, UNKNOWN_ROOM_LABEL } from '@/app/utils/device-location';
+import type { AllViewGrouping, AllViewSectionData } from './all-view-grid.types';
 import type { CustomCard } from './stores/custom-cards-store';
 
 interface UseAllViewGridParams {
   cardOrders: Record<string, string[]>;
   customCards: CustomCard[];
   deviceMap: Map<string, DeviceWithType>;
+  grouping: AllViewGrouping;
   rooms: string[];
   updateCardSize: (id: string, size: CardSize) => void;
 }
@@ -18,6 +20,7 @@ export function useAllViewGrid({
   cardOrders,
   customCards,
   deviceMap,
+  grouping,
   rooms,
   updateCardSize,
 }: UseAllViewGridParams) {
@@ -76,28 +79,96 @@ export function useAllViewGrid({
     [customCards]
   );
 
-  const roomSections = useMemo<RoomSectionData[]>(
+  const orderedRoomEntries = useMemo(
     () =>
-      rooms
-        .map((room) => {
-          const roomDevices = devicesByRoom[room] || [];
-          const roomCustomCards = customCardsByRoom[room] || [];
-          const totalItems = roomDevices.length + roomCustomCards.length;
-          const orderedRoomIds = (cardOrders[room] || []).filter(
-            (id) =>
-              roomDevices.some((device) => device.id === id) ||
-              roomCustomCards.some((card) => card.id === id)
-          );
+      rooms.map((room) => {
+        const roomDevices = devicesByRoom[room] || [];
+        const roomCustomCards = customCardsByRoom[room] || [];
+        const validIds = new Set([
+          ...roomDevices.map((device) => device.id),
+          ...roomCustomCards.map((card) => card.id),
+        ]);
+        const orderedIds = (cardOrders[room] || []).filter((id) => validIds.has(id));
 
-          return { room, orderedRoomIds, totalItems };
-        })
-        .filter((section) => section.totalItems > 0),
+        return {
+          room,
+          orderedIds,
+          totalItems: validIds.size,
+        };
+      }),
     [cardOrders, customCardsByRoom, devicesByRoom, rooms]
   );
 
+  const allOrderedIds = useMemo(
+    () => orderedRoomEntries.flatMap((entry) => entry.orderedIds),
+    [orderedRoomEntries]
+  );
+
+  const roomSections = useMemo<AllViewSectionData[]>(() => {
+    if (grouping === 'none') {
+      return allOrderedIds.length > 0
+        ? [
+            {
+              key: 'all-items',
+              title: 'All Items',
+              orderedIds: allOrderedIds,
+              totalItems: allOrderedIds.length,
+              showHeader: false,
+            },
+          ]
+        : [];
+    }
+
+    if (grouping === 'type') {
+      const grouped = new Map<string, string[]>();
+
+      allOrderedIds.forEach((id) => {
+        const customCard = customCardMap.get(id);
+        if (customCard) {
+          const existing = grouped.get('Widgets') ?? [];
+          existing.push(id);
+          grouped.set('Widgets', existing);
+          return;
+        }
+
+        const device = deviceMap.get(id);
+        if (!device) {
+          return;
+        }
+
+        const title = getDeviceTypeLabel(device.type);
+        const existing = grouped.get(title) ?? [];
+        existing.push(id);
+        grouped.set(title, existing);
+      });
+
+      return Array.from(grouped.entries())
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([title, orderedIds]) => ({
+          key: `type:${title}`,
+          title,
+          orderedIds,
+          totalItems: orderedIds.length,
+        }));
+    }
+
+    const visibleEntries = orderedRoomEntries.filter((entry) => entry.totalItems > 0);
+    const orderedEntries =
+      grouping === 'room'
+        ? [...visibleEntries].sort((left, right) => left.room.localeCompare(right.room))
+        : visibleEntries;
+
+    return orderedEntries.map((entry) => ({
+      key: `room:${entry.room}`,
+      title: entry.room,
+      orderedIds: entry.orderedIds,
+      totalItems: entry.totalItems,
+      mutedTitle: entry.room === UNKNOWN_ROOM_LABEL,
+    }));
+  }, [allOrderedIds, customCardMap, deviceMap, grouping, orderedRoomEntries]);
+
   return {
     customCardMap,
-    devicesByRoom,
     handleSizeChange,
     roomSections,
   };

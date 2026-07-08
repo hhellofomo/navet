@@ -1,9 +1,10 @@
-import type { CardSize } from './card-size-selector';
+import type { CardSize } from './card-size';
 
 export type EditControlVariant = 'neutral' | 'destructive';
+export type EditControlPlacement = 'top-left' | 'top-right';
 
 export function getEditControlLayout(size: CardSize) {
-  const isCompact = size === 'extra-small' || size === 'small';
+  const isCompact = size !== 'large';
 
   return {
     isCompact,

@@ -2,6 +2,7 @@ import type { DragEndEvent, DragOverEvent, useSensors } from '@dnd-kit/core';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import {
   useCardState,
   useDashboardDevices,
@@ -9,11 +10,16 @@ import {
   useEditMode,
   useHomeAssistant,
   useNavigation,
+  usePersistedState,
   useRoomNavigation,
 } from '@/app/hooks';
 import { useDevices, useRooms } from '@/app/hooks/use-devices';
 import type { Section } from '@/app/navigation/sections';
-import { importDashboardConfigFromFile } from '@/app/utils/dashboard-config';
+import {
+  downloadDashboardConfig,
+  importDashboardConfigFromFile,
+} from '@/app/utils/dashboard-config';
+import type { AllViewGrouping } from '../all-view-grid.types';
 import type { CardType } from '../components/AddCardDialogContainer';
 import { useDashboardEntitiesStore } from '../stores/dashboard-entities-store';
 import { useCardOrdering } from './use-card-ordering';
@@ -27,6 +33,7 @@ export interface DashboardController {
   activeSection: Section;
   addableEntityIds: string[];
   allEntityIds: string[];
+  allViewGrouping: AllViewGrouping;
   availableDeviceMap: ReturnType<typeof useDeviceMap>['deviceMap'];
   cardOrders: ReturnType<typeof useCardOrdering>['cardOrders'];
   cardSizes: ReturnType<typeof useCardState>['cardSizes'];
@@ -65,7 +72,9 @@ export interface DashboardController {
   onToggleEditMode: () => void;
   orderedCardIds: string[];
   onDismissImportedDashboardReveal: () => void;
+  onExportDashboardConfig: () => void;
   onMoveRoom: (activeRoom: string, overRoom: string) => void;
+  onSetAllViewGrouping: (grouping: AllViewGrouping) => void;
   roomOrder: string[];
   sensors: ReturnType<typeof useSensors>;
   setActiveSection: (section: Section) => void;
@@ -87,6 +96,10 @@ export function useDashboardController(): DashboardController {
   const [dashboardArrivalVariant, setDashboardArrivalVariant] =
     useState<OnboardingTransition>(null);
   const [showImportedDashboardReveal, setShowImportedDashboardReveal] = useState(false);
+  const [allViewGrouping, setAllViewGrouping] = usePersistedState<AllViewGrouping>(
+    STORAGE_KEYS.allViewGrouping,
+    'custom'
+  );
   const hiddenEntityIds = useDashboardEntitiesStore((state) => state.hiddenEntityIds);
   const onboardingCompleted = useDashboardEntitiesStore((state) => state.onboardingCompleted);
   const completeOnboarding = useDashboardEntitiesStore((state) => state.completeOnboarding);
@@ -238,6 +251,7 @@ export function useDashboardController(): DashboardController {
     activeSection,
     addableEntityIds,
     allEntityIds,
+    allViewGrouping,
     availableDeviceMap,
     cardOrders,
     cardSizes,
@@ -271,7 +285,9 @@ export function useDashboardController(): DashboardController {
       setDashboardArrivalVariant(null);
       setShowImportedDashboardReveal(false);
     },
+    onExportDashboardConfig: downloadDashboardConfig,
     onMoveRoom: moveRoom,
+    onSetAllViewGrouping: setAllViewGrouping,
     onOpenAddCardDialog: () => setShowAddCardDialog(true),
     onOpenAddEntityDialog: () => setShowAddEntityDialog(true),
     onToggleEditMode: toggleEditMode,

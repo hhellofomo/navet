@@ -2,16 +2,17 @@ import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { memo, useEffect, useRef, useState } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import type { DeviceWithType } from '@/app/types/device.types';
-import { UNKNOWN_ROOM_LABEL } from '@/app/utils/device-location';
 import type { CustomCard } from '../stores/custom-cards-store';
 import { DashboardCardItem } from './dashboard-card-item';
 
 interface RoomSectionProps {
-  room: string;
-  orderedRoomIds: string[];
+  title: string;
+  orderedIds: string[];
   totalItems: number;
   textColor: string;
   textSecondary: string;
+  mutedTitle?: boolean;
+  showHeader?: boolean;
   isEditMode: boolean;
   cardSizes: Record<string, CardSize>;
   deviceMap: Map<string, DeviceWithType>;
@@ -25,11 +26,13 @@ interface RoomSectionProps {
 }
 
 export const RoomSection = memo(function RoomSection({
-  room,
-  orderedRoomIds,
+  title,
+  orderedIds,
   totalItems,
   textColor,
   textSecondary,
+  mutedTitle = false,
+  showHeader = true,
   isEditMode,
   cardSizes,
   deviceMap,
@@ -83,21 +86,25 @@ export const RoomSection = memo(function RoomSection({
         containIntrinsicSize: '800px',
       }}
     >
-      <div className="flex items-center gap-3 mb-4">
-        <h2
-          className={`text-lg md:text-xl font-semibold ${room === UNKNOWN_ROOM_LABEL ? textSecondary : textColor}`}
-        >
-          {room}
-        </h2>
-        <span className={`text-xs md:text-sm ${textSecondary}`}>
-          {totalItems} {totalItems === 1 ? 'item' : 'items'}
-        </span>
+      <div className={showHeader ? 'mb-4 flex items-center gap-3' : ''}>
+        {showHeader ? (
+          <>
+            <h2
+              className={`text-lg md:text-xl font-semibold ${mutedTitle ? textSecondary : textColor}`}
+            >
+              {title}
+            </h2>
+            <span className={`text-xs md:text-sm ${textSecondary}`}>
+              {totalItems} {totalItems === 1 ? 'item' : 'items'}
+            </span>
+          </>
+        ) : null}
       </div>
 
       {isVisible ? (
-        <SortableContext items={orderedRoomIds} strategy={rectSortingStrategy}>
+        <SortableContext items={orderedIds} strategy={rectSortingStrategy}>
           <div className="grid w-full grid-flow-row-dense grid-cols-2 gap-2 auto-rows-[87px] md:grid-cols-4 md:gap-3 xl:grid-cols-6 lg:gap-4 2xl:grid-cols-8">
-            {orderedRoomIds.map((id, index) => {
+            {orderedIds.map((id) => {
               const device = deviceMap.get(id);
               if (device) {
                 const size = cardSizes[device.id] || (device.size as CardSize);
@@ -106,7 +113,6 @@ export const RoomSection = memo(function RoomSection({
                   <DashboardCardItem
                     key={device.id}
                     id={device.id}
-                    index={index}
                     device={device}
                     size={size}
                     isEditMode={isEditMode}
@@ -129,7 +135,6 @@ export const RoomSection = memo(function RoomSection({
                 <DashboardCardItem
                   key={card.id}
                   id={card.id}
-                  index={index}
                   card={card}
                   size={size}
                   isEditMode={isEditMode}

@@ -1,10 +1,9 @@
 import { type LucideIcon, MoreHorizontal } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
-import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { ThemeDropdownContent } from '@/app/components/shared/theme-dropdown-content';
 import {
   DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/app/components/ui/dropdown-menu';
@@ -79,11 +78,6 @@ function CardActionOverflowMenu({
   items: CardActionOverflowItem[];
 }) {
   const actionSize = getActionButtonSize(size);
-  const surface = getThemeSurfaceTokens(theme);
-  const menuSurface =
-    theme === 'light'
-      ? 'border-gray-200/80 bg-white/95 text-gray-900'
-      : `${surface.border} ${surface.panel} text-white`;
 
   return (
     <DropdownMenu>
@@ -99,10 +93,10 @@ function CardActionOverflowMenu({
           <MoreHorizontal className={actionSize.icon} />
         </RoundControlButton>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
+      <ThemeDropdownContent
+        theme={theme}
         align="end"
         sideOffset={10}
-        className={`rounded-2xl border p-2 shadow-2xl backdrop-blur-xl ${menuSurface}`}
         onClick={(event) => event.stopPropagation()}
       >
         {items.map((item) => {
@@ -123,7 +117,7 @@ function CardActionOverflowMenu({
             </DropdownMenuItem>
           );
         })}
-      </DropdownMenuContent>
+      </ThemeDropdownContent>
     </DropdownMenu>
   );
 }

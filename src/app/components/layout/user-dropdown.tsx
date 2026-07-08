@@ -1,5 +1,6 @@
 import { LogOut, Shield } from 'lucide-react';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { getThemeDropdownSurfaceClasses } from '@/app/components/shared/theme/dropdown-surface-tokens';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar';
@@ -43,10 +44,9 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
   const textPrimary = surface.textPrimary;
   const textSecondary = surface.textSecondary;
   const textMuted = surface.textMuted;
-  const cardBg = surface.panel;
-  const border = surface.border;
   const divider = surface.border;
   const itemBg = surface.subtleBg;
+  const dropdownSurfaceClass = getThemeDropdownSurfaceClasses(theme);
 
   const fullName = user?.name?.trim() || 'User';
   const initials = useMemo(() => {
@@ -82,7 +82,7 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className={`absolute right-0 top-full mt-2 w-72 ${cardBg} backdrop-blur-xl border ${border} rounded-2xl shadow-2xl overflow-visible z-50`}
+          className={`absolute right-0 top-full z-50 mt-2 w-72 overflow-visible ${dropdownSurfaceClass}`}
         >
           {/* User Info Section */}
           <div className={`p-4 border-b ${divider}`}>
