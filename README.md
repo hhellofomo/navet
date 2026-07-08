@@ -78,24 +78,27 @@ Choose the setup that matches where you want Navet to live.
 
 For Home Assistant OS or supervised installations:
 
-1. Open **Settings -> Add-ons -> Add-on Store** in Home Assistant.
-2. Open the three-dot menu and choose **Repositories**.
-3. Add this repository:
+1. Add the Navet add-on repository to Home Assistant:
+
+   [![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Fawesomestvi%2Fnavet)
+
+   Or manually open **Settings -> Add-ons -> Add-on Store**, open the three-dot menu, choose
+   **Repositories**, and add:
 
    ```text
    https://github.com/awesomestvi/navet
    ```
 
-4. Refresh the add-on store.
-5. Install **Navet**.
-6. Open the add-on configuration and set:
+2. Refresh the add-on store.
+3. Install **Navet**.
+4. Open the add-on configuration and set:
 
    ```yaml
    hass_url: http://homeassistant.local:8123
    token: your-long-lived-access-token
    ```
 
-7. Start the add-on and open Navet from the Home Assistant sidebar.
+5. Start the add-on and open Navet from the Home Assistant sidebar.
 
 ### Standalone Docker Compose
 
