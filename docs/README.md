@@ -48,6 +48,9 @@ Complete documentation for the Navet smart home dashboard.
 - **[Features](../design-system/FEATURES.md)** - Feature documentation
 - **[Moodboard](../design-system/MOODBOARD.md)** - Design inspiration
 
+### Roadmap
+- **[Roadmap](ROADMAP.md)** - HA feature parity gaps and Navet-native ideas, with shipped items tracked
+
 ### Project History
 - **[Change History](archive/CHANGES.md)** - Major changes and migrations
   - Rebranding to Navet
