@@ -33,7 +33,7 @@ export const AllViewGrid = memo(function AllViewGrid({
 	const { theme } = useTheme();
 
 	const handleSizeChange = useCallback(
-		(id: string, size: any) => {
+		(id: string, size: CardSize) => {
 			updateCardSize(id, size);
 		},
 		[updateCardSize]

@@ -1,4 +1,4 @@
-import type { HassEntities, HassEntity } from 'home-assistant-js-websocket';
+import type { HassEntity } from 'home-assistant-js-websocket';
 import { useMemo } from 'react';
 import { useHomeAssistantContext } from '../contexts/home-assistant-context';
 import type {

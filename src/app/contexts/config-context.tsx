@@ -26,9 +26,19 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
 					return JSON.parse(stored);
 				}
 			}
-		} catch (error) {
-			console.error('Failed to load config from localStorage:', error);
-		}
+
+			// Fallback to environment variables if available
+			const hassUrl = import.meta.env.VITE_URL;
+			const token = import.meta.env.VITE_TOKEN;
+
+			if (hassUrl && token) {
+				const cleanUrl = hassUrl.endsWith('/') ? hassUrl.slice(0, -1) : hassUrl;
+				return {
+					url: cleanUrl,
+					token: token,
+				};
+			}
+		} catch (_error) {}
 		return null;
 	});
 
@@ -40,7 +50,6 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
 			try {
 				new URL(cleanUrl);
 			} catch {
-				console.error('Invalid URL format');
 				return false;
 			}
 
@@ -54,8 +63,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
 			});
 
 			return response.ok;
-		} catch (error) {
-			console.error('Connection test failed:', error);
+		} catch (_error) {
 			// Return false but don't throw - let the UI handle it
 			return false;
 		}
@@ -75,8 +83,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
 			}
 
 			return true;
-		} catch (error) {
-			console.error('Failed to save config:', error);
+		} catch (_error) {
 			return false;
 		}
 	}, []);
