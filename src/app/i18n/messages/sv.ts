@@ -250,7 +250,7 @@ export const svMessages = {
   'dashboard.onboarding.heading.route': 'Hur ska Navet starta din dashboard?',
   'dashboard.onboarding.heading.localization': 'Välj språk och format för din första vy.',
   'dashboard.onboarding.heading.theme':
-    'Ställ in det första utseendet och språket innan dashboarden visas.',
+    'Ställ in utseendet innan dashboarden visas för första gången.',
   'dashboard.onboarding.body.route':
     'Välj en startrutt en gång. Import går direkt till återställning, medan nya starter låter dig välja det ursprungliga temat först.',
   'dashboard.onboarding.body.localization':
@@ -270,7 +270,8 @@ export const svMessages = {
     'Återställ en tidigare exporterad Navet YAML-konfiguration i stället för att börja från början.',
   'dashboard.onboarding.route.import.closingBody':
     'Förseglar onboardingupplevelsen och övergår till din återställda dashboard.',
-  'dashboard.onboarding.theme.stepLabel': 'Steg 2 av 2: utseende och lokalisering',
+  'dashboard.onboarding.localization.stepLabel': 'Steg 2 av 3: språk och format',
+  'dashboard.onboarding.theme.stepLabel': 'Steg 3 av 3: utseende',
   'dashboard.onboarding.localization.description':
     'Välj språk för gränssnittet samt tids- och temperaturformat redan från början.',
   'dashboard.onboarding.back': 'Tillbaka',

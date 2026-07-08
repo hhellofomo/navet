@@ -253,7 +253,7 @@ export const deMessages = {
   'dashboard.onboarding.heading.route': 'Wie soll Navet dein Dashboard starten?',
   'dashboard.onboarding.heading.localization': 'Wähle Sprache und Formate für deine erste Ansicht.',
   'dashboard.onboarding.heading.theme':
-    'Lege Look und Sprache fest, bevor dein Dashboard zum ersten Mal erscheint.',
+    'Lege den Look fest, bevor dein Dashboard zum ersten Mal erscheint.',
   'dashboard.onboarding.body.route':
     'Wähle einmal deinen Startweg. Import springt direkt in die Wiederherstellung, während frische Starts zuerst das Anfangsthema festlegen lassen.',
   'dashboard.onboarding.body.localization':
@@ -273,7 +273,8 @@ export const deMessages = {
     'Stelle eine zuvor exportierte Navet-YAML-Dashboard-Konfiguration wieder her, statt von vorne zu beginnen.',
   'dashboard.onboarding.route.import.closingBody':
     'Das Onboarding wird abgeschlossen und in dein wiederhergestelltes Dashboard übergeleitet.',
-  'dashboard.onboarding.theme.stepLabel': 'Schritt 2 von 2: Look und Sprache',
+  'dashboard.onboarding.localization.stepLabel': 'Schritt 2 von 3: Sprache und Formate',
+  'dashboard.onboarding.theme.stepLabel': 'Schritt 3 von 3: Erscheinungsbild',
   'dashboard.onboarding.localization.description':
     'Wähle die Sprache der Oberfläche sowie Zeit- und Temperaturformat direkt zum Start.',
   'dashboard.onboarding.back': 'Zurück',

@@ -1,4 +1,4 @@
-import { ArrowLeft, Check, Download, Layers3, Palette, Sparkles } from 'lucide-react';
+import { ArrowLeft, Check, Download, Languages, Layers3, Palette, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ThemeAppearancePicker } from '@/app/components/shared/theme/theme-appearance-picker';
 import {
@@ -109,6 +109,14 @@ export function DashboardOnboardingDialog({
       : isContrast
         ? 'border-white/16'
         : 'border-white/10';
+  const staticCardBg =
+    previewTheme === 'light'
+      ? 'bg-gray-50'
+      : isContrast
+        ? 'bg-black'
+        : previewTheme === 'glass'
+          ? 'bg-white/8'
+          : 'bg-white/5';
   const disabledCardBg =
     previewTheme === 'light'
       ? 'bg-gray-50 opacity-70'
@@ -318,14 +326,20 @@ export function DashboardOnboardingDialog({
             </button>
           </div>
         ) : step === 'localization' ? (
-          <div className={`mt-5 rounded-[28px] border ${borderColor} ${cardBg} p-5 md:p-6`}>
-            <div className="mb-4">
-              <p className={`text-sm font-semibold ${textColor}`}>
-                {t('settings.localization.sectionTitle')}
-              </p>
-              <p className={`mt-1 text-xs leading-relaxed ${mutedColor}`}>
-                {t('dashboard.onboarding.localization.description')}
-              </p>
+          <div className={`mt-5 rounded-[28px] border ${borderColor} ${staticCardBg} p-5 md:p-6`}>
+            <div className="mb-5 flex items-center gap-3">
+              <div
+                className="flex h-11 w-11 items-center justify-center rounded-2xl"
+                style={{ backgroundColor: `${accentColor}22` }}
+              >
+                <Languages className="h-5 w-5" style={{ color: accentColor }} />
+              </div>
+              <div>
+                <p className={`text-sm font-semibold ${textColor}`}>{routeLabel}</p>
+                <p className={`text-xs ${mutedColor}`}>
+                  {t('dashboard.onboarding.localization.stepLabel')}
+                </p>
+              </div>
             </div>
 
             <div className="space-y-4">

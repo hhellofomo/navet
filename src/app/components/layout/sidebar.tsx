@@ -107,7 +107,7 @@ export const Sidebar = memo(function Sidebar() {
       <div
         className={`fixed left-0 top-0 hidden h-full w-16 ${surface.shellPanel} border-r md:flex z-50`}
       >
-        <div className="flex w-full justify-center pt-8">
+        <div className="flex w-full justify-center safe-area-pt-5">
           <div className="flex h-10 w-10 items-center justify-center">
             <ImageWithFallback
               src="/logo.svg"
