@@ -98,7 +98,12 @@ export const LightCardMedium = memo(function LightCardMedium({
           }
           rightContent={
             showSettingsButton ? (
-              <CardSettingsActionButton {...settingsButtonProps} theme={theme} size="medium" />
+              <CardSettingsActionButton
+                {...settingsButtonProps}
+                theme={theme}
+                size="medium"
+                tone={isOn ? 'default' : 'muted'}
+              />
             ) : undefined
           }
         />

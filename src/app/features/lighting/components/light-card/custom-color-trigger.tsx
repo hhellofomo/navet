@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { useTheme } from '@/app/hooks';
 
 interface CustomColorTriggerProps {
   isOn: boolean;
@@ -14,6 +15,7 @@ export const CustomColorTrigger = memo(function CustomColorTrigger({
   onColorChange,
   size,
 }: CustomColorTriggerProps) {
+  const { theme } = useTheme();
   const inputColor =
     typeof currentColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(currentColor)
       ? currentColor
@@ -22,6 +24,26 @@ export const CustomColorTrigger = memo(function CustomColorTrigger({
   const triggerSize = isCompact ? 'w-7 h-7' : size === 'medium' ? 'w-8 h-8' : 'w-12 h-12';
   const innerSize = isCompact ? 'w-3.5 h-3.5' : size === 'medium' ? 'w-4 h-4' : 'w-6 h-6';
   const dotSize = isCompact ? 'w-1.5 h-1.5' : size === 'medium' ? 'w-2 h-2' : 'w-3 h-3';
+  const triggerBackground = isOn
+    ? `linear-gradient(135deg, ${inputColor} 0%, ${inputColor}cc 45%, rgba(255, 255, 255, 0.9) 100%)`
+    : theme === 'light'
+      ? 'linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%)'
+      : 'linear-gradient(135deg, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0.14) 100%)';
+  const innerBackground = isOn
+    ? 'rgba(255,255,255,0.2)'
+    : theme === 'light'
+      ? 'rgba(243,244,246,0.9)'
+      : 'rgba(255,255,255,0.08)';
+  const dotBackground = isOn
+    ? `linear-gradient(135deg, ${inputColor} 0%, rgba(255, 255, 255, 0.9) 100%)`
+    : theme === 'light'
+      ? '#9ca3af'
+      : 'rgba(255,255,255,0.45)';
+  const dotBorder = isOn
+    ? 'rgba(255,255,255,0.8)'
+    : theme === 'light'
+      ? '#9ca3af'
+      : 'rgba(255,255,255,0.18)';
 
   return (
     <label
@@ -38,7 +60,8 @@ export const CustomColorTrigger = memo(function CustomColorTrigger({
       }}
       tabIndex={isOn ? 0 : -1}
       style={{
-        background: `linear-gradient(135deg, ${inputColor} 0%, ${inputColor}cc 45%, rgba(255, 255, 255, 0.9) 100%)`,
+        background: triggerBackground,
+        opacity: isOn ? 1 : 0.5,
       }}
     >
       <input
@@ -53,12 +76,14 @@ export const CustomColorTrigger = memo(function CustomColorTrigger({
         className="absolute inset-0 opacity-0 cursor-pointer"
       />
       <div
-        className={`${innerSize} rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center pointer-events-none`}
+        className={`${innerSize} rounded-full backdrop-blur-sm flex items-center justify-center pointer-events-none`}
+        style={{ backgroundColor: innerBackground }}
       >
         <div
-          className={`${dotSize} rounded-full border border-white/80`}
+          className={`${dotSize} rounded-full border`}
           style={{
-            background: `linear-gradient(135deg, ${inputColor} 0%, rgba(255, 255, 255, 0.9) 100%)`,
+            background: dotBackground,
+            borderColor: dotBorder,
           }}
         />
       </div>

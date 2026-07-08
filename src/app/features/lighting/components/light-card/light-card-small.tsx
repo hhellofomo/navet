@@ -80,7 +80,12 @@ export const LightCardSmall = memo(function LightCardSmall({
             </div>
 
             {showSettingsButton && (
-              <CardSettingsActionButton {...settingsButtonProps} theme={theme} size="small" />
+              <CardSettingsActionButton
+                {...settingsButtonProps}
+                theme={theme}
+                size="small"
+                tone={isOn ? 'default' : 'muted'}
+              />
             )}
           </div>
         ) : (
@@ -125,7 +130,12 @@ export const LightCardSmall = memo(function LightCardSmall({
             }
             rightContent={
               showSettingsButton ? (
-                <CardSettingsActionButton {...settingsButtonProps} theme={theme} size="small" />
+                <CardSettingsActionButton
+                  {...settingsButtonProps}
+                  theme={theme}
+                  size="small"
+                  tone={isOn ? 'default' : 'muted'}
+                />
               ) : undefined
             }
           />

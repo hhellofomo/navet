@@ -117,7 +117,12 @@ export const LightCardLarge = memo(function LightCardLarge({
               theme={theme}
               size="large"
               rightContent={
-                <CardSettingsActionButton {...settingsButtonProps} theme={theme} size="large" />
+                <CardSettingsActionButton
+                  {...settingsButtonProps}
+                  theme={theme}
+                  size="large"
+                  tone={isOn ? 'default' : 'muted'}
+                />
               }
             />
           </div>

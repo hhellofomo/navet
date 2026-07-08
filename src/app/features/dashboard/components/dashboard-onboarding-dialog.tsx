@@ -153,7 +153,7 @@ export function DashboardOnboardingDialog({
 
   return (
     <div
-      className="fixed inset-0 z-[60] overflow-y-auto bg-black/55 p-4 backdrop-blur-sm sm:flex sm:items-center sm:justify-center"
+      className="fixed inset-0 z-[60] overflow-y-auto bg-black/55 p-4 safe-area-pt-4 backdrop-blur-sm sm:flex sm:items-center sm:justify-center"
       style={{
         animation: isClosing ? 'navet-onboarding-backdrop-exit 0.9s ease forwards' : undefined,
       }}

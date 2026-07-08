@@ -7,6 +7,7 @@ import type {
   DeviceMetric,
   LightDevice,
   LockDevice,
+  MediaDevice,
   PersonDevice,
   SwitchDevice,
 } from '../types/device.types';
@@ -155,6 +156,7 @@ export const useHADevices = (): DeviceCollection => {
     const lights: LightDevice[] = [];
     const switches: SwitchDevice[] = [];
     const climate: ClimateDevice[] = [];
+    const media: MediaDevice[] = [];
     const persons: PersonDevice[] = [];
     const covers: CoverDevice[] = [];
     const locks: LockDevice[] = [];
@@ -498,6 +500,54 @@ export const useHADevices = (): DeviceCollection => {
           });
           break;
 
+        case 'media_player': {
+          const entityPicture =
+            (typeof entity.attributes?.entity_picture === 'string' &&
+              entity.attributes.entity_picture) ||
+            (typeof entity.attributes?.entity_picture_local === 'string' &&
+              entity.attributes.entity_picture_local) ||
+            (typeof entity.attributes?.media_image_url === 'string' &&
+              entity.attributes.media_image_url) ||
+            undefined;
+          const mediaTitle =
+            (typeof entity.attributes?.media_title === 'string' && entity.attributes.media_title) ||
+            (typeof entity.attributes?.app_name === 'string' && entity.attributes.app_name) ||
+            name;
+          const mediaArtist =
+            (typeof entity.attributes?.media_artist === 'string' &&
+              entity.attributes.media_artist) ||
+            (typeof entity.attributes?.source === 'string' && entity.attributes.source) ||
+            (typeof entity.attributes?.media_album_name === 'string' &&
+              entity.attributes.media_album_name) ||
+            'Ready to play';
+          const volumeLevel = parseNumberish(entity.attributes?.volume_level);
+          const normalizedState: MediaDevice['state'] =
+            entity.state === 'playing'
+              ? 'playing'
+              : entity.state === 'paused'
+                ? 'paused'
+                : entity.state === 'off' || entity.state === 'standby'
+                  ? 'off'
+                  : 'idle';
+
+          media.push({
+            id: entityId,
+            name,
+            room,
+            size: 'medium',
+            title: mediaTitle,
+            artist: mediaArtist,
+            entityPicture,
+            state: normalizedState,
+            volume:
+              typeof volumeLevel === 'number'
+                ? Math.max(0, Math.min(100, Math.round(volumeLevel * 100)))
+                : 70,
+            isMuted: entity.attributes?.is_volume_muted === true,
+          });
+          break;
+        }
+
         case 'person':
           persons.push({
             id: entityId,
@@ -534,8 +584,8 @@ export const useHADevices = (): DeviceCollection => {
       lights,
       hvac: [],
       climate,
+      media,
       power: [],
-      media: [],
       weather: [],
       wifi: [],
       switches,

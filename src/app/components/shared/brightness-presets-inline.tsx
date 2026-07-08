@@ -64,7 +64,7 @@ export const BrightnessPresetsInline = memo(function BrightnessPresetsInline({
   const disabledUnselectedClasses =
     theme === 'light'
       ? 'cursor-not-allowed bg-gray-900/10 text-gray-500 opacity-50'
-      : 'cursor-not-allowed opacity-50';
+      : 'cursor-not-allowed bg-white/15 text-white/60 opacity-50';
 
   return (
     <fieldset
@@ -178,7 +178,7 @@ const BrightnessOverflowMenu = memo(function BrightnessOverflowMenu({
   const disabledTriggerClasses =
     theme === 'light'
       ? 'opacity-50 cursor-not-allowed bg-gray-900/10 text-gray-500'
-      : 'opacity-50 cursor-not-allowed bg-white/15 text-white';
+      : 'opacity-50 cursor-not-allowed bg-white/15 text-white/60';
   const selectedClasses = 'text-white ring-2 scale-105';
   const unselectedClasses =
     theme === 'light'

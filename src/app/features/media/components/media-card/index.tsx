@@ -6,7 +6,7 @@ import albumArt from '@/assets/847d39d7e328a23edbec0f0c53ec4c57b6f1d6fb.png';
 import { MediaLargeView } from '../media/media-large-view';
 import { MediaMediumView } from '../media/media-medium-view';
 import { MediaSmallView } from '../media/media-small-view';
-import { useMediaState } from '../media/use-media-state';
+import { useMediaCardController } from './use-media-card-controller';
 
 const MediaDialog = lazy(async () => {
   const module = await import('../media/media-dialog');
@@ -14,16 +14,30 @@ const MediaDialog = lazy(async () => {
 });
 
 interface MediaCardProps {
+  id: string;
+  name: string;
+  room: string;
   title: string;
   artist: string;
+  entityPicture?: string;
+  state: 'playing' | 'paused' | 'idle' | 'off';
+  volume: number;
+  isMuted: boolean;
   size: CardSize;
   onSizeChange: (id: string, size: CardSize) => void;
   isEditMode: boolean;
 }
 
 export const MediaCard = memo(function MediaCard({
+  id,
+  name: _name,
+  room: _room,
   title,
   artist,
+  entityPicture,
+  state,
+  volume: initialVolume,
+  isMuted: initialMuted,
   size,
   onSizeChange,
   isEditMode,
@@ -31,23 +45,30 @@ export const MediaCard = memo(function MediaCard({
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const {
+    albumArt: resolvedAlbumArt,
+    closeDialog,
+    handleNext,
+    handlePrevious,
+    handleVolumeChange,
     isPlaying,
-    volume,
     isMuted,
     isOpen,
-    togglePlay,
-    toggleMute,
-    handleVolumeChange,
     openDialog,
-    closeDialog,
-    handlePrevious,
-    handleNext,
-  } = useMediaState();
+    toggleMute,
+    togglePlay,
+    volume,
+  } = useMediaCardController({
+    entityId: id,
+    entityPicture,
+    initialState: state,
+    initialVolume,
+    initialMuted,
+  });
 
-  const cardId = 'media-1';
   const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const isLarge = size === 'large';
+  const artwork = resolvedAlbumArt ?? albumArt;
   const padding = isSmall ? 'p-4' : isLarge ? 'p-6' : 'p-5';
   const isLight = theme === 'light';
   const isGlass = theme === 'glass';
@@ -78,13 +99,13 @@ export const MediaCard = memo(function MediaCard({
         {isEditMode && (
           <CardSizeSelector
             currentSize={size}
-            onSizeChange={(newSize) => onSizeChange(cardId, newSize)}
+            onSizeChange={(newSize) => onSizeChange(id, newSize)}
           />
         )}
 
         <div className="absolute inset-0 overflow-hidden">
           <img
-            src={albumArt}
+            src={artwork}
             alt="Album art"
             className={`absolute inset-0 w-full h-full object-cover blur-3xl scale-110 ${artworkOpacity}`}
           />
@@ -96,7 +117,7 @@ export const MediaCard = memo(function MediaCard({
         <div className="relative h-full flex flex-col">
           {isSmall ? (
             <MediaSmallView
-              albumArt={albumArt}
+              albumArt={artwork}
               title={title}
               artist={artist}
               isPlaying={isPlaying}
@@ -105,7 +126,7 @@ export const MediaCard = memo(function MediaCard({
             />
           ) : isMedium ? (
             <MediaMediumView
-              albumArt={albumArt}
+              albumArt={artwork}
               title={title}
               artist={artist}
               isPlaying={isPlaying}
@@ -121,7 +142,7 @@ export const MediaCard = memo(function MediaCard({
             />
           ) : (
             <MediaLargeView
-              albumArt={albumArt}
+              albumArt={artwork}
               title={title}
               artist={artist}
               isPlaying={isPlaying}
@@ -144,7 +165,7 @@ export const MediaCard = memo(function MediaCard({
           <MediaDialog
             isOpen={isOpen}
             onOpenChange={closeDialog}
-            albumArt={albumArt}
+            albumArt={artwork}
             title={title}
             artist={artist}
             isPlaying={isPlaying}

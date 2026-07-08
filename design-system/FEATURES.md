@@ -121,6 +121,26 @@ Recent UI cleanup moved repeated theme logic into shared primitives so cross-the
 - **Interactive nav/action pills** - centralized for active/inactive, light/dark/contrast/glass behavior
 - **Theme surface tokens** - still define the shared panel, border, text, and input surfaces used by these primitives
 
+---
+
+## Climate System
+
+### HVAC Card Path
+
+**Location**: `/src/app/features/climate/components/hvac-card/`
+
+Navet now uses a single HVAC-based card path for Home Assistant climate entities.
+
+#### Current Behavior
+- **Climate entities render as HVAC cards** - the dashboard card registry maps `climate` devices directly to `HVACCard`
+- **Legacy climate card removed** - there is no parallel `ClimateCard` path to maintain or style separately
+- **Shared interaction model** - climate controls now follow the same card-shell, header icon, action-row, and settings patterns as other modern entity cards
+
+#### Why
+- avoids duplicated climate UI logic
+- keeps climate theming aligned with the HVAC-specific card/controller flow
+- reduces future regressions by centralizing climate behavior in one feature module
+
 #### Implementation
 ```tsx
 const { theme, setTheme, primaryColor, setPrimaryColor } = useTheme();

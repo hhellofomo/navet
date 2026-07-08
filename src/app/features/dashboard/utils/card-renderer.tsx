@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { CalendarCard } from '@/app/features/calendar';
-import { ClimateCard, HVACCard } from '@/app/features/climate';
+import { HVACCard } from '@/app/features/climate';
 import { LightCard, SwitchCard } from '@/app/features/lighting';
 import { MediaCard } from '@/app/features/media';
 import { PersonCard } from '@/app/features/person';
@@ -63,11 +63,14 @@ export const renderCard = ({
       );
     case 'climate':
       return (
-        <ClimateCard
+        <HVACCard
           id={device.id as string}
           name={device.name as string}
-          temperature={device.temperature as number}
-          mode={device.mode as string}
+          room={device.room as string}
+          initialTemp={device.temperature as number | undefined}
+          initialCurrentTemp={device.temperature as number | undefined}
+          initialMode={device.mode as string | undefined}
+          initialState={(device.mode as string | undefined) !== 'off'}
           size={size}
           onSizeChange={handleSizeChange}
           isEditMode={isEditMode}
@@ -87,8 +90,15 @@ export const renderCard = ({
     case 'media':
       return (
         <MediaCard
+          id={device.id as string}
+          name={device.name as string}
+          room={device.room as string}
           title={device.title as string}
           artist={device.artist as string}
+          entityPicture={device.entityPicture as string | undefined}
+          state={device.state as 'playing' | 'paused' | 'idle' | 'off'}
+          volume={device.volume as number}
+          isMuted={device.isMuted as boolean}
           size={size}
           onSizeChange={handleSizeChange}
           isEditMode={isEditMode}
