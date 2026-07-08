@@ -1,4 +1,5 @@
 import type { DashboardConfigPayload } from '@/app/utils/dashboard-config';
+import { resolveAddonLocalEndpointUrl } from '@/app/utils/home-assistant-connection-target';
 
 const DASHBOARD_PROFILE_ENDPOINT = '/__navet_profile__/default';
 
@@ -9,7 +10,7 @@ export interface DashboardProfileLoadResult {
 
 export async function loadDashboardProfile(): Promise<DashboardProfileLoadResult> {
   try {
-    const response = await fetch(DASHBOARD_PROFILE_ENDPOINT, {
+    const response = await fetch(resolveAddonLocalEndpointUrl(DASHBOARD_PROFILE_ENDPOINT), {
       cache: 'no-store',
       credentials: 'same-origin',
     });
@@ -41,7 +42,7 @@ export async function loadDashboardProfile(): Promise<DashboardProfileLoadResult
 
 export async function saveDashboardProfile(profile: DashboardConfigPayload): Promise<boolean> {
   try {
-    const response = await fetch(DASHBOARD_PROFILE_ENDPOINT, {
+    const response = await fetch(resolveAddonLocalEndpointUrl(DASHBOARD_PROFILE_ENDPOINT), {
       method: 'PUT',
       cache: 'no-store',
       credentials: 'same-origin',

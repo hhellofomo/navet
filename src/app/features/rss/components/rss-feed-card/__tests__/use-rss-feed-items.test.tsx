@@ -33,9 +33,9 @@ afterEach(() => {
 });
 
 describe('useRSSFeedItems', () => {
-  it('requests the root RSS proxy when the document base URI is nested', async () => {
+  it('requests the ingress-aware RSS proxy when the document base URI is nested', async () => {
     const baseElement = document.createElement('base');
-    baseElement.href = 'http://localhost:3000/navet/storybook/iframe.html';
+    baseElement.href = `${window.location.origin}/api/hassio_ingress/navet_dev/`;
     document.head.append(baseElement);
 
     const providers = [makeProvider('nested-base', 'Nested', 'https://feeds.example.com/rss.xml')];
@@ -56,7 +56,7 @@ describe('useRSSFeedItems', () => {
       await waitFor(() => expect(result.current.isLoading).toBe(false));
 
       const requestedUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
-      expect(requestedUrl.pathname).toBe('/__navet_rss_proxy__');
+      expect(requestedUrl.pathname).toBe('/api/hassio_ingress/navet_dev/__navet_rss_proxy__');
       expect(requestedUrl.searchParams.get('url')).toBe('https://feeds.example.com/rss.xml');
     } finally {
       baseElement.remove();

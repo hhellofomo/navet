@@ -1,4 +1,5 @@
 import type { SessionConfig } from '@/app/session/session';
+import { resolveAddonLocalEndpointUrl } from '@/app/utils/home-assistant-connection-target';
 
 const DASHBOARD_SESSION_ENDPOINT = '/__navet_session__/default';
 
@@ -23,7 +24,7 @@ function isSessionConfig(value: unknown): value is SessionConfig {
 
 export async function loadDashboardSession(): Promise<DashboardSessionLoadResult> {
   try {
-    const response = await fetch(DASHBOARD_SESSION_ENDPOINT, {
+    const response = await fetch(resolveAddonLocalEndpointUrl(DASHBOARD_SESSION_ENDPOINT), {
       cache: 'no-store',
       credentials: 'same-origin',
     });
@@ -50,7 +51,7 @@ export async function loadDashboardSession(): Promise<DashboardSessionLoadResult
 
 export async function saveDashboardSession(session: SessionConfig): Promise<boolean> {
   try {
-    const response = await fetch(DASHBOARD_SESSION_ENDPOINT, {
+    const response = await fetch(resolveAddonLocalEndpointUrl(DASHBOARD_SESSION_ENDPOINT), {
       method: 'PUT',
       cache: 'no-store',
       credentials: 'same-origin',
