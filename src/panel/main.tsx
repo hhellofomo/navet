@@ -1,5 +1,5 @@
 import type { HassConfig, HassEntities, HassUser } from 'home-assistant-js-websocket';
-import leafletStyles from 'leaflet/dist/leaflet.css?inline';
+import leafletStylesUrl from 'leaflet/dist/leaflet.css?url';
 import { useCallback, useEffect } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { useShallow } from 'zustand/react/shallow';
@@ -17,21 +17,68 @@ import { settingsSelectors } from '@/app/stores/selectors';
 import { useSettingsStore } from '@/app/stores/settings-store';
 import { resolveEffectsQuality } from '@/app/utils/effects-quality';
 import { clearViewportCssVars, syncViewportCssVars } from '@/app/utils/viewport';
-import navetPanelStyles from '@/styles/index.css?inline';
+import navetPanelStylesUrl from '@/styles/index.css?url';
 
 window.__NAVET_PANEL__ = true;
 
-const PANEL_STYLE_ID = 'navet-panel-styles';
+const PANEL_STYLESHEET_IDS = ['navet-panel-styles', 'navet-panel-leaflet-styles'] as const;
+const PANEL_STYLESHEET_LOAD_TIMEOUT_MS = 3000;
+let panelStylesReadyPromise: Promise<void> | null = null;
 
-function ensurePanelStyles() {
-  if (document.getElementById(PANEL_STYLE_ID)) {
-    return;
+function waitForStylesheet(link: HTMLLinkElement) {
+  if (link.sheet) {
+    return Promise.resolve();
   }
 
-  const style = document.createElement('style');
-  style.id = PANEL_STYLE_ID;
-  style.textContent = `${navetPanelStyles}\n${leafletStyles}`;
-  document.head.append(style);
+  return new Promise<void>((resolve) => {
+    const timeout = window.setTimeout(resolve, PANEL_STYLESHEET_LOAD_TIMEOUT_MS);
+    const finish = () => {
+      window.clearTimeout(timeout);
+      link.removeEventListener('load', finish);
+      link.removeEventListener('error', finish);
+      resolve();
+    };
+
+    link.addEventListener('load', finish, { once: true });
+    link.addEventListener('error', finish, { once: true });
+  });
+}
+
+function ensurePanelStyles() {
+  if (panelStylesReadyPromise) {
+    return panelStylesReadyPromise;
+  }
+
+  const stylesheets = [
+    { id: PANEL_STYLESHEET_IDS[0], href: navetPanelStylesUrl },
+    { id: PANEL_STYLESHEET_IDS[1], href: leafletStylesUrl },
+  ];
+  const links: HTMLLinkElement[] = [];
+
+  for (const { id, href } of stylesheets) {
+    const existing = document.getElementById(id);
+
+    if (existing instanceof HTMLLinkElement) {
+      if (existing.href !== new URL(href, document.baseURI).href) {
+        existing.href = href;
+      }
+      links.push(existing);
+      continue;
+    }
+
+    existing?.remove();
+
+    const link = document.createElement('link');
+    link.id = id;
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.append(link);
+    links.push(link);
+  }
+
+  panelStylesReadyPromise = Promise.all(links.map(waitForStylesheet)).then(() => undefined);
+
+  return panelStylesReadyPromise;
 }
 
 interface HomeAssistantPanelRoute {
@@ -137,19 +184,28 @@ class NavetPanelElement extends HTMLElement {
     panel: null,
   };
   private renderQueued = false;
+  private stylesReady = false;
 
   connectedCallback() {
-    ensurePanelStyles();
-
     this.style.display = 'block';
     this.style.height = '100%';
     this.style.minHeight = '100dvh';
+    this.style.visibility = 'hidden';
 
-    if (!this.root) {
-      this.root = createRoot(this);
-    }
+    void ensurePanelStyles().then(() => {
+      if (!this.isConnected) {
+        return;
+      }
 
-    this.queueRender();
+      this.stylesReady = true;
+      this.style.visibility = '';
+
+      if (!this.root) {
+        this.root = createRoot(this);
+      }
+
+      this.queueRender();
+    });
   }
 
   disconnectedCallback() {
@@ -185,7 +241,7 @@ class NavetPanelElement extends HTMLElement {
   }
 
   private queueRender() {
-    if (!this.root || this.renderQueued) {
+    if (!this.stylesReady || !this.root || this.renderQueued) {
       return;
     }
 

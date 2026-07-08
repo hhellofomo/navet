@@ -4,6 +4,20 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '.github/workflows/pages-demo.yml'
+      - '.storybook/**'
+      - 'docs/marketing/assets/screenshots/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'public/demo/**'
+      - 'src/**/*.stories.*'
+      - 'src/app/demo/**'
+      - 'src/app/storybook/**'
+      - 'src/app/ui-kit/**'
+      - 'src/main.tsx'
+      - 'src/styles/**'
+      - 'vite.config.ts'
   workflow_dispatch:
 
 permissions:
