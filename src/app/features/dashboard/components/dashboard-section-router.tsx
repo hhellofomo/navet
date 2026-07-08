@@ -175,10 +175,14 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
               updateCardSize={updateCardSize}
               isEditMode={isEditMode}
               hiddenEntityCount={hiddenEntityIds.length}
+              allCustomCards={controller.allCustomCards}
+              cardZones={controller.cardZones}
               onOpenAddEntityDialog={
                 addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined
               }
               onOpenBuilder={() => controller.setActiveSection('mock')}
+              onDeleteCard={handleDeleteCard}
+              onUpdateCard={handleUpdateCard}
               setActiveSection={controller.setActiveSection}
             />
           </RenderProfiler>
