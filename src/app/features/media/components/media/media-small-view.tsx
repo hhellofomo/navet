@@ -53,31 +53,47 @@ export function MediaSmallView({
   const palette = useMediaArtworkColors(artwork, theme, entityId, `${title}::${artist}`);
   const controlSizes = getCardActionControlSizes('small');
   const primaryControlSizes = getCardActionControlSizes('medium');
+  const subduedFallback = !artwork && !isActive;
   const backgroundBaseStyle = {
-    background: `radial-gradient(circle at 18% 14%, ${withAlpha(
-      palette.highlight,
-      0.12
-    )} 0%, transparent 34%), linear-gradient(165deg, ${withAlpha(
-      palette.dominant,
-      0.94
-    )} 0%, ${withAlpha(palette.dominant, 0.88)} 42%, ${withAlpha(palette.gradientEnd, 0.94)} 100%)`,
+    background: subduedFallback
+      ? `linear-gradient(165deg, ${withAlpha(palette.dominant, 0.18)} 0%, ${withAlpha(
+          palette.dominant,
+          0.14
+        )} 42%, ${withAlpha(palette.gradientEnd, 0.2)} 100%)`
+      : `radial-gradient(circle at 18% 14%, ${withAlpha(
+          palette.highlight,
+          0.12
+        )} 0%, transparent 34%), linear-gradient(165deg, ${withAlpha(
+          palette.dominant,
+          0.94
+        )} 0%, ${withAlpha(palette.dominant, 0.88)} 42%, ${withAlpha(
+          palette.gradientEnd,
+          0.94
+        )} 100%)`,
   };
   const colorTintStyle = {
-    background: `linear-gradient(160deg, ${withAlpha(palette.dominant, 0.52)} 0%, ${withAlpha(
-      palette.dominant,
-      0.58
-    )} 48%, ${withAlpha(palette.darkMuted, 0.62)} 100%)`,
+    background: subduedFallback
+      ? `linear-gradient(160deg, ${withAlpha(palette.dominant, 0.12)} 0%, ${withAlpha(
+          palette.dominant,
+          0.14
+        )} 48%, ${withAlpha(palette.darkMuted, 0.18)} 100%)`
+      : `linear-gradient(160deg, ${withAlpha(palette.dominant, 0.52)} 0%, ${withAlpha(
+          palette.dominant,
+          0.58
+        )} 48%, ${withAlpha(palette.darkMuted, 0.62)} 100%)`,
   };
   const readabilityGradientStyle = {
-    background: `radial-gradient(circle at 50% 46%, ${withAlpha(
-      palette.highlight,
-      0.08
-    )} 0%, transparent 34%), linear-gradient(180deg, rgba(0,0,0,0.36) 0%, rgba(0,0,0,0.16) 42%, rgba(0,0,0,0.28) 68%, rgba(0,0,0,0.46) 100%)`,
+    background: subduedFallback
+      ? `linear-gradient(180deg, rgba(0,0,0,0.24) 0%, rgba(0,0,0,0.1) 42%, rgba(0,0,0,0.16) 68%, rgba(0,0,0,0.28) 100%)`
+      : `radial-gradient(circle at 50% 46%, ${withAlpha(
+          palette.highlight,
+          0.08
+        )} 0%, transparent 34%), linear-gradient(180deg, rgba(0,0,0,0.36) 0%, rgba(0,0,0,0.16) 42%, rgba(0,0,0,0.28) 68%, rgba(0,0,0,0.46) 100%)`,
   };
   const artworkAtmosphereStyle = {
     background: `radial-gradient(circle at 50% 50%, ${withAlpha(
       palette.dominant,
-      0.12
+      subduedFallback ? 0.05 : 0.12
     )} 0%, transparent 72%)`,
   };
 
@@ -103,7 +119,7 @@ export function MediaSmallView({
         <MediaFallbackArtwork
           palette={palette}
           compact
-          className="absolute inset-0 opacity-72"
+          className={`absolute inset-0 ${subduedFallback ? 'opacity-28' : 'opacity-72'}`}
           style={{ transform: 'scale(1.02)' }}
         />
       )}

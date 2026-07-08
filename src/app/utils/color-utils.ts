@@ -24,19 +24,42 @@ export const getGradientColors = (
   theme: ThemeType = 'dark'
 ): GradientColors => {
   if (!isOn) {
-    return theme === 'light'
-      ? {
-          from: 'from-gray-100/60',
-          to: 'to-gray-200/40',
-          border: 'border-gray-200/50',
-          glow: 'transparent',
-        }
-      : {
-          from: 'from-gray-900/20',
-          to: 'to-gray-950/20',
-          border: 'border-gray-500/10',
-          glow: 'transparent',
-        };
+    if (theme === 'light') {
+      return {
+        from: 'from-gray-100/60',
+        to: 'to-gray-200/40',
+        border: 'border-gray-200/50',
+        glow: 'transparent',
+      };
+    }
+
+    if (theme === 'glass') {
+      return {
+        from: 'from-white/12',
+        to: 'to-white/04',
+        border: 'border-white/18',
+        glow: 'transparent',
+        customGradient:
+          'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 52%, rgba(255,255,255,0.04) 100%)',
+      };
+    }
+
+    if (theme === 'contrast') {
+      return {
+        from: 'from-black',
+        to: 'to-black',
+        border: 'border-white/16',
+        glow: 'transparent',
+        customGradient: 'linear-gradient(135deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 100%)',
+      };
+    }
+
+    return {
+      from: 'from-gray-900/32',
+      to: 'to-gray-950/24',
+      border: 'border-gray-500/10',
+      glow: 'transparent',
+    };
   }
 
   if (selectedColor) {

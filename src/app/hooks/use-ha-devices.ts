@@ -1,5 +1,5 @@
-import type { HassEntity } from 'home-assistant-js-websocket';
-import { useMemo } from 'react';
+import type { Connection, HassEntity } from 'home-assistant-js-websocket';
+import { useEffect, useMemo, useState } from 'react';
 import type {
   ClimateDevice,
   CoverDevice,
@@ -10,15 +10,89 @@ import type {
   MediaDevice,
   PersonDevice,
   SwitchDevice,
+  VacuumDevice,
+  WeatherDevice,
 } from '../types/device.types';
 import { UNKNOWN_ROOM_LABEL } from '../utils/device-location';
 import { useHomeAssistant } from './use-home-assistant';
+
+type WeatherForecastEntry = Record<string, unknown>;
+
+type WeatherForecastServicePayload = {
+  response?: Record<
+    string,
+    {
+      forecast?: WeatherForecastEntry[];
+    }
+  >;
+};
+
+type WeatherForecastServiceEnvelope = WeatherForecastServicePayload & {
+  result?: WeatherForecastServicePayload;
+};
+
+async function fetchWeatherForecast(
+  connection: Connection,
+  entityId: string
+): Promise<WeatherForecastEntry[]> {
+  const response = (await connection.sendMessagePromise({
+    type: 'call_service',
+    domain: 'weather',
+    service: 'get_forecasts',
+    target: { entity_id: entityId },
+    service_data: { type: 'daily' },
+    return_response: true,
+  })) as WeatherForecastServiceEnvelope;
+
+  const payload = response?.result?.response ? response.result : response;
+  const forecast = payload?.response?.[entityId]?.forecast;
+  return Array.isArray(forecast) ? forecast : [];
+}
 
 /**
  * Maps Home Assistant entities to Navet device structure
  */
 export const useHADevices = (): DeviceCollection => {
-  const { areas, deviceRegistry, entities, entityRegistry } = useHomeAssistant();
+  const { areas, connection, deviceRegistry, entities, entityRegistry } = useHomeAssistant();
+  const primaryWeatherEntityId = useMemo(() => {
+    if (!entities) {
+      return null;
+    }
+
+    return Object.keys(entities).find((entityId) => entityId.startsWith('weather.')) ?? null;
+  }, [entities]);
+  const [weatherForecasts, setWeatherForecasts] = useState<Record<string, WeatherForecastEntry[]>>(
+    {}
+  );
+
+  useEffect(() => {
+    if (!connection || !primaryWeatherEntityId) {
+      setWeatherForecasts({});
+      return;
+    }
+
+    let cancelled = false;
+
+    void fetchWeatherForecast(connection, primaryWeatherEntityId)
+      .then((forecast) => {
+        if (cancelled) {
+          return;
+        }
+
+        setWeatherForecasts({ [primaryWeatherEntityId]: forecast });
+      })
+      .catch(() => {
+        if (cancelled) {
+          return;
+        }
+
+        setWeatherForecasts({});
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [connection, primaryWeatherEntityId]);
 
   return useMemo(() => {
     const brightnessToPercent = (entityId: string, entity: HassEntity): number => {
@@ -84,6 +158,11 @@ export const useHADevices = (): DeviceCollection => {
       }
 
       return null;
+    };
+
+    const parseRoundedNumberish = (value: unknown): number | null => {
+      const parsed = parseNumberish(value);
+      return parsed === null ? null : Math.round(parsed);
     };
 
     const toWatts = (value: number, unit: unknown): number => {
@@ -152,6 +231,10 @@ export const useHADevices = (): DeviceCollection => {
       };
     }
 
+    const sunEntity = entities['sun.sun'];
+    const sunEntitySunrise = sunEntity?.attributes?.next_rising;
+    const sunEntitySunset = sunEntity?.attributes?.next_setting;
+
     // Process entities into device collections
     const lights: LightDevice[] = [];
     const switches: SwitchDevice[] = [];
@@ -160,6 +243,8 @@ export const useHADevices = (): DeviceCollection => {
     const persons: PersonDevice[] = [];
     const covers: CoverDevice[] = [];
     const locks: LockDevice[] = [];
+    const vacuums: VacuumDevice[] = [];
+    const weather: WeatherDevice[] = [];
     const areaMap = new Map(areas.map((area) => [area.area_id, area.name]));
     const entityRegistryMap = new Map(
       entityRegistry.map((registryEntry) => [registryEntry.entity_id, registryEntry])
@@ -193,6 +278,39 @@ export const useHADevices = (): DeviceCollection => {
     // Helper function to get friendly name or entity id
     const getName = (entity: HassEntity): string => {
       return entity.attributes?.friendly_name || entity.entity_id;
+    };
+
+    const formatClock = (value: unknown): string => {
+      if (typeof value !== 'string' || !value) {
+        return '--';
+      }
+
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) {
+        return value;
+      }
+
+      return date.toLocaleTimeString([], {
+        hour: 'numeric',
+        minute: '2-digit',
+      });
+    };
+
+    const formatDaylight = (sunrise: unknown, sunset: unknown): string => {
+      if (typeof sunrise !== 'string' || typeof sunset !== 'string') {
+        return '--';
+      }
+
+      const sunriseDate = new Date(sunrise);
+      const sunsetDate = new Date(sunset);
+      if (Number.isNaN(sunriseDate.getTime()) || Number.isNaN(sunsetDate.getTime())) {
+        return '--';
+      }
+
+      const diffMs = Math.max(0, sunsetDate.getTime() - sunriseDate.getTime());
+      const hours = Math.floor(diffMs / 3_600_000);
+      const minutes = Math.round((diffMs % 3_600_000) / 60_000);
+      return `${hours} h ${minutes} m`;
     };
 
     const inferMetricIcon = (
@@ -496,7 +614,17 @@ export const useHADevices = (): DeviceCollection => {
             room,
             size: 'medium',
             temperature: parseFloat(entity.attributes?.temperature) || 0,
-            mode: entity.attributes?.hvac_mode || 'off',
+            currentTemperature:
+              parseNumberish(entity.attributes?.current_temperature) ??
+              (parseFloat(entity.attributes?.temperature ?? '0') || 0),
+            mode:
+              (typeof entity.state === 'string' && entity.state) ||
+              (typeof entity.attributes?.hvac_mode === 'string' && entity.attributes.hvac_mode) ||
+              'off',
+            action:
+              (typeof entity.attributes?.hvac_action === 'string' &&
+                entity.attributes.hvac_action) ||
+              undefined,
           });
           break;
 
@@ -592,6 +720,140 @@ export const useHADevices = (): DeviceCollection => {
             state: entity.state === 'locked',
           });
           break;
+
+        case 'vacuum': {
+          const batteryLevel = parseNumberish(entity.attributes?.battery_level);
+          const cleanedAreaValue =
+            parseNumberish(entity.attributes?.cleaned_area) ??
+            parseNumberish(entity.attributes?.cleaned_area_today) ??
+            parseNumberish(entity.attributes?.last_cleaned_area);
+          const cleaningTimeMinutes =
+            parseNumberish(entity.attributes?.cleaning_time) ??
+            parseNumberish(entity.attributes?.clean_time) ??
+            parseNumberish(entity.attributes?.cleaning_duration);
+
+          const normalizedStatus: VacuumDevice['status'] =
+            entity.state === 'cleaning'
+              ? 'cleaning'
+              : entity.state === 'returning' || entity.state === 'returning_home'
+                ? 'returning'
+                : entity.state === 'paused'
+                  ? 'paused'
+                  : entity.state === 'docked'
+                    ? 'docked'
+                    : 'idle';
+
+          vacuums.push({
+            id: entityId,
+            name,
+            room,
+            size: 'medium',
+            status: normalizedStatus,
+            battery:
+              typeof batteryLevel === 'number' ? Math.max(0, Math.min(100, batteryLevel)) : 0,
+            cleanedArea:
+              typeof cleanedAreaValue === 'number'
+                ? `${cleanedAreaValue.toFixed(cleanedAreaValue >= 10 ? 0 : 1)} m²`
+                : undefined,
+            cleaningTime:
+              typeof cleaningTimeMinutes === 'number'
+                ? `${Math.max(0, Math.round(cleaningTimeMinutes))} min`
+                : undefined,
+          });
+          break;
+        }
+
+        case 'weather': {
+          if (entityId !== primaryWeatherEntityId) {
+            break;
+          }
+
+          const forecastSource = Array.isArray(weatherForecasts[entityId])
+            ? weatherForecasts[entityId]
+            : Array.isArray(entity.attributes?.forecast)
+              ? (entity.attributes.forecast as WeatherForecastEntry[])
+              : [];
+
+          const forecast = forecastSource
+            .slice(0, 7)
+            .map((entry: Record<string, unknown>, index) => {
+              const forecastDate =
+                typeof entry.datetime === 'string'
+                  ? new Date(entry.datetime)
+                  : typeof entry.datetime === 'number'
+                    ? new Date(entry.datetime)
+                    : null;
+              const dayLabel =
+                forecastDate && !Number.isNaN(forecastDate.getTime())
+                  ? index === 0
+                    ? 'Today'
+                    : forecastDate.toLocaleDateString([], { weekday: 'short' })
+                  : index === 0
+                    ? 'Today'
+                    : `Day ${index + 1}`;
+
+              return {
+                day: dayLabel,
+                condition: (typeof entry.condition === 'string' && entry.condition) || entity.state,
+                high: parseRoundedNumberish(entry.temperature) ?? 0,
+                low: parseRoundedNumberish(entry.templow) ?? 0,
+              };
+            });
+
+          const highTemp =
+            forecast[0]?.high ??
+            parseRoundedNumberish(entity.attributes?.temperature) ??
+            parseRoundedNumberish(entity.attributes?.native_temperature) ??
+            0;
+          const lowTemp = forecast[0]?.low ?? highTemp;
+
+          const sunriseSource = sunEntitySunrise ?? entity.attributes?.sunrise;
+          const sunsetSource = sunEntitySunset ?? entity.attributes?.sunset;
+
+          weather.push({
+            id: entityId,
+            name,
+            room,
+            size: 'large',
+            location: name,
+            temperature:
+              parseRoundedNumberish(entity.attributes?.temperature) ??
+              parseRoundedNumberish(entity.attributes?.native_temperature) ??
+              0,
+            condition: entity.state,
+            humidity: parseNumberish(entity.attributes?.humidity) ?? 0,
+            windSpeed:
+              parseNumberish(entity.attributes?.wind_speed) ??
+              parseNumberish(entity.attributes?.native_wind_speed) ??
+              0,
+            pressure:
+              parseNumberish(entity.attributes?.pressure) ??
+              parseNumberish(entity.attributes?.native_pressure) ??
+              0,
+            precipitation:
+              parseNumberish(entity.attributes?.precipitation_probability) ??
+              parseNumberish(entity.attributes?.precipitation) ??
+              0,
+            sunrise: formatClock(sunriseSource),
+            sunset: formatClock(sunsetSource),
+            daylight: formatDaylight(sunriseSource, sunsetSource),
+            rainForecast:
+              forecastSource[1] &&
+              parseNumberish(
+                (forecastSource[1] as Record<string, unknown>).precipitation_probability
+              ) !== null
+                ? `${Math.round(
+                    parseNumberish(
+                      (forecastSource[1] as Record<string, unknown>).precipitation_probability
+                    ) ?? 0
+                  )}% chance of rain tomorrow`
+                : '',
+            highTemp,
+            lowTemp,
+            forecast,
+          });
+          break;
+        }
       }
     });
 
@@ -601,17 +863,17 @@ export const useHADevices = (): DeviceCollection => {
       climate,
       media,
       power: [],
-      weather: [],
+      weather,
       wifi: [],
       switches,
       covers,
       locks,
       persons,
       sensors: [],
-      vacuums: [],
+      vacuums,
       rssFeeds: [],
       calendars: [],
       'grouped-sensors': [],
     };
-  }, [areas, deviceRegistry, entities, entityRegistry]);
+  }, [areas, deviceRegistry, entities, entityRegistry, primaryWeatherEntityId, weatherForecasts]);
 };

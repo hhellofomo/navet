@@ -22,6 +22,7 @@ interface ThemeColors {
   media: {
     gradient: string;
     border: string;
+    off: { gradient: string; border: string };
   };
   switch: {
     on: { gradient: string; border: string; iconBg: string; accent: string; glow: string };
@@ -86,8 +87,49 @@ const colorMap: Record<PrimaryColor, string> = {
   teal: 'teal',
 };
 
+const getInactiveThemeTone = (themeType: ThemeType) => {
+  if (themeType === 'light') {
+    return {
+      gradient: 'from-gray-100/60 to-gray-200/40',
+      border: 'border-gray-200/50',
+      iconBg: 'bg-gray-300/35',
+      accent: 'text-gray-500',
+      glow: 'transparent',
+    };
+  }
+
+  if (themeType === 'glass') {
+    return {
+      gradient: 'from-white/12 via-white/06 to-white/04',
+      border: 'border-white/18',
+      iconBg: 'bg-white/10',
+      accent: 'text-white/80',
+      glow: 'transparent',
+    };
+  }
+
+  if (themeType === 'contrast') {
+    return {
+      gradient: 'from-black via-black to-black',
+      border: 'border-white/16',
+      iconBg: 'bg-white/10',
+      accent: 'text-gray-300',
+      glow: 'transparent',
+    };
+  }
+
+  return {
+    gradient: 'from-gray-900/32 to-gray-950/24',
+    border: 'border-gray-500/10',
+    iconBg: 'bg-white/6',
+    accent: 'text-gray-300',
+    glow: 'transparent',
+  };
+};
+
 const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): ThemeColors => {
   const color = colorMap[primaryColor];
+  const inactiveTone = getInactiveThemeTone(themeType);
 
   if (themeType === 'dark') {
     return {
@@ -112,17 +154,15 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: 'text-cyan-400',
           glow: 'from-cyan-500/10',
         },
-        off: {
-          gradient: 'from-gray-800/95 to-gray-900/95',
-          border: 'border-white/14',
-          iconBg: 'bg-white/10',
-          accent: 'text-gray-100',
-          glow: 'from-white/8',
-        },
+        off: inactiveTone,
       },
       media: {
         gradient: 'from-pink-500/10',
         border: 'border-pink-700/20',
+        off: {
+          gradient: inactiveTone.gradient,
+          border: inactiveTone.border,
+        },
       },
       switch: {
         on: {
@@ -132,13 +172,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: `text-${color}-400`,
           glow: `from-${color}-500/10`,
         },
-        off: {
-          gradient: 'from-gray-800/95 to-gray-900/95',
-          border: 'border-white/14',
-          iconBg: 'bg-white/10',
-          accent: 'text-gray-100',
-          glow: 'from-white/8',
-        },
+        off: inactiveTone,
       },
       cover: {
         open: {
@@ -148,13 +182,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: `text-${color}-400`,
           glow: `from-${color}-500/10`,
         },
-        closed: {
-          gradient: 'from-gray-800/95 to-gray-900/95',
-          border: 'border-white/14',
-          iconBg: 'bg-white/10',
-          accent: 'text-gray-100',
-          glow: 'from-white/8',
-        },
+        closed: inactiveTone,
       },
       lock: {
         locked: {
@@ -180,13 +208,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: `text-${color}-400`,
           glow: `from-${color}-500/10`,
         },
-        away: {
-          gradient: 'from-gray-800/95 to-gray-900/95',
-          border: 'border-white/14',
-          iconBg: 'bg-white/10',
-          accent: 'text-gray-100',
-          glow: 'from-white/8',
-        },
+        away: inactiveTone,
       },
       sensor: {
         gradient: `from-${color}-900/90 to-${color}-950/95`,
@@ -210,13 +232,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: 'text-purple-400',
           glow: 'from-purple-500/10',
         },
-        docked: {
-          gradient: `from-${color}-900/90 to-${color}-950/95`,
-          border: `border-${color}-700/30`,
-          iconBg: `bg-${color}-500/20`,
-          accent: `text-${color}-400`,
-          glow: `from-${color}-500/10`,
-        },
+        docked: inactiveTone,
         paused: {
           gradient: 'from-yellow-900/90 to-yellow-950/95',
           border: 'border-yellow-700/30',
@@ -268,17 +284,15 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: 'text-cyan-600',
           glow: 'from-cyan-300/30',
         },
-        off: {
-          gradient: 'from-gray-100/98 to-white/94',
-          border: 'border-gray-300/80',
-          iconBg: 'bg-gray-400/40',
-          accent: 'text-gray-700',
-          glow: 'from-white/40',
-        },
+        off: inactiveTone,
       },
       media: {
         gradient: 'from-pink-200/80',
         border: 'border-pink-300/50',
+        off: {
+          gradient: inactiveTone.gradient,
+          border: inactiveTone.border,
+        },
       },
       switch: {
         on: {
@@ -288,13 +302,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: `text-${color}-600`,
           glow: `from-${color}-300/30`,
         },
-        off: {
-          gradient: 'from-gray-100/98 to-white/94',
-          border: 'border-gray-300/80',
-          iconBg: 'bg-gray-400/40',
-          accent: 'text-gray-700',
-          glow: 'from-white/40',
-        },
+        off: inactiveTone,
       },
       cover: {
         open: {
@@ -304,13 +312,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: `text-${color}-600`,
           glow: `from-${color}-300/30`,
         },
-        closed: {
-          gradient: 'from-gray-100/98 to-white/94',
-          border: 'border-gray-300/80',
-          iconBg: 'bg-gray-400/40',
-          accent: 'text-gray-700',
-          glow: 'from-white/40',
-        },
+        closed: inactiveTone,
       },
       lock: {
         locked: {
@@ -336,13 +338,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: `text-${color}-600`,
           glow: `from-${color}-300/30`,
         },
-        away: {
-          gradient: 'from-gray-100/98 to-white/94',
-          border: 'border-gray-300/80',
-          iconBg: 'bg-gray-400/40',
-          accent: 'text-gray-700',
-          glow: 'from-white/40',
-        },
+        away: inactiveTone,
       },
       sensor: {
         gradient: `from-${color}-200/95 to-${color}-100/90`,
@@ -366,13 +362,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: 'text-purple-600',
           glow: 'from-purple-300/30',
         },
-        docked: {
-          gradient: `from-${color}-200/95 to-${color}-100/90`,
-          border: `border-${color}-300/60`,
-          iconBg: `bg-${color}-400/50`,
-          accent: `text-${color}-600`,
-          glow: `from-${color}-300/30`,
-        },
+        docked: inactiveTone,
         paused: {
           gradient: 'from-yellow-200/95 to-yellow-100/90',
           border: 'border-yellow-300/60',
@@ -424,17 +414,15 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: 'text-cyan-200',
           glow: 'from-cyan-300/18',
         },
-        off: {
-          gradient: 'from-white/22 via-white/12 to-white/10',
-          border: 'border-white/26',
-          iconBg: 'bg-white/14',
-          accent: 'text-white',
-          glow: 'from-white/12',
-        },
+        off: inactiveTone,
       },
       media: {
         gradient: 'from-pink-200/18',
         border: 'border-white/22',
+        off: {
+          gradient: inactiveTone.gradient,
+          border: inactiveTone.border,
+        },
       },
       switch: {
         on: {
@@ -444,13 +432,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: 'text-white',
           glow: `from-${color}-300/18`,
         },
-        off: {
-          gradient: 'from-white/22 via-white/12 to-white/10',
-          border: 'border-white/26',
-          iconBg: 'bg-white/14',
-          accent: 'text-white',
-          glow: 'from-white/12',
-        },
+        off: inactiveTone,
       },
       cover: {
         open: {
@@ -460,13 +442,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: 'text-white',
           glow: `from-${color}-300/18`,
         },
-        closed: {
-          gradient: 'from-white/22 via-white/12 to-white/10',
-          border: 'border-white/26',
-          iconBg: 'bg-white/14',
-          accent: 'text-white',
-          glow: 'from-white/12',
-        },
+        closed: inactiveTone,
       },
       lock: {
         locked: {
@@ -492,13 +468,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: 'text-white',
           glow: `from-${color}-300/18`,
         },
-        away: {
-          gradient: 'from-white/22 via-white/12 to-white/10',
-          border: 'border-white/26',
-          iconBg: 'bg-white/14',
-          accent: 'text-white',
-          glow: 'from-white/12',
-        },
+        away: inactiveTone,
       },
       sensor: {
         gradient: `from-white/24 via-${color}-200/18 to-white/10`,
@@ -522,13 +492,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: 'text-white',
           glow: 'from-purple-300/18',
         },
-        docked: {
-          gradient: `from-white/24 via-${color}-200/18 to-white/10`,
-          border: 'border-white/22',
-          iconBg: `bg-${color}-300/20`,
-          accent: 'text-white',
-          glow: `from-${color}-300/18`,
-        },
+        docked: inactiveTone,
         paused: {
           gradient: 'from-white/24 via-yellow-200/18 to-white/10',
           border: 'border-white/22',
@@ -580,17 +544,15 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: 'text-cyan-300',
           glow: 'from-cyan-400/18',
         },
-        off: {
-          gradient: 'from-black via-black to-black',
-          border: 'border-white/35',
-          iconBg: 'bg-white/16',
-          accent: 'text-white',
-          glow: 'from-white/12',
-        },
+        off: inactiveTone,
       },
       media: {
         gradient: 'from-pink-400/18',
         border: 'border-pink-400/45',
+        off: {
+          gradient: inactiveTone.gradient,
+          border: inactiveTone.border,
+        },
       },
       switch: {
         on: {
@@ -600,13 +562,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: `text-${color}-300`,
           glow: `from-${color}-400/18`,
         },
-        off: {
-          gradient: 'from-black via-black to-black',
-          border: 'border-white/35',
-          iconBg: 'bg-white/16',
-          accent: 'text-white',
-          glow: 'from-white/12',
-        },
+        off: inactiveTone,
       },
       cover: {
         open: {
@@ -616,13 +572,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: `text-${color}-300`,
           glow: `from-${color}-400/18`,
         },
-        closed: {
-          gradient: 'from-black via-black to-black',
-          border: 'border-white/35',
-          iconBg: 'bg-white/16',
-          accent: 'text-white',
-          glow: 'from-white/12',
-        },
+        closed: inactiveTone,
       },
       lock: {
         locked: {
@@ -648,13 +598,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: `text-${color}-300`,
           glow: `from-${color}-400/18`,
         },
-        away: {
-          gradient: 'from-black via-black to-black',
-          border: 'border-white/35',
-          iconBg: 'bg-white/16',
-          accent: 'text-white',
-          glow: 'from-white/12',
-        },
+        away: inactiveTone,
       },
       sensor: {
         gradient: `from-black via-black to-${color}-950`,
@@ -678,13 +622,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
           accent: 'text-purple-300',
           glow: 'from-purple-400/18',
         },
-        docked: {
-          gradient: `from-black via-black to-${color}-950`,
-          border: `border-${color}-400/85`,
-          iconBg: `bg-${color}-500/30`,
-          accent: `text-${color}-300`,
-          glow: `from-${color}-400/18`,
-        },
+        docked: inactiveTone,
         paused: {
           gradient: 'from-black via-black to-yellow-950',
           border: 'border-yellow-400/85',
@@ -735,17 +673,15 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
         accent: 'text-cyan-300',
         glow: 'from-cyan-400/20',
       },
-      off: {
-        gradient: 'from-gray-900 to-black',
-        border: 'border-white/18',
-        iconBg: 'bg-white/10',
-        accent: 'text-gray-100',
-        glow: 'from-white/10',
-      },
+      off: inactiveTone,
     },
     media: {
       gradient: 'from-pink-400/20',
       border: 'border-pink-400/40',
+      off: {
+        gradient: inactiveTone.gradient,
+        border: inactiveTone.border,
+      },
     },
     switch: {
       on: {
@@ -755,13 +691,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
         accent: `text-${color}-300`,
         glow: `from-${color}-400/20`,
       },
-      off: {
-        gradient: 'from-gray-900 to-black',
-        border: 'border-white/18',
-        iconBg: 'bg-white/10',
-        accent: 'text-gray-100',
-        glow: 'from-white/10',
-      },
+      off: inactiveTone,
     },
     cover: {
       open: {
@@ -771,13 +701,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
         accent: `text-${color}-300`,
         glow: `from-${color}-400/20`,
       },
-      closed: {
-        gradient: 'from-gray-900 to-black',
-        border: 'border-white/18',
-        iconBg: 'bg-white/10',
-        accent: 'text-gray-100',
-        glow: 'from-white/10',
-      },
+      closed: inactiveTone,
     },
     lock: {
       locked: {
@@ -803,13 +727,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
         accent: `text-${color}-300`,
         glow: `from-${color}-400/20`,
       },
-      away: {
-        gradient: 'from-gray-900 to-black',
-        border: 'border-white/18',
-        iconBg: 'bg-white/10',
-        accent: 'text-gray-100',
-        glow: 'from-white/10',
-      },
+      away: inactiveTone,
     },
     sensor: {
       gradient: `from-black via-${color}-950 to-${color}-900`,
@@ -833,13 +751,7 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
         accent: 'text-purple-300',
         glow: 'from-purple-400/20',
       },
-      docked: {
-        gradient: `from-black via-${color}-950 to-${color}-900`,
-        border: `border-${color}-400/80`,
-        iconBg: `bg-${color}-500/30`,
-        accent: `text-${color}-300`,
-        glow: `from-${color}-400/20`,
-      },
+      docked: inactiveTone,
       paused: {
         gradient: 'from-black via-yellow-950 to-yellow-900',
         border: 'border-yellow-400/80',

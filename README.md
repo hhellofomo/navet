@@ -44,10 +44,11 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 
 ### 🛠️ Functionality
 - **Edit Mode** - Drag-and-drop card reordering and resizing
-- **Custom Widgets** - Add Calendar, News, Weather, Photo Frame, and Quick Note widgets
+- **Custom Widgets** - Add Calendar, News, Photo Frame, and Quick Note widgets
 - **Entity Visibility Control** - Start with all entities, a blank board, or import a saved config, then add/remove entities as needed
 - **Search & Filter** - Real-time search filters dashboard view
 - **All View Modes** - Switch the `All` room between custom, room, type, or flat grouping
+- **Live Weather Entity Card** - Home Assistant weather entities now render as the dashboard weather card with forecast and solar data from Home Assistant
 - **Dashboard Menu** - The room-bar dashboard menu now groups add/view/edit actions plus config export in one dropdown
 - **Notifications** - System notifications panel
 - **Settings** - Comprehensive theme and customization options
@@ -155,8 +156,8 @@ pnpm build
 
 #### Edit Mode
 - Click **Customize**
-- The top action row uses **Add Entity**, **Add Card**, and **Done Editing**
-- **Add widgets** with the Add Card button
+- The top action row uses **Done Editing** plus **Add** and **View** dropdowns
+- **Add widgets** from the **Add** dropdown
 - Use **Add Entity** to bring entities onto the dashboard
 - Use the card remove action to remove entities from the dashboard
 - **Drag cards** to reorder them
@@ -186,7 +187,7 @@ pnpm build
 
 #### Room Navigation
 - Use **room tabs** to filter by room
-- In **All**, use the **Dashboard** dropdown to switch between **Custom**, **Room**, **Type**, and **No Grouping**
+- In **All**, use the **View** dropdown to switch between **Custom**, **Room**, **Type**, and **No Grouping**
 - Device counts shown for each room
 - The selected dashboard section and room both persist across refresh
 
@@ -212,10 +213,9 @@ pnpm build
 
 #### Custom Widgets
 - Click **Add Card** in edit mode to add custom widgets
-- Choose from **5 widget types**:
+- Choose from **4 widget types**:
   - **📅 Calendar** - View upcoming events and appointments
   - **📰 News Feed** - Latest headlines and updates
-  - **☁️ Weather** - Current conditions and 5-day forecast
   - **🖼️ Photo Frame** - Beautiful photo carousel with navigation
   - **📝 Quick Note** - Editable sticky notes for reminders
 - Available in **3 sizes**: Small, Medium, Large

@@ -70,6 +70,7 @@ export const WeatherCard = memo(function WeatherCard({
   const shell = getAccentCardShellTokens(theme, 'blue');
   const isSmall = isCompactCardSize(size);
   const isLarge = size === 'large';
+  const visibleForecast = isLarge ? forecast : forecast.slice(0, 3);
 
   // Get current date and time
   const now = new Date();
@@ -178,10 +179,9 @@ export const WeatherCard = memo(function WeatherCard({
               </div>
             </div>
 
-            {/* Weekly Forecast - Only show on large cards */}
-            {isLarge && (
+            {visibleForecast.length > 0 && (
               <div className="flex justify-between gap-3">
-                {forecast.map((day, index) => (
+                {visibleForecast.map((day, index) => (
                   <div key={index} className="flex-1 text-center min-w-0">
                     <div className={`text-xs ${textSecondary} mb-2`}>{day.day}</div>
                     <WeatherIcon condition={day.condition} className="w-8 h-8 mx-auto mb-2" />

@@ -9,6 +9,7 @@ interface MediaArtworkSurfaceProps {
   imagePaddingClassName?: string;
   imageClassName?: string;
   artRegionClassName?: string;
+  subduedFallback?: boolean;
 }
 
 export function MediaArtworkSurface({
@@ -18,7 +19,9 @@ export function MediaArtworkSurface({
   imagePaddingClassName = 'p-6',
   imageClassName = '',
   artRegionClassName = 'w-[44%]',
+  subduedFallback = false,
 }: MediaArtworkSurfaceProps) {
+  const useSubduedFallback = subduedFallback && !artwork;
   const edgeFadeMask =
     layout === 'split'
       ? 'linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 55%, rgba(0,0,0,0.9) 68%, rgba(0,0,0,0.54) 84%, rgba(0,0,0,0.14) 95%, rgba(0,0,0,0) 100%)'
@@ -35,11 +38,27 @@ export function MediaArtworkSurface({
         className="absolute inset-0"
         style={{
           background:
-            layout === 'split'
-              ? `radial-gradient(circle at 76% 24%, ${withAlpha(palette.highlight, 0.18)} 0%, transparent 28%), radial-gradient(circle at 68% 66%, ${withAlpha(palette.vibrant, 0.24)} 0%, transparent 32%), linear-gradient(90deg, ${withAlpha(palette.dominant, 0.96)} 0%, ${withAlpha(palette.dominant, 0.94)} 28%, ${withAlpha(palette.darkMuted, 0.94)} 62%, ${withAlpha(palette.gradientEnd, 0.98)} 100%)`
-              : layout === 'stacked'
-                ? `radial-gradient(circle at 22% 20%, ${withAlpha(palette.highlight, 0.18)} 0%, transparent 24%), radial-gradient(circle at 68% 54%, ${withAlpha(palette.vibrant, 0.22)} 0%, transparent 32%), linear-gradient(180deg, ${withAlpha(palette.dominant, 0.96)} 0%, ${withAlpha(palette.dominant, 0.94)} 34%, ${withAlpha(palette.darkMuted, 0.94)} 68%, ${withAlpha(palette.gradientEnd, 0.98)} 100%)`
-                : `linear-gradient(135deg, ${palette.dominant} 0%, ${palette.gradientEnd} 100%)`,
+            useSubduedFallback && layout === 'split'
+              ? `linear-gradient(90deg, ${withAlpha(palette.dominant, 0.14)} 0%, ${withAlpha(
+                  palette.dominant,
+                  0.12
+                )} 28%, ${withAlpha(palette.darkMuted, 0.14)} 62%, ${withAlpha(
+                  palette.gradientEnd,
+                  0.18
+                )} 100%)`
+              : useSubduedFallback && layout === 'stacked'
+                ? `linear-gradient(180deg, ${withAlpha(palette.dominant, 0.14)} 0%, ${withAlpha(
+                    palette.dominant,
+                    0.12
+                  )} 34%, ${withAlpha(palette.darkMuted, 0.14)} 68%, ${withAlpha(
+                    palette.gradientEnd,
+                    0.18
+                  )} 100%)`
+                : layout === 'split'
+                  ? `radial-gradient(circle at 76% 24%, ${withAlpha(palette.highlight, 0.18)} 0%, transparent 28%), radial-gradient(circle at 68% 66%, ${withAlpha(palette.vibrant, 0.24)} 0%, transparent 32%), linear-gradient(90deg, ${withAlpha(palette.dominant, 0.96)} 0%, ${withAlpha(palette.dominant, 0.94)} 28%, ${withAlpha(palette.darkMuted, 0.94)} 62%, ${withAlpha(palette.gradientEnd, 0.98)} 100%)`
+                  : layout === 'stacked'
+                    ? `radial-gradient(circle at 22% 20%, ${withAlpha(palette.highlight, 0.18)} 0%, transparent 24%), radial-gradient(circle at 68% 54%, ${withAlpha(palette.vibrant, 0.22)} 0%, transparent 32%), linear-gradient(180deg, ${withAlpha(palette.dominant, 0.96)} 0%, ${withAlpha(palette.dominant, 0.94)} 34%, ${withAlpha(palette.darkMuted, 0.94)} 68%, ${withAlpha(palette.gradientEnd, 0.98)} 100%)`
+                    : `linear-gradient(135deg, ${palette.dominant} 0%, ${palette.gradientEnd} 100%)`,
         }}
       />
       {artwork ? (
@@ -52,7 +71,9 @@ export function MediaArtworkSurface({
       ) : (
         <MediaFallbackArtwork
           palette={palette}
-          className="absolute inset-0 scale-[1.08] blur-[42px] opacity-55"
+          className={`absolute inset-0 scale-[1.08] blur-[42px] ${
+            useSubduedFallback ? 'opacity-24' : 'opacity-55'
+          }`}
         />
       )}
 
@@ -122,7 +143,7 @@ export function MediaArtworkSurface({
           <MediaFallbackArtwork
             palette={palette}
             compact={layout !== 'split'}
-            className="relative h-full w-full"
+            className={`relative h-full w-full ${useSubduedFallback ? 'opacity-42' : ''}`}
           />
         </div>
       )}
@@ -130,18 +151,28 @@ export function MediaArtworkSurface({
       <div
         className="absolute inset-0"
         style={{
-          background: `linear-gradient(180deg, ${withAlpha(palette.highlight, 0.03)} 0%, ${withAlpha(palette.darkMuted, 0.08)} 52%, ${withAlpha(palette.darkMuted, 0.18)} 100%)`,
+          background: `linear-gradient(180deg, ${withAlpha(palette.highlight, useSubduedFallback ? 0.015 : 0.03)} 0%, ${withAlpha(palette.darkMuted, useSubduedFallback ? 0.04 : 0.08)} 52%, ${withAlpha(palette.darkMuted, useSubduedFallback ? 0.08 : 0.18)} 100%)`,
         }}
       />
       <div
         className="absolute inset-0"
         style={{
           background:
-            layout === 'split'
-              ? `linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 64%, ${withAlpha(palette.darkMuted, 0.03)} 82%, ${withAlpha(palette.darkMuted, 0.09)} 100%)`
-              : layout === 'stacked'
-                ? `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 56%, ${withAlpha(palette.darkMuted, 0.04)} 78%, ${withAlpha(palette.darkMuted, 0.1)} 100%)`
-                : `linear-gradient(180deg, rgba(0,0,0,0) 0%, ${withAlpha(palette.darkMuted, 0.12)} 64%, ${withAlpha(palette.darkMuted, 0.28)} 100%)`,
+            useSubduedFallback && layout === 'split'
+              ? `linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 72%, ${withAlpha(
+                  palette.darkMuted,
+                  0.02
+                )} 86%, ${withAlpha(palette.darkMuted, 0.05)} 100%)`
+              : useSubduedFallback && layout === 'stacked'
+                ? `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 64%, ${withAlpha(
+                    palette.darkMuted,
+                    0.02
+                  )} 82%, ${withAlpha(palette.darkMuted, 0.05)} 100%)`
+                : layout === 'split'
+                  ? `linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 64%, ${withAlpha(palette.darkMuted, 0.03)} 82%, ${withAlpha(palette.darkMuted, 0.09)} 100%)`
+                  : layout === 'stacked'
+                    ? `linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 56%, ${withAlpha(palette.darkMuted, 0.04)} 78%, ${withAlpha(palette.darkMuted, 0.1)} 100%)`
+                    : `linear-gradient(180deg, rgba(0,0,0,0) 0%, ${withAlpha(palette.darkMuted, 0.12)} 64%, ${withAlpha(palette.darkMuted, 0.28)} 100%)`,
         }}
       />
     </div>

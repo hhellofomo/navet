@@ -7,7 +7,7 @@ import {
 } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
-import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import { useVacuumControl } from '../vacuum/use-vacuum-control';
@@ -16,7 +16,7 @@ import { VacuumControlsMedium } from '../vacuum/vacuum-controls-medium';
 import { VacuumControlsSmall } from '../vacuum/vacuum-controls-small';
 import { VacuumSettingsDialog } from '../vacuum/vacuum-settings-dialog';
 import { VacuumStatusDisplay } from '../vacuum/vacuum-status-display';
-import type { VacuumStatus } from '../vacuum/vacuum-utils';
+import { getVacuumThemeStatus, type VacuumStatus } from '../vacuum/vacuum-utils';
 
 interface VacuumCardProps {
   id: string;
@@ -51,29 +51,15 @@ export const VacuumCard = memo(function VacuumCard({
     handlePause,
     handleReturnHome,
   } = useVacuumControl({ initialStatus: status });
-  const { theme, primaryColor } = useTheme();
+  const { theme, colors } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
-  const isGlass = theme === 'glass';
-  const accentColorValue = getThemeColorValue(primaryColor);
+  const isActive = currentStatus === 'cleaning' || currentStatus === 'returning';
+  const stateSurface = getCardStateSurfaceTokens(theme, isActive);
+  const cardColors = colors.vacuum[getVacuumThemeStatus(currentStatus)];
 
   const isSmall = isCompactCardSize(size);
   const isMedium = size === 'medium';
   const padding = isSmall ? 'p-4' : 'p-5';
-
-  const cardGradient =
-    theme === 'light'
-      ? 'from-white to-gray-50/80'
-      : isGlass
-        ? 'from-white/16 via-slate-200/8 to-white/[0.03]'
-        : 'from-gray-900/90 to-gray-950/95';
-  const cardBorder =
-    theme === 'light' ? 'border-gray-200/80' : isGlass ? surface.border : 'border-gray-700/30';
-  const glowGradient =
-    theme === 'light'
-      ? 'from-gray-50/40'
-      : isGlass
-        ? 'from-white/10 via-cyan-300/8'
-        : 'from-gray-500/5';
 
   return (
     <div className="h-full w-full relative">
@@ -85,11 +71,18 @@ export const VacuumCard = memo(function VacuumCard({
       )}
 
       <div
-        className={`relative h-full bg-gradient-to-br ${cardGradient} backdrop-blur-xl rounded-3xl ${padding} border ${cardBorder} overflow-hidden ${surface.cardShadow}`}
+        className={`relative h-full bg-gradient-to-br ${cardColors.gradient} backdrop-blur-xl rounded-3xl ${padding} border ${cardColors.border} overflow-hidden ${surface.cardShadow} ${stateSurface.containerClassName}`}
       >
-        <div className={`absolute inset-0 bg-gradient-to-br ${glowGradient} to-transparent`}></div>
+        {isActive && (
+          <div
+            className={`absolute inset-0 bg-gradient-to-br ${cardColors.glow} to-transparent`}
+          ></div>
+        )}
 
         {surface.lightOverlay && <div className={`absolute inset-0 ${surface.lightOverlay}`} />}
+        {stateSurface.overlayClassName && (
+          <div className={`absolute inset-0 ${stateSurface.overlayClassName}`} />
+        )}
 
         <div className="relative h-full flex flex-col">
           <EntityCardHeader
@@ -128,7 +121,7 @@ export const VacuumCard = memo(function VacuumCard({
                   onReturnHome={handleReturnHome}
                   onOpenSettings={() => setIsDialogOpen(true)}
                   theme={theme}
-                  accentColorValue={accentColorValue}
+                  accentColorValue={cardColors.accent}
                 />
               ) : isMedium ? (
                 <VacuumControlsMedium
@@ -138,7 +131,7 @@ export const VacuumCard = memo(function VacuumCard({
                   onReturnHome={handleReturnHome}
                   onOpenSettings={() => setIsDialogOpen(true)}
                   theme={theme}
-                  accentColorValue={accentColorValue}
+                  accentColorValue={cardColors.accent}
                 />
               ) : (
                 <VacuumControlsLarge
@@ -148,7 +141,7 @@ export const VacuumCard = memo(function VacuumCard({
                   onReturnHome={handleReturnHome}
                   onOpenSettings={() => setIsDialogOpen(true)}
                   theme={theme}
-                  accentColorValue={accentColorValue}
+                  accentColorValue={cardColors.accent}
                 />
               )}
             </div>
@@ -163,7 +156,7 @@ export const VacuumCard = memo(function VacuumCard({
         onReturnHome={handleReturnHome}
         name={name}
         theme={theme}
-        accentColorValue={accentColorValue}
+        accentColorValue={cardColors.accent}
       />
     </div>
   );

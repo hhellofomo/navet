@@ -35,7 +35,9 @@ export interface HVACDevice extends BaseDevice {
 export interface ClimateDevice extends BaseDevice {
   room: string;
   temperature: number;
+  currentTemperature: number;
   mode: string;
+  action?: string;
 }
 
 // Weather device

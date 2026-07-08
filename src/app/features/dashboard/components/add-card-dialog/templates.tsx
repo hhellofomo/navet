@@ -25,15 +25,6 @@ function Newspaper(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-function Cloud(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <title>Weather</title>
-      <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
-    </svg>
-  );
-}
-
 function Image(props: SVGProps<SVGSVGElement>) {
   return (
     <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -72,13 +63,6 @@ export const cardTemplates: CardTemplate[] = [
     description: 'Latest news and updates',
     icon: <Newspaper className="w-5 h-5" />,
     defaultSize: 'large',
-  },
-  {
-    id: 'weather',
-    name: 'Weather',
-    description: 'Current weather and forecast',
-    icon: <Cloud className="w-5 h-5" />,
-    defaultSize: 'medium',
   },
   {
     id: 'photo',
