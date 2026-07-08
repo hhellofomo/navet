@@ -5,6 +5,7 @@ import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import { useSettingsStore } from '@/app/stores';
+import { resolveEffectsQuality } from '@/app/utils/effects-quality';
 import type { DashboardLayoutProps } from './types';
 
 /**
@@ -15,9 +16,14 @@ import type { DashboardLayoutProps } from './types';
 export const DashboardLayout = memo(function DashboardLayout({ children }: DashboardLayoutProps) {
   const { theme, wallpaper, primaryColor } = useTheme();
   const lowPowerMode = useSettingsStore((state) => state.lowPowerMode);
+  const effectsQuality = useSettingsStore((state) => state.effectsQuality);
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
   const isContrast = theme === 'contrast';
+  const resolvedEffectsQuality = resolveEffectsQuality(effectsQuality, lowPowerMode);
+  const isMediumEffects = resolvedEffectsQuality === 'medium';
+  const isLowEffects = resolvedEffectsQuality === 'low';
+  const showSharedGlassBlur = isGlass && resolvedEffectsQuality === 'high';
 
   const bgColor =
     theme === 'light'
@@ -51,29 +57,34 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
             style={{
               background:
                 theme === 'light'
-                  ? `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}${lowPowerMode ? '35' : '50'}, ${getThemeColorValue(primaryColor)}${lowPowerMode ? '18' : '30'}, transparent 70%)`
+                  ? `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}${isLowEffects ? '38' : '46'}, ${getThemeColorValue(primaryColor)}${isLowEffects ? '22' : '2a'}, transparent 70%)`
                   : isGlass
-                    ? lowPowerMode
-                      ? `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}26, rgba(255,255,255,0.04), transparent 58%)`
-                      : `radial-gradient(circle at 16% 18%, ${getThemeColorValue(primaryColor)}55 0%, transparent 34%), radial-gradient(circle at 84% 12%, rgba(255,255,255,0.18) 0%, transparent 26%), linear-gradient(135deg, rgba(255,255,255,0.12), transparent 58%)`
+                    ? resolvedEffectsQuality === 'high'
+                      ? `radial-gradient(circle at 16% 18%, ${getThemeColorValue(primaryColor)}55 0%, transparent 34%), radial-gradient(circle at 84% 12%, rgba(255,255,255,0.18) 0%, transparent 26%), linear-gradient(135deg, rgba(255,255,255,0.12), transparent 58%)`
+                      : isMediumEffects
+                        ? `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}24, rgba(255,255,255,0.06), rgba(15,23,42,0.18) 72%)`
+                        : `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}18, rgba(15,23,42,0.12), transparent 72%)`
                     : `linear-gradient(135deg, ${getThemeColorValue(primaryColor)}40, ${getThemeColorValue(primaryColor)}20, transparent 60%)`,
-              mixBlendMode: theme === 'light' ? 'multiply' : isGlass ? 'screen' : 'color',
+              mixBlendMode:
+                theme === 'light' ? 'multiply' : isGlass && !isLowEffects ? 'screen' : 'normal',
             }}
           />
 
-          {/* Blur and Darken Overlay for Readability */}
+          {/* Shared readability/glass layer */}
           <div
-            className={`absolute inset-0 ${lowPowerMode ? '' : 'backdrop-blur-sm'}`}
+            className={`absolute inset-0 ${showSharedGlassBlur ? 'backdrop-blur-sm' : ''}`}
             style={{
               backgroundColor:
                 theme === 'light'
-                  ? lowPowerMode
+                  ? isLowEffects
                     ? 'rgba(249, 250, 251, 0.82)'
                     : 'rgba(249, 250, 251, 0.50)'
                   : isGlass
-                    ? lowPowerMode
-                      ? 'rgba(7, 12, 22, 0.72)'
-                      : 'rgba(7, 12, 22, 0.46)'
+                    ? resolvedEffectsQuality === 'high'
+                      ? 'rgba(7, 12, 22, 0.46)'
+                      : isMediumEffects
+                        ? 'rgba(8, 13, 22, 0.70)'
+                        : 'rgba(8, 12, 20, 0.82)'
                     : 'rgba(10, 10, 10, 0.55)',
             }}
           />
@@ -85,12 +96,15 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
           <div
             className="absolute inset-0"
             style={{
-              background: lowPowerMode
-                ? 'linear-gradient(180deg, rgba(12,18,32,0.98), rgba(7,10,18,0.99))'
-                : 'radial-gradient(circle at 14% 18%, rgba(255,255,255,0.14) 0%, transparent 26%), radial-gradient(circle at 82% 14%, rgba(255,255,255,0.08) 0%, transparent 24%), radial-gradient(circle at 18% 80%, rgba(59,130,246,0.18) 0%, transparent 28%), radial-gradient(circle at 78% 72%, rgba(255,255,255,0.06) 0%, transparent 22%), linear-gradient(180deg, rgba(12,18,32,0.96), rgba(7,10,18,0.98))',
+              background:
+                resolvedEffectsQuality === 'high'
+                  ? 'radial-gradient(circle at 14% 18%, rgba(255,255,255,0.14) 0%, transparent 26%), radial-gradient(circle at 82% 14%, rgba(255,255,255,0.08) 0%, transparent 24%), radial-gradient(circle at 18% 80%, rgba(59,130,246,0.18) 0%, transparent 28%), radial-gradient(circle at 78% 72%, rgba(255,255,255,0.06) 0%, transparent 22%), linear-gradient(180deg, rgba(12,18,32,0.96), rgba(7,10,18,0.98))'
+                  : isMediumEffects
+                    ? 'linear-gradient(180deg, rgba(18,24,38,0.96), rgba(10,14,24,0.98)), linear-gradient(135deg, rgba(255,255,255,0.05), transparent 42%)'
+                    : 'linear-gradient(180deg, rgba(12,18,32,0.98), rgba(7,10,18,0.99))',
             }}
           />
-          {lowPowerMode ? null : <div className="absolute inset-0 backdrop-blur-[36px]" />}
+          {showSharedGlassBlur ? <div className="absolute inset-0 backdrop-blur-[28px]" /> : null}
         </div>
       )}
 

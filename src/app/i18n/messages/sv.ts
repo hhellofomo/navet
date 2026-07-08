@@ -12,15 +12,16 @@ export const svMessages = {
   'header.weekLabel': 'Vecka {week}',
   'settings.hero.eyebrow': 'Inställningar',
   'settings.hero.title': 'En lugnare plats att finjustera Navet.',
-  'settings.hero.description':
-    'Stor typografi, färre rutor och en tydlig väg per inställning. Sidan är fortfarande skalbar, men ska nu kännas mer som en riktig produktinställning än en tät kontrollpanel.',
+  'settings.hero.description': 'Justera hur Navet ser ut, beter sig och ansluter på ett ställe.',
   'settings.nav.appearance': 'Utseende',
+  'settings.nav.localization': 'Lokalisering',
+  'settings.nav.interaction': 'Interaktion',
   'settings.nav.dashboard': 'Dashboard',
   'settings.nav.system': 'System',
   'settings.nav.project': 'Projekt',
   'settings.appearance.sectionTitle': 'Utseende',
   'settings.appearance.sectionDescription':
-    'Visuella val som formar dashboardens övergripande känsla.',
+    'Tema, bakgrund, glasintensitet och ljusatmosfär som formar Navets visuella identitet.',
   'settings.appearance.themeAccent.title': 'Tema och accent',
   'settings.appearance.themeAccent.description':
     'Välj den övergripande visuella tonen och accentfärgen med samma väljare som visas under onboarding.',
@@ -33,7 +34,7 @@ export const svMessages = {
   'settings.appearance.ambience.ambientBleed': 'Ambient spill',
   'settings.appearance.ambience.contained': 'Inneslutet',
   'settings.appearance.ambience.disabledInLowPower':
-    'Inte tillgängligt när läge för svagare enheter är aktivt. Ljuskort använder inneslutet läge i stället.',
+    'Tillgängligt bara vid hög visuell kvalitet. Ljuskort använder inneslutet läge vid medium och låg.',
   'settings.appearance.wallpaper.title': 'Bakgrund',
   'settings.appearance.wallpaper.description':
     'Lägg till en bakgrundsbild som blandar sig med aktiv accentfärg och tema.',
@@ -43,7 +44,7 @@ export const svMessages = {
   'settings.appearance.wallpaper.fileHint': 'PNG, JPG upp till 5 MB',
   'settings.dashboard.sectionTitle': 'Dashboard',
   'settings.dashboard.sectionDescription':
-    'Bestäm vad som visas på ytan och hur den lokala konfigurationen säkerhetskopieras.',
+    'Hantera vad som visas på ytan och hur den lokala konfigurationen säkerhetskopieras.',
   'settings.dashboard.entityVisibility.title': 'Enhetssynlighet',
   'settings.dashboard.entityVisibility.description':
     'Navet använder nu en gemensam synlighetsmodell. Ta bort enheter i redigeringsläget och lägg tillbaka dem senare via Add Entity.',
@@ -63,6 +64,28 @@ export const svMessages = {
     'Välj om tryck på kortet ska toggla enheten direkt eller öppna kontrollerna först.',
   'settings.dashboard.interaction.toggleFirst': 'Tryck togglar',
   'settings.dashboard.interaction.controlFirst': 'Tryck öppnar kontroller',
+  'settings.localization.sectionTitle': 'Lokalisering',
+  'settings.localization.sectionDescription':
+    'Språk och formatinställningar för namn, datum, tider och enheter.',
+  'settings.localization.language.title': 'Språk',
+  'settings.localization.language.description':
+    'Ange språk och locale för gränssnittet samt formatering av datum, tid och tal.',
+  'settings.localization.timeFormat.title': 'Tidsformat',
+  'settings.localization.timeFormat.description':
+    'Välj om Navet ska visa tid i 12- eller 24-timmarsformat.',
+  'settings.localization.timeFormat.twelveHour': '12-timmars',
+  'settings.localization.timeFormat.twentyFourHour': '24-timmars',
+  'settings.localization.temperatureUnit.title': 'Temperaturenhet',
+  'settings.localization.temperatureUnit.description':
+    'Välj vilken temperaturenhet kort och vädervyer ska använda.',
+  'settings.localization.temperatureUnit.celsius': 'Celsius',
+  'settings.localization.temperatureUnit.fahrenheit': 'Fahrenheit',
+  'settings.interaction.sectionTitle': 'Interaktion',
+  'settings.interaction.sectionDescription':
+    'Hur kort reagerar när du trycker på dem och vilken handling Navet prioriterar först.',
+  'settings.interaction.cardBehavior.title': 'Kortbeteende',
+  'settings.interaction.cardBehavior.description':
+    'Välj om ett tryck på kortet ska agera direkt eller öppna detaljerade kontroller först.',
   'settings.dashboard.backup.title': 'Lokal konfigurationsbackup',
   'settings.dashboard.backup.description':
     'Exportera en återanvändbar ögonblicksbild av dashboardlayouten och återställ den på en annan enhet senare.',
@@ -72,13 +95,19 @@ export const svMessages = {
   'settings.dashboard.backup.import': 'Importera konfiguration',
   'settings.system.sectionTitle': 'System',
   'settings.system.sectionDescription':
-    'Prestandakontroller och anslutningsdetaljer för den aktuella Home Assistant-målservern.',
+    'Anslutningsdetaljer och återställningsåtgärder för den aktuella Home Assistant-servern.',
   'settings.system.animations.title': 'Inaktivera animationer',
   'settings.system.animations.description':
     'Användbart för långsammare enheter som Raspberry Pi. Stänger av övergångar och animerade effekter i hela appen.',
   'settings.system.lowPowerMode.title': 'Läge för svagare enheter',
   'settings.system.lowPowerMode.description':
     'Stänger av animationer och minskar oskarpa effekter, tunga skuggor, bakgrundsbearbetning och omgivande ljus för jämnare rendering på svagare enheter.',
+  'settings.system.effectsQuality.title': 'Visuell kvalitet',
+  'settings.system.effectsQuality.description':
+    'Välj hur mycket levande glaseffekt Navet ska använda. Hög behåller full effekt, Medium använder simulerat glas och Låg minimerar effekter för de svagaste enheterna.',
+  'settings.system.effectsQuality.high': 'Hög',
+  'settings.system.effectsQuality.medium': 'Medium',
+  'settings.system.effectsQuality.low': 'Låg',
   'settings.system.connection.title': 'Anslutning',
   'settings.system.connection.description':
     'Granska aktuell server, öppna Home Assistant eller nollställ sparad anslutning.',
@@ -329,6 +358,8 @@ export const svMessages = {
   'login.errors.unexpected': 'Ett oväntat fel inträffade',
   'themePicker.themeMode': 'Temaläge',
   'themePicker.accentColor': 'Accentfärg',
+  'themePicker.customAccent': 'Anpassad accentfärg',
+  'themePicker.customAccentBadge': 'Välj',
   'themePicker.previewSubtitle': '{mode}-läge',
   'themeOption.glass.label': 'Flytande glas',
   'themeOption.glass.description': 'Frostade transparenta paneler med lysande accenter',

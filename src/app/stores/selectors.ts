@@ -21,26 +21,31 @@ export const themeSelectors = {
   // Single value selectors
   theme: (state: ThemeState) => state.theme,
   primaryColor: (state: ThemeState) => state.primaryColor,
+  customPrimaryColor: (state: ThemeState) => state.customPrimaryColor,
   wallpaper: (state: ThemeState) => state.wallpaper,
 
   // Action selectors (never cause re-renders)
   setTheme: (state: ThemeState) => state.setTheme,
   setPrimaryColor: (state: ThemeState) => state.setPrimaryColor,
+  setCustomPrimaryColor: (state: ThemeState) => state.setCustomPrimaryColor,
   setWallpaper: (state: ThemeState) => state.setWallpaper,
 
   // Combined selectors (use with shallow equality)
   themeAndColor: (state: ThemeState) => ({
     theme: state.theme,
     primaryColor: state.primaryColor,
+    customPrimaryColor: state.customPrimaryColor,
   }),
   allValues: (state: ThemeState) => ({
     theme: state.theme,
     primaryColor: state.primaryColor,
+    customPrimaryColor: state.customPrimaryColor,
     wallpaper: state.wallpaper,
   }),
   allActions: (state: ThemeState) => ({
     setTheme: state.setTheme,
     setPrimaryColor: state.setPrimaryColor,
+    setCustomPrimaryColor: state.setCustomPrimaryColor,
     setWallpaper: state.setWallpaper,
   }),
 };
@@ -94,6 +99,7 @@ export const settingsSelectors = {
   compactMode: (state: SettingsState) => state.compactMode,
   disableAnimations: (state: SettingsState) => state.disableAnimations,
   lowPowerMode: (state: SettingsState) => state.lowPowerMode,
+  effectsQuality: (state: SettingsState) => state.effectsQuality,
   entityInteractionMode: (state: SettingsState) => state.entityInteractionMode,
   ambientLightBleed: (state: SettingsState) => state.ambientLightBleed,
 
@@ -109,6 +115,7 @@ export const settingsSelectors = {
     compactMode: state.compactMode,
     disableAnimations: state.disableAnimations,
     lowPowerMode: state.lowPowerMode,
+    effectsQuality: state.effectsQuality,
     entityInteractionMode: state.entityInteractionMode,
     ambientLightBleed: state.ambientLightBleed,
   }),

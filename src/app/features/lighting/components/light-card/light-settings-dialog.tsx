@@ -10,6 +10,7 @@ import {
   IconPicker,
 } from '@/app/components/shared/device-editor';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
+import { resolvePrimaryColorToken } from '@/app/components/shared/theme/theme-colors';
 import { PRESET_COLORS } from '@/app/constants/light-constants';
 import { useI18n, useTheme } from '@/app/hooks';
 import type { BrightnessPresetKey } from '../../stores/light-preset-store';
@@ -86,7 +87,7 @@ export const LightSettingsDialog = memo(function LightSettingsDialog({
     yellow: { from: 'from-yellow-900/95', to: 'to-yellow-950/95', border: 'border-yellow-500/20' },
     teal: { from: 'from-teal-900/95', to: 'to-teal-950/95', border: 'border-teal-500/20' },
   } as const;
-  const activeDialogColors = colorMap[primaryColor];
+  const activeDialogColors = colorMap[resolvePrimaryColorToken(primaryColor)];
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>

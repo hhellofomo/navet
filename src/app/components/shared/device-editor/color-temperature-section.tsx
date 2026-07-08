@@ -1,5 +1,6 @@
 import * as Slider from '@radix-ui/react-slider';
 import { memo } from 'react';
+import { ColorInputSwatch } from '@/app/components/shared/color-input-swatch';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useI18n, useTheme } from '@/app/hooks';
 import { getDeviceEditorSurfaceTokens } from './device-editor-surface-tokens';
@@ -83,34 +84,39 @@ export const ColorTemperatureSection = memo(function ColorTemperatureSection({
       </div>
 
       {/* Temperature Presets */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {tempOptions.map((temp) => (
-          <button
-            type="button"
-            key={temp.value}
-            onClick={() => {
-              onTempChange(temp.value);
-              onTempCommit?.(temp.value);
-            }}
-            disabled={!isOn}
-            className={`h-10 rounded-full text-xs font-semibold transition-all duration-300 border-2 ${
-              colorTemp === temp.value
-                ? 'scale-105 shadow-lg text-white'
-                : isOn
-                  ? 'border-transparent hover:border-white/30'
-                  : `border-transparent ${editorSurface.disabledCircleClassName}`
-            }`}
-            style={{
-              backgroundColor: isOn
-                ? colorTemp === temp.value
-                  ? activeColor
-                  : temp.color
-                : editorSurface.disabledSurfaceColor,
-              borderColor: colorTemp === temp.value ? activeColor : undefined,
-            }}
-          >
-            {temp.label}
-          </button>
+          <div key={temp.value} className="flex items-center gap-2 rounded-2xl px-2 py-2 text-left">
+            <ColorInputSwatch
+              mode="swatch"
+              value={temp.color}
+              ariaLabel={`${temp.label} (${temp.value}K)`}
+              title={`${temp.label} (${temp.value}K)`}
+              size="small"
+              disabled={!isOn}
+              selected={colorTemp === temp.value}
+              ringColor={activeColor}
+              className={`shrink-0 ${!isOn ? editorSurface.disabledCircleClassName : ''}`}
+              onClick={() => {
+                onTempChange(temp.value);
+                onTempCommit?.(temp.value);
+              }}
+            />
+            <div className="min-w-0">
+              <div
+                className={`text-xs font-semibold transition-colors duration-300 ${
+                  colorTemp === temp.value
+                    ? editorSurface.sectionValueClassName
+                    : editorSurface.sectionLabelClassName
+                }`}
+              >
+                {temp.label}
+              </div>
+              <div className={`text-[11px] ${editorSurface.sectionLabelClassName}`}>
+                {temp.value}K
+              </div>
+            </div>
+          </div>
         ))}
       </div>
     </div>

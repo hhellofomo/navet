@@ -44,7 +44,7 @@ Design inspiration and visual direction:
 ### [Features Documentation](./FEATURES.md) ✨ NEW
 Complete feature implementation guide:
 - Authentication system and login flow
-- Theme customization (4 modes, 8 colors)
+- Theme customization (4 modes, built-in accents, custom accent color, and visual quality tiers)
 - Navigation and section management
 - Settings page architecture
 - Empty states for sections
@@ -55,12 +55,12 @@ Complete feature implementation guide:
 ## 🎯 Quick Reference
 
 ### Core Design Principles
-1. **iOS Widget Aesthetic** - Frosted glass, rounded corners, semantic colors
+1. **Adaptive Glass Aesthetic** - Premium glass-inspired surfaces, rounded corners, semantic colors
 2. **Adaptive Layouts** - Content rearranges intelligently based on card size
 3. **Room-Based Organization** - Filter devices by physical location
 4. **Consistent Icon Sizing** - Extra-small: 7×7 container / 3.5×3.5 icon, Small: 8×8 / 4×4, Medium/Large: 10×10 / 5×5
 5. **Smooth Transitions** - 500ms for state changes, 200ms for interactions
-6. **Theme Customization** - Four theme modes (Liquid Glass, Dark, Light, High Contrast) with 8 primary color options
+6. **Theme Customization** - Four theme modes (Liquid Glass, Dark, Light, High Contrast) with 8 built-in accents, a custom accent picker, and visual quality tiers
 7. **Section-Based Navigation** - Organized into dedicated sections (Home, Security, Tasks, Locks, Lights, Media, Mock, Settings)
 8. **Shared Primitives First** - Cross-theme icon pills, nav/action pills, and card off-state surfaces should resolve through shared primitives before feature-level custom styling is added
 9. **One Climate Card Pattern** - Climate entities should use the HVAC card pattern; do not reintroduce a parallel legacy climate-card implementation
@@ -76,21 +76,22 @@ Complete feature implementation guide:
   - Dark - Subtle gradients with muted colors
   - Light - Bright pastels with soft accents
   - High Contrast - OLED-black surfaces with stronger contrast
-- **Primary Colors**: Orange (default), Blue, Green, Purple, Pink, Red, Yellow, Teal
+- **Effects Quality**: High keeps the richest live glass treatment, Medium uses simulated glass, and Low reduces effects for constrained devices
+- **Primary Colors**: Orange (default), Blue, Green, Purple, Pink, Red, Yellow, Teal, or a custom accent color
 - **Dynamic Theming** - All active states, buttons, and indicators adapt to selected primary color
 
 ### Navigation Structure
 - **Sections**: Home (dashboard), Security, Tasks, Locks, Lights, Media, Mock, Settings
 - **Desktop**: Fixed vertical sidebar on left (16px wide)
-- **Mobile**: Bottom navigation bar with 6 key sections including Mock and Settings
+- **Mobile**: Compact icon-only bottom navigation bar with 6 key sections including Mock and Settings
 - **Mobile Scroll Behavior**: Bottom navigation hides on downward scroll and returns near the top of the document
 - **Empty States**: Beautiful placeholder screens for sections without data
 
 ### Color System at a Glance
 - **Background (Dark)**: `#0a0a0a` (Deep black)
 - **Background (Light)**: `#f9fafb` (Gray-50)
-- **Glass Cards**: `backdrop-blur-xl` + `bg-white/5-10` (dark) / `bg-white` (light)
-- **Primary Color** (customizable): Orange (default), Blue, Green, Purple, Pink, Red, Yellow, or Teal
+- **Glass Cards**: shared surfaces adapt by effects quality instead of forcing the same live blur treatment everywhere
+- **Primary Color** (customizable): Orange (default), Blue, Green, Purple, Pink, Red, Yellow, Teal, or a custom accent
 - **Lights**: Orange/Amber when active (or custom primary color)
 - **Climate**: Blue (cooling) / Orange (heating) / Green (auto)
 - **Media**: Pink accent

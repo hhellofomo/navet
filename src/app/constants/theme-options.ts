@@ -45,4 +45,5 @@ export const PRIMARY_COLOR_OPTIONS: PrimaryColorOption[] = [
   { value: 'red', label: 'Red', color: '#ef4444' },
   { value: 'yellow', label: 'Yellow', color: '#eab308' },
   { value: 'teal', label: 'Teal', color: '#14b8a6' },
+  { value: 'custom', label: 'Custom', color: '#111827' },
 ];

@@ -3,14 +3,17 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { InteractivePill } from '@/app/components/shared/interactive-pill';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { type Section, useI18n, useMediaQuery, useNavigation, useTheme } from '@/app/hooks';
+import { useSettingsStore } from '@/app/stores';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 
 export const Sidebar = memo(function Sidebar() {
   const { theme } = useTheme();
   const { t } = useI18n();
   const { activeSection, setActiveSection } = useNavigation();
-  const surface = getThemeSurfaceTokens(theme);
+  const effectsQuality = useSettingsStore((state) => state.effectsQuality);
+  const surface = getThemeSurfaceTokens(theme, effectsQuality);
   const isGlass = theme === 'glass';
+  const isHighEffects = effectsQuality === 'high';
   const inactiveColor = `${surface.textMuted} ${surface.hoverBg}`;
   const [isMobileNavHidden, setIsMobileNavHidden] = useState(false);
   const lastScrollYRef = useRef(0);
@@ -139,27 +142,25 @@ export const Sidebar = memo(function Sidebar() {
         }}
       >
         <div
-          className={`relative overflow-hidden rounded-[28px] border ${surface.borderStrong} ${isGlass ? 'shadow-[0_-10px_40px_rgba(15,23,42,0.32)]' : 'shadow-lg'}`}
+          className={`relative overflow-hidden rounded-[28px] border ${surface.borderStrong} ${isGlass && isHighEffects ? 'shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]' : ''}`}
           style={
             isGlass
               ? {
-                  background:
-                    'linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08))',
-                  backdropFilter: 'blur(28px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(28px) saturate(180%)',
+                  background: isHighEffects
+                    ? 'linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.06)), rgba(12,18,32,0.78)'
+                    : 'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)), rgba(10,16,28,0.88)',
                 }
               : undefined
           }
         >
           {isGlass ? (
-            <>
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.24),transparent_48%)]" />
-              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.12),rgba(15,23,42,0.32))]" />
-            </>
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),transparent_44%)]" />
           ) : null}
 
           <div
-            className={`relative flex items-center justify-around px-1.5 py-1.5 ${isGlass ? 'bg-slate-950/18' : surface.shellPanel}`}
+            className={`relative flex items-center justify-around px-1.5 py-1.5 ${
+              isGlass ? surface.panelMuted : surface.shellPanel
+            }`}
           >
             {[
               menuItems[0],

@@ -439,7 +439,7 @@ If this dashboard were a person:
 ✅ Authentication system
 ✅ User management with dropdown
 ✅ Theme customization (4 modes)
-✅ Primary color selection (8 colors)
+✅ Primary color selection (built-in accents + custom accent)
 ✅ Section-based navigation
 ✅ Settings page
 ✅ Empty states for all sections

@@ -3,6 +3,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { type AppLanguage, getNavigatorLanguage } from '@/app/i18n/config';
 
 export type EntityInteractionMode = 'control-first' | 'toggle-first';
+export type EffectsQuality = 'high' | 'medium' | 'low';
 
 export interface UserSettings {
   username: string;
@@ -16,6 +17,7 @@ export interface UserSettings {
   compactMode: boolean;
   disableAnimations: boolean;
   lowPowerMode: boolean;
+  effectsQuality: EffectsQuality;
   entityInteractionMode: EntityInteractionMode;
   ambientLightBleed: boolean;
 }
@@ -37,6 +39,7 @@ export const defaultSettings: UserSettings = {
   compactMode: false,
   disableAnimations: false,
   lowPowerMode: false,
+  effectsQuality: 'high',
   entityInteractionMode: 'toggle-first',
   ambientLightBleed: true,
 };

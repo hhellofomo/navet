@@ -2,6 +2,10 @@
  * Theme hook and derived palette utilities backed by the theme store.
  */
 import { useMemo } from 'react';
+import {
+  resolvePrimaryColorToken,
+  resolvePrimaryColorValue,
+} from '@/app/components/shared/theme/theme-colors';
 import type { PrimaryColor, ThemeMode as ThemeType } from '../stores/theme-store';
 import { useThemeStore } from '../stores/theme-store';
 
@@ -72,20 +76,12 @@ interface ThemeValue {
   colors: ThemeColors;
   primaryColor: PrimaryColor;
   setPrimaryColor: (color: PrimaryColor) => void;
+  customPrimaryColor: string | null;
+  setCustomPrimaryColor: (color: string | null) => void;
+  accentColor: string;
   wallpaper: string | null;
   setWallpaper: (wallpaper: string | null) => void;
 }
-
-const colorMap: Record<PrimaryColor, string> = {
-  orange: 'orange',
-  blue: 'blue',
-  green: 'green',
-  purple: 'purple',
-  pink: 'pink',
-  red: 'red',
-  yellow: 'yellow',
-  teal: 'teal',
-};
 
 const getInactiveThemeTone = (themeType: ThemeType) => {
   if (themeType === 'light') {
@@ -127,8 +123,12 @@ const getInactiveThemeTone = (themeType: ThemeType) => {
   };
 };
 
-const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): ThemeColors => {
-  const color = colorMap[primaryColor];
+const generateThemeColors = (
+  themeType: ThemeType,
+  primaryColor: PrimaryColor,
+  customPrimaryColor: string | null
+): ThemeColors => {
+  const color = resolvePrimaryColorToken(primaryColor, customPrimaryColor);
   const inactiveTone = getInactiveThemeTone(themeType);
 
   if (themeType === 'dark') {
@@ -783,11 +783,20 @@ const generateThemeColors = (themeType: ThemeType, primaryColor: PrimaryColor): 
 export function useTheme(): ThemeValue {
   const theme = useThemeStore((state) => state.theme);
   const primaryColor = useThemeStore((state) => state.primaryColor);
+  const customPrimaryColor = useThemeStore((state) => state.customPrimaryColor);
   const wallpaper = useThemeStore((state) => state.wallpaper);
   const setTheme = useThemeStore((state) => state.setTheme);
   const setPrimaryColor = useThemeStore((state) => state.setPrimaryColor);
+  const setCustomPrimaryColor = useThemeStore((state) => state.setCustomPrimaryColor);
   const setWallpaper = useThemeStore((state) => state.setWallpaper);
-  const colors = useMemo(() => generateThemeColors(theme, primaryColor), [theme, primaryColor]);
+  const accentColor = useMemo(
+    () => resolvePrimaryColorValue(primaryColor, customPrimaryColor),
+    [customPrimaryColor, primaryColor]
+  );
+  const colors = useMemo(
+    () => generateThemeColors(theme, primaryColor, customPrimaryColor),
+    [customPrimaryColor, primaryColor, theme]
+  );
 
   return {
     theme,
@@ -795,6 +804,9 @@ export function useTheme(): ThemeValue {
     colors,
     primaryColor,
     setPrimaryColor,
+    customPrimaryColor,
+    setCustomPrimaryColor,
+    accentColor,
     wallpaper,
     setWallpaper,
   };

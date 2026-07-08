@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document details the key features and systems implemented in Navet, including authentication, theming, navigation, and settings.
+This document details the key features and systems implemented in Navet, including authentication, adaptive theming, navigation, and settings.
 
 ---
 
@@ -61,7 +61,7 @@ await login(url, token);
 
 **Location**: `/src/app/hooks/use-theme.ts`
 
-Exposes global theme state including mode and primary color customization through a direct hook API backed by shared client state.
+Exposes global theme state including mode, effects quality, and primary color customization through a direct hook API backed by shared client state.
 
 #### Theme Modes
 
@@ -103,6 +103,17 @@ Users can customize the primary color used throughout the interface:
 | Red    | #ef4444  | Bold, urgent                  |
 | Yellow | #eab308  | Bright, energetic             |
 | Teal   | #14b8a6  | Fresh, balanced               |
+| Custom | User-set | Personalized accent color     |
+
+#### Effects Quality System
+
+Navet scales its glass treatment through visual quality tiers instead of forcing the same rendering path on every device:
+
+- **High** - richest live glass treatment for capable hardware
+- **Medium** - simulated glass with tinted surfaces and reduced live effects
+- **Low** - reduced effects and more contained surfaces for constrained hardware
+
+This keeps the same design language while making the UI practical on devices like Raspberry Pi.
 
 #### What Changes with Primary Color
 - Active card states
@@ -112,6 +123,7 @@ Users can customize the primary color used throughout the interface:
 - Icon accents
 - Selection indicators
 - Focus states
+- Shared color picker swatches used for custom accents, light colors, and Kelvin presets
 
 #### Shared Theme Primitives
 
@@ -208,7 +220,7 @@ Manages section navigation state across desktop and mobile layouts through a dir
 - **Position**: Fixed bottom, full width
 - **Height**: Auto with safe area padding
 - **Layout**: 6 icons in horizontal row
-- **Icons**: 20px with label underneath
+- **Icons**: compact icon-only buttons
 - **Active state**: theme-aware shared pill treatment
 - **Inactive state**: transparent/ghost buttons; only the selected item carries the pill
 - **Scroll behavior**: slides down and hides on downward scroll, returns when the user is near the top
@@ -236,35 +248,35 @@ Full-page settings interface with card-based organization.
 
 **1. Appearance**
 - **Theme Mode Selection**: 2 × 2 grid with live card previews
-- **Primary Color Picker**: 8 color circles in a row
-- **Language selection**: persisted app language for interface and locale-aware formatting
+- **Primary Color Picker**: 8 built-in accent circles plus a custom accent swatch
+- **Visual quality**: choose between High, Medium, and Low glass rendering
 - **Localized theme picker copy**: theme names and descriptions resolve through the shared i18n dictionaries
 - **Light card ambience**: global visual toggle between ambient bleed and contained light-card rendering
 - **Theme-aware live previews**: theme/accent and ambience previews share the same preview-frame primitive, and the shared `Live Preview` header localizes with the active language
-- **Visual feedback**: Selected items show primary color indicator
+- **Shared color picker primitive**: custom accents, light colors, and Kelvin swatches reuse the same base control with size variants
 - **Layout**: Left-aligned text, right-aligned selection indicator
 
-**2. Dashboard**
+**2. Localization**
+- **Language selection**: persisted app language for interface and locale-aware formatting
+- **Localized theme picker copy**: shared previews and theme labels follow the selected locale
+
+**3. Interaction**
 - **Interaction mode**: choose between tap toggles and tap opens controls
 - **Interaction preview**: compact live preview sits beside the interaction toggle for faster comparison
+
+**4. Dashboard**
 - **Entity restore action**: add all removed entities back to the dashboard
 - **Onboarding reset**: restart the first-launch dashboard choice
 - **Search behavior**: dashboard search accepts friendly names, rooms, and Home Assistant entity-id/domain queries such as `light.` and `sensor.`
-- **Shared segmented controls**: current dashboard/system control groups are a candidate for the same primitive-based refactor pattern used by icon/nav pills
 
-**3. Connection**
+**5. System**
 - **Connection Status**: Shows Home Assistant URL
 - **Visual design**: Code-style display in subtle container
 
-**4. About**
+**6. Project**
 - **Version Information**: Current app version
 - **Build Date**: Last build timestamp
 - **Layout**: Two-column key-value pairs
-
-**5. Logout**
-- **Logout Button**: Prominent red-themed button
-- **Confirmation**: Browser confirm dialog before logout
-- **Icon**: LogOut icon from Lucide
 
 #### Design Specifications
 
@@ -343,7 +355,7 @@ Beautiful placeholder screens for sections without data.
 
 ### Mobile (< 768px)
 - No sidebar
-- Bottom navigation bar with 6 sections including Mock and Settings
+- Compact icon-only bottom navigation bar with 6 sections including Mock and Settings
 - Grid: 2 columns
 - Settings: Full width with mobile padding
 
@@ -356,16 +368,17 @@ Beautiful placeholder screens for sections without data.
 2. **Onboarding Dialog** → Choose start with all entities, a blank dashboard, or import a YAML config file
 3. **Dashboard** → See current entities and rooms
 4. **Explore Sections** → Navigate to different sections via sidebar/bottom nav
-5. **Customize Appearance** → Go to Settings → Change theme, accent color, and light-card ambience
+5. **Customize Appearance** → Go to Settings → adjust theme, accent color, visual quality, and light-card ambience
 6. **Edit Cards** → Enter edit mode from Customize or a dashboard long-press to add/remove entities, reorder cards, and resize cards
 
 ### Settings Customization Flow
 1. Navigate to Settings section
 2. Select Appearance card
 3. Choose theme mode (Liquid Glass/Dark/Light/Contrast)
-4. Select primary color from 8 options
-5. Changes apply immediately across entire app
-6. Theme persists across sessions
+4. Select a built-in accent color or choose a custom accent
+5. Set visual quality to High, Medium, or Low when needed
+6. Changes apply immediately across entire app
+7. Theme persists across sessions
 
 ### Authentication Flow
 1. **Logged Out** → Show login page

@@ -3,22 +3,14 @@
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import { CheckIcon } from 'lucide-react';
 import type * as React from 'react';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useTheme } from '@/app/hooks';
 
 import { cn } from './utils';
 
 function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
   const { primaryColor } = useTheme();
-  const colorMap = {
-    blue: '#3b82f6',
-    purple: '#a855f7',
-    pink: '#ec4899',
-    red: '#ef4444',
-    orange: '#f97316',
-    yellow: '#eab308',
-    green: '#22c55e',
-    teal: '#14b8a6',
-  } as const;
+  const accentColor = getThemeColorValue(primaryColor);
 
   return (
     <CheckboxPrimitive.Root
@@ -28,7 +20,7 @@ function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxP
         className
       )}
       style={{
-        ['--checkbox-checked-bg' as string]: colorMap[primaryColor],
+        ['--checkbox-checked-bg' as string]: accentColor,
       }}
       {...props}
     >

@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { isCompactCardSize } from '@/app/components/shared/card-size-selector';
-import { useTheme } from '@/app/hooks';
+import { ColorInputSwatch } from '@/app/components/shared/color-input-swatch';
 import type { CardSize } from '../card-size-selector';
 
 interface ColorPickerProps {
@@ -18,30 +18,24 @@ export const ColorPicker = memo(function ColorPicker({
   onColorChange,
   size = 'medium',
 }: ColorPickerProps) {
-  const { theme } = useTheme();
   const isCompact = isCompactCardSize(size);
-  const buttonSize = isCompact ? 'w-8 h-8' : size === 'medium' ? 'w-10 h-10' : 'w-12 h-12';
-  const ringOffset = theme === 'light' ? 'ring-offset-white' : 'ring-offset-gray-900';
+  const swatchSize = isCompact ? 'small' : size === 'medium' ? 'medium' : 'large';
 
   return (
     <>
       {colors.map((color) => (
-        <button
-          type="button"
+        <ColorInputSwatch
           key={color}
-          aria-label={`Select color ${color}`}
-          aria-pressed={selectedColor === color}
+          mode="swatch"
+          value={color}
+          ariaLabel={`Select color ${color}`}
+          selected={selectedColor === color}
+          size={swatchSize}
+          disabled={!isOn}
           onClick={(e) => {
             e.stopPropagation();
             onColorChange(color);
           }}
-          disabled={!isOn}
-          className={`${buttonSize} rounded-full transition-all duration-500 ${
-            selectedColor === color
-              ? `ring-2 ring-white ring-offset-2 ${ringOffset} scale-110`
-              : 'hover:scale-105'
-          } ${!isOn ? 'opacity-50 cursor-not-allowed' : ''}`}
-          style={{ backgroundColor: color }}
         />
       ))}
     </>

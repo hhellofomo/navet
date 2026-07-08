@@ -13,14 +13,16 @@ export const frMessages = {
   'settings.hero.eyebrow': 'Paramètres',
   'settings.hero.title': 'Un endroit plus calme pour régler Navet.',
   'settings.hero.description':
-    'Une typographie plus ample, moins de boîtes et un chemin d’action clair pour chaque réglage. La page reste évolutive, mais doit maintenant ressembler davantage à une expérience de paramètres produit qu’à un panneau de contrôle dense.',
+    'Réglez l’apparence, le comportement et la connexion de Navet au même endroit.',
   'settings.nav.appearance': 'Apparence',
+  'settings.nav.localization': 'Localisation',
+  'settings.nav.interaction': 'Interaction',
   'settings.nav.dashboard': 'Tableau de bord',
   'settings.nav.system': 'Système',
   'settings.nav.project': 'Projet',
   'settings.appearance.sectionTitle': 'Apparence',
   'settings.appearance.sectionDescription':
-    'Les choix visuels qui définissent l’impression générale du tableau de bord.',
+    'Thème, fond, intensité du verre et ambiance lumineuse qui définissent l’identité visuelle de Navet.',
   'settings.appearance.themeAccent.title': 'Thème et accent',
   'settings.appearance.themeAccent.description':
     'Choisissez le ton visuel global et la couleur d’accent avec le même sélecteur que pendant l’onboarding.',
@@ -33,7 +35,7 @@ export const frMessages = {
   'settings.appearance.ambience.ambientBleed': 'Diffusion ambiante',
   'settings.appearance.ambience.contained': 'Contenu',
   'settings.appearance.ambience.disabledInLowPower':
-    'Indisponible lorsque le mode basse consommation est actif. Les cartes lumière utilisent le mode contenu à la place.',
+    'Disponible uniquement avec la qualité visuelle Élevée. Les cartes lumière utilisent le mode contenu en qualité Moyenne et Faible.',
   'settings.appearance.wallpaper.title': 'Fond d’écran',
   'settings.appearance.wallpaper.description':
     'Ajoutez une image de fond qui se mélange avec l’accent et le thème actifs.',
@@ -43,7 +45,7 @@ export const frMessages = {
   'settings.appearance.wallpaper.fileHint': 'PNG, JPG jusqu’à 5 Mo',
   'settings.dashboard.sectionTitle': 'Tableau de bord',
   'settings.dashboard.sectionDescription':
-    'Décidez ce qui apparaît sur le tableau et comment cette configuration locale est sauvegardée.',
+    'Gérez ce qui apparaît sur le tableau et la manière dont cette configuration locale est sauvegardée.',
   'settings.dashboard.entityVisibility.title': 'Visibilité des entités',
   'settings.dashboard.entityVisibility.description':
     'Navet utilise maintenant un modèle unique de visibilité. Retirez des entités en mode édition, puis rajoutez-les plus tard via Add Entity.',
@@ -63,6 +65,28 @@ export const frMessages = {
     'Choisissez si toucher la carte doit basculer l’appareil immédiatement ou ouvrir d’abord ses contrôles.',
   'settings.dashboard.interaction.toggleFirst': 'Le toucher bascule',
   'settings.dashboard.interaction.controlFirst': 'Le toucher ouvre les contrôles',
+  'settings.localization.sectionTitle': 'Localisation',
+  'settings.localization.sectionDescription':
+    'Préférences de langue et de format pour les noms, les dates, les heures et les unités.',
+  'settings.localization.language.title': 'Langue',
+  'settings.localization.language.description':
+    'Définissez la langue de l’interface et la locale utilisée pour les dates, l’heure et les nombres.',
+  'settings.localization.timeFormat.title': 'Format de l’heure',
+  'settings.localization.timeFormat.description':
+    'Choisissez si Navet doit afficher l’heure en format 12 h ou 24 h.',
+  'settings.localization.timeFormat.twelveHour': '12 h',
+  'settings.localization.timeFormat.twentyFourHour': '24 h',
+  'settings.localization.temperatureUnit.title': 'Unité de température',
+  'settings.localization.temperatureUnit.description':
+    'Choisissez l’unité de température utilisée par les cartes et les vues météo.',
+  'settings.localization.temperatureUnit.celsius': 'Celsius',
+  'settings.localization.temperatureUnit.fahrenheit': 'Fahrenheit',
+  'settings.interaction.sectionTitle': 'Interaction',
+  'settings.interaction.sectionDescription':
+    'Définissez comment les cartes réagissent au toucher et quelle action Navet priorise en premier.',
+  'settings.interaction.cardBehavior.title': 'Comportement des cartes',
+  'settings.interaction.cardBehavior.description':
+    'Choisissez si un toucher doit agir immédiatement ou ouvrir d’abord les contrôles détaillés.',
   'settings.dashboard.backup.title': 'Sauvegarde locale de config',
   'settings.dashboard.backup.description':
     'Exportez un instantané réutilisable de la mise en page du tableau et restaurez-le plus tard sur un autre appareil.',
@@ -72,13 +96,19 @@ export const frMessages = {
   'settings.dashboard.backup.import': 'Importer la config',
   'settings.system.sectionTitle': 'Système',
   'settings.system.sectionDescription':
-    'Contrôles de performance et détails de connexion pour la cible Home Assistant actuelle.',
+    'Détails de connexion et actions de récupération pour la cible Home Assistant actuelle.',
   'settings.system.animations.title': 'Désactiver les animations',
   'settings.system.animations.description':
     'Utile pour les appareils plus lents comme les Raspberry Pi. Désactive les transitions et effets animés dans toute l’app.',
   'settings.system.lowPowerMode.title': 'Mode basse consommation',
   'settings.system.lowPowerMode.description':
     'Désactive les animations et réduit le flou, les ombres lourdes, le traitement du fond et la lumière ambiante pour un rendu plus fluide sur les appareils plus lents.',
+  'settings.system.effectsQuality.title': 'Qualité visuelle',
+  'settings.system.effectsQuality.description':
+    'Choisissez combien d’effets de verre dynamiques Navet doit utiliser. Élevée conserve le rendu complet, Moyenne passe au verre simulé et Faible réduit les effets pour les appareils les plus limités.',
+  'settings.system.effectsQuality.high': 'Élevée',
+  'settings.system.effectsQuality.medium': 'Moyenne',
+  'settings.system.effectsQuality.low': 'Faible',
   'settings.system.connection.title': 'Connexion',
   'settings.system.connection.description':
     'Consultez la cible serveur actuelle, ouvrez Home Assistant ou réinitialisez la connexion enregistrée.',
@@ -334,6 +364,8 @@ export const frMessages = {
   'login.errors.unexpected': 'Une erreur inattendue est survenue',
   'themePicker.themeMode': 'Mode de thème',
   'themePicker.accentColor': 'Couleur d’accent',
+  'themePicker.customAccent': 'Couleur d’accent personnalisée',
+  'themePicker.customAccentBadge': 'Choisir',
   'themePicker.previewSubtitle': 'Mode {mode}',
   'themeOption.glass.label': 'Verre liquide',
   'themeOption.glass.description': 'Panneaux translucides givrés avec des accents lumineux',

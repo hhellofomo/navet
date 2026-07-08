@@ -10,14 +10,17 @@ export type PrimaryColor =
   | 'orange'
   | 'yellow'
   | 'green'
-  | 'teal';
+  | 'teal'
+  | 'custom';
 
 interface ThemeState {
   theme: ThemeMode;
   primaryColor: PrimaryColor;
+  customPrimaryColor: string | null;
   wallpaper: string | null;
   setTheme: (theme: ThemeMode) => void;
   setPrimaryColor: (color: PrimaryColor) => void;
+  setCustomPrimaryColor: (color: string | null) => void;
   setWallpaper: (wallpaper: string | null) => void;
 }
 
@@ -26,9 +29,11 @@ export const useThemeStore = create<ThemeState>()(
     (set) => ({
       theme: 'dark',
       primaryColor: 'orange',
+      customPrimaryColor: null,
       wallpaper: null,
       setTheme: (theme) => set({ theme }),
       setPrimaryColor: (primaryColor) => set({ primaryColor }),
+      setCustomPrimaryColor: (customPrimaryColor) => set({ customPrimaryColor }),
       setWallpaper: (wallpaper) => set({ wallpaper }),
     }),
     {

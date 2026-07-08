@@ -153,7 +153,7 @@ The current dashboard build includes a few runtime-focused optimizations:
 - Onboarding-based dashboard visibility with add/remove entity curation
 - Local dashboard config YAML export/import for layout and preference backup, including first-run import from onboarding
 - Configurable entity card interaction styles with a live preview in Settings
-- Optional no-animation mode for slower devices such as Raspberry Pi deployments
+- Optional lower visual quality for slower devices such as Raspberry Pi deployments
 
 ## Remaining Limitation
 

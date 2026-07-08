@@ -1,4 +1,5 @@
 import type { ThemeType } from '@/app/hooks/use-theme';
+import type { EffectsQuality } from '@/app/stores/settings-store';
 
 export interface ThemeSurfaceTokens {
   appBg: string;
@@ -23,7 +24,19 @@ export interface ThemeSurfaceTokens {
   ringOffset: string;
 }
 
-export function getThemeSurfaceTokens(theme: ThemeType): ThemeSurfaceTokens {
+const getCurrentEffectsQuality = (): EffectsQuality => {
+  if (typeof document === 'undefined') {
+    return 'high';
+  }
+
+  const value = document.documentElement.dataset.effectsQuality;
+  return value === 'medium' || value === 'low' ? value : 'high';
+};
+
+export function getThemeSurfaceTokens(
+  theme: ThemeType,
+  effectsQuality: EffectsQuality = getCurrentEffectsQuality()
+): ThemeSurfaceTokens {
   if (theme === 'light') {
     return {
       appBg: 'bg-gray-50',
@@ -42,9 +55,9 @@ export function getThemeSurfaceTokens(theme: ThemeType): ThemeSurfaceTokens {
       hoverBg: 'hover:bg-gray-100',
       inputBg: 'bg-gray-100',
       placeholder: 'placeholder-gray-400',
-      cardShadow: 'shadow-lg',
+      cardShadow: effectsQuality === 'high' ? 'shadow-md' : '',
       lightOverlay: 'bg-white/60',
-      dialogBackdrop: 'bg-black/50 backdrop-blur-sm',
+      dialogBackdrop: 'bg-black/48',
       ringOffset: 'ring-offset-white',
     };
   }
@@ -75,26 +88,37 @@ export function getThemeSurfaceTokens(theme: ThemeType): ThemeSurfaceTokens {
   }
 
   if (theme === 'glass') {
+    const isHigh = effectsQuality === 'high';
+    const isMedium = effectsQuality === 'medium';
+
     return {
       appBg: 'bg-slate-950',
-      shellPanel: 'bg-white/8 border-white/12 backdrop-blur-2xl',
-      panel: 'bg-white/10',
-      panelMuted: 'bg-white/8',
-      border: 'border-white/18',
-      borderStrong: 'border-white/18',
+      shellPanel: isHigh
+        ? 'bg-white/10 border-white/12'
+        : isMedium
+          ? 'bg-slate-900/82 border-white/12'
+          : 'bg-slate-950/94 border-white/10',
+      panel: isHigh ? 'bg-white/10' : isMedium ? 'bg-slate-900/80' : 'bg-slate-950/92',
+      panelMuted: isHigh ? 'bg-white/8' : isMedium ? 'bg-slate-900/74' : 'bg-slate-950/88',
+      border: isHigh ? 'border-white/18' : 'border-white/12',
+      borderStrong: isHigh ? 'border-white/18' : 'border-white/12',
       divider: 'divide-white/10',
       textPrimary: 'text-white',
       textSecondary: 'text-gray-300',
       textSubtle: 'text-gray-300',
-      textMuted: 'text-white/60',
-      iconBg: 'bg-white/10',
-      subtleBg: 'bg-white/8',
-      hoverBg: 'hover:bg-white/12',
-      inputBg: 'bg-white/8',
+      textMuted: isHigh ? 'text-white/60' : 'text-white/68',
+      iconBg: isHigh ? 'bg-white/10' : 'bg-white/8',
+      subtleBg: isHigh ? 'bg-white/8' : 'bg-white/6',
+      hoverBg: isHigh ? 'hover:bg-white/12' : 'hover:bg-white/8',
+      inputBg: isHigh ? 'bg-white/8' : 'bg-white/6',
       placeholder: 'placeholder-white/45',
       cardShadow: '',
-      lightOverlay: 'bg-white/[0.03]',
-      dialogBackdrop: 'bg-black/45 backdrop-blur-md',
+      lightOverlay: isHigh
+        ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02)_38%,transparent_68%)]'
+        : isMedium
+          ? 'bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.015)_34%,transparent_60%)]'
+          : 'bg-[linear-gradient(180deg,rgba(255,255,255,0.05),transparent_52%)]',
+      dialogBackdrop: isHigh ? 'bg-black/42' : isMedium ? 'bg-slate-950/68' : 'bg-slate-950/78',
       ringOffset: 'ring-offset-slate-950',
     };
   }
@@ -118,7 +142,7 @@ export function getThemeSurfaceTokens(theme: ThemeType): ThemeSurfaceTokens {
     placeholder: 'placeholder-gray-500',
     cardShadow: '',
     lightOverlay: null,
-    dialogBackdrop: 'bg-black/50 backdrop-blur-sm',
+    dialogBackdrop: 'bg-black/50',
     ringOffset: 'ring-offset-gray-900',
   };
 }

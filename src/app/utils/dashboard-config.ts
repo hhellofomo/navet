@@ -8,6 +8,7 @@ import { isSection } from '@/app/navigation/sections';
 import { useNavigationStore } from '@/app/stores/navigation-store';
 import { defaultSettings, useSettingsStore } from '@/app/stores/settings-store';
 import { useThemeStore } from '@/app/stores/theme-store';
+import { getLegacyReducedEffectsFlags, resolveEffectsQuality } from '@/app/utils/effects-quality';
 import { storage } from '@/app/utils/storage';
 
 interface DashboardConfigPayload {
@@ -17,6 +18,7 @@ interface DashboardConfigPayload {
   theme: {
     theme: ReturnType<typeof useThemeStore.getState>['theme'];
     primaryColor: ReturnType<typeof useThemeStore.getState>['primaryColor'];
+    customPrimaryColor?: ReturnType<typeof useThemeStore.getState>['customPrimaryColor'];
     wallpaper?: ReturnType<typeof useThemeStore.getState>['wallpaper'];
   };
   settings: Partial<
@@ -57,7 +59,10 @@ const buildExportedSettings = (
     'updateSettings' | 'resetSettings'
   >
 ) => {
-  const reducedEffectsEnabled = settingsState.disableAnimations || settingsState.lowPowerMode;
+  const effectsQuality = resolveEffectsQuality(
+    settingsState.effectsQuality,
+    settingsState.disableAnimations || settingsState.lowPowerMode
+  );
 
   return omitUndefinedEntries({
     username:
@@ -89,12 +94,9 @@ const buildExportedSettings = (
       settingsState.compactMode !== defaultSettings.compactMode
         ? settingsState.compactMode
         : undefined,
-    disableAnimations:
-      reducedEffectsEnabled !== defaultSettings.disableAnimations
-        ? reducedEffectsEnabled
-        : undefined,
-    lowPowerMode:
-      reducedEffectsEnabled !== defaultSettings.lowPowerMode ? reducedEffectsEnabled : undefined,
+    disableAnimations: undefined,
+    lowPowerMode: undefined,
+    effectsQuality: effectsQuality !== defaultSettings.effectsQuality ? effectsQuality : undefined,
     entityInteractionMode:
       settingsState.entityInteractionMode !== defaultSettings.entityInteractionMode
         ? settingsState.entityInteractionMode
@@ -121,6 +123,9 @@ export const exportDashboardConfig = (): DashboardConfigPayload => {
     theme: {
       theme: themeState.theme,
       primaryColor: themeState.primaryColor,
+      ...(themeState.customPrimaryColor
+        ? { customPrimaryColor: themeState.customPrimaryColor }
+        : {}),
       ...(themeState.wallpaper ? { wallpaper: themeState.wallpaper } : {}),
     },
     settings: buildExportedSettings(settingsState),
@@ -181,6 +186,14 @@ export const importDashboardConfig = (value: unknown) => {
       : typeof settings.disableAnimations === 'boolean'
         ? settings.disableAnimations
         : defaultSettings.lowPowerMode;
+  const effectsQuality = resolveEffectsQuality(
+    settings.effectsQuality === 'high' ||
+      settings.effectsQuality === 'medium' ||
+      settings.effectsQuality === 'low'
+      ? settings.effectsQuality
+      : undefined,
+    reducedEffectsEnabled
+  );
 
   useThemeStore.setState({
     theme:
@@ -190,6 +203,10 @@ export const importDashboardConfig = (value: unknown) => {
       (theme.primaryColor as
         | ReturnType<typeof useThemeStore.getState>['primaryColor']
         | undefined) ?? currentThemeState.primaryColor,
+    customPrimaryColor:
+      theme.customPrimaryColor === undefined
+        ? currentThemeState.customPrimaryColor
+        : (theme.customPrimaryColor as string | null),
     wallpaper:
       theme.wallpaper === undefined
         ? currentThemeState.wallpaper
@@ -223,8 +240,8 @@ export const importDashboardConfig = (value: unknown) => {
       typeof settings.compactMode === 'boolean'
         ? settings.compactMode
         : defaultSettings.compactMode,
-    disableAnimations: reducedEffectsEnabled,
-    lowPowerMode: reducedEffectsEnabled,
+    ...getLegacyReducedEffectsFlags(effectsQuality),
+    effectsQuality,
     entityInteractionMode:
       settings.entityInteractionMode === 'control-first' ||
       settings.entityInteractionMode === 'toggle-first'

@@ -42,9 +42,8 @@ export const DashboardCardItem = memo(function DashboardCardItem({
     device?.type === 'media' && size === 'large' ? 'col-span-1 row-span-4' : getCardSpanClass(size);
   const editControlSize = device?.type === 'media' && size === 'large' ? 'medium' : size;
   const allowedSizes = getAllowedSizes(device, card);
-
-  return (
-    <DraggableCard id={id} isEditMode={isEditMode} className={spanClass}>
+  const cardContent = (
+    <>
       {isEditMode && device && allowEntityRemoval && onRemoveEntity && (
         <CardEditActionButton
           cardSize={editControlSize}
@@ -67,13 +66,13 @@ export const DashboardCardItem = memo(function DashboardCardItem({
           aria-label="Delete widget"
         />
       )}
-      {isEditMode && (
+      {isEditMode ? (
         <DashboardResizeTrigger
           cardId={id}
           cardSize={editControlSize}
           allowedSizes={allowedSizes}
         />
-      )}
+      ) : null}
       {device
         ? renderCard({ device, size, handleSizeChange, isEditMode })
         : card && (
@@ -84,6 +83,16 @@ export const DashboardCardItem = memo(function DashboardCardItem({
               onUpdate={onUpdateCard}
             />
           )}
+    </>
+  );
+
+  if (!isEditMode) {
+    return <div className={`h-full relative ${spanClass}`}>{cardContent}</div>;
+  }
+
+  return (
+    <DraggableCard id={id} isEditMode={isEditMode} className={spanClass}>
+      {cardContent}
     </DraggableCard>
   );
 }, areDashboardCardItemPropsEqual);

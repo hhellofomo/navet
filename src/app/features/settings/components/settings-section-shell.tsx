@@ -36,23 +36,30 @@ export function SettingsSectionShell({
   children,
 }: SettingsSectionShellProps) {
   return (
-    <section id={id} className={`rounded-[32px] border ${styles.borderColor} ${styles.cardBg}`}>
-      <div className="px-6 py-6 md:px-8 md:py-8">
-        <div className="flex items-start gap-4">
+    <section
+      id={id}
+      className={`rounded-[28px] border ${styles.borderColor} ${styles.cardBg} md:rounded-[32px]`}
+    >
+      <div className="px-4 py-5 md:px-8 md:py-8">
+        <div className="flex items-start gap-3 md:gap-4">
           <div
-            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border ${styles.borderColor} ${styles.iconBg}`}
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border ${styles.borderColor} ${styles.iconBg} md:h-11 md:w-11`}
           >
-            <Icon className={`h-5 w-5 ${styles.mutedColor}`} />
+            <Icon className={`h-4.5 w-4.5 ${styles.mutedColor} md:h-5 md:w-5`} />
           </div>
           <div className="min-w-0">
-            <h2 className={`text-xl font-semibold tracking-tight ${styles.textColor}`}>{title}</h2>
-            <p className={`mt-1 max-w-2xl text-sm leading-relaxed ${styles.subtleColor}`}>
+            <h2 className={`text-lg font-semibold tracking-tight md:text-xl ${styles.textColor}`}>
+              {title}
+            </h2>
+            <p
+              className={`mt-1 max-w-2xl text-sm leading-6 md:leading-relaxed ${styles.subtleColor}`}
+            >
               {description}
             </p>
           </div>
         </div>
 
-        <div className={`mt-8 divide-y ${styles.dividerColor}`}>{children}</div>
+        <div className={`mt-5 divide-y md:mt-8 ${styles.dividerColor}`}>{children}</div>
       </div>
     </section>
   );
@@ -60,11 +67,15 @@ export function SettingsSectionShell({
 
 export function SettingsItem({ title, description, styles, children }: SettingsItemProps) {
   return (
-    <div className="py-6">
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)] lg:gap-8">
+    <div className="py-4 md:py-6">
+      <div className="grid gap-4 md:gap-5 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)] lg:gap-8">
         <div className="min-w-0">
           <h3 className={`text-base font-medium tracking-tight ${styles.textColor}`}>{title}</h3>
-          <p className={`mt-2 text-sm leading-relaxed ${styles.subtleColor}`}>{description}</p>
+          <p
+            className={`mt-1.5 text-sm leading-6 md:mt-2 md:leading-relaxed ${styles.subtleColor}`}
+          >
+            {description}
+          </p>
         </div>
         <div className="min-w-0">{children}</div>
       </div>
@@ -77,7 +88,7 @@ export function SettingsHero({ navItems, styles }: SettingsHeroProps) {
 
   return (
     <section
-      className={`relative overflow-hidden rounded-[36px] border px-6 py-8 md:px-8 md:py-10 ${styles.borderColor} ${styles.cardBg}`}
+      className={`relative overflow-hidden rounded-[30px] border px-5 py-6 md:rounded-[36px] md:px-8 md:py-10 ${styles.borderColor} ${styles.cardBg}`}
     >
       <div
         className="absolute inset-x-0 top-0 h-px"
@@ -86,11 +97,11 @@ export function SettingsHero({ navItems, styles }: SettingsHeroProps) {
         }}
       />
       <div
-        className="absolute right-[-36px] top-[-28px] h-36 w-36 rounded-full blur-3xl"
+        className="absolute right-[-36px] top-[-28px] h-28 w-28 rounded-full blur-3xl md:h-36 md:w-36"
         style={{ backgroundColor: `${styles.accentColor}18` }}
       />
       <div
-        className="absolute left-[-20px] bottom-[-44px] h-32 w-32 rounded-full blur-3xl"
+        className="absolute left-[-20px] bottom-[-44px] h-24 w-24 rounded-full blur-3xl md:h-32 md:w-32"
         style={{ backgroundColor: `${styles.accentColor}10` }}
       />
       <div className={`absolute inset-0 bg-gradient-to-br ${styles.softBg} opacity-35`} />
@@ -102,20 +113,22 @@ export function SettingsHero({ navItems, styles }: SettingsHeroProps) {
           {t('settings.hero.eyebrow')}
         </p>
         <h1
-          className={`mt-4 max-w-3xl text-3xl font-semibold tracking-tight md:text-5xl ${styles.textColor}`}
+          className={`mt-3 max-w-3xl text-2xl font-semibold tracking-tight sm:text-3xl md:mt-4 md:text-5xl ${styles.textColor}`}
         >
           {t('settings.hero.title')}
         </h1>
-        <p className={`mt-4 max-w-2xl text-sm leading-7 md:text-base ${styles.subtleColor}`}>
+        <p
+          className={`mt-3 max-w-2xl text-sm leading-6 md:mt-4 md:text-base md:leading-7 ${styles.subtleColor}`}
+        >
           {t('settings.hero.description')}
         </p>
 
-        <div className="mt-8 flex flex-wrap gap-2">
+        <div className="-mx-1 mt-5 flex gap-2 overflow-x-auto px-1 pb-1 md:mx-0 md:mt-8 md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
           {navItems.map(({ id, label, icon: Icon }) => (
             <a
               key={id}
               href={`#${id}`}
-              className={`flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-colors ${styles.borderColor} ${styles.chipBg} ${styles.chipHoverBg} ${styles.mutedColor}`}
+              className={`flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-medium transition-colors md:px-4 ${styles.borderColor} ${styles.chipBg} ${styles.chipHoverBg} ${styles.mutedColor}`}
             >
               <Icon className="h-3.5 w-3.5" />
               <span>{label}</span>
