@@ -90,7 +90,7 @@ export const DashboardLayout = memo(function DashboardLayout({ children }: Dashb
       <div className="relative z-10">
         <Sidebar />
 
-        <div className="md:ml-16 p-3 md:p-6 lg:p-8 pb-20 md:pb-6 lg:pb-8">
+        <div className="safe-area-pt md:ml-16 p-3 md:p-6 lg:p-8 pb-20 md:pb-6 lg:pb-8">
           <Header />
           {children}
         </div>

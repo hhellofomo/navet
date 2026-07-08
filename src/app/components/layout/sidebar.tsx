@@ -120,7 +120,7 @@ export const Sidebar = memo(function Sidebar() {
 
       {/* Mobile Bottom Navigation */}
       <div
-        className={`fixed inset-x-0 bottom-0 z-50 px-2 pb-2 transition-transform duration-300 md:hidden safe-area-pb ${
+        className={`safe-area-bottom-offset fixed inset-x-0 z-50 px-2 pb-2 transition-transform duration-300 md:hidden ${
           isMobileNavHidden ? 'translate-y-[calc(100%+1rem)]' : 'translate-y-0'
         }`}
       >
