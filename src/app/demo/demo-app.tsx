@@ -41,6 +41,7 @@ import type { Section } from '@/app/navigation/sections';
 import { useNavigationStore } from '@/app/stores/navigation-store';
 import { defaultSettings, useSettingsStore } from '@/app/stores/settings-store';
 import { useThemeStore } from '@/app/stores/theme-store';
+import cameraSampleImage from '@/assets/camera-sample.webp';
 import nevermindAlbumArt from '@/assets/nevermind-album-art.jpg';
 
 type DemoSection = Section;
@@ -605,7 +606,7 @@ function SecurityShot() {
           id="camera.front_door"
           name="Front Door"
           room="Entrance"
-          entityPicture="/src/assets/camera-sample.webp"
+          entityPicture={cameraSampleImage}
           supportedFeatures={2}
           isStreamCapable
           size="extra-large"
@@ -618,7 +619,7 @@ function SecurityShot() {
           id="camera.driveway"
           name="Driveway"
           room="Garage"
-          entityPicture="/src/assets/camera-sample.webp"
+          entityPicture={cameraSampleImage}
           supportedFeatures={2}
           isStreamCapable
           size="extra-large"
@@ -1158,7 +1159,7 @@ function RoomShot({ room }: { room: string }) {
             id="camera.front_door_room"
             name="Front Door Cam"
             room="Outside"
-            entityPicture="/src/assets/camera-sample.webp"
+            entityPicture={cameraSampleImage}
             supportedFeatures={2}
             isStreamCapable
             size="medium"
