@@ -32,11 +32,21 @@ const getBasePath = (): string => {
 };
 
 export const sectionToPath = (section: Section): string => {
+  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/demo')) {
+    return section === 'home' ? '/demo' : `/demo/${section}`;
+  }
+
   const base = getBasePath();
   return section === 'home' ? base : `${base}${section}`;
 };
 
 export const pathToSection = (pathname: string): Section => {
+  if (pathname === '/demo' || pathname.startsWith('/demo/')) {
+    const segment = pathname.replace(/^\/demo\/?/, '').split('/')[0] ?? '';
+    if (!segment || !isSection(segment)) return 'home';
+    return segment;
+  }
+
   const base = getBasePath();
   const relative =
     base !== '/' && pathname.startsWith(base)

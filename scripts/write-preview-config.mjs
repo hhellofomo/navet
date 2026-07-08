@@ -59,14 +59,9 @@ loadDotenv();
 
 const runtimeConfig = {};
 const hassUrl = normalizeUrl(process.env.NAVET_HASS_URL);
-const token = normalizeValue(process.env.NAVET_HASS_TOKEN);
 
 if (hassUrl) {
   runtimeConfig.hassUrl = hassUrl;
-}
-
-if (token) {
-  runtimeConfig.token = token;
 }
 
 const distDir = path.resolve(process.cwd(), 'dist');
@@ -82,5 +77,5 @@ fs.writeFileSync(
 );
 
 console.log(
-  `Wrote ${path.relative(process.cwd(), outputPath)} (hassUrl: ${hassUrl ? 'set' : 'missing'}, token: ${token ? 'set' : 'missing'})`
+  `Wrote ${path.relative(process.cwd(), outputPath)} (hassUrl: ${hassUrl ? 'set' : 'missing'}, token: server-only)`
 );

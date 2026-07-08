@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 import { resolveHomeAssistantProxyUrl } from '@/app/utils/home-assistant-url';
+import { sanitizeImageUrl } from '@/app/utils/url-security';
 import { type PhotoFrameSourceMode, resolvePhotoFrameSourceMode } from './photo-frame-types';
 
 const MAX_MEDIA_SOURCE_DEPTH = 2;
@@ -87,7 +88,9 @@ export function usePhotoFrameSources({
   hassUrl,
 }: UsePhotoFrameSourcesOptions) {
   const resolvedSourceMode = resolvePhotoFrameSourceMode(sourceMode, mediaSourceId);
-  const manualPhotoUrls = photoUrls ?? [];
+  const manualPhotoUrls = (photoUrls ?? [])
+    .map((url) => sanitizeImageUrl(url, undefined, { allowDataImage: true }))
+    .filter((url): url is string => url !== null);
   const [homeAssistantPhotoUrls, setHomeAssistantPhotoUrls] = useState<string[]>([]);
 
   useEffect(() => {

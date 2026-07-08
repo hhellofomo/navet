@@ -8,6 +8,7 @@ import type {
   EnergyOverview,
   EnergyRange,
   EnergyRangeSnapshot,
+  EnergySourceDiagnostic,
   EnergyStat,
 } from '../types/energy.types';
 
@@ -685,6 +686,69 @@ export function getMockEnergyDashboard(
   const dashboard = cloneDashboard(getEnergyDashboardScenario(scenarioId).dashboard);
   dashboard.selectedRange = range === 'live' ? 'now' : range === 'day' ? 'today' : range;
   return dashboard;
+}
+
+export function getMockEnergySourceDiagnostics(
+  dashboard: EnergyDashboardModel
+): EnergySourceDiagnostic[] {
+  const diagnostics: EnergySourceDiagnostic[] = [];
+
+  if (dashboard.dataCoverage.hasGridImport) {
+    diagnostics.push({
+      id: 'grid-import',
+      label: 'Grid import',
+      entityId: 'sensor.grid_import_energy',
+      liveEntityId: 'sensor.grid_import_power',
+      status:
+        dashboard.totals.importW > 0 || dashboard.totals.importTodayKWh > 0
+          ? 'configured_numeric'
+          : 'configured_idle',
+      currentPowerW: dashboard.totals.importW,
+      todayKWh: dashboard.totals.importTodayKWh,
+    });
+  }
+
+  if (dashboard.dataCoverage.hasGridExport) {
+    diagnostics.push({
+      id: 'grid-export',
+      label: 'Grid export',
+      entityId: 'sensor.grid_export_energy',
+      liveEntityId: 'sensor.grid_export_power',
+      status:
+        dashboard.totals.exportW > 0 || dashboard.totals.exportTodayKWh > 0
+          ? 'configured_numeric'
+          : 'configured_idle',
+      currentPowerW: dashboard.totals.exportW,
+      todayKWh: dashboard.totals.exportTodayKWh,
+    });
+  }
+
+  if (dashboard.dataCoverage.hasSolar) {
+    diagnostics.push({
+      id: 'solar',
+      label: 'Solar production',
+      entityId: 'sensor.solar_energy',
+      liveEntityId: 'sensor.solar_power',
+      status:
+        dashboard.totals.solarW > 0 || dashboard.totals.solarTodayKWh > 0
+          ? 'configured_numeric'
+          : 'configured_idle',
+      currentPowerW: dashboard.totals.solarW,
+      todayKWh: dashboard.totals.solarTodayKWh,
+    });
+  }
+
+  if (dashboard.dataCoverage.hasGas) {
+    diagnostics.push({
+      id: 'gas',
+      label: 'Gas',
+      entityId: 'sensor.gas_energy',
+      status: dashboard.totals.gasTodayKWh > 0 ? 'configured_numeric' : 'configured_idle',
+      todayKWh: dashboard.totals.gasTodayKWh,
+    });
+  }
+
+  return diagnostics;
 }
 
 export function getMockEnergyOverview(range: EnergyRange | 'live' | 'day'): EnergyOverview {

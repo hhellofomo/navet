@@ -4,6 +4,7 @@ import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import { useHomeAssistant } from '@/app/hooks';
 import { selectFeedreaderEventEntities } from '@/app/hooks/ha-domain-entity-maps';
 import { usePersistedState } from '@/app/hooks/use-persisted-state';
+import { sanitizeExternalUrl } from '@/app/utils/url-security';
 import { DEFAULT_RSS_PROVIDERS } from './providers';
 import type { RSSCardData, RSSProvider } from './types';
 
@@ -15,6 +16,11 @@ const toProviderId = (value: string): string =>
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+
+const sanitizeFeedUrl = (value: string) => {
+  const safeUrl = sanitizeExternalUrl(value);
+  return safeUrl?.startsWith('https://') ? safeUrl : undefined;
+};
 
 export function useRSSFeedSources(
   cardId: string,
@@ -124,8 +130,8 @@ export function useRSSFeedSources(
 
   const addProvider = (name: string, feedUrl: string) => {
     const trimmedName = name.trim();
-    const trimmedFeedUrl = feedUrl.trim();
-    const baseId = toProviderId(trimmedName || trimmedFeedUrl);
+    const trimmedFeedUrl = sanitizeFeedUrl(feedUrl);
+    const baseId = toProviderId(trimmedName || (trimmedFeedUrl ?? ''));
 
     if (!trimmedName || !trimmedFeedUrl || !baseId) {
       return null;

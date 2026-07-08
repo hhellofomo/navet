@@ -1,3 +1,5 @@
+import { isSafeRelativePath, sanitizeImageUrl } from './url-security';
+
 const HOME_ASSISTANT_PROXY_PATH = '/__navet_ha_proxy__';
 const HOME_ASSISTANT_RELATIVE_PREFIXES = [
   '/api/',
@@ -22,15 +24,27 @@ export function resolveHomeAssistantAbsoluteUrl(resourceUrl: string, hassUrl?: s
     return null;
   }
 
-  if (resourceUrl.startsWith('blob:') || resourceUrl.startsWith('data:')) {
-    return resourceUrl;
+  const safeImageUrl = sanitizeImageUrl(resourceUrl, undefined, {
+    allowBlob: true,
+    allowDataImage: true,
+  });
+  if (safeImageUrl && safeImageUrl !== resourceUrl) {
+    return safeImageUrl;
   }
 
-  if (resourceUrl.startsWith('/') && isHomeAssistantRelativeUrl(resourceUrl)) {
+  if (resourceUrl.startsWith('blob:') || resourceUrl.startsWith('data:')) {
+    return safeImageUrl;
+  }
+
+  if (
+    resourceUrl.startsWith('/') &&
+    isSafeRelativePath(resourceUrl) &&
+    isHomeAssistantRelativeUrl(resourceUrl)
+  ) {
     return hassUrl ? `${hassUrl}${resourceUrl}` : resourceUrl;
   }
 
-  return resourceUrl;
+  return sanitizeImageUrl(resourceUrl) ?? null;
 }
 
 export function resolveHomeAssistantProxyUrl(resourceUrl: string, hassUrl?: string) {
@@ -38,20 +52,28 @@ export function resolveHomeAssistantProxyUrl(resourceUrl: string, hassUrl?: stri
     return null;
   }
 
+  const safeImageUrl = sanitizeImageUrl(resourceUrl, undefined, {
+    allowBlob: true,
+    allowDataImage: true,
+  });
   if (resourceUrl.startsWith('blob:') || resourceUrl.startsWith('data:')) {
-    return resourceUrl;
+    return safeImageUrl;
   }
 
   if (resourceUrl.startsWith(HOME_ASSISTANT_PROXY_PATH)) {
     return resourceUrl;
   }
 
-  if (resourceUrl.startsWith('/') && isHomeAssistantRelativeUrl(resourceUrl)) {
+  if (
+    resourceUrl.startsWith('/') &&
+    isSafeRelativePath(resourceUrl) &&
+    isHomeAssistantRelativeUrl(resourceUrl)
+  ) {
     return `${HOME_ASSISTANT_PROXY_PATH}${resourceUrl}`;
   }
 
   if (!isAbsoluteHttpUrl(resourceUrl)) {
-    return resourceUrl;
+    return null;
   }
 
   if (!hassUrl) {
@@ -73,7 +95,7 @@ export function resolveHomeAssistantProxyUrl(resourceUrl: string, hassUrl?: stri
     }
 
     if (resolvedResourceUrl.origin !== resolvedHassUrl.origin) {
-      return resourceUrl;
+      return sanitizeImageUrl(resourceUrl);
     }
 
     return `${HOME_ASSISTANT_PROXY_PATH}${resolvedResourceUrl.pathname}${resolvedResourceUrl.search}`;

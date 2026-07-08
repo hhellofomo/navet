@@ -1,7 +1,16 @@
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { ALL_ROOMS_ID } from '@/app/constants/rooms';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
-import { useCustomCardsStore, useDashboardEntitiesStore } from '@/app/features/dashboard';
+import {
+  type CardType,
+  useCustomCardsStore,
+  useDashboardEntitiesStore,
+} from '@/app/features/dashboard';
+import {
+  parseButtonServiceCall,
+  sanitizeButtonEntityId,
+} from '@/app/features/dashboard/utils/button-widget-security';
 import { useLightPresetStore } from '@/app/features/lighting';
 import { resolveAppLanguage } from '@/app/i18n/config';
 import { isSection } from '@/app/navigation/sections';
@@ -14,6 +23,7 @@ import {
 import { useThemeStore } from '@/app/stores/theme-store';
 import { getLegacyReducedEffectsFlags, resolveEffectsQuality } from '@/app/utils/effects-quality';
 import { storage } from '@/app/utils/storage';
+import { sanitizeExternalUrl, sanitizeImageUrl } from '@/app/utils/url-security';
 
 interface DashboardConfigPayload {
   version: 3;
@@ -202,6 +212,222 @@ export const exportDashboardConfig = (): DashboardConfigPayload => {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
+const cardTypes = new Set<CardType>([
+  'rss',
+  'photo',
+  'note',
+  'battery',
+  'energy-now',
+  'button',
+  'map',
+]);
+const cardSizes = new Set(['small', 'medium', 'large', 'extra-large']);
+const MAX_IMPORTED_CARDS = 200;
+const MAX_IMPORTED_RECORD_KEYS = 500;
+
+const sanitizeRSSFeedUrl = (value: unknown) => {
+  const safeUrl = sanitizeExternalUrl(stringValue(value, 2000));
+  return safeUrl?.startsWith('https://') ? safeUrl : null;
+};
+
+type SanitizedJsonPrimitive = string | number | boolean | null;
+type SanitizedJsonValue =
+  | SanitizedJsonPrimitive
+  | SanitizedJsonPrimitive[]
+  | Record<string, unknown>;
+type SanitizedJsonEntry = readonly [string, SanitizedJsonValue];
+
+function isSanitizedJsonPrimitive(value: unknown): value is SanitizedJsonPrimitive {
+  return (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
+    value === null
+  );
+}
+
+function stringValue(value: unknown, maxLength = 240): string | undefined {
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  return trimmed ? trimmed.slice(0, maxLength) : undefined;
+}
+
+function sanitizeJsonRecord(value: unknown, depth = 0): Record<string, unknown> | undefined {
+  if (!isRecord(value) || depth > 4) {
+    return undefined;
+  }
+
+  const entries = Object.entries(value)
+    .slice(0, 50)
+    .flatMap<SanitizedJsonEntry>(([key, entry]) => {
+      const safeKey = stringValue(key, 80);
+      if (!safeKey) {
+        return [];
+      }
+
+      if (isSanitizedJsonPrimitive(entry)) {
+        return [[safeKey, entry] as const];
+      }
+
+      if (Array.isArray(entry)) {
+        return [[safeKey, entry.slice(0, 50).filter(isSanitizedJsonPrimitive)] as const];
+      }
+
+      const nested = sanitizeJsonRecord(entry, depth + 1);
+      return nested ? ([[safeKey, nested]] as const) : [];
+    });
+
+  return Object.fromEntries(entries);
+}
+
+function sanitizeStringArray(value: unknown, maxItems = 200): string[] {
+  return Array.isArray(value)
+    ? value.slice(0, maxItems).flatMap((item) => {
+        const safeItem = stringValue(item);
+        return safeItem ? [safeItem] : [];
+      })
+    : [];
+}
+
+function sanitizeStringRecord(value: unknown): Record<string, string> {
+  if (!isRecord(value)) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(value)
+      .slice(0, MAX_IMPORTED_RECORD_KEYS)
+      .flatMap(([key, entry]) => {
+        const safeKey = stringValue(key);
+        const safeEntry = stringValue(entry);
+        return safeKey && safeEntry ? ([[safeKey, safeEntry]] as const) : [];
+      })
+  );
+}
+
+function sanitizeStringArrayRecord(value: unknown): Record<string, string[]> {
+  if (!isRecord(value)) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(value)
+      .slice(0, MAX_IMPORTED_RECORD_KEYS)
+      .flatMap(([key, entry]) => {
+        const safeKey = stringValue(key);
+        const safeEntries = sanitizeStringArray(entry);
+        return safeKey && safeEntries.length > 0 ? ([[safeKey, safeEntries]] as const) : [];
+      })
+  );
+}
+
+function sanitizeCustomCardData(
+  type: CardType,
+  data: unknown
+): Record<string, unknown> | undefined {
+  if (!isRecord(data)) {
+    return undefined;
+  }
+
+  if (type === 'button') {
+    const serviceCall = parseButtonServiceCall(stringValue(data.service));
+    const serviceData = sanitizeJsonRecord(data.serviceData);
+
+    return omitUndefinedEntries({
+      label: stringValue(data.label, 80),
+      service: serviceCall ? `${serviceCall.domain}.${serviceCall.service}` : undefined,
+      entityId: sanitizeButtonEntityId(stringValue(data.entityId)),
+      icon: stringValue(data.icon, 80),
+      serviceData,
+      tintColor: stringValue(data.tintColor, 40),
+    });
+  }
+
+  if (type === 'photo') {
+    const photoUrls = Array.isArray(data.photoUrls)
+      ? data.photoUrls.slice(0, 48).flatMap((url) => {
+          const safeUrl = sanitizeImageUrl(stringValue(url, 2000), undefined, {
+            allowDataImage: true,
+          });
+          return safeUrl ? [safeUrl] : [];
+        })
+      : undefined;
+
+    return omitUndefinedEntries({
+      sourceMode: data.sourceMode === 'home-assistant' ? 'home-assistant' : 'urls',
+      photoUrls,
+      mediaSourceId: stringValue(data.mediaSourceId, 240),
+      shuffleEnabled: typeof data.shuffleEnabled === 'boolean' ? data.shuffleEnabled : undefined,
+      tintColor: stringValue(data.tintColor, 40),
+    });
+  }
+
+  if (type === 'rss') {
+    const customProviders = Array.isArray(data.customProviders)
+      ? data.customProviders.slice(0, 50).flatMap((provider) => {
+          if (!isRecord(provider)) {
+            return [];
+          }
+
+          const id = stringValue(provider.id, 120);
+          const name = stringValue(provider.name, 120);
+          const feedUrl = sanitizeRSSFeedUrl(provider.feedUrl);
+          if (!id || !name || !feedUrl) {
+            return [];
+          }
+
+          return [{ id, name, type: 'url', feedUrl }];
+        })
+      : undefined;
+
+    return omitUndefinedEntries({
+      customProviders,
+      selectedProviderIds: sanitizeStringArray(data.selectedProviderIds, 50),
+      articleCount:
+        typeof data.articleCount === 'number'
+          ? Math.max(1, Math.min(50, Math.round(data.articleCount)))
+          : undefined,
+      tintColor: stringValue(data.tintColor, 40),
+    });
+  }
+
+  return sanitizeJsonRecord(data);
+}
+
+function sanitizeImportedCustomCards(value: unknown) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.slice(0, MAX_IMPORTED_CARDS).flatMap((card) => {
+    if (!isRecord(card) || !cardTypes.has(card.type as CardType)) {
+      return [];
+    }
+
+    const id = stringValue(card.id, 160);
+    const type = card.type as CardType;
+    const room = stringValue(card.room) ?? ALL_ROOMS_ID;
+    const size = cardSizes.has(card.size as string) ? (card.size as CardSize) : 'medium';
+    if (!id) {
+      return [];
+    }
+
+    return [
+      {
+        id,
+        type,
+        size,
+        room,
+        data: sanitizeCustomCardData(type, card.data),
+        createdAt: typeof card.createdAt === 'number' ? card.createdAt : Date.now(),
+      },
+    ];
+  });
+}
+
 export const importDashboardConfig = (value: unknown) => {
   if (!isRecord(value) || (value.version !== 1 && value.version !== 2 && value.version !== 3)) {
     throw new Error('Unsupported dashboard config format.');
@@ -302,14 +528,10 @@ export const importDashboardConfig = (value: unknown) => {
     activeSection: isSection(navigation.activeSection) ? navigation.activeSection : 'home',
   });
 
-  useCustomCardsStore
-    .getState()
-    .replaceCards(Array.isArray(value.customCards) ? value.customCards : []);
+  useCustomCardsStore.getState().replaceCards(sanitizeImportedCustomCards(value.customCards));
 
   useDashboardEntitiesStore.getState().replaceDashboardEntitiesState({
-    hiddenEntityIds: Array.isArray(dashboardEntities.hiddenEntityIds)
-      ? dashboardEntities.hiddenEntityIds.filter((item): item is string => typeof item === 'string')
-      : [],
+    hiddenEntityIds: sanitizeStringArray(dashboardEntities.hiddenEntityIds),
     onboardingCompleted:
       typeof dashboardEntities.onboardingCompleted === 'boolean'
         ? dashboardEntities.onboardingCompleted
@@ -331,11 +553,14 @@ export const importDashboardConfig = (value: unknown) => {
       >['lightPresetConfigs']) ?? currentLightPresetState.lightPresetConfigs,
   });
 
-  storage.set(STORAGE_KEYS.cardSizes, isRecord(value.cardSizes) ? value.cardSizes : {});
-  storage.set(STORAGE_KEYS.cardOrders, isRecord(value.cardOrders) ? value.cardOrders : {});
-  storage.set(STORAGE_KEYS.cardZones, isRecord(value.cardZones) ? value.cardZones : {});
-  storage.set(STORAGE_KEYS.homeDashboardLayout, value.homeDashboardLayout ?? null);
-  storage.set(STORAGE_KEYS.roomOrder, Array.isArray(value.roomOrder) ? value.roomOrder : []);
+  storage.set(STORAGE_KEYS.cardSizes, sanitizeStringRecord(value.cardSizes));
+  storage.set(STORAGE_KEYS.cardOrders, sanitizeStringArrayRecord(value.cardOrders));
+  storage.set(STORAGE_KEYS.cardZones, sanitizeStringRecord(value.cardZones));
+  storage.set(
+    STORAGE_KEYS.homeDashboardLayout,
+    sanitizeJsonRecord(value.homeDashboardLayout) ?? null
+  );
+  storage.set(STORAGE_KEYS.roomOrder, sanitizeStringArray(value.roomOrder));
 };
 
 export const downloadDashboardConfig = async (): Promise<'shared' | 'downloaded'> => {

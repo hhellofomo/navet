@@ -7,6 +7,7 @@ export { getDashboardWidgetSurfaceTokens } from './components/widgets/widget-sur
 export { DashboardPage } from './page';
 export { DashboardLayout } from './shell';
 export {
+  type CardType,
   type CustomCard,
   ENERGY_WIDGET_ROOM,
   HOME_WIDGET_ROOM,

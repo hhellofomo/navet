@@ -20,7 +20,7 @@ export function buildMarkerIcon(marker: MapMarker, accentHex: string): L.DivIcon
     <div style="
       width:${size}px;height:${size}px;border-radius:50%;
       border:2.5px solid ${borderColor};
-      background:${marker.entityPicture ? 'transparent' : 'rgba(30,30,40,0.85)'};
+      background:${marker.entityPicture ? 'transparent' : isHome ? accentHex : 'rgba(30,30,40,0.85)'};
       display:flex;align-items:center;justify-content:center;
       overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.45);
       backdrop-filter:blur(4px);

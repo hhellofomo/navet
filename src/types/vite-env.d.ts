@@ -2,8 +2,7 @@
 /// <reference types="vite-plugin-pwa/client" />
 
 interface ImportMetaEnv {
-  readonly NAVET_HASS_URL?: string;
-  readonly NAVET_HASS_TOKEN?: string;
+  readonly VITE_NAVET_PUBLIC_URL?: string;
 }
 
 interface ImportMeta {

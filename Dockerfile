@@ -12,6 +12,7 @@ FROM --platform=$TARGETPLATFORM nginx:1.27-alpine
 COPY docker/nginx.main.conf /etc/nginx/nginx.conf
 COPY docker/njs/rss-proxy.js /etc/nginx/njs/rss-proxy.js
 COPY docker/snippets/navet-rss-proxy.conf /etc/nginx/snippets/navet-rss-proxy.conf
+COPY docker/snippets/navet-security-headers.conf /etc/nginx/snippets/navet-security-headers.conf
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 COPY docker/nginx.proxy.conf.template /etc/navet-nginx/default.proxy.conf.template
 COPY docker/nginx.no-proxy.conf /etc/navet-nginx/default.no-proxy.conf

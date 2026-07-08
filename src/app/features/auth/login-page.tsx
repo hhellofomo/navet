@@ -3,13 +3,14 @@ import { useState } from 'react';
 import { FieldBlock } from '@/app/components/patterns';
 import { Button, Input } from '@/app/components/primitives';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { getRuntimeConfig } from '@/app/config/runtime-config';
 import { useI18n, useTheme } from '@/app/hooks';
 import { useAuth } from '@/app/stores/auth-store';
 import { useConfig } from '@/app/stores/config-store';
 import { authSelectors, configSelectors } from '@/app/stores/selectors';
 
 export function LoginPage() {
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState(() => getRuntimeConfig().hassUrl ?? '');
   const [token, setToken] = useState('');
   const [showToken, setShowToken] = useState(false);
   const [error, setError] = useState('');

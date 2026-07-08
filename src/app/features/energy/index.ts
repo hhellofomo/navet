@@ -1,6 +1,15 @@
 export { EnergySparkline } from './components/charts/energy-sparkline';
+export { EnergyDashboardPage } from './components/dashboard/energy-dashboard-page';
 export { EnergySection } from './components/energy-section';
 export { EnergyNowCardView } from './components/widgets/energy-now-card-view';
+export {
+  getEnergyDashboardScenario,
+  getMockEnergySourceDiagnostics,
+} from './data/mock-energy-dashboard';
 export { useEnergyDashboard } from './hooks/use-energy-dashboard';
 export { useEnergyLoadHistory } from './hooks/use-energy-load-history';
-export type { EnergySeriesPoint } from './types/energy.types';
+export type {
+  EnergyDashboardModel,
+  EnergySeriesPoint,
+  EnergySourceDiagnostic,
+} from './types/energy.types';

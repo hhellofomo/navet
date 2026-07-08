@@ -21,6 +21,7 @@ COPY addons/navet/run.sh /run.sh
 COPY addons/navet/rootfs/ /
 COPY docker/njs/rss-proxy.js /etc/nginx/njs/rss-proxy.js
 COPY docker/snippets/navet-rss-proxy.conf /etc/nginx/snippets/navet-rss-proxy.conf
+COPY docker/snippets/navet-security-headers.conf /etc/nginx/snippets/navet-security-headers.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 
 RUN chmod a+x /run.sh

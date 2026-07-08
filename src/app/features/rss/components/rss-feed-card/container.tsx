@@ -7,6 +7,7 @@ import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useDashboardWidgetRoomOptions } from '@/app/features/dashboard';
 import { useAreaRooms, useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 import type { HomeAssistantStore } from '@/app/stores/home-assistant-store';
+import { sanitizeExternalUrl } from '@/app/utils/url-security';
 import { RSSFeedSettingsDialog } from './settings-dialog';
 import type { RSSFeedCardProps } from './types';
 import { useRSSFeedItems } from './use-rss-feed-items';
@@ -120,7 +121,10 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
 
   const handleArticleClick = (url: string) => {
     if (!inEditMode) {
-      window.open(url, '_blank');
+      const safeUrl = sanitizeExternalUrl(url);
+      if (safeUrl) {
+        window.open(safeUrl, '_blank', 'noopener,noreferrer');
+      }
     }
   };
 

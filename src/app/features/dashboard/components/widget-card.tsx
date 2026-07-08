@@ -7,6 +7,7 @@ import type { CustomCard } from '../stores/custom-cards-store';
 import { useCustomCardsStore } from '../stores/custom-cards-store';
 import type { BatteryOverviewWidgetData } from './widgets/battery-overview-widget';
 import type { EnergyNowWidgetData } from './widgets/energy-now-dashboard-widget';
+import type { MapMarker } from './widgets/map-types';
 import type { PhotoFrameSourceMode } from './widgets/photo-frame-types';
 
 class WidgetErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
@@ -60,6 +61,21 @@ const MapWidget = lazy(async () => {
   const module = await import('./widgets/map-widget');
   return { default: module.MapWidget };
 });
+
+function isMapMarker(value: unknown): value is MapMarker {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const marker = value as Partial<MapMarker>;
+  return (
+    typeof marker.id === 'string' &&
+    typeof marker.name === 'string' &&
+    typeof marker.latitude === 'number' &&
+    typeof marker.longitude === 'number' &&
+    typeof marker.state === 'string'
+  );
+}
 
 interface WidgetCardProps {
   card: CustomCard;
@@ -192,6 +208,9 @@ export function WidgetCard({ card, isEditMode, onUpdate }: WidgetCardProps) {
         <MapWidget
           size={card.size}
           tintColor={card.data?.tintColor as string | undefined}
+          markers={
+            Array.isArray(card.data?.markers) ? card.data.markers.filter(isMapMarker) : undefined
+          }
           onTintColorChange={(tintColor) =>
             handleCardUpdate(card.id, { data: { ...card.data, tintColor } })
           }

@@ -1,3 +1,4 @@
+import { sanitizeExternalUrl, sanitizeImageUrl } from '@/app/utils/url-security';
 import type { RSSItem } from './types';
 
 const stripHtml = (value: string): string =>
@@ -74,6 +75,8 @@ export function toRSSItem({
   imageUrl?: string;
   formatRelativeTime: (value: number, unit: Intl.RelativeTimeFormatUnit) => string;
 }): RSSItem {
+  const safeLink = sanitizeExternalUrl(link) ?? '#';
+  const safeImageUrl = sanitizeImageUrl(imageUrl);
   const publishedAt = publishedAtRaw ? new Date(publishedAtRaw) : null;
   const publishedAtMs = publishedAt?.getTime();
   const hasValidPublishedAt = typeof publishedAtMs === 'number' && !Number.isNaN(publishedAtMs);
@@ -87,9 +90,9 @@ export function toRSSItem({
     title,
     source: providerName,
     timeAgo,
-    url: link,
+    url: safeLink,
     excerpt: excerpt ? stripHtml(excerpt) : undefined,
-    imageUrl,
+    imageUrl: safeImageUrl ?? undefined,
     publishedAtMs: hasValidPublishedAt ? publishedAtMs : undefined,
   };
 }

@@ -11,12 +11,23 @@ import { SettingsProjectSection } from './settings-project-section';
 import { SettingsHero } from './settings-section-shell';
 import { SettingsSystemSection } from './settings-system-section';
 
-export function SettingsSection() {
+type SettingsTabId =
+  | 'appearance'
+  | 'localization'
+  | 'interaction'
+  | 'dashboard'
+  | 'system'
+  | 'project';
+
+interface SettingsSectionProps {
+  hiddenTabs?: SettingsTabId[];
+}
+
+export function SettingsSection({ hiddenTabs = [] }: SettingsSectionProps) {
   const { t } = useI18n();
   const controller = useSettingsSectionController();
-  const [activeTab, setActiveTab] = useState<
-    'appearance' | 'localization' | 'interaction' | 'dashboard' | 'system' | 'project'
-  >('appearance');
+  const [activeTab, setActiveTab] = useState<SettingsTabId>('appearance');
+  const hiddenTabSet = new Set<string>(hiddenTabs);
   const navItems = [
     { id: 'appearance', label: t('settings.nav.appearance'), icon: Palette },
     { id: 'localization', label: t('settings.nav.localization'), icon: Languages },
@@ -24,7 +35,7 @@ export function SettingsSection() {
     { id: 'dashboard', label: t('settings.nav.dashboard'), icon: LayoutGrid },
     { id: 'system', label: t('settings.nav.system'), icon: Server },
     { id: 'project', label: t('settings.nav.project'), icon: Info },
-  ] as const;
+  ].filter(({ id }) => !hiddenTabSet.has(id));
 
   return (
     <div className="h-full min-w-0 overflow-x-hidden overflow-y-auto">
@@ -66,9 +77,11 @@ export function SettingsSection() {
           <TabPanel value="dashboard">
             <SettingsDashboardSection controller={controller} />
           </TabPanel>
-          <TabPanel value="system">
-            <SettingsSystemSection controller={controller} />
-          </TabPanel>
+          {hiddenTabSet.has('system') ? null : (
+            <TabPanel value="system">
+              <SettingsSystemSection controller={controller} />
+            </TabPanel>
+          )}
           <TabPanel value="project">
             <SettingsProjectSection controller={controller} />
           </TabPanel>

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { sanitizeImageUrl } from '@/app/utils/url-security';
 
 export type ThemeMode = 'light' | 'dark' | 'black' | 'glass';
 export type PrimaryColor =
@@ -14,16 +15,16 @@ export type PrimaryColor =
   | 'custom';
 
 const LEGACY_ADAPTIVE_WALLPAPER_MAP: Record<string, string> = {
-  'preset:soft-dark-gradient': './wallpapers/soft-dark-gradient.svg',
-  'preset:frosted-glass-abstract': './wallpapers/frosted-glass-abstract.svg',
-  'preset:blurred-forest-mood': './wallpapers/blurred-forest-mood.svg',
-  'preset:luxury-living-room-ambient': './wallpapers/luxury-living-room-ambient.svg',
-  'preset:matte-concrete-texture': './wallpapers/matte-concrete-texture.svg',
-  'preset:muted-nebula-space': './wallpapers/muted-nebula-space.svg',
-  'preset:scandinavian-warm-neutral': './wallpapers/scandinavian-warm-neutral.svg',
-  'preset:subtle-smart-grid': './wallpapers/subtle-smart-grid.svg',
-  'preset:pure-oled-black-luxury': './wallpapers/pure-oled-black-luxury.svg',
-  'preset:dynamic-sunrise-gradient': './wallpapers/dynamic-sunrise-gradient.svg',
+  'preset:soft-dark-gradient': '/wallpapers/soft-dark-gradient.svg',
+  'preset:frosted-glass-abstract': '/wallpapers/frosted-glass-abstract.svg',
+  'preset:blurred-forest-mood': '/wallpapers/blurred-forest-mood.svg',
+  'preset:luxury-living-room-ambient': '/wallpapers/luxury-living-room-ambient.svg',
+  'preset:matte-concrete-texture': '/wallpapers/matte-concrete-texture.svg',
+  'preset:muted-nebula-space': '/wallpapers/muted-nebula-space.svg',
+  'preset:scandinavian-warm-neutral': '/wallpapers/scandinavian-warm-neutral.svg',
+  'preset:subtle-smart-grid': '/wallpapers/subtle-smart-grid.svg',
+  'preset:pure-oled-black-luxury': '/wallpapers/pure-oled-black-luxury.svg',
+  'preset:dynamic-sunrise-gradient': '/wallpapers/dynamic-sunrise-gradient.svg',
 };
 
 interface ThemeState {
@@ -61,7 +62,7 @@ function normalizeWallpaperPath(wallpaper: string | null | undefined) {
   }
 
   if (trimmed.startsWith('/wallpapers/')) {
-    return `.${trimmed}`;
+    return trimmed;
   }
 
   if (typeof window !== 'undefined') {
@@ -71,7 +72,7 @@ function normalizeWallpaperPath(wallpaper: string | null | undefined) {
         resolved.origin === window.location.origin &&
         resolved.pathname.startsWith('/wallpapers/')
       ) {
-        return `.${resolved.pathname}`;
+        return resolved.pathname;
       }
     } catch (error) {
       console.error('[ThemeStore] Wallpaper URL resolution failed:', error);
@@ -79,7 +80,7 @@ function normalizeWallpaperPath(wallpaper: string | null | undefined) {
     }
   }
 
-  return trimmed;
+  return sanitizeImageUrl(trimmed, undefined, { allowDataImage: true }) ?? null;
 }
 
 function normalizeThemeMode(theme: ThemeMode | 'contrast' | null | undefined): ThemeMode {
