@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { RotaryKnob } from '@/app/components/primitives';
 import { getCardReadableTextTokens } from '@/app/components/shared/theme/card-readable-text-tokens';
+import { getHVACGaugeSurfaceTokens } from '@/app/components/shared/theme/hvac-card-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { cn } from '@/app/components/ui/utils';
 import { useI18n, useTheme } from '@/app/hooks';
@@ -89,6 +90,7 @@ export const HVACGauge = memo(function HVACGauge({
   const surface = getThemeSurfaceTokens(theme);
   const tone = !isOn ? 'neutral' : mode === 'heat' ? 'orange' : mode === 'cool' ? 'cyan' : 'blue';
   const textTokens = getCardReadableTextTokens({ theme, tone, accentColor });
+  const hvacGaugeSurface = getHVACGaugeSurfaceTokens(theme, textTokens.titleColor);
   const gaugeLabel = t('climate.gaugeLabel', { mode, temp: targetTemp });
   const progress = clamp((targetTemp - minTemp) / Math.max(maxTemp - minTemp, step || 0.5), 0, 1);
 
@@ -122,7 +124,7 @@ export const HVACGauge = memo(function HVACGauge({
       const isCompact = variant === 'docked-card-small';
       const primaryBandColor = textTokens.titleColor;
       const secondaryBandColor = textTokens.subtitleColor;
-      const glowBandColor = withAlpha(primaryBandColor, theme === 'light' ? '44' : '66');
+      const glowBandColor = hvacGaugeSurface.glowBandColor || withAlpha(primaryBandColor, '66');
 
       return (
         <div
@@ -208,9 +210,9 @@ export const HVACGauge = memo(function HVACGauge({
         ? 'text-white'
         : 'text-gray-300';
   const currentTempColor = surface.textSubtle;
-  const tickColor = theme === 'light' ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.2)';
-  const arcBgStroke = theme === 'light' ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.05)';
-  const arcInnerStroke = theme === 'light' ? 'rgba(0, 0, 0, 0.04)' : 'rgba(0, 0, 0, 0.3)';
+  const tickColor = hvacGaugeSurface.tickColor;
+  const arcBgStroke = hvacGaugeSurface.arcBackground;
+  const arcInnerStroke = hvacGaugeSurface.arcInnerStroke;
 
   return (
     <div className={cn('relative h-36 w-56', className)}>

@@ -1,7 +1,6 @@
 import type { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
+import { DEFAULT_LIGHT_CUSTOM_COLOR } from '@/app/constants';
 import type { LightCardController } from './light-card-controller.types';
-
-const DEFAULT_LIGHT_CUSTOM_COLOR = '#FFA500';
 
 type BuildLightCardControllerStateParams = Omit<
   LightCardController,

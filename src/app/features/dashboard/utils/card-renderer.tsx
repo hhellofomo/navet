@@ -44,7 +44,7 @@ function getAvailabilityEntityIds(device: DeviceData): string[] {
     return sourceIds;
   }
 
-  return device.id.includes('.') ? [device.id] : [];
+  return typeof device.id === 'string' && device.id.includes('.') ? [device.id] : [];
 }
 
 function createEntityStatesSelector(entityIds: string[]) {

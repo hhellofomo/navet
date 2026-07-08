@@ -1,8 +1,10 @@
 import { Settings2 } from 'lucide-react';
-import type { CSSProperties } from 'react';
 import { BaseCard, InteractivePill, RoundControlButton } from '@/app/components/primitives';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { withTintAlpha } from '@/app/components/shared/theme/custom-card-tint-surface';
+import {
+  getRSSControlPillStyle,
+  getRSSSkeletonStyles,
+} from '@/app/components/shared/theme/rss-widget-surface-tokens';
 import { type PrimaryColor, type ThemeType, useI18n } from '@/app/hooks';
 import { getRSSFeedCardSurfaceTokens } from './surface-tokens';
 import type { RSSItem, RSSProvider } from './types';
@@ -388,19 +390,11 @@ function RSSFeedLoadingSkeleton({
   theme: ThemeType;
   accentColor: string;
 }) {
-  const pillStyle = {
-    backgroundColor: withTintAlpha(accentColor, theme === 'light' ? 0.1 : 0.18),
-    borderColor: withTintAlpha(accentColor, theme === 'light' ? 0.16 : 0.24),
-  };
-  const blockStyle = {
-    backgroundColor: withTintAlpha(accentColor, theme === 'light' ? 0.12 : 0.18),
-  };
-  const lineStyle = {
-    backgroundColor: withTintAlpha(accentColor, theme === 'light' ? 0.16 : 0.24),
-  };
-  const dividerStyle = {
-    backgroundColor: withTintAlpha(accentColor, theme === 'light' ? 0.12 : 0.16),
-  };
+  const skeletonStyles = getRSSSkeletonStyles({ theme, accentColor });
+  const pillStyle = skeletonStyles.pill;
+  const blockStyle = skeletonStyles.block;
+  const lineStyle = skeletonStyles.line;
+  const dividerStyle = skeletonStyles.divider;
 
   return (
     <div className="flex flex-1 flex-col animate-pulse">
@@ -495,31 +489,4 @@ function truncateExcerpt(value: string, maxLength = 420) {
   }
 
   return `${value.slice(0, maxLength).trimEnd()}...`;
-}
-
-function getRSSControlPillStyle({
-  accentColor,
-  isActive,
-  theme,
-  textPrimaryColor,
-  textSecondaryColor,
-}: {
-  accentColor: string;
-  isActive: boolean;
-  theme: ThemeType;
-  textPrimaryColor: string;
-  textSecondaryColor: string;
-}): CSSProperties {
-  return {
-    color: isActive ? textPrimaryColor : textSecondaryColor,
-    borderColor: isActive
-      ? withTintAlpha(accentColor, theme === 'light' ? 0.28 : 0.24)
-      : withTintAlpha(accentColor, theme === 'light' ? 0.18 : 0.14),
-    background: isActive
-      ? `linear-gradient(180deg, ${withTintAlpha(accentColor, theme === 'light' ? 0.14 : 0.26)} 0%, ${withTintAlpha(accentColor, theme === 'light' ? 0.08 : 0.14)} 100%)`
-      : withTintAlpha(accentColor, theme === 'light' ? 0.05 : 0.08),
-    boxShadow: isActive
-      ? `inset 0 1px 0 ${withTintAlpha(accentColor, theme === 'light' ? 0.16 : 0.22)}, 0 8px 20px -16px ${withTintAlpha(accentColor, theme === 'light' ? 0.2 : 0.34)}`
-      : 'none',
-  };
 }

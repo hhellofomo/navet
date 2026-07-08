@@ -1,9 +1,12 @@
 import { startTransition, useEffect, useState } from 'react';
+import { PROGRESSIVE_BATCHING_TIMEOUT } from '@/app/constants';
 
 const INITIAL_BATCH = 8;
 const BATCH_SIZE = 8;
 const EDIT_MODE_INITIAL_BATCH = 16;
 const EDIT_MODE_BATCH_SIZE = 16;
+const IDLE_CALLBACK_TIMEOUT = PROGRESSIVE_BATCHING_TIMEOUT;
+const SET_TIMEOUT_FALLBACK = 96;
 
 type IdleCallbackHandle = number;
 type IdleDeadlineLike = { didTimeout: boolean; timeRemaining: () => number };
@@ -78,7 +81,7 @@ export function useProgressiveBatching(
               scheduleNextBatch();
             }
           },
-          { timeout: 160 }
+          { timeout: IDLE_CALLBACK_TIMEOUT }
         );
         return;
       }
@@ -86,7 +89,7 @@ export function useProgressiveBatching(
       timeoutId = window.setTimeout(() => {
         timeoutId = null;
         runBatch();
-      }, 96);
+      }, SET_TIMEOUT_FALLBACK);
     };
 
     scheduleNextBatch();

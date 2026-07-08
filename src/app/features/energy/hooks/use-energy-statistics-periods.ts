@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import { ENERGY_STATISTICS_REFRESH_INTERVAL } from '@/app/constants';
 import { useHomeAssistant } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { getEnergyStatisticsPeriods } from '../services/energy-statistics-service';
 
-const REFRESH_MS = 5 * 60 * 1000;
+const REFRESH_MS = ENERGY_STATISTICS_REFRESH_INTERVAL;
 
 interface EnergyPeriodTotals {
   today: number;

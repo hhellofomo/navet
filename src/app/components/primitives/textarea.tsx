@@ -1,4 +1,5 @@
 import { forwardRef, type TextareaHTMLAttributes, useState } from 'react';
+import { getTextFieldSurfaceTokens } from '@/app/components/shared/theme/text-field-surface-tokens';
 import {
   getControlFocusStyles,
   navetRadiusTokens,
@@ -30,8 +31,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
 ) {
   const { theme, accentColor } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
-
-  const baseBorderColor = invalid ? (theme === 'light' ? '#dc2626' : '#f87171') : undefined;
+  const fieldTokens = getTextFieldSurfaceTokens(theme, invalid);
 
   return (
     <div className={cn('relative', containerClassName)}>
@@ -54,20 +54,14 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
           navetRadiusTokens.field,
           navetSizeTokens.fieldInset,
           navetTypographyTokens.control,
-          theme === 'light'
-            ? 'border-gray-200 bg-gray-100 text-gray-900 placeholder-slate-500'
-            : theme === 'black'
-              ? 'border-white/16 bg-black text-white placeholder-zinc-300'
-              : theme === 'glass'
-                ? 'border-white/16 bg-white/8 text-white placeholder-white/72'
-                : 'border-zinc-800 bg-zinc-900 text-white placeholder-zinc-400',
+          fieldTokens.fieldClassName,
           textareaClassName
         )}
         style={{
           ...getControlFocusStyles({
             isFocused,
             accentColor,
-            invalidBorderColor: baseBorderColor,
+            invalidBorderColor: fieldTokens.invalidBorderColor,
           }),
           ...style,
         }}

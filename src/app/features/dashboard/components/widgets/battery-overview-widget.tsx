@@ -33,6 +33,7 @@ import {
   haBatterySensorRowsEqual,
   selectBatterySensorRowsFromHa,
 } from '@/app/hooks/ha-battery-sensor-rows';
+import { BATTERY_LEVEL_COLORS, BATTERY_LEVEL_THRESHOLDS } from './battery-constants';
 import { getDashboardWidgetSurfaceTokens } from './widget-surface-tokens';
 
 export interface BatteryOverviewWidgetData {
@@ -350,8 +351,8 @@ export const BatteryOverviewWidget = memo(function BatteryOverviewWidget({
         : 'rgba(255,255,255,0.08)');
 
   const getLevelColor = (level: number) => {
-    if (level <= 20) return '#ef4444';
-    if (level <= 40) return '#f97316';
+    if (level <= BATTERY_LEVEL_THRESHOLDS.CRITICAL) return BATTERY_LEVEL_COLORS.critical;
+    if (level <= BATTERY_LEVEL_THRESHOLDS.LOW) return BATTERY_LEVEL_COLORS.low;
     return accentHex;
   };
 

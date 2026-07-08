@@ -1,0 +1,255 @@
+import type { Connection } from 'home-assistant-js-websocket';
+
+import type {
+  HomeAssistantAutomationConfig,
+  HomeAssistantMediaSourceItem,
+  HomeAssistantResolvedMediaSource,
+} from './home-assistant.service';
+
+/**
+ * Provides domain-specific Home Assistant service calls for entity control.
+ * Handles lights, switches, climate, media players, cameras, locks, vacuums, and covers.
+ */
+class HAEntityService {
+  constructor(private connection: () => Connection | null) {}
+
+  /**
+   * Call a Home Assistant service over the active websocket connection.
+   */
+  private async callService(
+    domain: string,
+    service: string,
+    serviceData: Record<string, unknown> = {},
+    target?: {
+      entity_id?: string | string[];
+      area_id?: string | string[];
+      device_id?: string | string[];
+    }
+  ): Promise<void> {
+    const conn = this.connection();
+    if (!conn) {
+      throw new Error('Home Assistant is not connected');
+    }
+
+    const normalizedServiceData = { ...serviceData };
+
+    if (target?.entity_id && normalizedServiceData.entity_id === undefined) {
+      normalizedServiceData.entity_id = target.entity_id;
+    }
+    if (target?.area_id && normalizedServiceData.area_id === undefined) {
+      normalizedServiceData.area_id = target.area_id;
+    }
+    if (target?.device_id && normalizedServiceData.device_id === undefined) {
+      normalizedServiceData.device_id = target.device_id;
+    }
+
+    const { callService: callHassService } = await import('home-assistant-js-websocket');
+    await callHassService(conn, domain, service, normalizedServiceData, target);
+  }
+
+  /**
+   * Update a light entity using Home Assistant light services.
+   */
+  async updateLight(
+    entityId: string,
+    options: {
+      state?: 'on' | 'off';
+      brightnessPct?: number;
+      kelvin?: number;
+      rgbColor?: [number, number, number];
+      hsColor?: [number, number];
+      xyColor?: [number, number];
+    }
+  ): Promise<void> {
+    const { state = 'on', brightnessPct, kelvin, rgbColor, hsColor, xyColor } = options;
+
+    if (state === 'off') {
+      await this.callService('light', 'turn_off', {}, { entity_id: entityId });
+      return;
+    }
+
+    const serviceData: Record<string, unknown> = {};
+    if (typeof brightnessPct === 'number') {
+      serviceData.brightness_pct = Math.max(1, Math.min(100, Math.round(brightnessPct)));
+    }
+    if (typeof kelvin === 'number') {
+      serviceData.color_temp_kelvin = Math.max(2000, Math.min(6500, Math.round(kelvin)));
+    }
+    if (rgbColor) {
+      serviceData.rgb_color = rgbColor;
+    }
+    if (hsColor) {
+      serviceData.hs_color = [
+        Math.max(0, Math.min(360, hsColor[0])),
+        Math.max(0, Math.min(100, hsColor[1])),
+      ];
+    }
+    if (xyColor) {
+      serviceData.xy_color = [
+        Math.max(0, Math.min(1, xyColor[0])),
+        Math.max(0, Math.min(1, xyColor[1])),
+      ];
+    }
+
+    await this.callService('light', 'turn_on', serviceData, { entity_id: entityId });
+  }
+
+  /**
+   * Update a switch entity using Home Assistant switch services.
+   */
+  async updateSwitch(entityId: string, state: 'on' | 'off'): Promise<void> {
+    await this.callService(
+      'switch',
+      state === 'on' ? 'turn_on' : 'turn_off',
+      {},
+      { entity_id: entityId }
+    );
+  }
+
+  async updateLock(entityId: string, state: 'locked' | 'unlocked'): Promise<void> {
+    await this.callService(
+      'lock',
+      state === 'locked' ? 'lock' : 'unlock',
+      {},
+      { entity_id: entityId }
+    );
+  }
+
+  async setClimateTemperature(entityId: string, temperature: number): Promise<void> {
+    await this.callService('climate', 'set_temperature', { temperature }, { entity_id: entityId });
+  }
+
+  async updateMediaPlayerPlayback(
+    entityId: string,
+    action: 'toggle' | 'play' | 'pause' | 'previous' | 'next'
+  ): Promise<void> {
+    const service =
+      action === 'toggle'
+        ? 'media_play_pause'
+        : action === 'play'
+          ? 'media_play'
+          : action === 'pause'
+            ? 'media_pause'
+            : action === 'previous'
+              ? 'media_previous_track'
+              : 'media_next_track';
+
+    await this.callService('media_player', service, {}, { entity_id: entityId });
+  }
+
+  async setMediaPlayerVolume(entityId: string, volumePct: number): Promise<void> {
+    const volumeLevel = Math.max(0, Math.min(1, volumePct / 100));
+    await this.callService(
+      'media_player',
+      'volume_set',
+      { volume_level: volumeLevel },
+      { entity_id: entityId }
+    );
+  }
+
+  async setMediaPlayerMute(entityId: string, isMuted: boolean): Promise<void> {
+    await this.callService(
+      'media_player',
+      'volume_mute',
+      { is_volume_muted: isMuted },
+      { entity_id: entityId }
+    );
+  }
+
+  async updateMediaPlayerPower(entityId: string, state: 'on' | 'off'): Promise<void> {
+    await this.callService(
+      'media_player',
+      state === 'on' ? 'turn_on' : 'turn_off',
+      {},
+      { entity_id: entityId }
+    );
+  }
+
+  async selectMediaPlayerSource(entityId: string, source: string): Promise<void> {
+    await this.callService('media_player', 'select_source', { source }, { entity_id: entityId });
+  }
+
+  async sendRemoteCommand(entityId: string, command: string | string[]): Promise<void> {
+    await this.callService('remote', 'send_command', { command }, { entity_id: entityId });
+  }
+
+  async setMediaPlayerShuffle(entityId: string, shuffle: boolean): Promise<void> {
+    await this.callService('media_player', 'shuffle_set', { shuffle }, { entity_id: entityId });
+  }
+
+  async setMediaPlayerRepeat(entityId: string, repeat: 'off' | 'one' | 'all'): Promise<void> {
+    await this.callService('media_player', 'repeat_set', { repeat }, { entity_id: entityId });
+  }
+
+  async joinMediaPlayers(entityId: string, memberEntityIds: string[]): Promise<void> {
+    await this.callService(
+      'media_player',
+      'join',
+      { group_members: memberEntityIds },
+      { entity_id: entityId }
+    );
+  }
+
+  async unjoinMediaPlayer(entityId: string): Promise<void> {
+    await this.callService('media_player', 'unjoin', {}, { entity_id: entityId });
+  }
+
+  /**
+   * Turn a camera entity on or off.
+   */
+  async updateCamera(entityId: string, state: 'on' | 'off'): Promise<void> {
+    await this.callService(
+      'camera',
+      state === 'on' ? 'turn_on' : 'turn_off',
+      {},
+      { entity_id: entityId }
+    );
+  }
+
+  /**
+   * Browse media source
+   */
+  async browseMediaSource(mediaContentId: string): Promise<HomeAssistantMediaSourceItem> {
+    const conn = this.connection();
+    if (!conn) {
+      throw new Error('Home Assistant is not connected');
+    }
+
+    return conn.sendMessagePromise({
+      type: 'media_source/browse_media',
+      media_content_id: mediaContentId,
+    }) as Promise<HomeAssistantMediaSourceItem>;
+  }
+
+  /**
+   * Resolve media source to get URL
+   */
+  async resolveMediaSource(mediaContentId: string): Promise<HomeAssistantResolvedMediaSource> {
+    const conn = this.connection();
+    if (!conn) {
+      throw new Error('Home Assistant is not connected');
+    }
+
+    return conn.sendMessagePromise({
+      type: 'media_source/resolve_media',
+      media_content_id: mediaContentId,
+    }) as Promise<HomeAssistantResolvedMediaSource>;
+  }
+
+  /**
+   * Get automation config
+   */
+  async getAutomationConfig(entityId: string): Promise<HomeAssistantAutomationConfig> {
+    const conn = this.connection();
+    if (!conn) {
+      throw new Error('Home Assistant is not connected');
+    }
+
+    return conn.sendMessagePromise({
+      type: 'automation/config',
+      entity_id: entityId,
+    }) as Promise<HomeAssistantAutomationConfig>;
+  }
+}
+
+export default HAEntityService;

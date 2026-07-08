@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useHomeAssistant } from '@/app/hooks';
+import { useCardSettingsDialog } from '@/app/hooks/use-card-settings-dialog';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { useBrightnessPresets } from '../../hooks/use-brightness-presets';
 import { useLightMemoryStore } from '../../stores/light-memory-store';
@@ -22,7 +23,7 @@ export function useLightCardController({
   isEditMode,
 }: LightCardControllerParams): LightCardController {
   const [isOn, setIsOn] = useState(initialState);
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, onOpen, onClose } = useCardSettingsDialog();
   const [selectedIcon, setSelectedIcon] = useState('');
   const [tintColor, setTintColor] = useState('');
 
@@ -84,7 +85,7 @@ export function useLightCardController({
     isEditMode,
     isSmall,
     toggleLightState,
-    setIsOpen,
+    setIsOpen: isOpen ? onClose : onOpen,
   });
   return buildLightCardControllerState({
     applyBrightnessPresetsToAll,
@@ -107,7 +108,7 @@ export function useLightCardController({
     onColorChange,
     onCustomColorChange,
     onIconChange: (icon) => setSelectedIcon(icon.trim()),
-    onOpenChange: setIsOpen,
+    onOpenChange: isOpen ? onClose : onOpen,
     onTempChange,
     onTempCommit,
     onTintColorChange: setTintColor,

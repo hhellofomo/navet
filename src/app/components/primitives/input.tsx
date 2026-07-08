@@ -1,4 +1,5 @@
 import { forwardRef, type InputHTMLAttributes, type ReactNode, useState } from 'react';
+import { getTextFieldSurfaceTokens } from '@/app/components/shared/theme/text-field-surface-tokens';
 import { getThemeAppearancePickerTokens } from '@/app/components/shared/theme/theme-appearance-picker-tokens';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import {
@@ -40,6 +41,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 ) {
   const { theme, accentColor, primaryColor } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
+  const fieldTokens = getTextFieldSurfaceTokens(theme, invalid);
 
   const pickerTokens =
     variant === 'soft'
@@ -48,23 +50,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   const softVariantClassName =
     pickerTokens !== null
       ? `${pickerTokens.optionBorderClassName} ${pickerTokens.optionCardClassName} ${pickerTokens.textClassName} placeholder-current/40`
-      : theme === 'light'
-        ? 'border-gray-200 bg-gray-100 text-gray-900 placeholder-slate-500'
-        : theme === 'black'
-          ? 'border-white/16 bg-black text-white placeholder-zinc-300'
-          : theme === 'glass'
-            ? 'border-white/16 bg-white/8 text-white placeholder-white/72'
-            : 'border-zinc-800 bg-zinc-900 text-white placeholder-zinc-400';
-
-  const baseBorderColor = invalid ? (theme === 'light' ? '#dc2626' : '#f87171') : undefined;
-  const adornmentClassName =
-    theme === 'light'
-      ? 'text-slate-500'
-      : theme === 'black'
-        ? 'text-zinc-300'
-        : theme === 'glass'
-          ? 'text-white/72'
-          : 'text-zinc-400';
+      : fieldTokens.fieldClassName;
   const sizeTokens = getInputSizeTokens(size);
 
   return (
@@ -73,7 +59,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         <div
           className={cn(
             'pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3',
-            adornmentClassName
+            fieldTokens.adornmentClassName
           )}
         >
           {leading}
@@ -100,22 +86,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           navetTypographyTokens.control,
           leading ? sizeTokens.leadingPaddingClassName : sizeTokens.idlePaddingLeftClassName,
           trailing ? sizeTokens.trailingPaddingClassName : sizeTokens.idlePaddingRightClassName,
-          variant === 'soft'
-            ? softVariantClassName
-            : theme === 'light'
-              ? 'border-gray-200 bg-gray-100 text-gray-900 placeholder-slate-500'
-              : theme === 'black'
-                ? 'border-white/16 bg-black text-white placeholder-zinc-300'
-                : theme === 'glass'
-                  ? 'border-white/16 bg-white/8 text-white placeholder-white/72'
-                  : 'border-zinc-800 bg-zinc-900 text-white placeholder-zinc-400',
+          variant === 'soft' ? softVariantClassName : fieldTokens.fieldClassName,
           inputClassName
         )}
         style={{
           ...getControlFocusStyles({
             isFocused,
             accentColor,
-            invalidBorderColor: baseBorderColor,
+            invalidBorderColor: fieldTokens.invalidBorderColor,
           }),
           ...style,
         }}
@@ -123,7 +101,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 
       {trailing ? (
         <div
-          className={cn('absolute inset-y-0 right-0 flex items-center pr-3', adornmentClassName)}
+          className={cn(
+            'absolute inset-y-0 right-0 flex items-center pr-3',
+            fieldTokens.adornmentClassName
+          )}
         >
           {trailing}
         </div>

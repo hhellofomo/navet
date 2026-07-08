@@ -126,8 +126,7 @@ export const LockCard = memo(function LockCard({
   };
 
   const topNameClassName = `${securitySurface.primaryTextClassName} truncate font-semibold tracking-[-0.02em]`;
-  const overlayTintClassName =
-    theme === 'light' ? 'bg-white/22' : theme === 'glass' ? 'bg-white/[0.03]' : 'bg-black/10';
+  const overlayTintClassName = securitySurface.lockCardOverlay;
   const heroPlateClassName =
     theme === 'light'
       ? 'border-black/8 bg-white/56 shadow-[0_18px_36px_-24px_rgba(15,23,42,0.36)]'
@@ -143,10 +142,10 @@ export const LockCard = memo(function LockCard({
   );
   const headerTitleClassName = isLocked
     ? `${securitySurface.primaryTextClassName} tracking-[-0.02em]`
-    : `${theme === 'light' ? 'text-red-950' : 'text-white'} tracking-[-0.02em]`;
+    : `${securitySurface.lockStatusText} tracking-[-0.02em]`;
   const headerSubtitleClassName = isLocked
     ? stateIconClassName
-    : `${theme === 'light' ? 'text-red-700' : 'text-red-200'} font-semibold uppercase tracking-[0.16em]`;
+    : `${securitySurface.lockStatusSubtext} font-semibold uppercase tracking-[0.16em]`;
   const slideThumbTokens = getEntityIconPillStyles({
     isActive: true,
     isInteractive: false,
@@ -209,11 +208,7 @@ export const LockCard = memo(function LockCard({
               className={`absolute inset-0 rounded-full bg-linear-to-br ${cardColors.glow} to-transparent`}
             />
             <div className="absolute inset-[8px] rounded-full border border-white/10" />
-            <div
-              className={`absolute inset-[14px] rounded-full ${
-                theme === 'light' ? 'bg-white/65' : 'bg-white/6'
-              }`}
-            />
+            <div className={`absolute inset-[14px] rounded-full ${securitySurface.lockButtonBg}`} />
             <IconComponent className={`relative h-6.5 w-6.5 ${stateIconClassName}`} />
           </div>
         </div>

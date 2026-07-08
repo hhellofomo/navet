@@ -24,6 +24,11 @@ export function getSecurityCardSurfaceTokens(theme: ThemeType) {
       theme === 'light' ? 'bg-gray-200' : theme === 'glass' ? 'bg-white/12' : 'bg-zinc-800',
     dialogContentClassName:
       theme === 'glass' ? 'bg-white/10 border-white/18' : 'bg-zinc-950 border-zinc-700',
+    lockCardOverlay:
+      theme === 'light' ? 'bg-white/22' : theme === 'glass' ? 'bg-white/[0.03]' : 'bg-black/10',
+    lockStatusText: theme === 'light' ? 'text-red-950' : 'text-white',
+    lockStatusSubtext: theme === 'light' ? 'text-red-700' : 'text-red-200',
+    lockButtonBg: theme === 'light' ? 'bg-white/65' : 'bg-white/6',
     dialogOptionClassName(themeSelected: boolean) {
       if (themeSelected) {
         return 'bg-indigo-500/20 border-indigo-500 shadow-lg shadow-indigo-500/20';

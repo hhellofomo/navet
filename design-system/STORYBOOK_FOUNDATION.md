@@ -5,7 +5,7 @@ Navet should grow an internal component workshop before it grows a package works
 ## Recommendation
 
 - Keep Navet in a single repo for now.
-- Build on an internal design-system layer under `src/app/components/system/`.
+- Build on the shared UI authoring layers under `src/app/components/primitives/` and `src/app/components/patterns/`, with curated exports in `src/app/components/system/`.
 - Treat Storybook as the official developer-facing UI-kit surface.
 - Run Storybook in this repo instead of splitting into a package workspace.
 - Delay a monorepo or package split until there is more than one real consumer.
@@ -24,6 +24,7 @@ Navet should grow an internal component workshop before it grows a package works
 - Storybook preview wiring reuses Navet's existing theme and settings stores so components render inside real theme context
 - Storybook manager UI, docs pages, and canvas default to dark mode
 - Token stories should document all four Navet themes: glass, dark, light, and black
+- Storybook docs and examples should prefer `@/app/ui-kit/*` imports when a stable shared export exists
 
 ## Story File Placement
 

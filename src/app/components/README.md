@@ -1,6 +1,7 @@
 # Components
 
-This folder has three distinct roles:
+This folder owns the shared UI authoring layers under `src/app/components/`. It also works
+alongside the separate `src/app/ui-kit/` discovery/import surface.
 
 - `primitives/`
   Low-level reusable UI building blocks with one clear responsibility.
@@ -18,10 +19,10 @@ This folder has three distinct roles:
   Do not treat `system/` as the source of truth for where new shared components are authored.
   `system/tokens` is the shared home for first-layer foundations such as spacing, radii, icon sizing, and focus behavior.
 
-- `ui-kit/`
-  Canonical import surface for Navet developers.
+- `../ui-kit/`
+  Sibling discovery and import surface for Navet developers.
   Prefer `@/app/ui-kit/primitives`, `@/app/ui-kit/patterns`, and `@/app/ui-kit/tokens`
-  in new docs, examples, and shared UI consumption. `system/` remains transitional.
+  in new docs, examples, and shared UI consumption. `system/` remains the curated export layer.
 
 - `shared/`
   Existing app-specific shared components that do not belong in the primitive/pattern system.

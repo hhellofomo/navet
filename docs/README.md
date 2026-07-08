@@ -46,9 +46,9 @@ Use these directories when docs need to be checked against the live implementati
 
 - [`src/app/features/`](../src/app/features/): feature-owned modules
 - [`src/app/components/`](../src/app/components/): shared UI layers and app-shell composition
-- [`src/app/ui-kit/`](../src/app/ui-kit/): canonical shared UI import surface
+- [`src/app/ui-kit/`](../src/app/ui-kit/): canonical shared UI import surface for docs, examples, and stable consumers
 - [`src/app/stores/`](../src/app/stores/): Zustand stores and selectors
-- [`src/app/services/`](../src/app/services/): Home Assistant integration services
+- [`src/app/services/`](../src/app/services/): Home Assistant facade plus connection, entity, and registry services
 - [`src/app/storybook/`](../src/app/storybook/): shared Storybook frames and docs helpers
 - [`src/test/`](../src/test/): shared Vitest helpers, stubs, and browser mocks
 
@@ -94,6 +94,7 @@ Use these directories when docs need to be checked against the live implementati
 - Treat `docs/archive/` as historical material, not the current source of truth
 - When top-level sections, shared stores, widget types, or test locations change, update `README.md` and `design-system/FEATURES.md`
 - When Storybook ownership, UI-layer boundaries, token helpers, or `ui-kit/` exports change, update `design-system/README.md`
+- When the Home Assistant service split or typed event flow changes, update `README.md` and `technical/REACT_ZUSTAND.md`
 - When setup scripts or test commands change, update `README.md`
 
 ## Known Scope
@@ -101,4 +102,4 @@ Use these directories when docs need to be checked against the live implementati
 This index intentionally focuses on active docs. Some older topic documents may still need a deeper
 staleness audit, especially if they describe features that have evolved faster than the docs.
 
-Last updated: May 12, 2026
+Last updated: May 13, 2026

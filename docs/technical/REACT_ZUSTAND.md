@@ -146,7 +146,9 @@ Never use the manual `subscribe` + `localStorage.setItem` pattern.
 
 ## Service → Store event flow
 
-`HomeAssistantService` emits typed events: `'entities' | 'config' | 'registries' | 'connection'`.
+`HomeAssistantService` is the public facade in `src/app/services/`. It currently composes the
+connection, entity, and registry services and emits typed events:
+`'entities' | 'config' | 'registries' | 'connection'`.
 
 The store subscribes via `addListener(event => ...)` and updates **only the affected slice**:
 

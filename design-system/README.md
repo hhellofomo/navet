@@ -9,7 +9,7 @@ UI layer backed by:
 - authoring in `src/app/components/primitives/` and `src/app/components/patterns/`
 - curated exports and token stories in `src/app/components/system/`
 - canonical discovery stories in `src/app/ui-kit/`
-- canonical shared imports in `src/app/ui-kit/`
+- canonical shared imports for docs, stories, and stable shared consumers in `src/app/ui-kit/`
 - shared theme/surface decisions in `src/app/components/shared/theme/`
 - Storybook as the main visual review and docs surface
 
@@ -104,6 +104,8 @@ Use `ui-kit/` when:
 - you want to avoid importing directly from authoring folders in cross-feature code
 - you are documenting the intended public shared UI surface
 
+When docs or stories need a shared import example, prefer `@/app/ui-kit/*` over `components/system/*`.
+
 ### `src/app/components/layout/`
 
 App-shell and section-level layout composition for navigation, room controls, headers, and
@@ -180,6 +182,9 @@ Shared surface decisions should resolve through helpers in
 - `entity-icon-pill-styles`
 
 Avoid adding inline `theme === ...` branches when an existing token helper already covers the case.
+
+Theme persistence still uses the `black` mode key in store/state code. If older docs or imported
+settings mention `contrast`, treat that as legacy naming rather than the preferred current term.
 
 ## Card System
 

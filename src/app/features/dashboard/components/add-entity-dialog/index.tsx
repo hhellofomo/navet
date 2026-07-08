@@ -98,7 +98,7 @@ export function AddEntityDialog({
   const scrollRafRef = useRef<number | null>(null);
   const deferredQuery = useDeferredValue(query);
 
-  const bgColor = theme === 'light' ? 'bg-white' : surface.panel;
+  const bgColor = theme !== 'light' ? surface.panel : 'bg-white';
   const textColor = surface.textPrimary;
   const mutedColor = surface.textSecondary;
   const borderColor = surface.border;

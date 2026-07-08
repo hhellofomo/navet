@@ -10,6 +10,13 @@ import type {
   EnergySeriesPoint,
   EnergySourceConfig,
 } from '../types/energy.types';
+import {
+  BATTERY_DISCHARGE_THRESHOLD_W,
+  BATTERY_PERCENT_DECIMALS,
+  ENERGY_METRIC_DECIMALS,
+  PEAK_IMPORT_THRESHOLD_W,
+  SOLAR_RENEWABLE_RATIO,
+} from './energy-constants';
 
 interface BuildEnergyDashboardModelParams {
   overview: EnergyOverview;
@@ -30,12 +37,12 @@ export interface EnergyMotionPreferences {
   prefersReducedMotion: boolean;
 }
 
-function round(value: number, digits = 1) {
+function round(value: number, digits = ENERGY_METRIC_DECIMALS) {
   const factor = 10 ** digits;
   return Math.round(value * factor) / factor;
 }
 
-function formatMetricValue(value: number, digits = 1) {
+function formatMetricValue(value: number, digits = ENERGY_METRIC_DECIMALS) {
   return round(value, digits).toFixed(digits);
 }
 
@@ -61,15 +68,18 @@ export function shouldUseStaticEnergyBeams(preferences: EnergyMotionPreferences)
 }
 
 function resolveMode(overview: EnergyOverview): EnergyDashboardMode {
-  if (overview.totals.importW > 1500) {
+  if (overview.totals.importW > PEAK_IMPORT_THRESHOLD_W) {
     return 'peak';
   }
 
-  if (overview.totals.batteryPowerW && overview.totals.batteryPowerW < -1200) {
+  if (
+    overview.totals.batteryPowerW &&
+    overview.totals.batteryPowerW < BATTERY_DISCHARGE_THRESHOLD_W
+  ) {
     return 'battery_saver';
   }
 
-  if (overview.totals.solarW > overview.totals.currentLoadW * 0.7) {
+  if (overview.totals.solarW > overview.totals.currentLoadW * SOLAR_RENEWABLE_RATIO) {
     return 'eco';
   }
 
@@ -82,15 +92,18 @@ export function getEnergyModeSummary(
   renewableSharePct: number
 ) {
   if (mode === 'peak') {
-    return `Grid import is carrying ${Math.round((overview.totals.importW / 1000) * 10) / 10} kW while high-demand loads overlap.`;
+    const importKw = Math.round((overview.totals.importW / 1000) * 10) / 10;
+    return `Grid import is carrying ${importKw} kW while high-demand loads overlap.`;
   }
 
   if (mode === 'battery_saver') {
-    return `Battery discharge is trimming the evening peak with ${overview.totals.batteryPercent.toFixed(0)}% reserve remaining.`;
+    const batteryPercent = overview.totals.batteryPercent.toFixed(BATTERY_PERCENT_DECIMALS);
+    return `Battery discharge is trimming the evening peak with ${batteryPercent}% reserve remaining.`;
   }
 
   if (mode === 'eco') {
-    return `Low-carbon sources are covering ${renewableSharePct.toFixed(0)}% of today's supply.`;
+    const renewablePct = renewableSharePct.toFixed(BATTERY_PERCENT_DECIMALS);
+    return `Low-carbon sources are covering ${renewablePct}% of today's supply.`;
   }
 
   return 'The home is balanced between local generation, storage, and grid supply.';
@@ -172,8 +185,6 @@ function buildNodes(
       icon: 'battery',
       value: round(overview.totals.batteryPercent),
       unit: '%',
-      todayValue: round(Math.abs((overview.totals.batteryPowerW ?? 0) / 1000), 1),
-      todayUnit: 'kWh',
       status:
         overview.totals.batteryPercent <= 15
           ? 'warning'

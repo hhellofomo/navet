@@ -102,11 +102,41 @@ describe('useNavigationStore', () => {
   });
 
   it('syncs activeSection from browser navigation events', () => {
+    const pushStateSpy = vi.spyOn(history, 'pushState');
+    const store = useNavigationStore.getState();
+
+    store.setActiveSection('media');
+    store.setActiveSection('tasks');
+    const previousRecentSections = useNavigationStore.getState().recentSections;
+    const previousLastNonHomeSection = useNavigationStore.getState().lastNonHomeSection;
+    pushStateSpy.mockClear();
+
     const stopSync = startNavigationStoreSync();
-    history.pushState({}, '', '/settings');
+    history.replaceState({}, '', '/settings');
     window.dispatchEvent(new PopStateEvent('popstate'));
 
     expect(useNavigationStore.getState().activeSection).toBe('settings');
+    expect(pushStateSpy).not.toHaveBeenCalled();
+    expect(useNavigationStore.getState().recentSections).toBe(previousRecentSections);
+    expect(useNavigationStore.getState().lastNonHomeSection).toBe(previousLastNonHomeSection);
+    stopSync();
+  });
+
+  it('does not rewrite MRU state when popstate navigates to home', () => {
+    const store = useNavigationStore.getState();
+
+    store.setActiveSection('media');
+    store.setActiveSection('tasks');
+    const previousRecentSections = useNavigationStore.getState().recentSections;
+    const previousLastNonHomeSection = useNavigationStore.getState().lastNonHomeSection;
+
+    const stopSync = startNavigationStoreSync();
+    history.replaceState({}, '', '/');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+
+    expect(useNavigationStore.getState().activeSection).toBe('home');
+    expect(useNavigationStore.getState().recentSections).toBe(previousRecentSections);
+    expect(useNavigationStore.getState().lastNonHomeSection).toBe(previousLastNonHomeSection);
     stopSync();
   });
 });

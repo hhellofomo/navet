@@ -1,4 +1,5 @@
 import { memo, useCallback, useId, useMemo, useState } from 'react';
+import { getEnergyChartSurfaceTokens } from '@/app/components/shared/theme/energy-widget-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
 import { getEnergyChartTokens } from './energy-chart-tokens';
 
@@ -63,13 +64,11 @@ export const EnergySparkline = memo(function EnergySparkline({
   const { theme } = useTheme();
   const id = useId();
   const tokens = getEnergyChartTokens(theme, accentColor);
+  const chartSurface = getEnergyChartSurfaceTokens(theme);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
-  const axisLineClassName = theme === 'light' ? 'border-slate-300/70' : 'border-white/6';
-  const axisLabelClassName = theme === 'light' ? 'text-slate-600' : 'text-white/76';
-  const tooltipClassName =
-    theme === 'light'
-      ? `border ${tokens.surface.border} ${tokens.surface.panel} shadow-[0_18px_38px_-24px_rgba(15,23,42,0.22)]`
-      : `border ${tokens.surface.border} ${tokens.surface.panel} shadow-2xl`;
+  const axisLineClassName = chartSurface.axisLineColor;
+  const axisLabelClassName = chartSurface.axisLabelColor;
+  const tooltipClassName = `border ${tokens.surface.border} ${tokens.surface.panel} ${theme !== 'light' ? 'shadow-2xl' : 'shadow-[0_18px_38px_-24px_rgba(15,23,42,0.22)]'}`;
   const updateHoverIndex = useCallback(
     (clientX: number, rect: DOMRect) => {
       const relativeX = Math.max(0, Math.min(rect.width, clientX - rect.left));

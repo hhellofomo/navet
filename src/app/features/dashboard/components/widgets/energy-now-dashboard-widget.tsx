@@ -25,6 +25,7 @@ import {
 } from '@/app/components/shared/device-editor';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { getCustomCardTintSurface } from '@/app/components/shared/theme/custom-card-tint-surface';
+import { getEnergyNowWidgetSurfaceTokens } from '@/app/components/shared/theme/energy-widget-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { HOME_WIDGET_ROOM } from '@/app/features/dashboard/stores/custom-cards-store';
 import { useEnergyUsageSensorOptions } from '@/app/features/energy';
@@ -92,6 +93,7 @@ export function EnergyNowSettingsDialog({
   const { theme } = useTheme();
   const { t } = useI18n();
   const surface = getDashboardWidgetSurfaceTokens(theme, tintColor);
+  const energySurface = getEnergyNowWidgetSurfaceTokens(theme);
   const tintSurface = getCustomCardTintSurface(theme, tintColor);
   const dialogShell = customCardDialogShellProps(
     { panel: surface.panelClassName, border: surface.borderClassName },
@@ -196,6 +198,10 @@ export function EnergyNowSettingsDialog({
                         <div className="space-y-2">
                           {group.items.map((option) => {
                             const isSelected = option.id === selectedId;
+                            const selectedBackground =
+                              typeof surface.panelStyle?.background === 'string'
+                                ? surface.panelStyle.background
+                                : surface.subtleFill;
                             return (
                               <CardDialogChoicePill
                                 key={option.id}
@@ -205,9 +211,7 @@ export function EnergyNowSettingsDialog({
                                 active={isSelected}
                                 className={`flex h-auto w-full items-center justify-start gap-3 rounded-2xl border px-3 py-3 text-left ${surface.borderClassName} ${surface.textPrimary}`}
                                 style={{
-                                  background: isSelected
-                                    ? (surface.panelStyle?.background ?? surface.subtleFill)
-                                    : surface.subtleFill,
+                                  background: isSelected ? selectedBackground : surface.subtleFill,
                                 }}
                               >
                                 <div
@@ -215,7 +219,7 @@ export function EnergyNowSettingsDialog({
                                   style={{ background: surface.subtleFill }}
                                 >
                                   <Bolt
-                                    className={`h-4 w-4 ${isSelected ? (theme === 'light' ? 'text-emerald-600' : 'text-emerald-400') : theme === 'light' ? 'text-slate-500' : 'text-white/60'}`}
+                                    className={`h-4 w-4 ${isSelected ? energySurface.solarTextColor : surface.textMuted}`}
                                   />
                                 </div>
                                 <div className="min-w-0 flex-1">
@@ -317,13 +321,8 @@ export const EnergyNowDashboardCardView = memo(function EnergyNowDashboardCardVi
       }
       contentClassName="h-full"
     >
-      {theme === 'light' ? (
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background: `radial-gradient(circle at 50% 100%, ${accentColor}16 0%, transparent 55%), linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.03) 100%)`,
-          }}
-        />
+      {tintSurface.glowStyle ? (
+        <div className="pointer-events-none absolute inset-0" style={tintSurface.glowStyle} />
       ) : null}
 
       <div className={`absolute inset-x-0 ${isSmall ? 'bottom-0 top-16' : 'bottom-0 top-20'}`}>

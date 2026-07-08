@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
+import { ENERGY_STATISTICS_REFRESH_INTERVAL } from '@/app/constants';
 import { useHomeAssistant } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { getPowerStatisticsHistory } from '../services/energy-statistics-service';
 import type { EnergySeriesPoint } from '../types/energy.types';
 
-const REFRESH_MS = 5 * 60 * 1000;
+const REFRESH_MS = ENERGY_STATISTICS_REFRESH_INTERVAL;
 const FALLBACK_POINT_COUNT = 12;
 
 function formatBucketLabel(timestampMs: number, index: number, total: number) {
