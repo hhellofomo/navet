@@ -4,12 +4,12 @@
  */
 
 import type {
-	CustomCardsState,
-	EditModeState,
-	NavigationState,
-	SearchState,
-	SettingsState,
-	ThemeState,
+  CustomCardsState,
+  EditModeState,
+  NavigationState,
+  SearchState,
+  SettingsState,
+  ThemeState,
 } from './types';
 
 /**
@@ -17,109 +17,109 @@ import type {
  * Use these to subscribe only to specific values
  */
 export const themeSelectors = {
-	// Single value selectors
-	theme: (state: ThemeState) => state.theme,
-	primaryColor: (state: ThemeState) => state.primaryColor,
-	wallpaper: (state: ThemeState) => state.wallpaper,
+  // Single value selectors
+  theme: (state: ThemeState) => state.theme,
+  primaryColor: (state: ThemeState) => state.primaryColor,
+  wallpaper: (state: ThemeState) => state.wallpaper,
 
-	// Action selectors (never cause re-renders)
-	setTheme: (state: ThemeState) => state.setTheme,
-	setPrimaryColor: (state: ThemeState) => state.setPrimaryColor,
-	setWallpaper: (state: ThemeState) => state.setWallpaper,
+  // Action selectors (never cause re-renders)
+  setTheme: (state: ThemeState) => state.setTheme,
+  setPrimaryColor: (state: ThemeState) => state.setPrimaryColor,
+  setWallpaper: (state: ThemeState) => state.setWallpaper,
 
-	// Combined selectors (use with shallow equality)
-	themeAndColor: (state: ThemeState) => ({
-		theme: state.theme,
-		primaryColor: state.primaryColor,
-	}),
-	allValues: (state: ThemeState) => ({
-		theme: state.theme,
-		primaryColor: state.primaryColor,
-		wallpaper: state.wallpaper,
-	}),
-	allActions: (state: ThemeState) => ({
-		setTheme: state.setTheme,
-		setPrimaryColor: state.setPrimaryColor,
-		setWallpaper: state.setWallpaper,
-	}),
+  // Combined selectors (use with shallow equality)
+  themeAndColor: (state: ThemeState) => ({
+    theme: state.theme,
+    primaryColor: state.primaryColor,
+  }),
+  allValues: (state: ThemeState) => ({
+    theme: state.theme,
+    primaryColor: state.primaryColor,
+    wallpaper: state.wallpaper,
+  }),
+  allActions: (state: ThemeState) => ({
+    setTheme: state.setTheme,
+    setPrimaryColor: state.setPrimaryColor,
+    setWallpaper: state.setWallpaper,
+  }),
 };
 
 /**
  * Edit Mode Store Selectors
  */
 export const editModeSelectors = {
-	isEditMode: (state: EditModeState) => state.isEditMode,
-	setEditMode: (state: EditModeState) => state.setEditMode,
-	toggleEditMode: (state: EditModeState) => state.toggleEditMode,
+  isEditMode: (state: EditModeState) => state.isEditMode,
+  setEditMode: (state: EditModeState) => state.setEditMode,
+  toggleEditMode: (state: EditModeState) => state.toggleEditMode,
 };
 
 /**
  * Navigation Store Selectors
  */
 export const navigationSelectors = {
-	currentRoom: (state: NavigationState) => state.currentRoom,
-	setCurrentRoom: (state: NavigationState) => state.setCurrentRoom,
-	activeSection: (state: NavigationState) => state.activeSection,
-	setActiveSection: (state: NavigationState) => state.setActiveSection,
+  currentRoom: (state: NavigationState) => state.currentRoom,
+  setCurrentRoom: (state: NavigationState) => state.setCurrentRoom,
+  activeSection: (state: NavigationState) => state.activeSection,
+  setActiveSection: (state: NavigationState) => state.setActiveSection,
 };
 
 /**
  * Search Store Selectors
  */
 export const searchSelectors = {
-	searchQuery: (state: SearchState) => state.searchQuery,
-	setSearchQuery: (state: SearchState) => state.setSearchQuery,
-	clearSearch: (state: SearchState) => state.clearSearch,
+  searchQuery: (state: SearchState) => state.searchQuery,
+  setSearchQuery: (state: SearchState) => state.setSearchQuery,
+  clearSearch: (state: SearchState) => state.clearSearch,
 
-	// Computed selectors
-	isSearching: (state: SearchState) => state.searchQuery.length > 0,
+  // Computed selectors
+  isSearching: (state: SearchState) => state.searchQuery.length > 0,
 };
 
 /**
  * Settings Store Selectors
  */
 export const settingsSelectors = {
-	// Individual settings
-	username: (state: SettingsState) => state.username,
-	email: (state: SettingsState) => state.email,
-	showNotifications: (state: SettingsState) => state.showNotifications,
-	showWeatherInHeader: (state: SettingsState) => state.showWeatherInHeader,
-	use24HourTime: (state: SettingsState) => state.use24HourTime,
-	temperatureUnit: (state: SettingsState) => state.temperatureUnit,
-	defaultView: (state: SettingsState) => state.defaultView,
-	compactMode: (state: SettingsState) => state.compactMode,
-	disableAnimations: (state: SettingsState) => state.disableAnimations,
+  // Individual settings
+  username: (state: SettingsState) => state.username,
+  email: (state: SettingsState) => state.email,
+  showNotifications: (state: SettingsState) => state.showNotifications,
+  showWeatherInHeader: (state: SettingsState) => state.showWeatherInHeader,
+  use24HourTime: (state: SettingsState) => state.use24HourTime,
+  temperatureUnit: (state: SettingsState) => state.temperatureUnit,
+  defaultView: (state: SettingsState) => state.defaultView,
+  compactMode: (state: SettingsState) => state.compactMode,
+  disableAnimations: (state: SettingsState) => state.disableAnimations,
 
-	// Actions
-	updateSettings: (state: SettingsState) => state.updateSettings,
-	resetSettings: (state: SettingsState) => state.resetSettings,
+  // Actions
+  updateSettings: (state: SettingsState) => state.updateSettings,
+  resetSettings: (state: SettingsState) => state.resetSettings,
 
-	// Combined selectors
-	displaySettings: (state: SettingsState) => ({
-		use24HourTime: state.use24HourTime,
-		temperatureUnit: state.temperatureUnit,
-		compactMode: state.compactMode,
-		disableAnimations: state.disableAnimations,
-	}),
-	notificationSettings: (state: SettingsState) => ({
-		showNotifications: state.showNotifications,
-		showWeatherInHeader: state.showWeatherInHeader,
-	}),
+  // Combined selectors
+  displaySettings: (state: SettingsState) => ({
+    use24HourTime: state.use24HourTime,
+    temperatureUnit: state.temperatureUnit,
+    compactMode: state.compactMode,
+    disableAnimations: state.disableAnimations,
+  }),
+  notificationSettings: (state: SettingsState) => ({
+    showNotifications: state.showNotifications,
+    showWeatherInHeader: state.showWeatherInHeader,
+  }),
 };
 
 /**
  * Custom Cards Store Selectors
  */
 export const customCardsSelectors = {
-	cards: (state: CustomCardsState) => state.cards,
-	addCard: (state: CustomCardsState) => state.addCard,
-	removeCard: (state: CustomCardsState) => state.removeCard,
-	updateCard: (state: CustomCardsState) => state.updateCard,
-	getCardsForRoom: (state: CustomCardsState) => state.getCardsForRoom,
+  cards: (state: CustomCardsState) => state.cards,
+  addCard: (state: CustomCardsState) => state.addCard,
+  removeCard: (state: CustomCardsState) => state.removeCard,
+  updateCard: (state: CustomCardsState) => state.updateCard,
+  getCardsForRoom: (state: CustomCardsState) => state.getCardsForRoom,
 
-	// Computed selectors
-	cardsCount: (state: CustomCardsState) => state.cards.length,
-	hasCards: (state: CustomCardsState) => state.cards.length > 0,
+  // Computed selectors
+  cardsCount: (state: CustomCardsState) => state.cards.length,
+  hasCards: (state: CustomCardsState) => state.cards.length > 0,
 };
 
 /**

@@ -6,20 +6,20 @@ import { useEditModeStore } from '../stores/edit-mode-store';
  * Provides toggle functionality for card editing mode
  */
 export const useEditMode = () => {
-	const isEditMode = useEditModeStore((state) => state.isEditMode);
-	const storeSetEditMode = useEditModeStore((state) => state.setEditMode);
-	const storeToggleEditMode = useEditModeStore((state) => state.toggleEditMode);
+  const isEditMode = useEditModeStore((state) => state.isEditMode);
+  const storeSetEditMode = useEditModeStore((state) => state.setEditMode);
+  const storeToggleEditMode = useEditModeStore((state) => state.toggleEditMode);
 
-	const toggleEditMode = useCallback(() => {
-		storeToggleEditMode();
-	}, [storeToggleEditMode]);
+  const toggleEditMode = useCallback(() => {
+    storeToggleEditMode();
+  }, [storeToggleEditMode]);
 
-	const setEditMode = useCallback(
-		(mode: boolean) => {
-			storeSetEditMode(mode);
-		},
-		[storeSetEditMode]
-	);
+  const setEditMode = useCallback(
+    (mode: boolean) => {
+      storeSetEditMode(mode);
+    },
+    [storeSetEditMode]
+  );
 
-	return { isEditMode, toggleEditMode, setEditMode };
+  return { isEditMode, toggleEditMode, setEditMode };
 };

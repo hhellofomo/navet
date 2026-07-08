@@ -2,36 +2,36 @@ import { useState } from 'react';
 import type { SensorReading } from './sensor-types';
 
 interface UseSensorGroupProps {
-	initialSensors: SensorReading[];
-	maxSensors?: number;
+  initialSensors: SensorReading[];
+  maxSensors?: number;
 }
 
 interface UseSensorGroupReturn {
-	selectedSensors: SensorReading[];
-	isSettingsOpen: boolean;
-	setIsSettingsOpen: (isOpen: boolean) => void;
-	handleSensorsUpdate: (newSensors: SensorReading[]) => void;
-	visibleSensors: SensorReading[];
+  selectedSensors: SensorReading[];
+  isSettingsOpen: boolean;
+  setIsSettingsOpen: (isOpen: boolean) => void;
+  handleSensorsUpdate: (newSensors: SensorReading[]) => void;
+  visibleSensors: SensorReading[];
 }
 
 export function useSensorGroup({
-	initialSensors,
-	maxSensors = 4,
+  initialSensors,
+  maxSensors = 4,
 }: UseSensorGroupProps): UseSensorGroupReturn {
-	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-	const [selectedSensors, setSelectedSensors] = useState<SensorReading[]>(initialSensors);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [selectedSensors, setSelectedSensors] = useState<SensorReading[]>(initialSensors);
 
-	const handleSensorsUpdate = (newSensors: SensorReading[]) => {
-		setSelectedSensors(newSensors.slice(0, maxSensors));
-	};
+  const handleSensorsUpdate = (newSensors: SensorReading[]) => {
+    setSelectedSensors(newSensors.slice(0, maxSensors));
+  };
 
-	const visibleSensors = selectedSensors.slice(0, maxSensors);
+  const visibleSensors = selectedSensors.slice(0, maxSensors);
 
-	return {
-		selectedSensors,
-		isSettingsOpen,
-		setIsSettingsOpen,
-		handleSensorsUpdate,
-		visibleSensors,
-	};
+  return {
+    selectedSensors,
+    isSettingsOpen,
+    setIsSettingsOpen,
+    handleSensorsUpdate,
+    visibleSensors,
+  };
 }

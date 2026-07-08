@@ -7,11 +7,11 @@ import type { DeviceCollection, DeviceWithType } from '../types/device.types';
  * Optimizes performance by preventing unnecessary recalculations
  */
 export const useDeviceMap = (devices: DeviceCollection) => {
-	const deviceMap = useMemo(() => deviceService.createDeviceMap(devices), [devices]);
+  const deviceMap = useMemo(() => deviceService.createDeviceMap(devices), [devices]);
 
-	const getDevice = (id: string): DeviceWithType | undefined => {
-		return deviceService.getDeviceById(deviceMap, id);
-	};
+  const getDevice = (id: string): DeviceWithType | undefined => {
+    return deviceService.getDeviceById(deviceMap, id);
+  };
 
-	return { deviceMap, getDevice };
+  return { deviceMap, getDevice };
 };

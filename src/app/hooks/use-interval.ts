@@ -12,21 +12,21 @@ import { useEffect, useRef } from 'react';
  * }, 5000); // Run every 5 seconds
  */
 export function useInterval(callback: () => void, delay: number | null): void {
-	const savedCallback = useRef(callback);
+  const savedCallback = useRef(callback);
 
-	// Remember the latest callback
-	useEffect(() => {
-		savedCallback.current = callback;
-	}, [callback]);
+  // Remember the latest callback
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
 
-	// Set up the interval
-	useEffect(() => {
-		if (delay === null) return;
+  // Set up the interval
+  useEffect(() => {
+    if (delay === null) return;
 
-		const id = setInterval(() => {
-			savedCallback.current();
-		}, delay);
+    const id = setInterval(() => {
+      savedCallback.current();
+    }, delay);
 
-		return () => clearInterval(id);
-	}, [delay]);
+    return () => clearInterval(id);
+  }, [delay]);
 }

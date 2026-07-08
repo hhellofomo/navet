@@ -5,11 +5,11 @@ import { useCallback, useState } from 'react';
  * Encapsulates active room selection logic
  */
 export const useRoomNavigation = (defaultRoom: string) => {
-	const [activeRoom, setActiveRoom] = useState(defaultRoom);
+  const [activeRoom, setActiveRoom] = useState(defaultRoom);
 
-	const changeRoom = useCallback((room: string) => {
-		setActiveRoom(room);
-	}, []);
+  const changeRoom = useCallback((room: string) => {
+    setActiveRoom(room);
+  }, []);
 
-	return { activeRoom, changeRoom };
+  return { activeRoom, changeRoom };
 };

@@ -9,10 +9,7 @@ export const useRoomOrdering = (rooms: string[]) => {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        if (
-          Array.isArray(parsed) &&
-          parsed.every((room) => typeof room === 'string')
-        ) {
+        if (Array.isArray(parsed) && parsed.every((room) => typeof room === 'string')) {
           const preserved = parsed.filter((room) => rooms.includes(room));
           const additions = rooms.filter((room) => !preserved.includes(room));
           return [...preserved, ...additions];

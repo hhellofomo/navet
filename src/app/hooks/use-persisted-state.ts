@@ -12,16 +12,16 @@ import { storage } from '../utils/storage';
  * const [theme, setTheme] = usePersistedState('theme', 'dark');
  */
 export function usePersistedState<T>(
-	key: string,
-	defaultValue: T
+  key: string,
+  defaultValue: T
 ): [T, (value: T | ((prev: T) => T)) => void] {
-	const [value, setValue] = useState<T>(() => {
-		return storage.get(key, defaultValue);
-	});
+  const [value, setValue] = useState<T>(() => {
+    return storage.get(key, defaultValue);
+  });
 
-	useEffect(() => {
-		storage.set(key, value);
-	}, [key, value]);
+  useEffect(() => {
+    storage.set(key, value);
+  }, [key, value]);
 
-	return [value, setValue];
+  return [value, setValue];
 }
