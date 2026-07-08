@@ -14,7 +14,12 @@ import type {
   HomeDashboardSectionSpan,
 } from '../hooks/use-home-dashboard-layout';
 import type { CustomCard } from '../stores/custom-cards-store';
-import { getSectionCardMinColumns, SECTION_LAYOUT_COLUMNS } from '../utils/layout-engine';
+import {
+  getRenderedRowLayouts,
+  getSectionCardMinColumns,
+  getSectionMinBaseWidth,
+  SECTION_LAYOUT_COLUMNS,
+} from '../utils/layout-engine';
 
 export interface HomeDashboardOverviewProps {
   deviceMap: Map<string, DeviceWithType>;
@@ -397,3 +402,5 @@ export function useHomeLayoutViewport() {
 
   return viewportState;
 }
+
+export { getRenderedRowLayouts, getSectionMinBaseWidth };

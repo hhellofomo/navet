@@ -1,14 +1,15 @@
-import { MapPin, Sunrise, Sunset } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { memo, useMemo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { CaptionValue } from '@/app/components/ui/caption-value';
 import { CardWrapper } from '@/app/components/ui/card-wrapper';
-import { useI18n } from '@/app/hooks';
 import type { WeatherForecastMode } from '@/app/stores/settings-store';
 import { useWeatherCardController } from './use-weather-card-controller';
 import { WeatherBackground } from './weather-card-overlays';
+import { WeatherDetails } from './weather-details';
+import { WeatherForecastRow } from './weather-forecast-row';
 import { formatWeatherConditionLabel, type WeatherCondition, WeatherIcon } from './weather-icon';
 import { WeatherSettingsDialog } from './weather-settings-dialog';
+import { WeatherSunTimes } from './weather-sun-times';
 
 // Re-export types
 export type { WeatherCondition };
@@ -62,7 +63,6 @@ export const WeatherCard = memo(function WeatherCard({
   onSizeChange: _onSizeChange,
   isEditMode,
 }: WeatherCardProps) {
-  const { t } = useI18n();
   const {
     theme,
     surface,
@@ -88,7 +88,6 @@ export const WeatherCard = memo(function WeatherCard({
   const isLarge = size === 'large';
   const usesDetailedLayout = isMedium || isLarge;
   const visibleForecast = isSmall ? forecast.slice(0, 4) : forecast.slice(0, 7);
-  const precipitationValue = `${precipitation}${precipitationUnit ? ` ${precipitationUnit}` : ''}`;
   const summaryLabel = formatWeatherConditionLabel(condition);
   const headerIconClassName = isSmall || usesDetailedLayout ? 'h-11 w-11' : 'h-10 w-10';
   const showHourlyForecast = effectiveForecastMode === 'hourly';
@@ -103,18 +102,10 @@ export const WeatherCard = memo(function WeatherCard({
   const compactTemperatureTextClassName = isSmall ? 'text-[2rem]' : 'text-3xl';
   const compactMetaTextClassName = isSmall ? 'text-xs' : 'text-sm';
   const compactSummaryTextClassName = isSmall ? 'text-xs' : 'text-sm';
-  const compactForecastDayTextClassName = isSmall ? 'text-xs' : 'text-sm';
-  const compactForecastIconClassName = isSmall
-    ? 'mx-auto mb-1 h-5 w-5'
-    : isMedium
-      ? 'mx-auto mb-0.5 h-5 w-5'
-      : 'mx-auto mb-1 h-6 w-6';
-  const compactForecastValueClassName = isSmall ? 'text-xs leading-none' : 'text-sm leading-none';
   const compactHeaderIconClassName = isSmall ? 'h-9 w-9' : headerIconClassName;
   const compactTemperatureBlockClassName = isSmall ? 'mt-1' : isMedium ? 'mt-1' : 'mt-1.5';
   const compactTemperatureClassName = isSmall ? 'mb-0.5' : isMedium ? 'mb-0.5' : 'mb-1';
   const compactSummaryClassName = isSmall ? 'mt-0.5 max-w-18' : isMedium ? 'mt-0.5' : 'mt-1';
-  const compactForecastDayClassName = isSmall ? 'mb-1' : isMedium ? 'mb-0.5' : 'mb-1';
 
   const textPrimary = weatherTextTreatment.primary;
   const textSecondary = weatherTextTreatment.secondary;
@@ -124,7 +115,6 @@ export const WeatherCard = memo(function WeatherCard({
     ? (tintSurface.overlayClassName ?? 'bg-transparent')
     : [surface.lightOverlay, shell.overlayClassName].filter(Boolean).join(' ');
 
-  // Memoize style objects to prevent GC pressure and enable React optimizations
   const gradientBackgroundStyle = useMemo(
     () =>
       ({
@@ -246,159 +236,66 @@ export const WeatherCard = memo(function WeatherCard({
           {isSmall || isMedium ? (
             <div className="flex h-full flex-col">
               {visibleForecast.length > 0 ? (
-                <div
-                  className={`mt-auto flex w-full items-start justify-between ${isSmall ? 'gap-1' : 'gap-2'}`}
-                >
-                  {visibleForecast.map((day) => (
-                    <div key={day.day} className="min-w-0 text-center">
-                      <div
-                        className={`${compactForecastDayClassName} ${compactForecastDayTextClassName}`}
-                        style={iconStyleSecondary}
-                      >
-                        {day.day}
-                      </div>
-                      <WeatherIcon
-                        condition={day.condition}
-                        className={compactForecastIconClassName}
-                        style={iconStylePrimary}
-                      />
-                      {showHourlyForecast ? (
-                        <div
-                          className={`${compactForecastValueClassName} font-medium`}
-                          style={titleStyle}
-                        >
-                          {day.high}°
-                        </div>
-                      ) : (
-                        <div
-                          className={`flex items-center justify-center ${isSmall ? 'gap-1' : 'gap-1.5'} ${compactForecastValueClassName}`}
-                        >
-                          <span className="font-medium" style={titleStyle}>
-                            {day.high}°
-                          </span>
-                          <span style={subtitleStyle}>{day.low}°</span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                <div className="mt-auto">
+                  <WeatherForecastRow
+                    forecast={visibleForecast}
+                    showHourlyForecast={showHourlyForecast}
+                    isSmall={isSmall}
+                    isMedium={isMedium}
+                    textPrimary={textPrimary}
+                    textSecondary={textSecondary}
+                    textShadow={weatherTextTreatment.textShadow}
+                    titleStyle={titleStyle}
+                    subtitleStyle={subtitleStyle}
+                  />
                 </div>
               ) : null}
             </div>
           ) : (
             <div className="mt-auto flex min-h-0 flex-col">
               <div className="flex items-end justify-between gap-4">
-                <div className="shrink-0">
-                  <div className="mb-1 text-3xl font-bold leading-none" style={titleStyle}>
-                    {temperature}°C
-                  </div>
-                  <div className="mb-0.5 text-sm" style={subtitleStyle}>
-                    H:{highTemp}° L:{lowTemp}°
-                  </div>
-                  {rainForecast ? (
-                    <div className="text-sm" style={subtitleStyle}>
-                      {rainForecast}
-                    </div>
-                  ) : null}
-                </div>
-
-                <div className="shrink-0 space-y-0.5">
-                  <CaptionValue
-                    caption={t('weather.precipitation')}
-                    value={precipitationValue}
-                    align="right"
-                    captionStyle={{
-                      color: textSecondary,
-                      textShadow: weatherTextTreatment.textShadow,
-                    }}
-                    valueStyle={{
-                      color: textPrimary,
-                      textShadow: weatherTextTreatment.textShadow,
-                    }}
-                  />
-                  <CaptionValue
-                    caption={t('weather.humidity')}
-                    value={`${humidity}%`}
-                    align="right"
-                    captionStyle={{
-                      color: textSecondary,
-                      textShadow: weatherTextTreatment.textShadow,
-                    }}
-                    valueStyle={titleStyle}
-                  />
-                  <CaptionValue
-                    caption={t('weather.wind')}
-                    value={`${windSpeed} km/h`}
-                    align="right"
-                    captionStyle={subtitleStyle}
-                    valueStyle={titleStyle}
-                  />
-                </div>
+                <WeatherDetails
+                  temperature={temperature}
+                  highTemp={highTemp}
+                  lowTemp={lowTemp}
+                  rainForecast={rainForecast}
+                  precipitation={precipitation}
+                  precipitationUnit={precipitationUnit}
+                  humidity={humidity}
+                  windSpeed={windSpeed}
+                  textPrimary={textPrimary}
+                  textSecondary={textSecondary}
+                  textShadow={weatherTextTreatment.textShadow}
+                  titleStyle={titleStyle}
+                  subtitleStyle={subtitleStyle}
+                />
               </div>
 
-              <div className="my-5 flex items-center justify-between px-1">
-                <div className="flex items-center gap-2">
-                  <Sunrise className="h-4 w-4" style={iconStyleSecondary} />
-                  <span className="text-sm font-medium" style={titleStyle}>
-                    {sunrise}
-                  </span>
-                </div>
-                <div className="mx-3 flex min-w-0 flex-1 items-center">
-                  <div
-                    className="flex-1 border-t border-dashed"
-                    style={{ borderColor: textSecondary }}
-                  />
-                </div>
-                <div className="shrink-0 text-sm" style={subtitleStyle}>
-                  {daylight}
-                </div>
-                <div className="mx-3 flex min-w-0 flex-1 items-center">
-                  <div
-                    className="flex-1 border-t border-dashed"
-                    style={{ borderColor: textSecondary }}
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Sunset className="h-4 w-4" style={iconStyleSecondary} />
-                  <span className="text-sm font-medium" style={titleStyle}>
-                    {sunset}
-                  </span>
-                </div>
-              </div>
+              <WeatherSunTimes
+                sunrise={sunrise}
+                sunset={sunset}
+                daylight={daylight}
+                textPrimary={textPrimary}
+                textSecondary={textSecondary}
+                textShadow={weatherTextTreatment.textShadow}
+                titleStyle={titleStyle}
+                subtitleStyle={subtitleStyle}
+                iconStyleSecondary={iconStyleSecondary}
+              />
 
               {visibleForecast.length > 0 && (
                 <div className="flex justify-between gap-2">
-                  {visibleForecast.map((day) => (
-                    <div key={day.day} className="min-w-0 text-center">
-                      <div
-                        className="mb-1.5 text-sm"
-                        style={{
-                          color: textSecondary,
-                          textShadow: weatherTextTreatment.textShadow,
-                        }}
-                      >
-                        {day.day}
-                      </div>
-                      <WeatherIcon
-                        condition={day.condition}
-                        className="mx-auto mb-1.5 h-7 w-7"
-                        style={iconStylePrimary}
-                      />
-                      {showHourlyForecast ? (
-                        <div className="text-sm font-medium" style={titleStyle}>
-                          {day.high}°
-                        </div>
-                      ) : (
-                        <>
-                          <div className="text-sm font-medium" style={titleStyle}>
-                            {day.high}°
-                          </div>
-                          <div className="text-sm" style={subtitleStyle}>
-                            {day.low}°
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  ))}
+                  <WeatherForecastRow
+                    forecast={visibleForecast}
+                    showHourlyForecast={showHourlyForecast}
+                    isSmall={false}
+                    isMedium={false}
+                    textPrimary={textPrimary}
+                    textSecondary={textSecondary}
+                    textShadow={weatherTextTreatment.textShadow}
+                    titleStyle={titleStyle}
+                    subtitleStyle={subtitleStyle}
+                  />
                 </div>
               )}
             </div>

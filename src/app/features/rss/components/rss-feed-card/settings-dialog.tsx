@@ -1,26 +1,16 @@
-import { Palette, Plus, Sliders, Trash2 } from 'lucide-react';
+import { Palette, Plus, Sliders } from 'lucide-react';
 import { type CSSProperties, useState } from 'react';
 import { toast } from 'sonner';
-import {
-  CardDialogHeader,
-  CardDialogTabList,
-  SelectableCheckboxRow,
-} from '@/app/components/patterns';
+import { CardDialogHeader, CardDialogTabList } from '@/app/components/patterns';
 import {
   Button,
   customCardDialogShellProps,
   DialogFooter,
   DialogShell,
-  Input,
   InteractivePill,
 } from '@/app/components/primitives';
 import { TabPanel, Tabs } from '@/app/components/primitives/tabs';
-import {
-  CompactRoomSelector,
-  CustomCardTintPicker,
-  CustomScrollbar,
-  DialogSectionRow,
-} from '@/app/components/shared/device-editor';
+import { CompactRoomSelector, CustomScrollbar } from '@/app/components/shared/device-editor';
 import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import {
   getCustomCardTintSurface,
@@ -29,10 +19,32 @@ import {
   withTintAlpha,
 } from '@/app/components/shared/theme/custom-card-tint-surface';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { type TranslateFn, useI18n, useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
+import { RSSCardTabContent } from './rss-card-tab-content';
+import { RSSFeedsTabContent } from './rss-feeds-tab-content';
+import { RSSSetupTabContent } from './rss-setup-tab-content';
 import { getRSSFeedCardSurfaceTokens } from './surface-tokens';
 import type { RSSProvider } from './types';
+
+function getRSSDialogPillStyle({
+  accentColor,
+  isActive,
+  textPrimaryColor,
+  textSecondaryColor,
+}: {
+  accentColor: string;
+  isActive: boolean;
+  textPrimaryColor: string;
+  textSecondaryColor: string;
+}): CSSProperties {
+  return {
+    color: isActive ? textPrimaryColor : textSecondaryColor,
+    borderColor: withTintAlpha(accentColor, isActive ? 0.34 : 0.22),
+    backgroundColor: withTintAlpha(accentColor, isActive ? 0.18 : 0.1),
+    boxShadow: isActive ? `inset 0 0 0 1px ${withTintAlpha(accentColor, 0.16)}` : 'none',
+  };
+}
 
 interface RSSFeedSettingsDialogProps {
   isOpen: boolean;
@@ -235,123 +247,48 @@ export function RSSFeedSettingsDialog({
             </CardDialogTabList>
 
             <TabPanel value="feeds" className="mt-5 space-y-4">
-              {hasProviders ? (
-                <>
-                  {homeAssistantProviders.length > 0 ? (
-                    <RSSProviderGroup
-                      title={t('rss.settings.availableHomeAssistantFeeds')}
-                      providers={homeAssistantProviders}
-                      selectedProviderIds={selectedProviderIds}
-                      onToggleProvider={handleToggleProvider}
-                      accentColorValue={activeAccentColor}
-                      textPrimaryColor={rssSurface.textPrimaryColor}
-                      textSecondaryColor={rssSurface.sourceColor}
-                      sectionStyle={sectionStyle}
-                      surface={surface}
-                      t={t}
-                    />
-                  ) : null}
-
-                  {directProviders.length > 0 ? (
-                    <RSSProviderGroup
-                      title={t('rss.settings.savedDirectFeeds')}
-                      providers={directProviders}
-                      selectedProviderIds={selectedProviderIds}
-                      onToggleProvider={handleToggleProvider}
-                      onRemoveProvider={onRemoveProvider}
-                      accentColorValue={activeAccentColor}
-                      textPrimaryColor={rssSurface.textPrimaryColor}
-                      textSecondaryColor={rssSurface.sourceColor}
-                      sectionStyle={sectionStyle}
-                      surface={surface}
-                      t={t}
-                    />
-                  ) : null}
-                </>
-              ) : (
-                <div
-                  className={`rounded-2xl border border-dashed px-4 py-5 text-sm ${surface.border} ${surface.textSecondary}`}
-                >
-                  {t('rss.settings.emptyState')}
-                </div>
-              )}
+              <RSSFeedsTabContent
+                hasProviders={hasProviders}
+                homeAssistantProviders={homeAssistantProviders}
+                directProviders={directProviders}
+                selectedProviderIds={selectedProviderIds}
+                onToggleProvider={handleToggleProvider}
+                onRemoveProvider={onRemoveProvider}
+                accentColorValue={activeAccentColor}
+                textPrimaryColor={rssSurface.textPrimaryColor}
+                textSecondaryColor={rssSurface.sourceColor}
+                sectionStyle={sectionStyle}
+                surface={rssSurface}
+                t={t}
+              />
             </TabPanel>
 
             <TabPanel value="setup" className="mt-5 space-y-4">
-              <DialogSectionRow
-                label={t('rss.settings.addFeed')}
-                helperText={t('rss.settings.addFeedDescription')}
-              >
-                <div className="space-y-3">
-                  <Input
-                    type="text"
-                    value={providerName}
-                    onChange={(event) => setProviderName(event.target.value)}
-                    placeholder={t('rss.settings.providerName')}
-                    inputClassName={`${surface.inputBg} ${surface.border} ${surface.textPrimary} placeholder:text-[var(--rss-placeholder-color)] rounded-2xl`}
-                    style={inputStyle}
-                  />
-                  <Input
-                    type="url"
-                    value={providerUrl}
-                    onChange={(event) => setProviderUrl(event.target.value)}
-                    placeholder={t('rss.settings.providerUrl')}
-                    inputClassName={`${surface.inputBg} ${surface.border} ${surface.textPrimary} placeholder:text-[var(--rss-placeholder-color)] rounded-2xl`}
-                    style={inputStyle}
-                  />
-                  <div className="flex items-center gap-2">
-                    <InteractivePill
-                      active={canAddProvider}
-                      intent="action"
-                      onClick={handleAddProvider}
-                      disabled={!canAddProvider}
-                      className="min-h-9 px-4 text-sm"
-                      style={getRSSDialogPillStyle({
-                        accentColor: activeAccentColor,
-                        isActive: canAddProvider,
-                        textPrimaryColor: rssSurface.textPrimaryColor,
-                        textSecondaryColor: rssSurface.sourceColor,
-                      })}
-                    >
-                      <Plus className="h-4 w-4" />
-                      {t('rss.settings.addFeed')}
-                    </InteractivePill>
-                  </div>
-                </div>
-              </DialogSectionRow>
-
-              <DialogSectionRow label={t('rss.settings.articleCount')}>
-                <div className="flex gap-2">
-                  {[5, 10, 20, 30].map((count) => (
-                    <InteractivePill
-                      key={count}
-                      onClick={() => onArticleCountChange(count)}
-                      active={articleCount === count}
-                      size="compact"
-                      className="text-xs"
-                      style={getRSSDialogPillStyle({
-                        accentColor: activeAccentColor,
-                        isActive: articleCount === count,
-                        textPrimaryColor: rssSurface.textPrimaryColor,
-                        textSecondaryColor: rssSurface.sourceColor,
-                      })}
-                    >
-                      {count}
-                    </InteractivePill>
-                  ))}
-                </div>
-              </DialogSectionRow>
+              <RSSSetupTabContent
+                providerName={providerName}
+                providerUrl={providerUrl}
+                onProviderNameChange={setProviderName}
+                onProviderUrlChange={setProviderUrl}
+                onAddProvider={handleAddProvider}
+                articleCount={articleCount}
+                onArticleCountChange={onArticleCountChange}
+                canAddProvider={canAddProvider}
+                inputStyle={inputStyle}
+                surface={rssSurface}
+                accentColor={activeAccentColor}
+                textPrimaryColor={rssSurface.textPrimaryColor}
+                textSecondaryColor={rssSurface.sourceColor}
+                t={t}
+              />
             </TabPanel>
 
             <TabPanel value="card" className="mt-5 space-y-4">
-              {onTintColorChange ? (
-                <CustomCardTintPicker
-                  value={tintColor}
-                  onChange={onTintColorChange}
-                  defaultColor="#06b6d4"
-                  className={surface.textMuted}
-                />
-              ) : null}
+              <RSSCardTabContent
+                tintColor={tintColor}
+                onTintColorChange={onTintColorChange}
+                defaultColor="#06b6d4"
+                surface={rssSurface}
+              />
             </TabPanel>
           </Tabs>
 
@@ -364,105 +301,4 @@ export function RSSFeedSettingsDialog({
       </CustomScrollbar>
     </DialogShell>
   );
-}
-
-function RSSProviderGroup({
-  title,
-  providers,
-  selectedProviderIds,
-  onToggleProvider,
-  onRemoveProvider,
-  accentColorValue,
-  textPrimaryColor,
-  textSecondaryColor,
-  sectionStyle,
-  surface,
-  t,
-}: {
-  title: string;
-  providers: RSSProvider[];
-  selectedProviderIds: string[];
-  onToggleProvider: (providerId: string) => void;
-  onRemoveProvider?: (providerId: string) => void;
-  accentColorValue: string;
-  textPrimaryColor: string;
-  textSecondaryColor: string;
-  sectionStyle?: CSSProperties;
-  surface: ReturnType<typeof getThemeSurfaceTokens>;
-  t: TranslateFn;
-}) {
-  return (
-    <DialogSectionRow label={title}>
-      <div className="space-y-2">
-        {providers.map((provider) => {
-          const isSelected = selectedProviderIds.includes(provider.id);
-          const secondaryLabel =
-            provider.type === 'home-assistant-feedreader' ? provider.entityId : provider.feedUrl;
-          const isRemovable = provider.type === 'url' && onRemoveProvider;
-          const rowStyle = {
-            ...sectionStyle,
-            backgroundColor: withTintAlpha(accentColorValue, isSelected ? 0.18 : 0.1),
-            borderColor: withTintAlpha(accentColorValue, isSelected ? 0.38 : 0.24),
-          } satisfies CSSProperties;
-
-          return (
-            <SelectableCheckboxRow
-              key={provider.id}
-              checked={isSelected}
-              onCheckedChange={() => onToggleProvider(provider.id)}
-              label={<span style={{ color: textPrimaryColor }}>{provider.name}</span>}
-              description={<span style={{ color: textSecondaryColor }}>{secondaryLabel}</span>}
-              rowClassName={`items-center px-4 ${surface.border}`}
-              labelClassName="truncate"
-              descriptionClassName="truncate"
-              checkboxPaletteColor={accentColorValue}
-              selectedStyle={rowStyle}
-              unselectedStyle={rowStyle}
-              action={
-                isRemovable ? (
-                  <InteractivePill
-                    active={false}
-                    intent="action"
-                    size="compact"
-                    className="shrink-0 min-h-8 w-8 px-0"
-                    onClick={(event) => {
-                      event.preventDefault();
-                      onRemoveProvider?.(provider.id);
-                    }}
-                    style={{
-                      backgroundColor: withTintAlpha(accentColorValue, 0.1),
-                      color: textSecondaryColor,
-                      borderColor: withTintAlpha(accentColorValue, 0.24),
-                    }}
-                    aria-label={t('rss.settings.removeProvider', { name: provider.name })}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </InteractivePill>
-                ) : null
-              }
-            />
-          );
-        })}
-      </div>
-    </DialogSectionRow>
-  );
-}
-
-function getRSSDialogPillStyle({
-  accentColor,
-  isActive,
-  textPrimaryColor,
-  textSecondaryColor,
-}: {
-  accentColor: string;
-  isActive: boolean;
-  textPrimaryColor: string;
-  textSecondaryColor: string;
-}): CSSProperties {
-  return {
-    color: isActive ? textPrimaryColor : textSecondaryColor,
-    borderColor: withTintAlpha(accentColor, isActive ? 0.34 : 0.22),
-    backgroundColor: withTintAlpha(accentColor, isActive ? 0.18 : 0.1),
-    boxShadow: isActive ? `inset 0 0 0 1px ${withTintAlpha(accentColor, 0.16)}` : 'none',
-  };
 }

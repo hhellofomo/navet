@@ -19,6 +19,8 @@ const RSS_ACCENT_COLORS = {
   teal: { strong: '#0f766e', base: '#14b8a6', soft: '#99f6e4' },
 } as const;
 
+export type RSSFeedCardSurfaceTokens = ReturnType<typeof getRSSFeedCardSurfaceTokens>;
+
 export function getRSSFeedCardSurfaceTokens(
   theme: ThemeType,
   primaryColor: PrimaryColor,

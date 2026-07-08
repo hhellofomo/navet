@@ -1,11 +1,11 @@
 import { Settings2 } from 'lucide-react';
-import { BaseCard, InteractivePill, RoundControlButton } from '@/app/components/primitives';
+import { BaseCard, RoundControlButton } from '@/app/components/primitives';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import {
-  getRSSControlPillStyle,
-  getRSSSkeletonStyles,
-} from '@/app/components/shared/theme/rss-widget-surface-tokens';
 import { type PrimaryColor, type ThemeType, useI18n } from '@/app/hooks';
+import { RSSArticleListLarge, RSSArticleListMedium, RSSArticleListSmall } from './rss-article-list';
+import { RSSEmptyState } from './rss-empty-state';
+import { RSSFeedLoadingSkeleton } from './rss-loading-skeleton';
+import { RSSProviderFilterPills } from './rss-provider-filter-pills';
 import { getRSSFeedCardSurfaceTokens } from './surface-tokens';
 import type { RSSItem, RSSProvider } from './types';
 
@@ -66,13 +66,6 @@ export function RSSFeedCardView({
   const hasCustomTint = Boolean(rssSurface.resolvedTintColor);
   const controlAccentColor = rssSurface.resolvedTintColor ?? rssSurface.accentColor.base;
   const isEmpty = !latestArticle && !isLoading;
-  const emptyMessage = !hasConfiguredProviders
-    ? t('rss.empty.noProviders')
-    : !hasSelectedProviders
-      ? t('rss.empty.noSelection')
-      : error
-        ? error
-        : t('rss.empty.noArticles');
 
   return (
     <BaseCard
@@ -111,37 +104,14 @@ export function RSSFeedCardView({
     >
       <div className="relative flex h-full flex-col">
         {isEmpty ? (
-          <div className="flex flex-1 flex-col justify-center text-left">
-            <p
-              className={`mt-2 text-sm leading-relaxed ${rssSurface.textSecondaryClassName}`}
-              style={{ color: rssSurface.textSecondaryColor }}
-            >
-              {emptyMessage}
-            </p>
-            {inEditMode ? (
-              <div
-                className="mt-4 inline-flex w-fit items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium"
-                style={{ color: rssSurface.textPrimaryColor }}
-              >
-                <Settings2 className="h-3.5 w-3.5" />
-                {t('rss.configureProviders')}
-              </div>
-            ) : (
-              <button
-                type="button"
-                onPointerDown={(e) => e.stopPropagation()}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onOpenSettings();
-                }}
-                className={`mt-4 inline-flex w-fit items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium transition-opacity hover:opacity-70 ${rssSurface.hoverClassName}`}
-                style={{ color: rssSurface.textPrimaryColor }}
-              >
-                <Settings2 className="h-3.5 w-3.5" />
-                {t('rss.configureProviders')}
-              </button>
-            )}
-          </div>
+          <RSSEmptyState
+            hasConfiguredProviders={hasConfiguredProviders}
+            hasSelectedProviders={hasSelectedProviders}
+            error={error}
+            inEditMode={inEditMode}
+            rssSurface={rssSurface}
+            onOpenSettings={onOpenSettings}
+          />
         ) : isLoading && !latestArticle ? (
           <RSSFeedLoadingSkeleton
             isSmall={isSmall}
@@ -152,49 +122,14 @@ export function RSSFeedCardView({
         ) : (
           <>
             <div className="mb-2 flex items-start gap-2">
-              <div className="min-w-0 flex-1">
-                <div className="flex gap-1 overflow-x-auto pb-0.5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                  <InteractivePill
-                    active={activeProviderId === 'all'}
-                    size="compact"
-                    className={`shrink-0 text-xs ${rssSurface.surface.border}`}
-                    style={getRSSControlPillStyle({
-                      accentColor: controlAccentColor,
-                      isActive: activeProviderId === 'all',
-                      theme,
-                      textPrimaryColor: rssSurface.textPrimaryColor,
-                      textSecondaryColor: rssSurface.textSecondaryColor,
-                    })}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onActiveProviderChange('all');
-                    }}
-                  >
-                    {t('rss.filter.all')}
-                  </InteractivePill>
-                  {selectedProviders.map((provider) => (
-                    <InteractivePill
-                      key={provider.id}
-                      active={activeProviderId === provider.id}
-                      size="compact"
-                      className={`shrink-0 text-xs ${rssSurface.surface.border}`}
-                      style={getRSSControlPillStyle({
-                        accentColor: controlAccentColor,
-                        isActive: activeProviderId === provider.id,
-                        theme,
-                        textPrimaryColor: rssSurface.textPrimaryColor,
-                        textSecondaryColor: rssSurface.textSecondaryColor,
-                      })}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onActiveProviderChange(provider.id);
-                      }}
-                    >
-                      {getCompactProviderLabel(provider.name)}
-                    </InteractivePill>
-                  ))}
-                </div>
-              </div>
+              <RSSProviderFilterPills
+                selectedProviders={selectedProviders}
+                activeProviderId={activeProviderId}
+                onActiveProviderChange={onActiveProviderChange}
+                rssSurface={rssSurface}
+                controlAccentColor={controlAccentColor}
+                theme={theme}
+              />
               <RoundControlButton
                 theme={theme}
                 size={chromeSize === 'small' ? 'small' : 'medium'}
@@ -212,281 +147,30 @@ export function RSSFeedCardView({
             </div>
 
             {isSmall && latestArticle ? (
-              // Small: compact headline list
-              <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
-                <div className="space-y-1.5 pr-1">
-                  {items.slice(0, 4).map((item, index) => (
-                    <a
-                      key={item.id}
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`group/item -m-1 block min-w-0 rounded-lg px-1 py-1 text-left no-underline transition-colors ${
-                        inEditMode ? '' : `cursor-pointer ${rssSurface.hoverClassName}`
-                      }`}
-                      onClick={(e) => {
-                        if (inEditMode) {
-                          e.preventDefault();
-                          return;
-                        }
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleArticleClick(item.url);
-                      }}
-                    >
-                      <h3
-                        className="text-left text-xs font-semibold leading-[1.35] line-clamp-2"
-                        style={{ color: rssSurface.textPrimaryColor }}
-                      >
-                        {item.title}
-                      </h3>
-                      <div className="mt-0.5 flex items-center gap-1 text-xs leading-none">
-                        <span style={{ color: rssSurface.sourceColor }}>{item.source}</span>
-                        <span className={rssSurface.dotClassName}>•</span>
-                        <span style={{ color: rssSurface.textSecondaryColor }}>{item.timeAgo}</span>
-                      </div>
-                      {index < Math.min(items.length, 4) - 1 ? (
-                        <div className={`mt-1.5 h-px ${rssSurface.dividerClassName}`} />
-                      ) : null}
-                    </a>
-                  ))}
-                </div>
-              </div>
+              <RSSArticleListSmall
+                items={items}
+                inEditMode={inEditMode}
+                rssSurface={rssSurface}
+                handleArticleClick={handleArticleClick}
+              />
             ) : isMedium ? (
-              // Medium: compact list, scrollable
-              <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
-                <div className="space-y-2 pr-1">
-                  {items.map((item, index) => (
-                    <a
-                      key={item.id}
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`group/item -m-1 block min-w-0 rounded-lg px-1 py-1.5 text-left no-underline transition-colors ${
-                        inEditMode ? '' : `cursor-pointer ${rssSurface.hoverClassName}`
-                      }`}
-                      onClick={(e) => {
-                        if (inEditMode) {
-                          e.preventDefault();
-                          return;
-                        }
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleArticleClick(item.url);
-                      }}
-                    >
-                      <h3
-                        className="mb-0.5 text-left text-sm font-semibold leading-tight line-clamp-2 transition-colors"
-                        style={{ color: rssSurface.textPrimaryColor }}
-                      >
-                        {item.title}
-                      </h3>
-                      <div className="flex items-center gap-1 text-xs leading-none">
-                        <span style={{ color: rssSurface.sourceColor }}>{item.source}</span>
-                        <span className={rssSurface.dotClassName}>•</span>
-                        <span style={{ color: rssSurface.textSecondaryColor }}>{item.timeAgo}</span>
-                      </div>
-                      {index < items.length - 1 && (
-                        <div className={`mt-2 h-px ${rssSurface.dividerClassName}`} />
-                      )}
-                    </a>
-                  ))}
-                </div>
-              </div>
+              <RSSArticleListMedium
+                items={items}
+                inEditMode={inEditMode}
+                rssSurface={rssSurface}
+                handleArticleClick={handleArticleClick}
+              />
             ) : (
-              // Large: articles with images, scrollable
-              <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
-                <div className="space-y-2 pr-1">
-                  {items.map((item, index) => {
-                    return (
-                      <a
-                        key={item.id}
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`group/item -m-2 block min-w-0 rounded-xl p-2 text-left no-underline transition-colors ${
-                          inEditMode ? '' : `cursor-pointer ${rssSurface.hoverClassName}`
-                        }`}
-                        onClick={(e) => {
-                          if (inEditMode) {
-                            e.preventDefault();
-                            return;
-                          }
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleArticleClick(item.url);
-                        }}
-                      >
-                        <div className="flex gap-3">
-                          {item.imageUrl && (
-                            <div
-                              className={`h-20 w-20 shrink-0 overflow-hidden rounded-lg ${rssSurface.thumbnailClassName}`}
-                            >
-                              <img
-                                src={item.imageUrl}
-                                alt={item.title}
-                                className="h-full w-full object-cover opacity-80 transition-opacity group-hover/item:opacity-100"
-                              />
-                            </div>
-                          )}
-                          <div className="min-w-0 flex-1 text-left">
-                            <h3
-                              className="mb-1.5 text-left text-sm font-semibold leading-[1.3] line-clamp-2 transition-colors"
-                              style={{ color: rssSurface.textPrimaryColor }}
-                            >
-                              {item.title}
-                            </h3>
-                            <div className="mb-2 flex items-center gap-1.5 text-[11px] leading-none">
-                              <span
-                                className="font-medium"
-                                style={{ color: rssSurface.metadataSourceColor }}
-                              >
-                                {item.source}
-                              </span>
-                              <span
-                                className={rssSurface.dotClassName}
-                                style={{ color: rssSurface.metadataTimeColor }}
-                              >
-                                •
-                              </span>
-                              <span style={{ color: rssSurface.metadataTimeColor }}>
-                                {item.timeAgo}
-                              </span>
-                            </div>
-                            {item.excerpt ? (
-                              <p
-                                className={`line-clamp-4 text-left text-xs whitespace-normal wrap-break-word leading-[1.5] ${rssSurface.excerptClassName}`}
-                                style={{ color: rssSurface.excerptColor }}
-                              >
-                                {truncateExcerpt(item.excerpt)}
-                              </p>
-                            ) : null}
-                          </div>
-                        </div>
-                        {index < items.length - 1 && (
-                          <div className={`mt-2 h-px ${rssSurface.dividerClassName}`} />
-                        )}
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
+              <RSSArticleListLarge
+                items={items}
+                inEditMode={inEditMode}
+                rssSurface={rssSurface}
+                handleArticleClick={handleArticleClick}
+              />
             )}
           </>
         )}
       </div>
     </BaseCard>
   );
-}
-
-function RSSFeedLoadingSkeleton({
-  isSmall,
-  isMedium,
-  theme,
-  accentColor,
-}: {
-  isSmall: boolean;
-  isMedium: boolean;
-  theme: ThemeType;
-  accentColor: string;
-}) {
-  const skeletonStyles = getRSSSkeletonStyles({ theme, accentColor });
-  const pillStyle = skeletonStyles.pill;
-  const blockStyle = skeletonStyles.block;
-  const lineStyle = skeletonStyles.line;
-  const dividerStyle = skeletonStyles.divider;
-
-  return (
-    <div className="flex flex-1 flex-col animate-pulse">
-      <div className="mb-2 flex items-start gap-2">
-        <div className="min-w-0 flex-1">
-          <div className="flex gap-1 overflow-hidden pb-0.5">
-            <div className="h-6 w-11 shrink-0 rounded-full border" style={pillStyle} />
-            <div className="h-6 w-14 shrink-0 rounded-full border" style={pillStyle} />
-            <div className="h-6 w-12 shrink-0 rounded-full border" style={pillStyle} />
-          </div>
-        </div>
-        <div className="h-6 w-7 shrink-0 rounded-full border" style={pillStyle} />
-      </div>
-
-      <div className="min-h-0 flex-1 overflow-hidden">
-        {isSmall ? (
-          <div className="space-y-1.5 pr-1">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="rounded-lg px-1 py-1">
-                <div className="h-3 w-full rounded" style={lineStyle} />
-                <div className="mt-1 h-3 w-4/5 rounded" style={lineStyle} />
-                <div className="mt-1.5 flex items-center gap-1">
-                  <div className="h-2.5 w-12 rounded" style={blockStyle} />
-                  <div className="h-2.5 w-1 rounded-full" style={blockStyle} />
-                  <div className="h-2.5 w-10 rounded" style={blockStyle} />
-                </div>
-                {index < 3 ? <div className="mt-1.5 h-px" style={dividerStyle} /> : null}
-              </div>
-            ))}
-          </div>
-        ) : isMedium ? (
-          <div className="space-y-2 pr-1">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <div key={index} className="rounded-lg px-1 py-1.5">
-                <div className="h-3 w-full rounded" style={lineStyle} />
-                <div className="mt-1 h-3 w-3/4 rounded" style={lineStyle} />
-                <div className="mt-1.5 flex items-center gap-1">
-                  <div className="h-2.5 w-14 rounded" style={blockStyle} />
-                  <div className="h-2.5 w-1 rounded-full" style={blockStyle} />
-                  <div className="h-2.5 w-12 rounded" style={blockStyle} />
-                </div>
-                {index < 4 ? <div className="mt-2 h-px" style={dividerStyle} /> : null}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-2 pr-1">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="rounded-xl p-2">
-                <div className="flex gap-3">
-                  <div className="h-20 w-20 shrink-0 rounded-lg" style={blockStyle} />
-                  <div className="min-w-0 flex-1">
-                    <div className="h-3 w-full rounded" style={lineStyle} />
-                    <div className="mt-1 h-3 w-4/5 rounded" style={lineStyle} />
-                    <div className="mt-1.5 flex items-center gap-1">
-                      <div className="h-2.5 w-14 rounded" style={blockStyle} />
-                      <div className="h-2.5 w-1 rounded-full" style={blockStyle} />
-                      <div className="h-2.5 w-12 rounded" style={blockStyle} />
-                    </div>
-                    <div className="mt-2 h-2.5 w-full rounded" style={blockStyle} />
-                    <div className="mt-1 h-2.5 w-11/12 rounded" style={blockStyle} />
-                    <div className="mt-1 h-2.5 w-2/3 rounded" style={blockStyle} />
-                  </div>
-                </div>
-                {index < 2 ? <div className="mt-2 h-px" style={dividerStyle} /> : null}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function getCompactProviderLabel(label: string) {
-  const normalized = label.trim();
-
-  if (/^bbc\b/i.test(normalized)) {
-    return 'BBC';
-  }
-
-  if (normalized.length <= 12) {
-    return normalized;
-  }
-
-  return normalized.split(/\s+/)[0] ?? normalized;
-}
-
-function truncateExcerpt(value: string, maxLength = 420) {
-  if (value.length <= maxLength) {
-    return value;
-  }
-
-  return `${value.slice(0, maxLength).trimEnd()}...`;
 }

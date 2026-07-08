@@ -429,8 +429,6 @@ export function translateGridUnits(value: number, fromColumns: number, toColumns
   return Math.round((value / fromColumns) * toColumns);
 }
 
-// --- Section rendering helpers ---
-
 export function getSectionCardMinColumns(size: CardSize | undefined): number {
   switch (size) {
     case 'medium':

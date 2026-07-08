@@ -3,10 +3,6 @@ import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import { storage } from '@/app/utils/storage';
 import {
-  buildBalancedWidths,
-  clampWidth,
-  compactRows,
-  compactStackGaps,
   getBottomRow,
   getSectionCardMinColumns,
   insertSectionBelow,
@@ -19,8 +15,8 @@ import {
   SECTION_LAYOUT_COLUMNS,
   type SectionLayoutItem,
   sortSectionLayout,
-  translateGridUnits,
 } from '../utils/layout-engine';
+import { normalizeLayout } from '../utils/layout-migration';
 
 export type HomeLayoutMode = 'flow' | 'sectioned';
 export type HomeDashboardSectionSpan = number;
@@ -37,25 +33,8 @@ export interface HomeDashboardLayoutState {
   cardSectionAssignments: Record<string, string>;
 }
 
-type LegacyHomeDashboardSection = {
-  id: string;
-  title: string;
-  span?: unknown;
-  stackUnder?: unknown;
-  x?: unknown;
-  y?: unknown;
-  w?: unknown;
-  h?: unknown;
-};
-
-type LegacySectionWithCoordinates = LegacyHomeDashboardSection & {
-  id: string;
-  title: string;
-  x: number;
-  y: number;
-  w: number;
-  h?: number;
-};
+const SECTION_TITLE_PREFIX = 'Section';
+const CUSTOM_CARD_ID_PREFIX = 'custom-';
 
 const DEFAULT_LAYOUT: HomeDashboardLayoutState = {
   mode: 'flow',
@@ -65,32 +44,12 @@ const DEFAULT_LAYOUT: HomeDashboardLayoutState = {
   cardSectionAssignments: {},
 };
 
-const SECTION_TITLE_PREFIX = 'Section';
-const LEGACY_TOTAL_SECTION_COLUMNS = 8;
-const CUSTOM_CARD_ID_PREFIX = 'custom-';
-
 function createSectionId() {
   return `home-section-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 function getNextSectionTitle(sectionCount: number) {
   return `${SECTION_TITLE_PREFIX} ${sectionCount + 1}`;
-}
-
-function normalizeCoordinate(value: unknown) {
-  if (typeof value === 'number' && Number.isInteger(value)) {
-    return Math.max(0, value);
-  }
-
-  return 0;
-}
-
-function normalizeSpan(value: unknown, maxColumns = SECTION_LAYOUT_COLUMNS) {
-  if (typeof value === 'number' && Number.isInteger(value)) {
-    return clampWidth(value, maxColumns);
-  }
-
-  return maxColumns;
 }
 
 function toHomeSection(section: SectionLayoutItem): HomeDashboardSection {
@@ -111,193 +70,23 @@ function toSectionLayoutItem(section: HomeDashboardSection): SectionLayoutItem {
   };
 }
 
-function partitionLegacyRows<T extends { span: number }>(sections: T[]) {
-  const rows: T[][] = [];
-  let currentRow: T[] = [];
-  let currentWidth = 0;
-
-  for (const section of sections) {
-    if (currentRow.length > 0 && currentWidth + section.span > LEGACY_TOTAL_SECTION_COLUMNS) {
-      rows.push(currentRow);
-      currentRow = [];
-      currentWidth = 0;
-    }
-
-    currentRow.push(section);
-    currentWidth += section.span;
-
-    if (currentWidth >= LEGACY_TOTAL_SECTION_COLUMNS) {
-      rows.push(currentRow);
-      currentRow = [];
-      currentWidth = 0;
-    }
-  }
-
-  if (currentRow.length > 0) {
-    rows.push(currentRow);
-  }
-
-  return rows;
-}
-
-function migrateLegacySections(sections: LegacyHomeDashboardSection[]) {
-  const validSections = sections
-    .filter(
-      (section): section is LegacyHomeDashboardSection & { id: string; title: string } =>
-        typeof section?.id === 'string' && typeof section?.title === 'string'
-    )
-    .map((section) => ({
-      id: section.id,
-      title: section.title,
-      span: normalizeSpan(section.span, LEGACY_TOTAL_SECTION_COLUMNS),
-      stackUnder: typeof section.stackUnder === 'string' ? section.stackUnder : undefined,
-    }));
-
-  if (validSections.length === 0) {
-    return [];
-  }
-
-  const sectionIds = new Set(validSections.map((section) => section.id));
-  const childrenByParent = new Map<string, typeof validSections>();
-  const topLevelSections = validSections.filter(
-    (section) => !section.stackUnder || !sectionIds.has(section.stackUnder)
-  );
-
-  for (const section of validSections) {
-    if (!section.stackUnder || !sectionIds.has(section.stackUnder)) {
-      continue;
-    }
-
-    const children = childrenByParent.get(section.stackUnder);
-    if (children) {
-      children.push(section);
-    } else {
-      childrenByParent.set(section.stackUnder, [section]);
-    }
-  }
-
-  const getSubtreeHeight = (sectionId: string): number => {
-    const children = childrenByParent.get(sectionId) ?? [];
-    return 1 + children.reduce((total, child) => total + getSubtreeHeight(child.id), 0);
-  };
-
-  const migrated: SectionLayoutItem[] = [];
-  const appendSection = (
-    section: (typeof validSections)[number],
-    x: number,
-    y: number,
-    w: number
-  ) => {
-    migrated.push({
-      id: section.id,
-      title: section.title,
-      x,
-      y,
-      w,
-      h: 1,
-    });
-
-    let nextY = y + 1;
-    for (const child of childrenByParent.get(section.id) ?? []) {
-      appendSection(child, x, nextY, w);
-      nextY += getSubtreeHeight(child.id);
-    }
-  };
-
-  let rowY = 0;
-  for (const row of partitionLegacyRows(topLevelSections)) {
-    const widths = buildBalancedWidths(row.length, LEGACY_TOTAL_SECTION_COLUMNS).map((span) =>
-      clampWidth(translateGridUnits(span, LEGACY_TOTAL_SECTION_COLUMNS, SECTION_LAYOUT_COLUMNS))
-    );
-
-    let x = 0;
-    let rowHeight = 1;
-    row.forEach((section, index) => {
-      const w = widths[index] ?? SECTION_LAYOUT_COLUMNS;
-      appendSection(section, x, rowY, w);
-      rowHeight = Math.max(rowHeight, getSubtreeHeight(section.id));
-      x += w;
-    });
-    rowY += rowHeight;
-  }
-
-  return compactRows(migrated).map(toHomeSection);
-}
-
-function normalizeLayout(value: unknown): HomeDashboardLayoutState {
-  if (typeof value !== 'object' || value === null) {
-    return DEFAULT_LAYOUT;
-  }
-
-  const candidate = value as {
-    mode?: unknown;
-    showHero?: unknown;
-    cardIds?: unknown;
-    sections?: LegacyHomeDashboardSection[];
-    cardSectionAssignments?: unknown;
-  };
-
-  const sections = Array.isArray(candidate.sections)
-    ? candidate.sections.every(
-        (section) =>
-          typeof section?.id === 'string' &&
-          typeof section?.title === 'string' &&
-          typeof section?.x === 'number' &&
-          typeof section?.y === 'number' &&
-          typeof section?.w === 'number'
-      )
-      ? compactStackGaps(
-          compactRows(
-            candidate.sections
-              .filter(
-                (section): section is LegacySectionWithCoordinates =>
-                  typeof section?.id === 'string' &&
-                  typeof section?.title === 'string' &&
-                  typeof section?.x === 'number' &&
-                  typeof section?.y === 'number' &&
-                  typeof section?.w === 'number'
-              )
-              .map((section) => ({
-                id: section.id,
-                title: section.title,
-                x: normalizeCoordinate(section.x),
-                y: normalizeCoordinate(section.y),
-                w: normalizeSpan(section.w),
-                h: normalizeCoordinate(section.h) || 1,
-              }))
-          )
-        ).map(toHomeSection)
-      : migrateLegacySections(candidate.sections)
-    : [];
-
-  return {
-    mode: candidate.mode === 'sectioned' ? 'sectioned' : 'flow',
-    showHero: candidate.showHero !== false,
-    cardIds: Array.isArray(candidate.cardIds)
-      ? candidate.cardIds.filter((id): id is string => typeof id === 'string')
-      : [],
-    sections,
-    cardSectionAssignments:
-      candidate.cardSectionAssignments &&
-      typeof candidate.cardSectionAssignments === 'object' &&
-      !Array.isArray(candidate.cardSectionAssignments)
-        ? Object.fromEntries(
-            Object.entries(candidate.cardSectionAssignments).filter(
-              ([cardId, sectionId]) => typeof cardId === 'string' && typeof sectionId === 'string'
-            )
-          )
-        : {},
-  };
-}
-
 export function useHomeDashboardLayout(
   validCardIds: string[],
   cardSizes: Record<string, CardSize>
 ) {
   const validIdSet = useMemo(() => new Set(validCardIds), [validCardIds]);
-  const [layout, setLayout] = useState<HomeDashboardLayoutState>(() =>
-    normalizeLayout(storage.get(STORAGE_KEYS.homeDashboardLayout, DEFAULT_LAYOUT))
-  );
+  const [layout, setLayout] = useState<HomeDashboardLayoutState>(() => {
+    const normalized = normalizeLayout(
+      storage.get(STORAGE_KEYS.homeDashboardLayout, DEFAULT_LAYOUT)
+    );
+    return {
+      mode: normalized.mode,
+      showHero: normalized.showHero,
+      cardIds: normalized.cardIds,
+      sections: normalized.sections.map(toHomeSection),
+      cardSectionAssignments: normalized.cardSectionAssignments,
+    };
+  });
 
   const persistLayout = useCallback((updater: SetStateAction<HomeDashboardLayoutState>) => {
     setLayout((previous) => {

@@ -1,30 +1,11 @@
+import { Palette, Sliders } from 'lucide-react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import {
-  Battery,
-  Home,
-  type LucideIcon,
-  Palette,
-  Pause,
-  Play,
-  ScanSearch,
-  Sliders,
-  Sparkles,
-  Wind,
-} from 'lucide-react';
-import { type CSSProperties, memo, useEffect, useMemo, useState } from 'react';
-import {
-  CardDialogChoicePill,
   CardDialogHeader,
-  CardDialogSection,
   CardDialogTabList,
   CardDialogTabTrigger,
 } from '@/app/components/patterns';
-import {
-  Button,
-  DialogDoneFooter,
-  InteractivePill,
-  ModalSurface,
-  Panel,
-} from '@/app/components/primitives';
+import { DialogDoneFooter, ModalSurface } from '@/app/components/primitives';
 import { TabPanel, Tabs } from '@/app/components/primitives/tabs';
 import { CustomCardTintPicker, CustomScrollbar } from '@/app/components/shared/device-editor';
 import {
@@ -38,7 +19,11 @@ import { cn } from '@/app/components/ui/utils';
 import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import { getEntityTypeLabel } from '@/app/utils/entity-type-label';
+import { VacuumCleaningControls } from './vacuum-cleaning-controls';
+import { VacuumPlannerSection } from './vacuum-planner-section';
 import { getVacuumSettingsDialogSurface } from './vacuum-settings-dialog-surface';
+import { VacuumStatusHeader } from './vacuum-status-header';
+import { VacuumStatusMetrics } from './vacuum-status-metrics';
 import type { VacuumStatus } from './vacuum-utils';
 
 type PlannerView = 'all' | 'rooms' | 'zones';
@@ -72,91 +57,6 @@ interface VacuumSettingsDialogProps {
   surfaceStateClassName?: string;
   surfaceGlowClassName?: string;
   surfaceOverlayClassName?: string;
-}
-
-function MetricCard({
-  icon: Icon,
-  label,
-  value,
-  className,
-  style,
-}: {
-  icon: LucideIcon;
-  label: string;
-  value: string;
-  className?: string;
-  style?: CSSProperties;
-}) {
-  return (
-    <div
-      className={cn('rounded-2xl border border-white/10 bg-white/6 p-3', className)}
-      style={style}
-    >
-      <div className="flex items-center gap-2 text-white/72">
-        <Icon className="h-4 w-4" />
-        <span className="text-xs font-semibold uppercase tracking-[0.14em]">{label}</span>
-      </div>
-      <div className="mt-2 text-base font-semibold text-white">{value}</div>
-    </div>
-  );
-}
-
-function SelectablePill({
-  label,
-  description,
-  active,
-  onClick,
-  style,
-}: {
-  label: string;
-  description?: string;
-  active: boolean;
-  onClick: () => void;
-  style?: CSSProperties;
-}) {
-  return (
-    <InteractivePill
-      onClick={onClick}
-      active={active}
-      intent="navigation"
-      variant="default"
-      className="min-h-18 w-full items-start justify-start rounded-2xl px-4 py-3 text-left"
-      style={style}
-    >
-      <div className="text-sm font-semibold">{label}</div>
-      {description ? <div className="mt-1 text-sm text-white/72">{description}</div> : null}
-    </InteractivePill>
-  );
-}
-
-function getStatusSummary(status: VacuumStatus, t: ReturnType<typeof useI18n>['t']) {
-  switch (status) {
-    case 'cleaning':
-      return t('vacuum.status.cleaning');
-    case 'returning':
-      return t('vacuum.status.returning');
-    case 'docked':
-      return t('vacuum.status.docked');
-    case 'paused':
-      return t('vacuum.status.paused');
-    default:
-      return t('vacuum.status.idle');
-  }
-}
-
-function getStatusIntentClassName(status: VacuumStatus) {
-  switch (status) {
-    case 'cleaning':
-      return 'border-cyan-400/30 bg-cyan-400/14 text-cyan-100';
-    case 'returning':
-      return 'border-amber-400/30 bg-amber-400/14 text-amber-100';
-    case 'paused':
-      return 'border-yellow-400/30 bg-yellow-400/14 text-yellow-100';
-    case 'docked':
-      return 'border-emerald-400/30 bg-emerald-400/14 text-emerald-100';
-    default:
-      return 'border-white/14 bg-white/10 text-white/82';
-  }
 }
 
 export const VacuumSettingsDialog = memo(function VacuumSettingsDialog({
@@ -193,7 +93,6 @@ export const VacuumSettingsDialog = memo(function VacuumSettingsDialog({
   const entityType = getEntityTypeLabel(entityId);
   const dialogSurface = getVacuumSettingsDialogSurface(theme, currentStatus);
   const isActive = currentStatus === 'cleaning' || currentStatus === 'returning';
-  const isOn = theme !== 'light';
   const roomTargets = useMemo(
     () => (availableRooms?.length ? availableRooms : room && room !== 'Whole Home' ? [room] : []),
     [availableRooms, room]
@@ -224,7 +123,6 @@ export const VacuumSettingsDialog = memo(function VacuumSettingsDialog({
   const [localTintColor, setLocalTintColor] = useState<string>(tintColor ?? accentColorValue);
   const [activeTab, setActiveTab] = useState('controls');
 
-  const statusSummary = getStatusSummary(currentStatus, t);
   const selectedTargetCount =
     plannerView === 'rooms'
       ? selectedRooms.length
@@ -263,7 +161,6 @@ export const VacuumSettingsDialog = memo(function VacuumSettingsDialog({
       : plannerView === 'rooms'
         ? `${selectedTargetCount} ${t('vacuum.plan.rooms')}`
         : `${selectedTargetCount} ${t('vacuum.plan.zones')}`;
-  const cleaningModes: CleaningMode[] = ['auto', 'spot', 'edge', 'room'];
   const resolvedTintColor =
     normalizeCustomCardTint(tintColor) ?? normalizeCustomCardTint(localTintColor);
   const tintSurface = getCustomCardTintSurface(theme, resolvedTintColor);
@@ -282,6 +179,7 @@ export const VacuumSettingsDialog = memo(function VacuumSettingsDialog({
         borderColor: withTintAlpha(activeControlColor, theme === 'light' ? 0.16 : 0.22),
       }
     : sectionStyle;
+
   const handleTintChange = (color: string) => {
     setLocalTintColor(color);
     onTintColorChange?.(color);
@@ -343,258 +241,61 @@ export const VacuumSettingsDialog = memo(function VacuumSettingsDialog({
             </CardDialogTabList>
 
             <TabPanel value="controls" className="mt-5 space-y-6">
-              {/* Status summary */}
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div
-                    className={cn(
-                      'inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold',
-                      getStatusIntentClassName(currentStatus)
-                    )}
-                  >
-                    {statusSummary}
-                  </div>
-                  <div className="mt-3 text-2xl font-semibold text-white">
-                    {plannerSummaryLabel}
-                  </div>
-                  <div className="mt-1 text-sm text-white/76">
-                    {plannerView === 'all'
-                      ? `${roomTargets.length || 1} ${t('vacuum.plan.rooms')} · ${selectedFanSpeed}`
-                      : `${t('vacuum.settings.cleaningMode')} · ${t(`vacuum.mode.${selectedCleaningMode}`)}`}
-                  </div>
-                </div>
+              <VacuumStatusHeader
+                currentStatus={currentStatus}
+                plannerSummaryLabel={plannerSummaryLabel}
+                cleaningMode={selectedCleaningMode}
+                selectedFanSpeed={selectedFanSpeed}
+                roomTargets={roomTargets}
+                plannerView={plannerView}
+                primaryActionLabel={primaryActionLabel}
+                onStartCleaning={onStartCleaning}
+                onPauseCleaning={onPauseCleaning}
+                softControlStyle={softControlStyle ?? undefined}
+              />
 
-                <Button
-                  iconOnly
-                  label={primaryActionLabel}
-                  variant="secondary"
-                  size="default"
-                  onClick={
-                    currentStatus === 'cleaning'
-                      ? (onPauseCleaning ?? onStartCleaning)
-                      : onStartCleaning
-                  }
-                  className="h-12 w-12 rounded-2xl border-white/12 bg-white/10 text-white hover:bg-white/16"
-                  style={softControlStyle}
-                >
-                  {currentStatus === 'cleaning' ? (
-                    <Pause className="h-5 w-5" />
-                  ) : (
-                    <Play className="h-5 w-5" />
-                  )}
-                </Button>
-              </div>
+              <VacuumStatusMetrics
+                battery={battery}
+                cleanedArea={cleanedArea}
+                cleaningTime={cleaningTime}
+                sectionStyle={sectionStyle ?? undefined}
+              />
 
-              <div className="grid grid-cols-3 gap-2">
-                <MetricCard
-                  icon={Battery}
-                  label={t('vacuum.settings.battery')}
-                  value={`${battery}%`}
-                  className="bg-white/7"
-                  style={sectionStyle}
-                />
-                <MetricCard
-                  icon={Sparkles}
-                  label={t('vacuum.cleanedArea')}
-                  value={cleanedArea}
-                  className="bg-white/7"
-                  style={sectionStyle}
-                />
-                <MetricCard
-                  icon={Wind}
-                  label={t('vacuum.cleaningTime')}
-                  value={cleaningTime}
-                  className="bg-white/7"
-                  style={sectionStyle}
-                />
-              </div>
+              <VacuumPlannerSection
+                plannerView={plannerView}
+                onPlannerViewChange={setPlannerView}
+                roomTargets={roomTargets}
+                zoneTargets={zoneTargets}
+                selectedRooms={selectedRooms}
+                selectedZones={selectedZones}
+                onRoomsChange={setSelectedRooms}
+                onZonesChange={setSelectedZones}
+                sectionStyle={sectionStyle ?? undefined}
+                activePillStyle={activePillStyle ?? undefined}
+              />
 
-              <CardDialogSection label={t('vacuum.settings.plan')}>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {(['all', 'rooms', 'zones'] as PlannerView[]).map((view) => (
-                    <CardDialogChoicePill
-                      key={view}
-                      active={plannerView === view}
-                      onClick={() => setPlannerView(view)}
-                      style={plannerView === view ? activePillStyle : undefined}
-                    >
-                      {view === 'all'
-                        ? t('vacuum.plan.all')
-                        : view === 'rooms'
-                          ? t('vacuum.plan.rooms')
-                          : t('vacuum.plan.zones')}
-                    </CardDialogChoicePill>
-                  ))}
-                </div>
-
-                {plannerView === 'all' ? (
-                  <div className="mt-3">
-                    <Panel className="border-white/10 bg-white/6" style={sectionStyle}>
-                      <div className="flex items-start gap-3">
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/8 text-white">
-                          <ScanSearch className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <div className="text-base font-semibold text-white">
-                            {t('vacuum.plan.wholeHome')}
-                          </div>
-                          <div className="mt-1 text-sm text-white/76">
-                            {roomTargets.length > 0
-                              ? `${roomTargets.length} ${t('vacuum.plan.rooms')}`
-                              : t('vacuum.plan.mapHint')}
-                          </div>
-                        </div>
-                      </div>
-                    </Panel>
-                  </div>
-                ) : null}
-
-                {plannerView === 'rooms' ? (
-                  <div className="mt-3">
-                    {roomTargets.length > 0 ? (
-                      <div className="grid grid-cols-2 gap-2">
-                        {roomTargets.map((target) => {
-                          const active = selectedRooms.includes(target);
-
-                          return (
-                            <SelectablePill
-                              key={target}
-                              label={target}
-                              active={active}
-                              style={active ? activePillStyle : undefined}
-                              onClick={() =>
-                                setSelectedRooms((current) =>
-                                  current.includes(target)
-                                    ? current.filter((entry) => entry !== target)
-                                    : [...current, target]
-                                )
-                              }
-                            />
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <Panel
-                        className="border-dashed border-white/10 bg-white/4 text-sm text-white/72"
-                        style={sectionStyle}
-                      >
-                        {t('vacuum.plan.mapHint')}
-                      </Panel>
-                    )}
-                  </div>
-                ) : null}
-
-                {plannerView === 'zones' ? (
-                  <div className="mt-3">
-                    {zoneTargets.length > 0 ? (
-                      <div className="grid grid-cols-2 gap-2">
-                        {zoneTargets.map((target) => {
-                          const active = selectedZones.includes(target);
-
-                          return (
-                            <SelectablePill
-                              key={target}
-                              label={target}
-                              active={active}
-                              style={active ? activePillStyle : undefined}
-                              onClick={() =>
-                                setSelectedZones((current) =>
-                                  current.includes(target)
-                                    ? current.filter((entry) => entry !== target)
-                                    : [...current, target]
-                                )
-                              }
-                            />
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <Panel
-                        className="border-dashed border-white/10 bg-white/4 text-sm text-white/72"
-                        style={sectionStyle}
-                      >
-                        {t('vacuum.plan.mapHint')}
-                      </Panel>
-                    )}
-                  </div>
-                ) : null}
-              </CardDialogSection>
-
-              <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr]">
-                <CardDialogSection label={t('vacuum.settings.profile')}>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {cleaningModes.map((mode) => (
-                      <CardDialogChoicePill
-                        key={mode}
-                        active={selectedCleaningMode === mode}
-                        onClick={() => setSelectedCleaningMode(mode)}
-                        style={selectedCleaningMode === mode ? activePillStyle : undefined}
-                      >
-                        {t(`vacuum.mode.${mode}`)}
-                      </CardDialogChoicePill>
-                    ))}
-                  </div>
-                </CardDialogSection>
-
-                <CardDialogSection label={t('vacuum.settings.fanSpeed')}>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {speedOptions.map((speed) => (
-                      <CardDialogChoicePill
-                        key={speed}
-                        active={selectedFanSpeed === speed}
-                        onClick={() => setSelectedFanSpeed(speed)}
-                        style={selectedFanSpeed === speed ? activePillStyle : undefined}
-                      >
-                        {speed}
-                      </CardDialogChoicePill>
-                    ))}
-                  </div>
-                </CardDialogSection>
-              </div>
-
-              <CardDialogSection label={t('vacuum.settings.actions')}>
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  <Button
-                    variant="primary"
-                    size="default"
-                    leading={
-                      currentStatus === 'cleaning' ? (
-                        <Pause className="h-4 w-4" />
-                      ) : (
-                        <Play className="h-4 w-4" />
-                      )
-                    }
-                    onClick={
-                      currentStatus === 'cleaning'
-                        ? (onPauseCleaning ?? onStartCleaning)
-                        : onStartCleaning
-                    }
-                    style={{ backgroundColor: activeControlColor }}
-                  >
-                    {primaryActionLabel}
-                  </Button>
-
-                  <Button
-                    variant="secondary"
-                    size="default"
-                    leading={<Home className="h-4 w-4" />}
-                    onClick={onReturnHome}
-                    className={cn(
-                      theme !== 'light' ? 'border-white/10 bg-white/8 hover:bg-white/12' : ''
-                    )}
-                    style={softControlStyle}
-                  >
-                    {t('vacuum.action.returnToDock')}
-                  </Button>
-                </div>
-              </CardDialogSection>
+              <VacuumCleaningControls
+                cleaningMode={selectedCleaningMode}
+                onCleaningModeChange={setSelectedCleaningMode}
+                fanSpeed={selectedFanSpeed}
+                onFanSpeedChange={setSelectedFanSpeed}
+                fanSpeedOptions={speedOptions}
+                currentStatus={currentStatus}
+                onStartCleaning={onStartCleaning}
+                onPauseCleaning={onPauseCleaning}
+                onReturnHome={onReturnHome}
+                activePillStyle={activePillStyle}
+                softControlStyle={softControlStyle}
+                activeControlColor={activeControlColor}
+                theme={theme}
+              />
             </TabPanel>
 
             <TabPanel value="card" className="mt-5">
               <CustomCardTintPicker
                 value={resolvedTintColor}
                 onChange={handleTintChange}
-                isOn={isOn}
+                isOn={theme !== 'light'}
                 defaultColor={accentColorValue}
               />
             </TabPanel>

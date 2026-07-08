@@ -25,6 +25,8 @@ export interface HVACSiblingEntity {
   entity: HassEntity;
 }
 
+export type HVACCardController = ReturnType<typeof useHVACCardController>;
+
 // Stable empty references so the selector and useMemo don't create new objects
 // when there are no siblings, which would break shallow equality.
 const EMPTY_SIBLING_RECORD: Record<string, HassEntity | undefined> = {};

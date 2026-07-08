@@ -1,6 +1,66 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/app/components/ui/utils';
+import type { ThemeType } from '@/app/hooks';
 import { useTheme } from '@/app/hooks';
+
+// ─── Theme-dependent visual constants ────────────────────────────────────────
+
+interface RotaryKnobVisualConstants {
+  knobCenterGradient: { light: string; dark: string };
+  knobInnerGradient: { light: string; dark: string };
+  knobBandTrackStroke: { light: string; dark: string };
+  knobInnerBorder: string;
+  tickMajorStroke: { light: string; dark: string };
+  tickMinorStroke: { light: string; dark: string };
+}
+
+const ROTARY_KNOB_VISUALS: RotaryKnobVisualConstants = {
+  knobCenterGradient: {
+    light:
+      'radial-gradient(circle at 50% 46%, rgba(255,255,255,0.94), rgba(226,232,240,0.86) 42%, rgba(203,213,225,0.52) 66%, rgba(148,163,184,0.18) 100%)',
+    dark: 'radial-gradient(circle at 50% 46%, rgba(255,255,255,0.18), rgba(255,255,255,0.10) 36%, rgba(255,255,255,0.05) 62%, rgba(255,255,255,0.02) 100%)',
+  },
+  knobInnerGradient: {
+    light:
+      'radial-gradient(circle at 42% 36%, rgba(255,255,255,0.88), rgba(248,250,252,0.68) 48%, rgba(226,232,240,0.34) 100%)',
+    dark: 'radial-gradient(circle at 38% 34%, rgba(255,255,255,0.12), rgba(255,255,255,0.06) 52%, rgba(255,255,255,0.02) 100%)',
+  },
+  knobBandTrackStroke: {
+    light: 'rgba(15,23,42,0.08)',
+    dark: 'rgba(255,255,255,0.06)',
+  },
+  knobInnerBorder: 'border-white/10',
+  tickMajorStroke: {
+    light: 'rgba(255,255,255,0.34)',
+    dark: 'rgba(255,255,255,0.34)',
+  },
+  tickMinorStroke: {
+    light: 'rgba(255,255,255,0.22)',
+    dark: 'rgba(255,255,255,0.14)',
+  },
+} as const;
+
+function getRotaryKnobVisuals(theme: ThemeType) {
+  const isLight = theme === 'light';
+  return {
+    knobCenterGradient: isLight
+      ? ROTARY_KNOB_VISUALS.knobCenterGradient.light
+      : ROTARY_KNOB_VISUALS.knobCenterGradient.dark,
+    knobInnerGradient: isLight
+      ? ROTARY_KNOB_VISUALS.knobInnerGradient.light
+      : ROTARY_KNOB_VISUALS.knobInnerGradient.dark,
+    knobBandTrackStroke: isLight
+      ? ROTARY_KNOB_VISUALS.knobBandTrackStroke.light
+      : ROTARY_KNOB_VISUALS.knobBandTrackStroke.dark,
+    knobInnerBorder: ROTARY_KNOB_VISUALS.knobInnerBorder,
+    tickMajorStroke: isLight
+      ? ROTARY_KNOB_VISUALS.tickMajorStroke.light
+      : ROTARY_KNOB_VISUALS.tickMajorStroke.dark,
+    tickMinorStroke: isLight
+      ? ROTARY_KNOB_VISUALS.tickMinorStroke.light
+      : ROTARY_KNOB_VISUALS.tickMinorStroke.dark,
+  };
+}
 
 export interface RotaryKnobProps {
   id: string;
@@ -238,6 +298,7 @@ export const RotaryKnob = memo(function RotaryKnob({
     }
   };
 
+  const visuals = getRotaryKnobVisuals(theme);
   const knobVisual = (
     <>
       <svg
@@ -272,7 +333,7 @@ export const RotaryKnob = memo(function RotaryKnob({
           cy="176"
           r="163"
           fill="none"
-          stroke={theme === 'light' ? 'rgba(15,23,42,0.08)' : 'rgba(255,255,255,0.06)'}
+          stroke={visuals.knobBandTrackStroke}
           strokeWidth={bandStrokeWidth}
           opacity={isOn ? 1 : 0.35}
         />
@@ -295,26 +356,20 @@ export const RotaryKnob = memo(function RotaryKnob({
       <div
         className="absolute inset-0 rounded-full"
         style={{
-          background:
-            theme === 'light'
-              ? 'radial-gradient(circle at 50% 46%, rgba(255,255,255,0.94), rgba(226,232,240,0.86) 42%, rgba(203,213,225,0.52) 66%, rgba(148,163,184,0.18) 100%)'
-              : 'radial-gradient(circle at 50% 46%, rgba(255,255,255,0.18), rgba(255,255,255,0.10) 36%, rgba(255,255,255,0.05) 62%, rgba(255,255,255,0.02) 100%)',
+          background: visuals.knobCenterGradient,
           boxShadow: isOn
             ? `inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -18px 44px rgba(0,0,0,0.26), 0 0 42px ${bandGlowColor}`
             : 'inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -18px 44px rgba(0,0,0,0.18)',
         }}
       />
 
-      <div className="absolute inset-[1.1rem] rounded-full border border-white/10 bg-black/10" />
+      <div
+        className={`absolute inset-[1.1rem] rounded-full border ${visuals.knobInnerBorder} bg-black/10`}
+      />
 
       <div
         className="absolute inset-[1.4rem] rounded-full"
-        style={{
-          background:
-            theme === 'light'
-              ? 'radial-gradient(circle at 42% 36%, rgba(255,255,255,0.88), rgba(248,250,252,0.68) 48%, rgba(226,232,240,0.34) 100%)'
-              : 'radial-gradient(circle at 38% 34%, rgba(255,255,255,0.12), rgba(255,255,255,0.06) 52%, rgba(255,255,255,0.02) 100%)',
-        }}
+        style={{ background: visuals.knobInnerGradient }}
       />
 
       <div
@@ -340,9 +395,9 @@ export const RotaryKnob = memo(function RotaryKnob({
                   transform: `translateY(-${tickOffsetRem}rem)`,
                   backgroundColor: isOn
                     ? isMajor
-                      ? 'rgba(255,255,255,0.34)'
-                      : 'rgba(255,255,255,0.22)'
-                    : 'rgba(255,255,255,0.14)',
+                      ? visuals.tickMajorStroke
+                      : visuals.tickMinorStroke
+                    : visuals.tickMinorStroke,
                 }}
               />
             </div>
@@ -351,7 +406,7 @@ export const RotaryKnob = memo(function RotaryKnob({
       </div>
 
       <div
-        className="absolute inset-[4rem] rounded-full border border-white/10"
+        className={`absolute inset-[4rem] rounded-full border ${visuals.knobInnerBorder}`}
         style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)' }}
       />
     </>

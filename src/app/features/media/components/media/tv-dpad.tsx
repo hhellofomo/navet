@@ -1,55 +1,23 @@
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react';
 import type { CSSProperties } from 'react';
-import { RoundControlButton } from '@/app/components/primitives/round-control-button';
-import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { getMediaControlSurfaceTokens } from '@/app/components/shared/theme/media-widget-surface-tokens';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import type { TvRemoteAction } from '../../tv-remote-commands';
+import { TvControlButton } from './tv-control-button';
 
-interface TvControlButtonProps {
-  theme: ThemeType;
-  size?: CardSize | 'large';
-  label: string;
-  disabled?: boolean;
-  style?: CSSProperties;
-  className?: string;
-  iconClassName?: string;
-  onPress: () => void;
-  children: React.ReactNode;
-}
+type TvDpadLayoutConfig = {
+  shell: string;
+  outerInset: string;
+  innerInset: string;
+  buttonSize: 'small' | 'large';
+  centerSize: 'small' | 'medium' | 'large';
+  edgeInset: number;
+  centerClassName: string;
+  crosshairMarginPx: number;
+  edgeIconClassName: string;
+  centerOkTextClassName: string;
+};
 
-function TvControlButton({
-  theme,
-  size = 'small',
-  label,
-  disabled = false,
-  style,
-  className = '',
-  iconClassName = '',
-  onPress,
-  children,
-}: TvControlButtonProps) {
-  return (
-    <RoundControlButton
-      theme={theme}
-      size={size}
-      variant="neutral"
-      aria-label={label}
-      disabled={disabled}
-      onClick={(event) => {
-        event.stopPropagation();
-        onPress();
-      }}
-      className={`border backdrop-blur-xl transition-colors disabled:opacity-40 ${className}`}
-      iconClassName={iconClassName}
-      style={style}
-    >
-      {children}
-    </RoundControlButton>
-  );
-}
-
-/** Default D-pad (104×104) — compact through medium horizontal */
 const TV_DPAD_LAYOUT_DEFAULT = {
   shell: 'h-[104px] w-[104px] rounded-[22px]',
   outerInset: 'inset-0',
@@ -63,7 +31,6 @@ const TV_DPAD_LAYOUT_DEFAULT = {
   centerOkTextClassName: '!text-xs !font-semibold',
 } as const;
 
-/** Larger D-pad for large / extra-large TV tiles */
 const TV_DPAD_LAYOUT_LARGE_CARD = {
   shell: 'h-[136px] w-[136px] rounded-[28px]',
   outerInset: 'inset-0',
@@ -77,9 +44,9 @@ const TV_DPAD_LAYOUT_LARGE_CARD = {
   centerOkTextClassName: '!text-xs !font-semibold',
 } as const;
 
-type TvDpadLayoutConfig = typeof TV_DPAD_LAYOUT_DEFAULT | typeof TV_DPAD_LAYOUT_LARGE_CARD;
-
-export function getTvDpadLayout(size: CardSize): TvDpadLayoutConfig {
+export function getTvDpadLayout(
+  size: 'small' | 'medium' | 'medium-vertical' | 'large' | 'extra-large'
+): TvDpadLayoutConfig {
   if (size === 'large' || size === 'extra-large') {
     return TV_DPAD_LAYOUT_LARGE_CARD;
   }
@@ -201,7 +168,7 @@ export function TvDpad({
         }}
       />
       <div
-        className="pointer-events-none absolute left-1/2 top-1/2 h-px w-[58%] -translate-x-1/2 -translate-y-1/2"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-px -translate-x-1/2 -translate-y-1/2"
         style={{
           ...crosshairStyle,
           opacity: 0.4,

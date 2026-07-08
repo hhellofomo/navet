@@ -1,9 +1,7 @@
 import { Flame, Snowflake, Thermometer, Wind } from 'lucide-react';
 import { memo } from 'react';
-import { CardActionRow, CardActionRowGroup } from '@/app/components/patterns/card-action-row';
 import { EntityCardHeader } from '@/app/components/primitives/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/primitives/entity-card-header-icon';
-import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
 import { getCardReadableTextTokens } from '@/app/components/shared/theme/card-readable-text-tokens';
 import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import {
@@ -11,14 +9,12 @@ import {
   getCardStateSurfaceTokens,
 } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { CardWrapper } from '@/app/components/ui/card-wrapper';
-import { cn } from '@/app/components/ui/utils';
 import { useI18n, useTheme } from '@/app/hooks';
 import { getHvacTemperatureStatusLabel } from '../../utils/hvac-temperature-status-label';
 import { HVACSettingsDialog } from '../hvac-settings-dialog';
 import type { HVACCardProps } from './hvac-card.types';
 import { HVACGauge } from './hvac-gauge';
-import { HVACModeControls } from './hvac-mode-controls';
-import { HVACTempControls } from './hvac-temp-controls';
+import { HVACCardLargeLayout, HVACCardMediumLayout, HVACCardSmallLayout } from './layouts';
 import { useHVACCardController } from './use-hvac-card-controller';
 
 function resolveHVACCardSize(size: HVACCardProps['size']): 'small' | 'medium' {
@@ -123,8 +119,6 @@ export const HVACCard = memo(function HVACCard({
         : controller.visualMode === 'fan' || controller.visualMode === 'fan_only'
           ? Wind
           : Thermometer;
-  const temperaturePresets = [18, 21, 24];
-
   return (
     <>
       <CardWrapper
@@ -190,7 +184,7 @@ export const HVACCard = memo(function HVACCard({
 
           <div className="flex-1">
             {controller.isSmall ? (
-              <div className="relative flex h-full flex-col gap-1.5">
+              <>
                 <HVACGauge
                   id={id}
                   mode={controller.visualMode}
@@ -202,57 +196,16 @@ export const HVACCard = memo(function HVACCard({
                   variant="docked-card-small"
                   className="pointer-events-auto absolute right-[-1.9rem] top-[36%] z-[2] -translate-y-1/2"
                 />
-
-                <div className="mt-auto inline-flex w-fit flex-col self-start">
-                  <div className="min-w-0">
-                    <div
-                      className={`mb-1 text-3xl font-bold leading-none transition-colors duration-500 ${stateSurface.primaryTextClassName}`}
-                      style={{ color: readableTokens.titleColor }}
-                    >
-                      {controller.currentTemp}°C
-                    </div>
-                    <div
-                      className={`text-xs ${stateSurface.secondaryTextClassName}`}
-                      style={{ color: readableTokens.subtitleColor }}
-                    >
-                      {targetTemperatureLabel}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-2">
-                  <CardActionRow
-                    theme={controller.theme}
-                    size="small"
-                    leftContent={
-                      <CardActionRowGroup>
-                        <div className="relative z-[3]">
-                          <HVACTempControls
-                            targetTemp={controller.targetTemp}
-                            onTempChange={controller.setTargetTemp}
-                            onTempCommit={controller.commitTargetTemp}
-                            isOn={controller.isOn}
-                            size="small"
-                          />
-                        </div>
-                      </CardActionRowGroup>
-                    }
-                    rightContent={
-                      <div className="relative z-[3]">
-                        <CardSettingsActionButton
-                          {...controller.cardInteraction.settingsButtonProps}
-                          theme={controller.theme}
-                          size="small"
-                          tone={controller.isOn ? 'default' : 'muted'}
-                          variant="soft"
-                        />
-                      </div>
-                    }
-                  />
-                </div>
-              </div>
+                <HVACCardSmallLayout
+                  controller={controller}
+                  targetTemperatureLabel={targetTemperatureLabel}
+                  readableTokens={readableTokens}
+                  stateSurface={stateSurface}
+                  theme={controller.theme}
+                />
+              </>
             ) : controller.isMedium ? (
-              <div className="relative flex h-full flex-col">
+              <>
                 <HVACGauge
                   id={id}
                   mode={controller.visualMode}
@@ -264,62 +217,16 @@ export const HVACCard = memo(function HVACCard({
                   variant="docked-card-small"
                   className="pointer-events-auto absolute right-[-0.25rem] top-[36%] z-[2] -translate-y-1/2"
                 />
-
-                <div className="mt-auto inline-flex w-fit flex-col self-start">
-                  <div className="min-w-0">
-                    <div
-                      className={`mb-1 text-3xl font-bold leading-none transition-colors duration-500 ${stateSurface.primaryTextClassName}`}
-                      style={{ color: readableTokens.titleColor }}
-                    >
-                      {controller.currentTemp}°C
-                    </div>
-                    <div
-                      className={`text-xs ${stateSurface.secondaryTextClassName}`}
-                      style={{ color: readableTokens.subtitleColor }}
-                    >
-                      {targetTemperatureLabel}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4">
-                  <CardActionRow
-                    theme={controller.theme}
-                    size="medium"
-                    leftContent={
-                      <div className="relative z-[3]">
-                        <CardActionRowGroup>
-                          <HVACTempControls
-                            targetTemp={controller.targetTemp}
-                            onTempChange={controller.setTargetTemp}
-                            isOn={controller.isOn}
-                            size="medium"
-                          />
-                          <HVACModeControls
-                            mode={controller.visualMode}
-                            isOn={controller.isOn}
-                            onModeChange={controller.setMode}
-                            size="medium"
-                          />
-                        </CardActionRowGroup>
-                      </div>
-                    }
-                    rightContent={
-                      <div className="relative z-[3]">
-                        <CardSettingsActionButton
-                          {...controller.cardInteraction.settingsButtonProps}
-                          theme={controller.theme}
-                          size="medium"
-                          tone={controller.isOn ? 'default' : 'muted'}
-                          variant="soft"
-                        />
-                      </div>
-                    }
-                  />
-                </div>
-              </div>
+                <HVACCardMediumLayout
+                  controller={controller}
+                  targetTemperatureLabel={targetTemperatureLabel}
+                  readableTokens={readableTokens}
+                  stateSurface={stateSurface}
+                  theme={controller.theme}
+                />
+              </>
             ) : (
-              <div className="relative flex h-full flex-col">
+              <>
                 <HVACGauge
                   id={id}
                   mode={controller.visualMode}
@@ -331,92 +238,14 @@ export const HVACCard = memo(function HVACCard({
                   variant="docked-card"
                   className="pointer-events-auto absolute right-[-3.4rem] top-[38%] z-[2] -translate-y-1/2"
                 />
-
-                <div className="flex flex-1 flex-col">
-                  <div className="mt-4 inline-flex w-fit max-w-[58%] flex-col">
-                    <div
-                      className={`mb-1 text-4xl font-bold leading-none transition-colors duration-500 ${stateSurface.primaryTextClassName}`}
-                      style={{ color: readableTokens.titleColor }}
-                    >
-                      {controller.currentTemp}°C
-                    </div>
-                    <div
-                      className={`text-sm ${stateSurface.secondaryTextClassName}`}
-                      style={{ color: readableTokens.subtitleColor }}
-                    >
-                      {targetTemperatureLabel}
-                    </div>
-                  </div>
-
-                  <div className="mt-auto">
-                    <div className="mb-4 flex max-w-[72%] items-center gap-1.5">
-                      {temperaturePresets.map((preset) => {
-                        const isSelected = Math.abs(controller.targetTemp - preset) < 0.05;
-
-                        return (
-                          <button
-                            type="button"
-                            key={preset}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              controller.commitTargetTemp(preset);
-                            }}
-                            className={cn(
-                              'relative z-[3] min-w-[4.5rem] rounded-2xl border px-3 py-2 text-sm font-semibold transition-all',
-                              isSelected
-                                ? 'border-white/20 bg-white/16'
-                                : 'border-white/10 bg-white/6 hover:bg-white/10'
-                            )}
-                            style={{
-                              color: isSelected
-                                ? readableTokens.titleColor
-                                : readableTokens.subtitleColor,
-                            }}
-                          >
-                            {preset}°
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4">
-                  <CardActionRow
-                    theme={controller.theme}
-                    size="medium"
-                    leftContent={
-                      <div className="relative z-[3]">
-                        <CardActionRowGroup>
-                          <HVACTempControls
-                            targetTemp={controller.targetTemp}
-                            onTempChange={controller.setTargetTemp}
-                            isOn={controller.isOn}
-                            size="medium"
-                          />
-                          <HVACModeControls
-                            mode={controller.visualMode}
-                            isOn={controller.isOn}
-                            onModeChange={controller.setMode}
-                            size="medium"
-                          />
-                        </CardActionRowGroup>
-                      </div>
-                    }
-                    rightContent={
-                      <div className="relative z-[3]">
-                        <CardSettingsActionButton
-                          {...controller.cardInteraction.settingsButtonProps}
-                          theme={controller.theme}
-                          size="medium"
-                          tone={controller.isOn ? 'default' : 'muted'}
-                          variant="soft"
-                        />
-                      </div>
-                    }
-                  />
-                </div>
-              </div>
+                <HVACCardLargeLayout
+                  controller={controller}
+                  targetTemperatureLabel={targetTemperatureLabel}
+                  readableTokens={readableTokens}
+                  stateSurface={stateSurface}
+                  theme={controller.theme}
+                />
+              </>
             )}
           </div>
         </div>
