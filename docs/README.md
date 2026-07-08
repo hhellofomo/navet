@@ -16,7 +16,7 @@ the docs that are meant to describe the current codebase rather than historical 
 ### Product, deployment, and operations
 
 - [WIDGETS.md](WIDGETS.md): widget behavior and extension notes
-- [DOCKER_HOME_ASSISTANT_ADDON.md](DOCKER_HOME_ASSISTANT_ADDON.md): Docker and Home Assistant add-on deployment
+- [DOCKER_HOME_ASSISTANT_ADDON.md](DOCKER_HOME_ASSISTANT_ADDON.md): Home Assistant custom panel, Docker, and add-on deployment
 - [VERSIONING.md](VERSIONING.md): release numbering and bump policy
 - [ROADMAP.md](ROADMAP.md): planned work and shipped history
 
@@ -98,4 +98,4 @@ Use these directories when docs need to be checked against the live implementati
 - When the Home Assistant service split or typed event flow changes, update `README.md` and `technical/REACT_ZUSTAND.md`
 - When setup scripts or test commands change, update `README.md`
 
-Last updated: May 17, 2026
+Last updated: May 19, 2026
