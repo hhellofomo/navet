@@ -1,4 +1,4 @@
-import { ChevronRight, Rss } from 'lucide-react';
+import { ChevronRight, Rss, Settings2 } from 'lucide-react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
@@ -23,8 +23,7 @@ interface RSSFeedCardViewProps {
   isSmall: boolean;
   isMedium: boolean;
   latestArticle: RSSItem | null;
-  mediumArticles: RSSItem[];
-  largeArticles: RSSItem[];
+  items: RSSItem[];
   handleArticleClick: (url: string) => void;
   isLoading: boolean;
   error: string | null;
@@ -43,8 +42,7 @@ export function RSSFeedCardView({
   isSmall,
   isMedium,
   latestArticle,
-  mediumArticles,
-  largeArticles,
+  items,
   handleArticleClick,
   isLoading,
   error,
@@ -113,6 +111,18 @@ export function RSSFeedCardView({
             <p className={`mt-2 text-sm leading-relaxed ${rssSurface.textSecondaryClassName}`}>
               {emptyMessage}
             </p>
+            <button
+              type="button"
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenSettings();
+              }}
+              className={`mt-4 inline-flex w-fit items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium transition-opacity hover:opacity-70 ${rssSurface.surface.textPrimary} ${rssSurface.hoverClassName}`}
+            >
+              <Settings2 className="h-3.5 w-3.5" />
+              {t('rss.configureProviders')}
+            </button>
           </div>
         ) : isLoading && !latestArticle ? (
           <div className="flex flex-1 flex-col justify-center text-left">
@@ -145,10 +155,10 @@ export function RSSFeedCardView({
             </div>
           </div>
         ) : isMedium ? (
-          // Medium: 3 articles in list
-          <div className="flex-1 overflow-hidden">
+          // Medium: compact list, scrollable
+          <div className="flex-1 overflow-y-auto">
             <div className="space-y-3">
-              {mediumArticles.map((item, index) => (
+              {items.map((item, index) => (
                 <a
                   key={item.id}
                   href={item.url}
@@ -171,7 +181,7 @@ export function RSSFeedCardView({
                     <span className={rssSurface.dotClassName}>•</span>
                     <span className={rssSurface.textSecondaryClassName}>{item.timeAgo}</span>
                   </div>
-                  {index < mediumArticles.length - 1 && (
+                  {index < items.length - 1 && (
                     <div className={`mt-3 h-px ${rssSurface.dividerClassName}`} />
                   )}
                 </a>
@@ -179,10 +189,10 @@ export function RSSFeedCardView({
             </div>
           </div>
         ) : (
-          // Large: Articles with images
-          <div className="flex-1 overflow-hidden">
+          // Large: articles with images, scrollable
+          <div className="flex-1 overflow-y-auto">
             <div className="space-y-2">
-              {largeArticles.map((item, index) => (
+              {items.map((item, index) => (
                 <a
                   key={item.id}
                   href={item.url}
@@ -196,7 +206,6 @@ export function RSSFeedCardView({
                   }}
                 >
                   <div className="flex gap-3">
-                    {/* Thumbnail */}
                     {item.imageUrl && (
                       <div
                         className={`h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg ${rssSurface.thumbnailClassName}`}
@@ -208,8 +217,6 @@ export function RSSFeedCardView({
                         />
                       </div>
                     )}
-
-                    {/* Content */}
                     <div className="flex-1 min-w-0 text-left">
                       <h3
                         className={`mb-1 text-left text-sm font-semibold leading-tight line-clamp-2 transition-colors ${rssSurface.surface.textPrimary}`}
@@ -230,7 +237,7 @@ export function RSSFeedCardView({
                       )}
                     </div>
                   </div>
-                  {index < largeArticles.length - 1 && (
+                  {index < items.length - 1 && (
                     <div className={`mt-2 h-px ${rssSurface.dividerClassName}`} />
                   )}
                 </a>

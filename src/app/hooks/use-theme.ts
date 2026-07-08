@@ -8,6 +8,7 @@ import {
 } from '@/app/components/shared/theme/theme-colors';
 import type { PrimaryColor, ThemeMode as ThemeType } from '../stores/theme-store';
 import { useThemeStore } from '../stores/theme-store';
+import { useMediaQuery } from './use-media-query';
 
 export type { PrimaryColor, ThemeType };
 
@@ -73,6 +74,8 @@ interface ThemeColors {
 interface ThemeValue {
   theme: ThemeType;
   setTheme: (theme: ThemeType) => void;
+  followSystemTheme: boolean;
+  setFollowSystemTheme: (follow: boolean) => void;
   colors: ThemeColors;
   primaryColor: PrimaryColor;
   setPrimaryColor: (color: PrimaryColor) => void;
@@ -782,6 +785,8 @@ const generateThemeColors = (
 
 export function useTheme(): ThemeValue {
   const theme = useThemeStore((state) => state.theme);
+  const followSystemTheme = useThemeStore((state) => state.followSystemTheme);
+  const setFollowSystemTheme = useThemeStore((state) => state.setFollowSystemTheme);
   const primaryColor = useThemeStore((state) => state.primaryColor);
   const customPrimaryColor = useThemeStore((state) => state.customPrimaryColor);
   const wallpaper = useThemeStore((state) => state.wallpaper);
@@ -789,18 +794,22 @@ export function useTheme(): ThemeValue {
   const setPrimaryColor = useThemeStore((state) => state.setPrimaryColor);
   const setCustomPrimaryColor = useThemeStore((state) => state.setCustomPrimaryColor);
   const setWallpaper = useThemeStore((state) => state.setWallpaper);
+  const sysDark = useMediaQuery('(prefers-color-scheme: dark)');
+  const effectiveTheme: ThemeType = followSystemTheme ? (sysDark ? 'dark' : 'light') : theme;
   const accentColor = useMemo(
     () => resolvePrimaryColorValue(primaryColor, customPrimaryColor),
     [customPrimaryColor, primaryColor]
   );
   const colors = useMemo(
-    () => generateThemeColors(theme, primaryColor, customPrimaryColor),
-    [customPrimaryColor, primaryColor, theme]
+    () => generateThemeColors(effectiveTheme, primaryColor, customPrimaryColor),
+    [customPrimaryColor, primaryColor, effectiveTheme]
   );
 
   return {
-    theme,
+    theme: effectiveTheme,
     setTheme,
+    followSystemTheme,
+    setFollowSystemTheme,
     colors,
     primaryColor,
     setPrimaryColor,

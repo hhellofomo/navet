@@ -12,6 +12,16 @@ const PhotoFrameWidget = lazy(async () => {
   return { default: module.PhotoFrameWidget };
 });
 
+const BatteryOverviewWidget = lazy(async () => {
+  const module = await import('./widgets/battery-overview-widget');
+  return { default: module.BatteryOverviewWidget };
+});
+
+const ButtonWidget = lazy(async () => {
+  const module = await import('./widgets/button-widget');
+  return { default: module.ButtonWidget };
+});
+
 interface WidgetCardProps {
   card: CustomCard;
   isEditMode: boolean;
@@ -36,11 +46,34 @@ export function WidgetCard({ card, isEditMode, onDelete: _onDelete, onUpdate }: 
       widgetContent = <RSSFeedCard cardId={card.id} inEditMode={isEditMode} size={card.size} />;
       break;
     case 'photo':
-      widgetContent = <PhotoFrameWidget size={card.size} />;
+      widgetContent = (
+        <PhotoFrameWidget
+          size={card.size}
+          cardId={card.id}
+          photoUrls={card.data?.photoUrls as string[] | undefined}
+          onUpdateUrls={
+            onUpdate ? (urls) => onUpdate(card.id, { ...card.data, photoUrls: urls }) : undefined
+          }
+          isEditMode={isEditMode}
+        />
+      );
       break;
     case 'note':
       widgetContent = (
         <NoteWidget initialNote={card.data?.note as string} onNoteChange={handleNoteChange} />
+      );
+      break;
+    case 'battery':
+      widgetContent = <BatteryOverviewWidget size={card.size} />;
+      break;
+    case 'button':
+      widgetContent = (
+        <ButtonWidget
+          size={card.size}
+          data={card.data as { label?: string; service?: string; entityId?: string } | undefined}
+          onUpdate={onUpdate ? (data) => onUpdate(card.id, { ...card.data, ...data }) : undefined}
+          isEditMode={isEditMode}
+        />
       );
       break;
     default:

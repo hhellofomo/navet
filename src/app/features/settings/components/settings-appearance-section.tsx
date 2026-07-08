@@ -20,12 +20,14 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
     colorOptions,
     customPrimaryColor,
     effectsQuality,
+    followSystemTheme,
     handleRemoveWallpaper,
     handleWallpaperUpload,
     pageZoom,
     primaryColor,
     setPrimaryColor,
     setCustomPrimaryColor,
+    setFollowSystemTheme,
     setTheme,
     styles,
     theme,
@@ -69,6 +71,8 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
           onAccentChange={setPrimaryColor}
           onCustomAccentChange={setCustomPrimaryColor}
           onThemeChange={setTheme}
+          followSystemTheme={followSystemTheme}
+          onFollowSystemThemeChange={setFollowSystemTheme}
         />
       </SettingsItem>
 

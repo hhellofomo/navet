@@ -22,6 +22,11 @@ export const svMessages = {
   'settings.appearance.sectionTitle': 'Utseende',
   'settings.appearance.sectionDescription':
     'Tema, bakgrund, glasintensitet och ljusatmosfär som formar Navets visuella identitet.',
+  'settings.appearance.systemTheme.title': 'Följ systemutseende',
+  'settings.appearance.systemTheme.description':
+    'Växla automatiskt mellan Mörkt och Ljust baserat på enhetens utseendeinställning.',
+  'settings.appearance.systemTheme.auto': 'Auto',
+  'settings.appearance.systemTheme.manual': 'Manuell',
   'settings.appearance.themeAccent.title': 'Tema och accent',
   'settings.appearance.themeAccent.description':
     'Välj den övergripande visuella tonen och accentfärgen med samma väljare som visas under onboarding.',
@@ -489,6 +494,7 @@ export const svMessages = {
   'rss.settings.selectedProviders': 'Valda källor',
   'rss.settings.deleteSelected': 'Ta bort valda',
   'rss.settings.removeProvider': 'Ta bort {name}',
+  'rss.settings.articleCount': 'Artiklar att hämta',
   'rss.settings.addDirectFeed': 'Lägg till direktflöde',
   'rss.settings.providerName': 'Källnamn',
   'rss.settings.providerUrl': 'https://example.com/feed.xml',
@@ -656,6 +662,27 @@ export const svMessages = {
   'widgets.photoFrame.photo.forestMist.subtitle': 'Mjuka naturliga toner',
   'widgets.photoFrame.photo.coastalBreeze.title': 'Coastal Breeze',
   'widgets.photoFrame.photo.coastalBreeze.subtitle': 'Sjöskum och sand',
+  'widgets.photoFrame.settings.title': 'Fotokällor',
+  'widgets.photoFrame.settings.addUrl': 'Lägg till URL',
+  'widgets.photoFrame.settings.urlPlaceholder': 'https://exempel.se/foto.jpg',
+  'widgets.photoFrame.settings.noPhotos':
+    'Inga foton tillagda. Lägg till en URL för att visa egna bilder.',
+  'widgets.photoFrame.settings.emptyHint': 'Visar inbyggda foton',
+  'widgets.battery.title': 'Batteriöversikt',
+  'widgets.battery.noBatteries': 'Inga batterisensorer hittades',
+  'widgets.battery.low': 'Låg',
+  'widgets.button.title': 'Åtgärdsknapp',
+  'widgets.button.labelPlaceholder': 'Knappetikett',
+  'widgets.button.servicePlaceholder': 't.ex. scene.turn_on',
+  'widgets.button.entityPlaceholder': 't.ex. scene.movie_time',
+  'widgets.button.configure': 'Konfigurera',
+  'widgets.button.unconfigured': 'Tryck för att konfigurera',
+  'dashboard.addCard.templates.battery.name': 'Batteriöversikt',
+  'dashboard.addCard.templates.battery.description':
+    'Alla batterisensorer sorterade efter laddningsnivå, lägst först.',
+  'dashboard.addCard.templates.button.name': 'Åtgärdsknapp',
+  'dashboard.addCard.templates.button.description':
+    'Tryck för att aktivera en Home Assistant-tjänst, scen eller skript.',
   'widgets.note.title': 'Snabb anteckning',
   'widgets.note.emptyState': 'Klicka för att lägga till en anteckning...',
   'widgets.note.placeholder': 'Skriv din anteckning här...',

@@ -1,5 +1,5 @@
 import type { HassEntities } from 'home-assistant-js-websocket';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useI18n } from '@/app/hooks';
 import type { RSSItem, RSSProvider } from './types';
 
@@ -184,7 +184,7 @@ async function fetchUrlProviderItems(
   }
 
   const xml = await response.text();
-  return parseRSSDocument(xml, provider.name, fallbackRecentLabel, formatRelativeTime).slice(0, 8);
+  return parseRSSDocument(xml, provider.name, fallbackRecentLabel, formatRelativeTime);
 }
 
 function getHomeAssistantProviderItems(
@@ -244,7 +244,11 @@ const dedupeItems = (items: RSSItem[]): RSSItem[] =>
       allItems.findIndex((candidate) => candidate.url === item.url) === index
   );
 
-export function useRSSFeedItems(providers: RSSProvider[], entities: HassEntities | null) {
+export function useRSSFeedItems(
+  providers: RSSProvider[],
+  entities: HassEntities | null,
+  limit = 10
+) {
   const { formatRelativeTime, t } = useI18n();
   const [items, setItems] = useState<RSSItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -286,7 +290,7 @@ export function useRSSFeedItems(providers: RSSProvider[], entities: HassEntities
 
         const nextItems = dedupeItems(
           results.flatMap((result) => (result.status === 'fulfilled' ? result.value : []))
-        ).slice(0, 8);
+        ).slice(0, limit);
 
         const failedResults = results.filter((result) => result.status === 'rejected');
 
@@ -306,17 +310,13 @@ export function useRSSFeedItems(providers: RSSProvider[], entities: HassEntities
     return () => {
       cancelled = true;
     };
-  }, [entities, formatRelativeTime, providers, t]);
+  }, [entities, formatRelativeTime, limit, providers, t]);
 
   const latestArticle = items[0] ?? null;
-  const mediumArticles = useMemo(() => items.slice(0, 3), [items]);
-  const largeArticles = useMemo(() => items.slice(0, 5), [items]);
 
   return {
     items,
     latestArticle,
-    mediumArticles,
-    largeArticles,
     isLoading,
     error,
   };

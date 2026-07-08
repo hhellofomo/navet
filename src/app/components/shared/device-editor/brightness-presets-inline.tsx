@@ -48,8 +48,8 @@ export const BrightnessPresetsInline = memo(function BrightnessPresetsInline({
   const iconSize = controlSizes.icon;
   const roundControl = getRoundControlStyles(theme);
   const gap = size === 'large' ? 'gap-2' : 'gap-1.5';
-  const visiblePresets = maxVisible ? presets.slice(0, maxVisible) : presets;
-  const overflowPresets = maxVisible ? presets.slice(maxVisible) : [];
+  const visiblePresets = maxVisible !== undefined ? presets.slice(0, maxVisible) : presets;
+  const overflowPresets = maxVisible !== undefined ? presets.slice(maxVisible) : [];
   const activeColor = getBrightnessPresetAccentColor(primaryColor);
   const selectedClasses = `${roundControl.selectedText} ring-2 scale-105`;
   const disabledSelectedClasses = 'cursor-not-allowed text-white ring-2 scale-105 opacity-70';

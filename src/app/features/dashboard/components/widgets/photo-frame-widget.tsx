@@ -1,9 +1,10 @@
-import { ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Image as ImageIcon, Settings2 } from 'lucide-react';
 import { useState } from 'react';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useI18n, useTheme } from '@/app/hooks';
 import type { TranslationKey } from '@/app/i18n';
+import { PhotoFrameSettingsDialog } from './photo-frame-settings-dialog';
 import { getDashboardWidgetSurfaceTokens } from './widget-surface-tokens';
 
 const mockPhotos = [
@@ -45,24 +46,38 @@ const mockPhotos = [
 
 interface PhotoFrameWidgetProps {
   size?: CardSize;
+  cardId?: string;
+  photoUrls?: string[];
+  onUpdateUrls?: (urls: string[]) => void;
+  isEditMode?: boolean;
 }
 
-export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
+export function PhotoFrameWidget({
+  size = 'large',
+  photoUrls,
+  onUpdateUrls,
+  isEditMode = false,
+}: PhotoFrameWidgetProps) {
   const { theme, primaryColor } = useTheme();
   const { t } = useI18n();
   const surface = getDashboardWidgetSurfaceTokens(theme);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const isCompact = isCompactCardSize(size);
+  const hasCustomPhotos = photoUrls && photoUrls.length > 0;
+
+  const photoCount = hasCustomPhotos ? photoUrls.length : mockPhotos.length;
 
   const nextPhoto = () => {
-    setCurrentIndex((prev) => (prev + 1) % mockPhotos.length);
+    setCurrentIndex((prev) => (prev + 1) % photoCount);
   };
 
   const prevPhoto = () => {
-    setCurrentIndex((prev) => (prev - 1 + mockPhotos.length) % mockPhotos.length);
+    setCurrentIndex((prev) => (prev - 1 + photoCount) % photoCount);
   };
 
-  const currentPhoto = mockPhotos[currentIndex];
+  const safeIndex = Math.min(currentIndex, photoCount - 1);
+  const currentPhoto = hasCustomPhotos ? null : mockPhotos[safeIndex];
 
   return (
     <div className={`${surface.panelClassName} h-full flex flex-col`}>
@@ -82,21 +97,43 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
             {t('widgets.photoFrame.title')}
           </h3>
           <p className={`mt-0.5 truncate text-[10px] ${surface.textMuted}`}>
-            {t('widgets.common.widget')}
+            {hasCustomPhotos
+              ? `${photoUrls.length} ${t('widgets.common.widget').toLowerCase()}`
+              : t('widgets.photoFrame.settings.emptyHint')}
           </p>
         </div>
+        {onUpdateUrls && (isEditMode || !hasCustomPhotos) && (
+          <button
+            type="button"
+            onClick={() => setIsSettingsOpen(true)}
+            className={`shrink-0 rounded-lg p-1.5 transition-opacity hover:opacity-70 ${surface.textMuted}`}
+            aria-label={t('widgets.photoFrame.settings.title')}
+          >
+            <Settings2 className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {/* Photo Display */}
       <div className="flex-1 relative rounded-xl overflow-hidden mb-4 group">
-        <div className={`absolute inset-0 ${currentPhoto.backgroundClassName}`} />
+        {hasCustomPhotos ? (
+          <img
+            src={photoUrls[safeIndex]}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <div className={`absolute inset-0 ${currentPhoto?.backgroundClassName ?? ''}`} />
+        )}
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),transparent_38%,rgba(15,23,42,0.28)_100%)]" />
-        <div className="absolute inset-x-0 bottom-0 p-4">
-          <div className="max-w-[70%] rounded-2xl bg-black/20 px-3 py-2 backdrop-blur-md">
-            <div className="text-sm font-semibold text-white">{t(currentPhoto.titleKey)}</div>
-            <div className="mt-0.5 text-[11px] text-white/80">{t(currentPhoto.subtitleKey)}</div>
+        {!hasCustomPhotos && currentPhoto && (
+          <div className="absolute inset-x-0 bottom-0 p-4">
+            <div className="max-w-[70%] rounded-2xl bg-black/20 px-3 py-2 backdrop-blur-md">
+              <div className="text-sm font-semibold text-white">{t(currentPhoto.titleKey)}</div>
+              <div className="mt-0.5 text-[11px] text-white/80">{t(currentPhoto.subtitleKey)}</div>
+            </div>
           </div>
-        </div>
+        )}
         <div className="absolute right-4 top-4 rounded-full bg-white/14 p-2 text-white/90 backdrop-blur-sm">
           <ImageIcon className="h-4 w-4" />
         </div>
@@ -125,17 +162,18 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
       </div>
 
       {/* Thumbnail Dots */}
-      {!isCompact && (
+      {!isCompact && photoCount > 1 && (
         <div className="flex justify-center gap-2">
-          {mockPhotos.map((photo, index) => (
+          {Array.from({ length: photoCount }).map((_, index) => (
             <button
               type="button"
-              key={photo.titleKey}
+              // biome-ignore lint/suspicious/noArrayIndexKey: dot index is stable
+              key={index}
               onClick={() => setCurrentIndex(index)}
               className="w-2 h-2 rounded-full transition-all"
               style={{
                 backgroundColor:
-                  index === currentIndex
+                  index === safeIndex
                     ? getThemeColorValue(primaryColor)
                     : theme === 'light'
                       ? '#d1d5db'
@@ -144,6 +182,15 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
             />
           ))}
         </div>
+      )}
+
+      {onUpdateUrls && (
+        <PhotoFrameSettingsDialog
+          isOpen={isSettingsOpen}
+          onOpenChange={setIsSettingsOpen}
+          photoUrls={photoUrls ?? []}
+          onUpdateUrls={onUpdateUrls}
+        />
       )}
     </div>
   );

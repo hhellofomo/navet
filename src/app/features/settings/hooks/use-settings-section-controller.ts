@@ -48,8 +48,10 @@ export type SettingsSectionStyles = {
 export function useSettingsSectionController() {
   const {
     customPrimaryColor,
+    followSystemTheme,
     theme,
     setTheme,
+    setFollowSystemTheme,
     primaryColor,
     setPrimaryColor,
     setCustomPrimaryColor,
@@ -158,6 +160,8 @@ export function useSettingsSectionController() {
     disableAnimations,
     effectsQuality,
     entityInteractionMode,
+    followSystemTheme,
+    setFollowSystemTheme,
     handleExportDashboardConfig,
     handleImportDashboardConfig,
     handleLogout,

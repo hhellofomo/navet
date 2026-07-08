@@ -1,6 +1,8 @@
 import { type CSSProperties, memo, startTransition, useEffect, useRef, useState } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useI18n } from '@/app/hooks';
+import { settingsSelectors } from '@/app/stores/selectors';
+import { useSettingsStore } from '@/app/stores/settings-store';
 import type { DeviceWithType } from '@/app/types/device.types';
 import { DashboardCardItem } from '../components/dashboard-card-item';
 import { DashboardEditActions } from '../components/dashboard-edit-actions';
@@ -61,6 +63,7 @@ export const RoomSection = memo(function RoomSection({
   usesHideAction = false,
 }: RoomSectionProps) {
   const { t } = useI18n();
+  const effectsQuality = useSettingsStore(settingsSelectors.effectsQuality);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isVisible, setIsVisible] = useState(isEditMode);
   const [visibleCount, setVisibleCount] = useState(isEditMode ? orderedIds.length : 0);
@@ -230,10 +233,12 @@ export const RoomSection = memo(function RoomSection({
     <div
       ref={containerRef}
       style={
-        {
-          contentVisibility: 'auto',
-          containIntrinsicBlockSize: `${placeholderHeight}px`,
-        } as CSSProperties
+        effectsQuality !== 'high'
+          ? ({
+              contentVisibility: 'auto',
+              containIntrinsicBlockSize: `${placeholderHeight}px`,
+            } as CSSProperties)
+          : undefined
       }
     >
       <div className={showHeader ? 'mb-4 flex items-center gap-3' : ''}>

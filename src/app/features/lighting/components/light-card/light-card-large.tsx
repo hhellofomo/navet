@@ -1,16 +1,18 @@
 import type { LucideIcon } from 'lucide-react';
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { CardActionRow } from '@/app/components/shared/card-action-row';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
 import {
   BrightnessPresetsInline,
   BrightnessSlider,
   ColorPicker,
+  KelvinSlider,
 } from '@/app/components/shared/device-editor';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { PRESET_COLORS } from '@/app/constants/light-constants';
 import { useI18n, useTheme } from '@/app/hooks';
 import { CustomColorTrigger } from './custom-color-trigger';
+import { KelvinColorTrigger } from './kelvin-color-trigger';
 import { LightCardHeader } from './light-card-header';
 import type { HeaderIconButtonProps, LightBrightnessPreset } from './light-card-types';
 
@@ -21,12 +23,20 @@ interface LightCardLargeProps {
   brightnessPresets: LightBrightnessPreset[];
   selectedColor: string | null;
   currentColor: string;
+  colorTemp: number;
+  currentTempColor: string;
+  minColorTemp: number;
+  maxColorTemp: number;
+  tempOptions: Array<{ value: number; color: string; label: string }>;
   isOn: boolean;
   IconComponent: LucideIcon;
   supportsColorControl: boolean;
+  supportsColorTemperature: boolean;
   onBrightnessChange: (value: number) => void;
   onBrightnessCommit: (value: number) => void;
   onColorChange: (color: string) => void;
+  onTempChange: (temp: number) => void;
+  onTempCommit: (temp: number) => void;
   iconButtonProps: HeaderIconButtonProps;
   settingsButtonProps: HeaderIconButtonProps;
   showSettingsButton: boolean;
@@ -38,21 +48,35 @@ export const LightCardLarge = memo(function LightCardLarge({
   brightnessPresets,
   selectedColor,
   currentColor,
+  colorTemp,
+  currentTempColor,
+  minColorTemp,
+  maxColorTemp,
   isOn,
   IconComponent,
   supportsColorControl,
+  supportsColorTemperature,
   onBrightnessChange,
   onBrightnessCommit,
   onColorChange,
+  onTempChange,
+  onTempCommit,
   iconButtonProps,
   settingsButtonProps,
   showSettingsButton,
-}: Omit<LightCardLargeProps, 'room'>) {
+}: Omit<LightCardLargeProps, 'room' | 'tempOptions'>) {
   const { theme } = useTheme();
   const { t } = useI18n();
   const stateSurface = getCardStateSurfaceTokens(theme, isOn);
   const secondaryTextColor = stateSurface.secondaryTextClassName;
   const textColor = stateSurface.primaryTextClassName;
+  const [isKelvinMode, setIsKelvinMode] = useState(false);
+
+  const handleKelvinToggle = () => {
+    if (isOn) setIsKelvinMode((prev) => !prev);
+  };
+
+  const roundedTemp = Math.round(colorTemp / 100) * 100;
 
   return (
     <>
@@ -67,50 +91,85 @@ export const LightCardLarge = memo(function LightCardLarge({
       />
 
       <div className="flex-1 flex flex-col justify-between">
-        {/* Brightness section */}
+        {/* Slider section */}
         <div className="mb-2">
           <div className="flex items-baseline justify-between mb-2">
-            <div className={`text-xs ${secondaryTextColor}`}>{t('lighting.brightness')}</div>
-            <div className={`text-2xl font-bold ${textColor}`}>{brightness}%</div>
+            <div className={`text-xs ${secondaryTextColor}`}>
+              {isKelvinMode && supportsColorTemperature
+                ? t('lighting.colorTemperature')
+                : t('lighting.brightness')}
+            </div>
+            <div className={`text-2xl font-bold ${textColor}`}>
+              {isKelvinMode && supportsColorTemperature ? `${roundedTemp}K` : `${brightness}%`}
+            </div>
           </div>
-          <BrightnessSlider
-            value={brightness}
-            onChange={onBrightnessChange}
-            onCommit={onBrightnessCommit}
-            isOn={isOn}
-            showLabel={false}
-            size="large"
-          />
-          <div className="mt-3">
-            <BrightnessPresetsInline
-              presets={brightnessPresets}
-              currentBrightness={brightness}
+
+          {isKelvinMode && supportsColorTemperature ? (
+            <KelvinSlider
+              value={colorTemp}
+              currentTempColor={currentTempColor}
+              onChange={onTempChange}
+              onCommit={onTempCommit}
               isOn={isOn}
-              onBrightnessChange={onBrightnessCommit}
+              min={minColorTemp}
+              max={maxColorTemp}
+              showLabel={false}
               size="large"
             />
-          </div>
+          ) : (
+            <BrightnessSlider
+              value={brightness}
+              onChange={onBrightnessChange}
+              onCommit={onBrightnessCommit}
+              isOn={isOn}
+              showLabel={false}
+              size="large"
+            />
+          )}
+
+          {!isKelvinMode && (
+            <div className="mt-3">
+              <BrightnessPresetsInline
+                presets={brightnessPresets}
+                currentBrightness={brightness}
+                isOn={isOn}
+                onBrightnessChange={onBrightnessCommit}
+                size="large"
+              />
+            </div>
+          )}
         </div>
 
-        {supportsColorControl && (
+        {(supportsColorTemperature || supportsColorControl) && (
           <div className="space-y-2">
             <div className={`text-xs ${secondaryTextColor}`}>{t('lighting.colors')}</div>
             <div className="flex items-center gap-2">
-              <div className="flex gap-2 flex-1">
-                <ColorPicker
-                  colors={Array.from(PRESET_COLORS).slice(0, 4)}
-                  selectedColor={selectedColor}
+              {supportsColorTemperature && (
+                <KelvinColorTrigger
                   isOn={isOn}
-                  onColorChange={onColorChange}
+                  currentTempColor={currentTempColor}
+                  isActive={isKelvinMode}
                   size="large"
+                  onClick={handleKelvinToggle}
                 />
-                <CustomColorTrigger
-                  isOn={isOn}
-                  currentColor={currentColor}
-                  onColorChange={onColorChange}
-                  size="large"
-                />
-              </div>
+              )}
+              {supportsColorControl && (
+                <>
+                  <ColorPicker
+                    colors={Array.from(PRESET_COLORS).slice(0, 4)}
+                    selectedColor={selectedColor}
+                    isOn={isOn}
+                    onColorChange={onColorChange}
+                    size="large"
+                  />
+                  <CustomColorTrigger
+                    isOn={isOn}
+                    currentColor={currentColor}
+                    onColorChange={onColorChange}
+                    size="large"
+                  />
+                </>
+              )}
             </div>
           </div>
         )}

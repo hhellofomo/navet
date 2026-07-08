@@ -16,6 +16,8 @@ interface ThemeAppearancePickerProps {
   onCustomAccentChange: (accent: string | null) => void;
   onThemeChange: (theme: ThemeType) => void;
   lead?: React.ReactNode;
+  followSystemTheme?: boolean;
+  onFollowSystemThemeChange?: (follow: boolean) => void;
 }
 
 export function ThemeAppearancePicker({
@@ -28,6 +30,8 @@ export function ThemeAppearancePicker({
   onCustomAccentChange,
   onThemeChange,
   lead,
+  followSystemTheme,
+  onFollowSystemThemeChange,
 }: ThemeAppearancePickerProps) {
   const { t } = useI18n();
   const customAccentValue = customAccent ?? '#f97316';
@@ -35,6 +39,8 @@ export function ThemeAppearancePicker({
     selectedAccent === 'custom' && customAccent ? customAccent : getThemeColorValue(selectedAccent);
   const previewTheme = selectedTheme;
   const pickerTokens = getThemeAppearancePickerTokens(previewTheme, accentColor);
+  const showSystemTheme =
+    followSystemTheme !== undefined && onFollowSystemThemeChange !== undefined;
 
   return (
     <div>
@@ -128,6 +134,40 @@ export function ThemeAppearancePicker({
             />
           </div>
         </div>
+
+        {showSystemTheme ? (
+          <div className="mt-5 md:mt-6">
+            <p className={`text-sm font-semibold ${pickerTokens.textClassName}`}>
+              {t('settings.appearance.systemTheme.title')}
+            </p>
+            <div
+              className={`mt-3 inline-flex rounded-full border p-1 ${pickerTokens.optionBorderClassName}`}
+            >
+              {[
+                { value: true, label: t('settings.appearance.systemTheme.auto') },
+                { value: false, label: t('settings.appearance.systemTheme.manual') },
+              ].map((option) => {
+                const isActive = followSystemTheme === option.value;
+                return (
+                  <button
+                    type="button"
+                    key={option.label}
+                    onClick={() => onFollowSystemThemeChange(option.value)}
+                    style={
+                      isActive ? { backgroundColor: accentColor, color: '#ffffff' } : undefined
+                    }
+                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all md:px-5 ${
+                      isActive ? 'shadow-sm' : pickerTokens.mutedClassName
+                    }`}
+                    aria-pressed={isActive}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

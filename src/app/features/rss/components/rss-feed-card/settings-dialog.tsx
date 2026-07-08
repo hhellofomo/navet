@@ -18,6 +18,8 @@ interface RSSFeedSettingsDialogProps {
   onAddProvider: (name: string, feedUrl: string) => boolean;
   onRemoveProvider: (providerId: string) => void;
   onDeleteSelectedProviders: () => void;
+  articleCount: number;
+  onArticleCountChange: (count: number) => void;
 }
 
 export function RSSFeedSettingsDialog({
@@ -31,6 +33,8 @@ export function RSSFeedSettingsDialog({
   onAddProvider,
   onRemoveProvider,
   onDeleteSelectedProviders,
+  articleCount,
+  onArticleCountChange,
 }: RSSFeedSettingsDialogProps) {
   const surface = getThemeSurfaceTokens(theme);
   const { t } = useI18n();
@@ -136,6 +140,28 @@ export function RSSFeedSettingsDialog({
                 </div>
               );
             })}
+          </div>
+
+          <div className="mb-4">
+            <div className={`mb-2 text-xs font-medium ${surface.textSecondary}`}>
+              {t('rss.settings.articleCount')}
+            </div>
+            <div className="flex gap-2">
+              {[5, 10, 20, 30].map((count) => (
+                <button
+                  key={count}
+                  type="button"
+                  onClick={() => onArticleCountChange(count)}
+                  className={`rounded-xl px-3 py-1.5 text-sm font-medium transition-colors ${
+                    articleCount === count
+                      ? `${surface.textPrimary} ${surface.subtleBg} ring-1 ring-inset ring-white/20`
+                      : `${surface.textSecondary} ${surface.hoverBg}`
+                  }`}
+                >
+                  {count}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-3">

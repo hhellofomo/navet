@@ -111,6 +111,9 @@ export function useLightCardController({
   const brightnessRequestInFlightRef = useRef(false);
   const pendingTempRef = useRef<number | null>(null);
   const tempSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tempSendTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const queuedTempRef = useRef<number | null>(null);
+  const tempRequestInFlightRef = useRef(false);
   const lastKnownColorRef = useRef<string | null>(null);
 
   const effectiveSelectedColor = selectedColor ?? (isOn ? lastKnownColorRef.current : null);
@@ -125,7 +128,7 @@ export function useLightCardController({
 
   const isExtraSmall = isExtraSmallCardSize(size);
   const isSmall = isExtraSmall || size === 'small';
-  const padding = isExtraSmall ? 'px-3.5 pt-3 pb-4' : isSmall ? 'p-4' : 'p-5';
+  const padding = isExtraSmall ? 'px-3.5 pt-3 pb-4' : size === 'large' ? 'p-5' : 'p-4';
 
   useEffect(() => {
     if (liveEntity) {
@@ -165,11 +168,21 @@ export function useLightCardController({
   }, [liveEntity]);
 
   useEffect(() => {
-    if (!liveEntity || isAdjustingBrightness || liveEntity.state !== 'on') {
+    if (!liveEntity || isAdjustingBrightness) {
       return;
     }
 
     const brightnessFromEntity = getBrightnessPercent(liveEntity);
+
+    if (liveEntity.state !== 'on') {
+      // Light is off — update the ref/memory so restore-on-turn-on uses the correct value.
+      if (brightnessFromEntity > 0) {
+        lastBrightnessRef.current = brightnessFromEntity;
+        rememberLightState(id, { brightness: brightnessFromEntity });
+      }
+      return;
+    }
+
     if (
       pendingBrightnessRef.current !== null &&
       Math.abs(brightnessFromEntity - pendingBrightnessRef.current) > 1
@@ -204,12 +217,15 @@ export function useLightCardController({
       if (tempSyncTimeoutRef.current) {
         clearTimeout(tempSyncTimeoutRef.current);
       }
+      if (tempSendTimeoutRef.current) {
+        clearTimeout(tempSendTimeoutRef.current);
+      }
     };
   }, []);
 
   useEffect(() => {
     if (liveEntity) {
-      if (isAdjustingTemp || liveEntity.state !== 'on') {
+      if (isAdjustingTemp) {
         return;
       }
 
@@ -217,6 +233,15 @@ export function useLightCardController({
       if (entityTemp === null) {
         return;
       }
+
+      if (liveEntity.state !== 'on') {
+        // Light is off — update the ref/memory so restore-on-turn-on uses the correct value.
+        const nextTemp = clampKelvin(entityTemp, minColorTemp, maxColorTemp);
+        lastColorTempRef.current = nextTemp;
+        rememberLightState(id, { colorTemp: nextTemp });
+        return;
+      }
+
       if (pendingTempRef.current !== null && Math.abs(entityTemp - pendingTempRef.current) > 100) {
         return;
       }
@@ -272,8 +297,8 @@ export function useLightCardController({
     }
 
     const reportedColor = getReportedColorHex(liveEntity);
-    setSelectedColor(reportedColor);
     if (reportedColor) {
+      setSelectedColor(reportedColor);
       lastKnownColorRef.current = reportedColor;
       setCustomColor(reportedColor);
     }
@@ -285,6 +310,8 @@ export function useLightCardController({
       brightnessPct?: number;
       kelvin?: number;
       rgbColor?: [number, number, number];
+      hsColor?: [number, number];
+      xyColor?: [number, number];
     }) => {
       if (!isHomeAssistantLight) {
         return;
@@ -341,6 +368,45 @@ export function useLightCardController({
     [flushQueuedBrightnessSync]
   );
 
+  const flushQueuedTempSync = useCallback(() => {
+    if (tempRequestInFlightRef.current || queuedTempRef.current === null) {
+      return;
+    }
+
+    const nextTemp = queuedTempRef.current;
+    queuedTempRef.current = null;
+    tempRequestInFlightRef.current = true;
+
+    void syncLightWithHomeAssistant({ state: 'on', kelvin: nextTemp }).finally(() => {
+      tempRequestInFlightRef.current = false;
+      if (queuedTempRef.current !== null) {
+        flushQueuedTempSync();
+      }
+    });
+  }, [syncLightWithHomeAssistant]);
+
+  const queueTempSync = useCallback(
+    (nextTemp: number, immediate = false) => {
+      queuedTempRef.current = nextTemp;
+
+      if (tempSendTimeoutRef.current) {
+        clearTimeout(tempSendTimeoutRef.current);
+        tempSendTimeoutRef.current = null;
+      }
+
+      if (immediate) {
+        flushQueuedTempSync();
+        return;
+      }
+
+      tempSendTimeoutRef.current = setTimeout(() => {
+        tempSendTimeoutRef.current = null;
+        flushQueuedTempSync();
+      }, 75);
+    },
+    [flushQueuedTempSync]
+  );
+
   const hexToRgb = useCallback((hex: string): [number, number, number] | null => {
     const normalized = hex.replace('#', '');
     if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
@@ -352,6 +418,58 @@ export function useLightCardController({
       parseInt(normalized.slice(2, 4), 16),
       parseInt(normalized.slice(4, 6), 16),
     ];
+  }, []);
+
+  const rgbToHs = useCallback((rgb: [number, number, number]): [number, number] => {
+    const [rRaw, gRaw, bRaw] = rgb;
+    const r = Math.max(0, Math.min(255, rRaw)) / 255;
+    const g = Math.max(0, Math.min(255, gRaw)) / 255;
+    const b = Math.max(0, Math.min(255, bRaw)) / 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const delta = max - min;
+
+    let hue = 0;
+    if (delta > 0) {
+      if (max === r) {
+        hue = 60 * (((g - b) / delta) % 6);
+      } else if (max === g) {
+        hue = 60 * ((b - r) / delta + 2);
+      } else {
+        hue = 60 * ((r - g) / delta + 4);
+      }
+    }
+
+    if (hue < 0) {
+      hue += 360;
+    }
+
+    const saturation = max === 0 ? 0 : (delta / max) * 100;
+    return [Math.round(hue * 10) / 10, Math.round(saturation * 10) / 10];
+  }, []);
+
+  const rgbToXy = useCallback((rgb: [number, number, number]): [number, number] => {
+    const gammaCorrect = (channel: number) => {
+      const normalized = Math.max(0, Math.min(255, channel)) / 255;
+      return normalized > 0.04045 ? ((normalized + 0.055) / 1.055) ** 2.4 : normalized / 12.92;
+    };
+
+    const r = gammaCorrect(rgb[0]);
+    const g = gammaCorrect(rgb[1]);
+    const b = gammaCorrect(rgb[2]);
+
+    const X = r * 0.664511 + g * 0.154324 + b * 0.162028;
+    const Y = r * 0.283881 + g * 0.668433 + b * 0.047685;
+    const Z = r * 0.000088 + g * 0.07231 + b * 0.986039;
+    const sum = X + Y + Z;
+
+    if (sum <= 0) {
+      return [0.3127, 0.329];
+    }
+
+    const x = X / sum;
+    const y = Y / sum;
+    return [Math.round(x * 10000) / 10000, Math.round(y * 10000) / 10000];
   }, []);
 
   const onBrightnessChange = useCallback(
@@ -411,8 +529,9 @@ export function useLightCardController({
       if (!isOn) {
         setIsOn(true);
       }
+      queueTempSync(nextTemp);
     },
-    [id, isOn, maxColorTemp, minColorTemp, rememberLightState]
+    [id, isOn, maxColorTemp, minColorTemp, queueTempSync, rememberLightState]
   );
 
   const onTempCommit = useCallback(
@@ -435,13 +554,20 @@ export function useLightCardController({
       if (!isOn) {
         setIsOn(true);
       }
-      void syncLightWithHomeAssistant({ state: 'on', kelvin: nextTemp });
+      queueTempSync(nextTemp, true);
     },
-    [id, isOn, maxColorTemp, minColorTemp, rememberLightState, syncLightWithHomeAssistant]
+    [id, isOn, maxColorTemp, minColorTemp, queueTempSync, rememberLightState]
   );
 
   const onColorChange = useCallback(
     (color: string) => {
+      // Cancel any queued kelvin sync — otherwise it fires after the color change and overrides it.
+      if (tempSendTimeoutRef.current) {
+        clearTimeout(tempSendTimeoutRef.current);
+        tempSendTimeoutRef.current = null;
+      }
+      queuedTempRef.current = null;
+
       setSelectedColor(color);
       lastKnownColorRef.current = color;
       if (!isOn) {
@@ -450,10 +576,54 @@ export function useLightCardController({
 
       const rgbColor = hexToRgb(color);
       if (rgbColor) {
-        void syncLightWithHomeAssistant({ state: 'on', rgbColor });
+        const hsColor = rgbToHs(rgbColor);
+        const xyColor = rgbToXy(rgbColor);
+        const supportedModes = Array.isArray(liveEntity?.attributes?.supported_color_modes)
+          ? liveEntity.attributes.supported_color_modes.filter(
+              (mode): mode is string => typeof mode === 'string'
+            )
+          : typeof liveEntity?.attributes?.color_mode === 'string'
+            ? [liveEntity.attributes.color_mode]
+            : [];
+
+        const activeMode =
+          typeof liveEntity?.attributes?.color_mode === 'string'
+            ? liveEntity.attributes.color_mode
+            : null;
+
+        const supportsRgb = supportedModes.some((mode) => ['rgb', 'rgbw', 'rgbww'].includes(mode));
+        const supportsHs = supportedModes.includes('hs');
+        const supportsXy = supportedModes.includes('xy');
+
+        const preferredColorPayload: {
+          rgbColor?: [number, number, number];
+          hsColor?: [number, number];
+          xyColor?: [number, number];
+        } =
+          activeMode === 'xy' && supportsXy
+            ? { xyColor }
+            : activeMode === 'hs' && supportsHs
+              ? { hsColor }
+              : ['rgb', 'rgbw', 'rgbww'].includes(activeMode ?? '') && supportsRgb
+                ? { rgbColor }
+                : supportsXy
+                  ? { xyColor }
+                  : supportsHs
+                    ? { hsColor }
+                    : { rgbColor };
+
+        const turnOnBrightness = !isOn
+          ? Math.max(1, Math.round(lastBrightnessRef.current || brightness || 100))
+          : undefined;
+
+        void syncLightWithHomeAssistant({
+          state: 'on',
+          brightnessPct: turnOnBrightness,
+          ...preferredColorPayload,
+        });
       }
     },
-    [hexToRgb, isOn, syncLightWithHomeAssistant]
+    [brightness, hexToRgb, isOn, liveEntity, rgbToHs, rgbToXy, syncLightWithHomeAssistant]
   );
 
   const toggleLightState = useCallback(

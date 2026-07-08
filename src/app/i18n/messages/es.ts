@@ -22,6 +22,11 @@ export const esMessages = {
   'settings.appearance.sectionTitle': 'Apariencia',
   'settings.appearance.sectionDescription':
     'Tema, fondo, intensidad del cristal y ambiente de luz que definen la identidad visual de Navet.',
+  'settings.appearance.systemTheme.title': 'Seguir apariencia del sistema',
+  'settings.appearance.systemTheme.description':
+    'Cambiar automáticamente entre Oscuro y Claro según la configuración de apariencia del dispositivo.',
+  'settings.appearance.systemTheme.auto': 'Auto',
+  'settings.appearance.systemTheme.manual': 'Manual',
   'settings.appearance.themeAccent.title': 'Tema y acento',
   'settings.appearance.themeAccent.description':
     'Elige el tono visual general y el color de acento con el mismo selector que aparece durante el onboarding.',
@@ -494,6 +499,7 @@ export const esMessages = {
   'rss.settings.selectedProviders': 'Proveedores seleccionados',
   'rss.settings.deleteSelected': 'Eliminar seleccionados',
   'rss.settings.removeProvider': 'Eliminar {name}',
+  'rss.settings.articleCount': 'Artículos a cargar',
   'rss.settings.addDirectFeed': 'Agregar fuente directa',
   'rss.settings.providerName': 'Nombre del proveedor',
   'rss.settings.providerUrl': 'https://example.com/feed.xml',
@@ -661,6 +667,27 @@ export const esMessages = {
   'widgets.photoFrame.photo.forestMist.subtitle': 'Tonos naturales suaves',
   'widgets.photoFrame.photo.coastalBreeze.title': 'Coastal Breeze',
   'widgets.photoFrame.photo.coastalBreeze.subtitle': 'Espuma marina y arena',
+  'widgets.photoFrame.settings.title': 'Fuentes de fotos',
+  'widgets.photoFrame.settings.addUrl': 'Añadir URL',
+  'widgets.photoFrame.settings.urlPlaceholder': 'https://ejemplo.com/foto.jpg',
+  'widgets.photoFrame.settings.noPhotos':
+    'No hay fotos añadidas. Añade una URL para mostrar tus propias imágenes.',
+  'widgets.photoFrame.settings.emptyHint': 'Mostrando fotos integradas',
+  'widgets.battery.title': 'Resumen de batería',
+  'widgets.battery.noBatteries': 'No se encontraron sensores de batería',
+  'widgets.battery.low': 'Bajo',
+  'widgets.button.title': 'Botón de acción',
+  'widgets.button.labelPlaceholder': 'Etiqueta del botón',
+  'widgets.button.servicePlaceholder': 'ej. scene.turn_on',
+  'widgets.button.entityPlaceholder': 'ej. scene.movie_time',
+  'widgets.button.configure': 'Configurar',
+  'widgets.button.unconfigured': 'Toca para configurar',
+  'dashboard.addCard.templates.battery.name': 'Resumen de batería',
+  'dashboard.addCard.templates.battery.description':
+    'Todos los sensores de batería ordenados por nivel de carga, los más bajos primero.',
+  'dashboard.addCard.templates.button.name': 'Botón de acción',
+  'dashboard.addCard.templates.button.description':
+    'Toca para activar cualquier servicio, escena o script de Home Assistant.',
   'widgets.note.title': 'Nota rápida',
   'widgets.note.emptyState': 'Haz clic para agregar una nota...',
   'widgets.note.placeholder': 'Escribe tu nota aquí...',
