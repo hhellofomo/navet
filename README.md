@@ -39,7 +39,8 @@ Routing and lazy-loading are coordinated by
 The home section is the main editable canvas. It currently supports:
 
 - room-driven navigation with `All` and per-room views
-- sectioned and flow-style layouts for the `All` room
+- zone-based overview layout for the `All` room with `hero`, `actions`, `status`, and `analytics` bands
+- presentation and edit canvases for the home overview, including drag/drop zone reassignment in edit mode
 - entity cards plus custom widgets stored alongside dashboard layout state
 - card resizing, room reassignment, ordering, and visibility control
 - import/export of local dashboard configuration
@@ -73,7 +74,7 @@ Navet currently includes first-class card or section support for:
 - RSS/news feeds
 - energy dashboards and derived energy widgets
 
-Current home custom-widget types are defined in
+Current dashboard custom-widget types are defined in
 [`src/app/features/dashboard/stores/custom-cards-store.ts`](src/app/features/dashboard/stores/custom-cards-store.ts):
 
 - `rss`
@@ -83,6 +84,11 @@ Current home custom-widget types are defined in
 - `energy-now`
 - `button`
 - `map`
+
+The same store also persists special room sentinels for shared widget bands:
+
+- `__home__` for home overview widgets that belong to the `All` home canvas
+- `__energy__` for the energy section's custom-widget band
 
 ## Tech Stack
 
@@ -158,13 +164,16 @@ See [docs/technical/REACT_ZUSTAND.md](docs/technical/REACT_ZUSTAND.md) for the s
 | [`src/app/App.tsx`](src/app/App.tsx) | Root shell, auth split, HA bootstrap, DOM sync, and PWA wiring |
 | [`src/app/navigation/sections.ts`](src/app/navigation/sections.ts) | Section registry and URL/path helpers |
 | [`src/app/features/dashboard/components/dashboard-section-router.tsx`](src/app/features/dashboard/components/dashboard-section-router.tsx) | Top-level section router |
+| [`src/app/features/dashboard/components/home-dashboard-overview.tsx`](src/app/features/dashboard/components/home-dashboard-overview.tsx) | Home overview presentation/edit canvas |
 | [`src/app/features/dashboard/utils/card-renderer.tsx`](src/app/features/dashboard/utils/card-renderer.tsx) | Entity-card registry for the dashboard |
 | [`src/app/features/dashboard/stores/custom-cards-store.ts`](src/app/features/dashboard/stores/custom-cards-store.ts) | Custom-widget persistence and migration |
+| [`src/app/features/dashboard/zones/`](src/app/features/dashboard/zones/) | Zone defaults, zone resolution, and home overview grouping |
 | [`src/app/components/layout/device-section-layout.tsx`](src/app/components/layout/device-section-layout.tsx) | Shared shell for domain-specific entity sections |
 | [`src/app/components/shared/theme/`](src/app/components/shared/theme/) | Theme, surface, readable-text, and card-state helpers |
 | [`src/app/hooks/use-ha-devices.ts`](src/app/hooks/use-ha-devices.ts) | Home Assistant entity-to-device mapping |
 | [`src/app/storybook/story-frames.tsx`](src/app/storybook/story-frames.tsx) | Shared Storybook frame helpers |
 | [`src/app/storybook/story-docs.ts`](src/app/storybook/story-docs.ts) | Shared Storybook docs descriptions |
+| [`src/app/ui-kit/`](src/app/ui-kit/) | Canonical shared UI import surface for stories and shared consumers |
 
 ## Setup
 

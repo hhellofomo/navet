@@ -2,6 +2,7 @@ import { CalendarDays, Clock3, SlidersHorizontal } from 'lucide-react';
 import { memo } from 'react';
 import { AppReleaseBadge } from '@/app/components/shared/app-release-badge';
 import { NotificationPanel } from '@/app/features/notifications';
+import { useMediaQuery } from '@/app/hooks';
 import { HeaderDesktopActions } from './header-actions';
 import { HeaderSearchInput } from './header-search-input';
 import type { MobileHeaderEditActions } from './mobile-header-actions';
@@ -21,6 +22,7 @@ function HeaderView({
   mobileEditActions,
   mobileRoomNavigation,
 }: HeaderProps & { controller: HeaderController }) {
+  const isMobileViewport = useMediaQuery('(max-width: 767px)');
   const {
     activeColorValue,
     avatarUrl,
@@ -150,7 +152,7 @@ function HeaderView({
               hoverBg={hoverBg}
               isNotificationOpen={isNotificationOpen}
               mobileNotificationButtonRef={mobileNotificationButtonRef}
-              renderPanel={false}
+              renderPanel
               setIsNotificationOpen={setIsNotificationOpen}
               textSecondary={textSecondary}
               unreadCount={unreadCount}
@@ -159,11 +161,13 @@ function HeaderView({
         </div>
       </div>
 
-      <NotificationPanel
-        isOpen={isNotificationOpen}
-        onClose={closeNotifications}
-        triggerRefs={[mobileNotificationButtonRef, desktopNotificationButtonRef]}
-      />
+      {isMobileViewport ? (
+        <NotificationPanel
+          isOpen={isNotificationOpen}
+          onClose={closeNotifications}
+          triggerRefs={[mobileNotificationButtonRef, desktopNotificationButtonRef]}
+        />
+      ) : null}
       <MobileHeaderCommandSheet
         controller={controller}
         actions={mobileEditActions}

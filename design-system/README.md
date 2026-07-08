@@ -9,6 +9,7 @@ UI layer backed by:
 - authoring in `src/app/components/primitives/` and `src/app/components/patterns/`
 - curated exports and token stories in `src/app/components/system/`
 - canonical discovery stories in `src/app/ui-kit/`
+- canonical shared imports in `src/app/ui-kit/`
 - shared theme/surface decisions in `src/app/components/shared/theme/`
 - Storybook as the main visual review and docs surface
 
@@ -92,6 +93,16 @@ to become first-class design-system exports.
 Curated public exports and token-story surfaces for mature shared pieces.
 
 Use `system/` to expose or document stable shared UI. Do not author new components there by default.
+
+### `src/app/ui-kit/`
+
+Canonical shared import surface for Navet developers and Storybook examples.
+
+Use `ui-kit/` when:
+
+- examples or consumers need a stable import path for shared primitives, patterns, or tokens
+- you want to avoid importing directly from authoring folders in cross-feature code
+- you are documenting the intended public shared UI surface
 
 ### `src/app/components/layout/`
 

@@ -42,7 +42,14 @@ const meta = {
       options: ['small', 'medium', 'large'],
     },
   },
-  parameters: { docs: { description: {} } },
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Energy Now custom card. In dark theme, the outer shell should inherit the shared `BaseCard` inactive surface, while the accent remains inside the chart/content rather than tinting the whole card border/background.',
+      },
+    },
+  },
 } satisfies Meta<EnergyNowStoryArgs>;
 
 const richComponentDocsDescription = getStoryDocsDescription(meta.title);

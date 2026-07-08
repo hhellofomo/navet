@@ -12,7 +12,6 @@ function QuickNoteStoryPreview({ size }: QuickNoteStoryArgs) {
     <CustomWidgetStoryFrame
       card={buildCustomCard('note', size, {
         note: 'Remember to close the patio blinds at sunset.',
-        tintColor: '#f97316',
       })}
     />
   );
@@ -28,7 +27,14 @@ const meta = {
       options: ['small', 'medium', 'large'],
     },
   },
-  parameters: { docs: { description: {} } },
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Quick note custom card. In dark theme, the outer card shell should inherit the shared `BaseCard` inactive surface instead of adding a separate glossy/tinted surface layer.',
+      },
+    },
+  },
 } satisfies Meta<QuickNoteStoryArgs>;
 
 const richComponentDocsDescription = getStoryDocsDescription(meta.title);

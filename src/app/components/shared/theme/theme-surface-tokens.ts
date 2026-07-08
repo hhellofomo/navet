@@ -152,12 +152,9 @@ export function getThemeSurfaceTokens(
 
   return {
     appBg: 'bg-[#0a0a0a]',
-    shellPanel:
-      'bg-[linear-gradient(180deg,rgba(39,39,42,0.92),rgba(24,24,27,0.98)_38%,rgba(9,9,11,1)_100%)] border-[rgba(161,161,170,0.18)]',
-    panel:
-      'bg-[linear-gradient(180deg,rgba(39,39,42,0.94),rgba(24,24,27,0.98)_36%,rgba(9,9,11,1)_100%)]',
-    panelMuted:
-      'bg-[linear-gradient(180deg,rgba(39,39,42,0.96),rgba(24,24,27,0.98)_44%,rgba(9,9,11,1)_100%)]',
+    shellPanel: 'bg-[rgba(24,24,27,0.96)] border-[rgba(161,161,170,0.18)]',
+    panel: 'bg-[rgba(24,24,27,0.97)]',
+    panelMuted: 'bg-[rgba(18,18,21,0.98)]',
     border: 'border-[rgba(161,161,170,0.18)]',
     borderStrong: 'border-[rgba(161,161,170,0.24)]',
     divider: 'divide-[rgba(161,161,170,0.18)]',
@@ -165,10 +162,10 @@ export function getThemeSurfaceTokens(
     textSecondary: 'text-gray-300',
     textSubtle: 'text-zinc-300',
     textMuted: 'text-zinc-400',
-    iconBg: 'bg-zinc-800',
-    subtleBg: 'bg-zinc-900/88',
+    iconBg: 'bg-[rgba(39,39,42,0.94)]',
+    subtleBg: 'bg-[rgba(28,28,32,0.92)]',
     hoverBg: 'hover:bg-zinc-800/82',
-    inputBg: 'bg-zinc-900/92',
+    inputBg: 'bg-[rgba(28,28,32,0.94)]',
     placeholder: 'placeholder-gray-500',
     cardShadow: 'shadow-[0_26px_62px_-36px_rgba(0,0,0,0.78),inset_0_1px_0_rgba(255,255,255,0.04)]',
     lightOverlay: null,

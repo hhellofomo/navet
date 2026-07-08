@@ -23,7 +23,6 @@ import { CompactRoomSelector, CustomCardTintPicker } from '@/app/components/shar
 import {
   getCustomCardTintSurface,
   normalizeCustomCardTint,
-  withTintAlpha,
 } from '@/app/components/shared/theme/custom-card-tint-surface';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
@@ -379,11 +378,7 @@ export const BatteryOverviewWidget = memo(function BatteryOverviewWidget({
         size={size}
         fullBleed
         className="transition-all duration-500"
-        style={
-          tintSurface.panelStyle ?? {
-            borderColor: withTintAlpha(accentHex, theme === 'light' ? 0.2 : 0.28),
-          }
-        }
+        style={tintSurface.panelStyle}
         frameClassName="overflow-hidden"
         overlay={
           <>

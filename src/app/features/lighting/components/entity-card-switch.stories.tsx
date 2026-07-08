@@ -35,7 +35,14 @@ const meta = {
     voltage: 230,
     energy: 2.6,
   },
-  parameters: { docs: { description: {} } },
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Active and inactive switch-card states. Use the small active state to review accent border weight against other entity cards in dark theme.',
+      },
+    },
+  },
 } satisfies Meta<typeof SwitchCardStory>;
 
 const richComponentDocsDescription = getStoryDocsDescription(meta.title);
@@ -71,6 +78,13 @@ export const ExtraSmall: Story = {
 export const Small: Story = {
   args: {
     size: 'small',
+  },
+};
+
+export const InactiveSmall: Story = {
+  args: {
+    size: 'small',
+    initialState: false,
   },
 };
 

@@ -59,7 +59,7 @@ The code foundation now groups stable exports into three buckets:
 - `src/app/components/system/`
   - curated public export surface for Storybook navigation and cross-app discovery
 - `src/app/ui-kit/`
-  - canonical developer import surface for Navet UI
+  - canonical developer import surface that re-exports stable primitives, patterns, and tokens
 - `src/app/components/system/tokens/`
   - theme surface helpers, accent shell treatments, color helpers, and style calculators
 
