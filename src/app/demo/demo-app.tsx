@@ -1,6 +1,10 @@
 import { Bot, ClipboardList, Clock3, Play, Zap } from 'lucide-react';
 import type { ComponentType, CSSProperties, ReactNode } from 'react';
 import { useEffect, useState } from 'react';
+import demoEnergyImage from '@/../docs/marketing/assets/screenshots/navet-ipad-landscape-energy.jpg';
+import demoHomeImage from '@/../docs/marketing/assets/screenshots/navet-ipad-landscape-home.jpg';
+import demoSecurityImage from '@/../docs/marketing/assets/screenshots/navet-ipad-landscape-security.jpg';
+import demoMobileImage from '@/../docs/marketing/assets/screenshots/navet-mobile-pwa-home.jpg';
 import { RoomNav } from '@/app/components/layout/room-nav';
 import { DashboardEmptyState, DashboardHeroSection, SectionCard } from '@/app/components/patterns';
 import { Badge, Button, Panel, Switch, Tag } from '@/app/components/primitives';
@@ -205,6 +209,52 @@ const demoHomeWidgets: CustomCard[] = [
           name: 'BBC World',
           type: 'url',
           feedUrl: 'https://feeds.bbci.co.uk/news/world/rss.xml',
+          demoItems: [
+            {
+              id: 'demo-rss-1',
+              title: 'Energy dashboard highlights evening demand peak',
+              source: 'BBC World',
+              timeAgo: '12 min ago',
+              url: 'https://www.bbc.com/news',
+              excerpt:
+                'A practical view of home energy demand helps households shift flexible loads away from the evening peak.',
+              imageUrl: demoEnergyImage,
+              publishedAtMs: Date.UTC(2026, 4, 16, 18, 40),
+            },
+            {
+              id: 'demo-rss-2',
+              title: 'Smart home controls move toward calmer shared screens',
+              source: 'BBC World',
+              timeAgo: '28 min ago',
+              url: 'https://www.bbc.com/news',
+              excerpt:
+                'Dashboard-first interfaces are focusing on clarity, glanceability, and fewer interruptions for family spaces.',
+              imageUrl: demoHomeImage,
+              publishedAtMs: Date.UTC(2026, 4, 16, 18, 24),
+            },
+            {
+              id: 'demo-rss-3',
+              title: 'Weather systems bring cooler nights across southern Sweden',
+              source: 'BBC World',
+              timeAgo: '46 min ago',
+              url: 'https://www.bbc.com/weather',
+              excerpt:
+                'Forecasts show mild daytime conditions with cooler nights and a chance of showers later in the week.',
+              imageUrl: demoMobileImage,
+              publishedAtMs: Date.UTC(2026, 4, 16, 18, 6),
+            },
+            {
+              id: 'demo-rss-4',
+              title: 'Connected devices get renewed focus on local-first privacy',
+              source: 'BBC World',
+              timeAgo: '1 hr ago',
+              url: 'https://www.bbc.com/news/technology',
+              excerpt:
+                'More smart home products are adding local controls and clearer data boundaries for household automation.',
+              imageUrl: demoSecurityImage,
+              publishedAtMs: Date.UTC(2026, 4, 16, 17, 40),
+            },
+          ],
         },
       ],
       selectedProviderIds: ['bbc-world'],

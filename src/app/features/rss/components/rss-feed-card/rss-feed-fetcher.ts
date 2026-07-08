@@ -21,6 +21,10 @@ export async function fetchUrlProviderItems(
   fallbackRecentLabel: string,
   formatRelativeTime: (value: number, unit: Intl.RelativeTimeFormatUnit) => string
 ): Promise<RSSItem[]> {
+  if (provider.demoItems) {
+    return provider.demoItems;
+  }
+
   if (!provider.feedUrl) {
     return [];
   }

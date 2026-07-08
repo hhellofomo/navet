@@ -1,3 +1,4 @@
+import { getPublicAssetUrl } from '@/app/utils/public-assets';
 import type { DashboardArrivalRevealController } from './use-dashboard-arrival-reveal';
 
 interface BakingStageProps {
@@ -49,7 +50,7 @@ export function BakingStage({ controller }: BakingStageProps) {
                     : undefined,
               }}
             >
-              <img src="./logo.svg" alt="" className="h-24 w-24" />
+              <img src={getPublicAssetUrl('logo.svg')} alt="" className="h-24 w-24" />
             </div>
           </div>
           <p

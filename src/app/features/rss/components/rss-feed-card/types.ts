@@ -19,6 +19,7 @@ export interface RSSProvider {
   type: RSSProviderType;
   feedUrl?: string;
   entityId?: string;
+  demoItems?: RSSItem[];
 }
 
 export interface RSSCardData {

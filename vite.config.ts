@@ -329,8 +329,8 @@ export default defineConfig(({ mode }) => {
           name: 'Navet',
           short_name: 'Navet',
           description: 'A smart home dashboard built for calm, app-like control surfaces.',
-          start_url: '/',
-          scope: '/',
+          start_url: './',
+          scope: './',
           display: 'standalone',
           orientation: 'portrait-primary',
           background_color: '#0a0a0a',
@@ -338,19 +338,19 @@ export default defineConfig(({ mode }) => {
           categories: ['productivity', 'utilities', 'lifestyle'],
           icons: [
             {
-              src: '/pwa-192.png',
+              src: './pwa-192.png',
               sizes: '192x192',
               type: 'image/png',
               purpose: 'any maskable',
             },
             {
-              src: '/pwa-512.png',
+              src: './pwa-512.png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any maskable',
             },
             {
-              src: '/favicon.svg',
+              src: './favicon.svg',
               sizes: 'any',
               type: 'image/svg+xml',
               purpose: 'any',
@@ -358,7 +358,7 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
-          navigateFallback: '/index.html',
+          navigateFallback: './index.html',
           globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest}'],
         },
       })

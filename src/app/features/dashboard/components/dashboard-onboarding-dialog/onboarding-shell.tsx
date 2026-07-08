@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
+import { getPublicAssetUrl } from '@/app/utils/public-assets';
 import type { WizardStep } from './types';
 
 interface OnboardingShellProps {
@@ -73,7 +74,7 @@ export function OnboardingShell({
         />
         <div className="relative">
           <div className="mb-4 flex items-center sm:mb-5">
-            <img src="./logo.svg" alt="" className="h-10 w-10 sm:h-12 sm:w-12" />
+            <img src={getPublicAssetUrl('logo.svg')} alt="" className="h-10 w-10 sm:h-12 sm:w-12" />
           </div>
           <p
             className={`text-xs font-semibold uppercase tracking-[0.18em] sm:tracking-[0.24em] ${mutedColor}`}

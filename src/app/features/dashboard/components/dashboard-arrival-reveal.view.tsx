@@ -1,3 +1,4 @@
+import { getPublicAssetUrl } from '@/app/utils/public-assets';
 import { RevealBackground } from './dashboard-arrival-reveal-background';
 import { BakingStage } from './dashboard-arrival-reveal-baking-stage';
 import { RevealEffects } from './dashboard-arrival-reveal-effects';
@@ -85,7 +86,7 @@ export function DashboardArrivalRevealView({
           >
             <div className="relative flex h-24 w-24 items-center justify-center">
               <RevealEffects controller={controller} />
-              <img src="./logo.svg" alt="" className="relative z-10 h-24 w-24" />
+              <img src={getPublicAssetUrl('logo.svg')} alt="" className="relative z-10 h-24 w-24" />
             </div>
           </div>
           <div

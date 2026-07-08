@@ -18,6 +18,7 @@ import { getDashboardRoomLabel, isAllRooms } from '@/app/constants/rooms';
 import { useI18n, useMediaQuery, useTheme } from '@/app/hooks';
 import { useNavigationStore, useSettingsStore } from '@/app/stores';
 import { resolveEffectsQuality } from '@/app/utils/effects-quality';
+import { getPublicAssetUrl } from '@/app/utils/public-assets';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import type { MobileRoomNavigation } from './mobile-room-dropdown';
 import { getVisibleRoomNavRooms } from './room-nav.utils';
@@ -176,7 +177,7 @@ export const Sidebar = memo(function Sidebar({
         <div className="flex w-full justify-center safe-area-pt-5">
           <div className="flex h-10 w-10 items-center justify-center">
             <ImageWithFallback
-              src="/logo.svg"
+              src={getPublicAssetUrl('logo.svg')}
               alt={t('sidebar.brandLogoAlt')}
               className="h-10 w-10"
             />
