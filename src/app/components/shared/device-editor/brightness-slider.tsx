@@ -87,11 +87,12 @@ export const BrightnessSlider = memo(function BrightnessSlider({
         onValueChange={(val) => onChange(val[0])}
         onValueCommit={(val) => onCommit?.(val[0])}
         onClick={onClick}
+        onPointerDownCapture={(event) => event.stopPropagation()}
         min={1}
         max={100}
         step={1}
         disabled={disabled}
-        className={`relative flex items-center w-full select-none touch-pan-x ${heightClass}`}
+        className={`relative flex items-center w-full select-none touch-none ${heightClass}`}
       >
         <Slider.Track className={`relative grow rounded-full ${trackHeightClass} ${trackBg}`}>
           <Slider.Range
@@ -102,7 +103,7 @@ export const BrightnessSlider = memo(function BrightnessSlider({
           />
         </Slider.Track>
         <Slider.Thumb
-          className={`block ${thumbSizeClass} rounded-full shadow-lg focus:outline-none cursor-pointer touch-pan-x`}
+          className={`block ${thumbSizeClass} rounded-full shadow-lg focus:outline-none cursor-pointer touch-none`}
           style={{ backgroundColor: thumbBg, boxShadow: `0 0 0 2px ${thumbRing}` }}
         />
       </Slider.Root>
