@@ -17,7 +17,27 @@ import type {
   VacuumDevice,
   WeatherDevice,
 } from '../types/device.types';
-import { UNKNOWN_ROOM_LABEL } from '../utils/device-location';
+import {
+  brightnessToPercent,
+  formatCalendarTime,
+  formatClock,
+  formatDaylight,
+  formatEntityType,
+  formatMediaEntityType,
+  formatSensorValue,
+  getMetricLabel,
+  getName,
+  helperLabelForDomain,
+  inferCalendarEventType,
+  inferMetricIcon,
+  isAllDayCalendarValue,
+  normalizeKelvin,
+  normalizeMetric,
+  parseCalendarDate,
+  parseNumberish,
+  parseRoundedNumberish,
+  resolveEntityRoom,
+} from './ha-entity-utils';
 import { useHomeAssistant } from './use-home-assistant';
 
 type WeatherForecastEntry = Record<string, unknown>;
@@ -63,33 +83,35 @@ async function fetchWeatherForecast(
     return_response: true,
   })) as WeatherForecastServiceEnvelope;
 
-  const payload = response?.result?.response ? response.result : response;
-  const forecast = payload?.response?.[entityId]?.forecast;
-  return Array.isArray(forecast) ? forecast : [];
+  const payload = response.response ?? response.result?.response;
+  return payload?.[entityId]?.forecast ?? [];
 }
 
 async function fetchCalendarEvents(
   connection: Connection,
   entityId: string
 ): Promise<CalendarServiceEvent[]> {
+  const now = new Date();
+  const end = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
   const response = (await connection.sendMessagePromise({
     type: 'call_service',
     domain: 'calendar',
     service: 'get_events',
     target: { entity_id: entityId },
     service_data: {
-      duration: { hours: 744 },
+      start_date_time: now.toISOString(),
+      end_date_time: end.toISOString(),
     },
     return_response: true,
   })) as CalendarEventsServiceEnvelope;
 
-  const payload = response?.result?.response ? response.result : response;
-  const events = payload?.response?.[entityId]?.events;
-  return Array.isArray(events) ? events : [];
+  const payload = response.response ?? response.result?.response;
+  return payload?.[entityId]?.events ?? [];
 }
 
 /**
- * Maps Home Assistant entities to Navet device structure
+ * Maps raw Home Assistant entities to typed device collections.
  */
 export const useHADevices = (): DeviceCollection => {
   const areas = useHomeAssistant(homeAssistantSelectors.areas);
@@ -175,121 +197,6 @@ export const useHADevices = (): DeviceCollection => {
   }, [calendarEntityIds, connection]);
 
   return useMemo(() => {
-    const brightnessToPercent = (entityId: string, entity: HassEntity): number => {
-      const brightnessPct = entity.attributes?.brightness_pct;
-      if (typeof brightnessPct === 'number' && !Number.isNaN(brightnessPct)) {
-        return Math.max(0, Math.min(100, Math.round(brightnessPct)));
-      }
-
-      const brightness = entity.attributes?.brightness;
-      if (typeof brightness === 'number' && !Number.isNaN(brightness)) {
-        return Math.max(0, Math.min(100, Math.round((brightness / 255) * 100)));
-      }
-
-      if (typeof brightnessPct === 'string') {
-        const parsedBrightnessPct = Number.parseFloat(brightnessPct);
-        if (!Number.isNaN(parsedBrightnessPct)) {
-          return Math.max(0, Math.min(100, Math.round(parsedBrightnessPct)));
-        }
-      }
-
-      if (typeof brightness === 'string') {
-        const parsedBrightness = Number.parseFloat(brightness);
-        if (!Number.isNaN(parsedBrightness)) {
-          return Math.max(0, Math.min(100, Math.round((parsedBrightness / 255) * 100)));
-        }
-      }
-
-      if (import.meta.env.DEV && entity.state === 'on') {
-        console.debug('[Navet] Light missing brightness attributes', {
-          entityId,
-          attributes: entity.attributes,
-        });
-      }
-
-      // Some integrations expose on/off without a brightness attribute.
-      return entity.state === 'on' ? 100 : 0;
-    };
-
-    const normalizeKelvin = (entity: HassEntity): number => {
-      const kelvin = entity.attributes?.color_temp_kelvin;
-      if (typeof kelvin === 'number' && !Number.isNaN(kelvin)) {
-        return Math.round(kelvin);
-      }
-
-      const mired = entity.attributes?.color_temp;
-      if (typeof mired === 'number' && mired > 0) {
-        return Math.round(1000000 / mired);
-      }
-
-      return 4000;
-    };
-
-    const parseNumberish = (value: unknown): number | null => {
-      if (typeof value === 'number' && !Number.isNaN(value)) {
-        return value;
-      }
-
-      if (typeof value === 'string') {
-        const parsed = Number.parseFloat(value);
-        if (!Number.isNaN(parsed)) {
-          return parsed;
-        }
-      }
-
-      return null;
-    };
-
-    const parseRoundedNumberish = (value: unknown): number | null => {
-      const parsed = parseNumberish(value);
-      return parsed === null ? null : Math.round(parsed);
-    };
-
-    const toWatts = (value: number, unit: unknown): number => {
-      if (typeof unit !== 'string') {
-        return value;
-      }
-
-      switch (unit.toLowerCase()) {
-        case 'kw':
-          return value * 1000;
-        case 'mw':
-          return value * 1000000;
-        default:
-          return value;
-      }
-    };
-
-    const toVolts = (value: number, unit: unknown): number => {
-      if (typeof unit !== 'string') {
-        return value;
-      }
-
-      switch (unit.toLowerCase()) {
-        case 'mv':
-          return value / 1000;
-        case 'kv':
-          return value * 1000;
-        default:
-          return value;
-      }
-    };
-
-    const toKilowattHours = (value: number, unit: unknown): number => {
-      if (typeof unit !== 'string') {
-        return value;
-      }
-
-      switch (unit.toLowerCase()) {
-        case 'wh':
-          return value / 1000;
-        case 'mwh':
-          return value * 1000;
-        default:
-          return value;
-      }
-    };
-
     if (!entities) {
       return {
         lights: [],
@@ -332,362 +239,10 @@ export const useHADevices = (): DeviceCollection => {
     const deviceRegistryMap = new Map(deviceRegistry.map((device) => [device.id, device]));
     const switchMetricsByDeviceId = new Map<string, DeviceMetric[]>();
 
-    // Resolve room from Home Assistant registries first, then fall back to entity attributes.
-    const getRoom = (entityId: string, entity: HassEntity): string => {
-      const entityEntry = entityRegistryMap.get(entityId);
-      const deviceEntry = entityEntry?.device_id
-        ? deviceRegistryMap.get(entityEntry.device_id)
-        : undefined;
-      const areaId = entityEntry?.area_id ?? deviceEntry?.area_id;
+    const getRoom = (entityId: string, entity: HassEntity) =>
+      resolveEntityRoom(entityId, entity, areaMap, entityRegistryMap, deviceRegistryMap);
 
-      if (areaId) {
-        const areaName = areaMap.get(areaId);
-        if (areaName) {
-          return areaName;
-        }
-      }
-
-      return (
-        entity.attributes?.room ||
-        entity.attributes?.area ||
-        entity.attributes?.zone ||
-        UNKNOWN_ROOM_LABEL
-      );
-    };
-
-    // Helper function to get friendly name or entity id
-    const getName = (entity: HassEntity): string => {
-      return entity.attributes?.friendly_name || entity.entity_id;
-    };
-
-    const formatClock = (value: unknown): string => {
-      if (typeof value !== 'string' || !value) {
-        return '--';
-      }
-
-      const date = new Date(value);
-      if (Number.isNaN(date.getTime())) {
-        return value;
-      }
-
-      return new Intl.DateTimeFormat(locale, {
-        hour: 'numeric',
-        minute: '2-digit',
-      }).format(date);
-    };
-
-    const formatDaylight = (sunrise: unknown, sunset: unknown): string => {
-      if (typeof sunrise !== 'string' || typeof sunset !== 'string') {
-        return '--';
-      }
-
-      const sunriseDate = new Date(sunrise);
-      const sunsetDate = new Date(sunset);
-      if (Number.isNaN(sunriseDate.getTime()) || Number.isNaN(sunsetDate.getTime())) {
-        return '--';
-      }
-
-      const diffMs = Math.max(0, sunsetDate.getTime() - sunriseDate.getTime());
-      const hours = Math.floor(diffMs / 3_600_000);
-      const minutes = Math.round((diffMs % 3_600_000) / 60_000);
-      return `${hours} h ${minutes} m`;
-    };
-
-    const parseCalendarDate = (value: unknown): Date | null => {
-      if (typeof value === 'string' && value) {
-        const parsed = new Date(value);
-        return Number.isNaN(parsed.getTime()) ? null : parsed;
-      }
-
-      if (value && typeof value === 'object') {
-        const record = value as Record<string, unknown>;
-        const raw = record.dateTime ?? record.date;
-        if (typeof raw === 'string' && raw) {
-          const parsed = new Date(raw);
-          return Number.isNaN(parsed.getTime()) ? null : parsed;
-        }
-      }
-
-      return null;
-    };
-
-    const isAllDayCalendarValue = (value: unknown): boolean => {
-      if (typeof value === 'string' && value) {
-        return /^\d{4}-\d{2}-\d{2}$/.test(value);
-      }
-
-      if (value && typeof value === 'object') {
-        const record = value as Record<string, unknown>;
-        return typeof record.date === 'string' && record.date.length > 0;
-      }
-
-      return false;
-    };
-
-    const formatCalendarTime = (date: Date | null): string => {
-      if (!date) {
-        return '--';
-      }
-
-      return new Intl.DateTimeFormat(locale, {
-        hour: 'numeric',
-        minute: '2-digit',
-      }).format(date);
-    };
-
-    const inferCalendarEventType = (title: string, location?: string) => {
-      const searchText = `${title} ${location ?? ''}`.toLowerCase();
-
-      if (
-        searchText.includes('zoom') ||
-        searchText.includes('meet') ||
-        searchText.includes('teams') ||
-        searchText.includes('call') ||
-        searchText.includes('video')
-      ) {
-        return 'call' as const;
-      }
-
-      if (
-        searchText.includes('meeting') ||
-        searchText.includes('standup') ||
-        searchText.includes('review') ||
-        searchText.includes('sync')
-      ) {
-        return 'meeting' as const;
-      }
-
-      return 'event' as const;
-    };
-
-    const inferMetricIcon = (
-      deviceClass: string | null,
-      searchText: string,
-      unit: unknown
-    ): DeviceMetric['icon'] => {
-      const normalizedUnit = typeof unit === 'string' ? unit.toLowerCase() : '';
-      const normalizedSearch = searchText.toLowerCase();
-
-      if (
-        deviceClass === 'motion' ||
-        deviceClass === 'occupancy' ||
-        normalizedSearch.includes('motion') ||
-        normalizedSearch.includes('occupancy') ||
-        normalizedSearch.includes('presence') ||
-        normalizedSearch.includes('pir')
-      ) {
-        return 'motion';
-      }
-
-      if (
-        deviceClass === 'power' ||
-        normalizedSearch.includes('power') ||
-        normalizedSearch.includes('watt') ||
-        normalizedSearch.includes('consumption') ||
-        normalizedUnit === 'w' ||
-        normalizedUnit === 'kw' ||
-        normalizedUnit === 'mw'
-      ) {
-        return 'zap';
-      }
-
-      if (
-        deviceClass === 'voltage' ||
-        normalizedSearch.includes('voltage') ||
-        normalizedUnit === 'v' ||
-        normalizedUnit === 'mv' ||
-        normalizedUnit === 'kv'
-      ) {
-        return 'gauge';
-      }
-
-      if (
-        deviceClass === 'temperature' ||
-        normalizedSearch.includes('temperature') ||
-        normalizedSearch.includes('temp') ||
-        normalizedUnit.includes('c') ||
-        normalizedUnit.includes('f')
-      ) {
-        return 'thermometer';
-      }
-
-      if (
-        deviceClass === 'humidity' ||
-        normalizedSearch.includes('humidity') ||
-        normalizedUnit === '%'
-      ) {
-        return 'droplets';
-      }
-
-      if (
-        deviceClass === 'current' ||
-        deviceClass === 'energy' ||
-        normalizedSearch.includes('current') ||
-        normalizedSearch.includes('amp') ||
-        normalizedSearch.includes('energy') ||
-        normalizedUnit === 'a' ||
-        normalizedUnit === 'ma' ||
-        normalizedUnit === 'wh' ||
-        normalizedUnit === 'kwh' ||
-        normalizedUnit === 'mwh'
-      ) {
-        return 'activity';
-      }
-
-      return 'activity';
-    };
-
-    const getMetricLabel = (entityId: string, entity: HassEntity): string => {
-      const friendlyName =
-        typeof entity.attributes?.friendly_name === 'string'
-          ? entity.attributes.friendly_name.trim()
-          : '';
-      if (friendlyName) {
-        return friendlyName;
-      }
-
-      return (
-        entityId
-          .split('.')
-          .slice(-1)[0]
-          ?.replace(/_/g, ' ')
-          .replace(/\b\w/g, (char: string) => char.toUpperCase()) ?? entityId
-      );
-    };
-
-    const formatEntityType = (deviceClass: unknown, fallback: string): string => {
-      if (typeof deviceClass === 'string' && deviceClass.trim()) {
-        const normalized = deviceClass.trim().toLowerCase();
-
-        if (normalized === 'outlet') {
-          return t('lighting.type.outlet');
-        }
-
-        if (normalized === 'switch') {
-          return t('lighting.type.switch');
-        }
-
-        return deviceClass
-          .trim()
-          .replace(/_/g, ' ')
-          .replace(/\b\w/g, (char) => char.toUpperCase());
-      }
-
-      return fallback;
-    };
-
-    const formatMediaEntityType = (deviceClass: unknown): string => {
-      if (typeof deviceClass !== 'string' || !deviceClass.trim()) {
-        return t('media.type.player');
-      }
-
-      const normalized = deviceClass.trim().toLowerCase();
-
-      switch (normalized) {
-        case 'tv':
-        case 'television':
-          return t('media.type.tv');
-        case 'speaker':
-          return t('media.type.speaker');
-        case 'receiver':
-          return t('media.type.receiver');
-        case 'set_top_box':
-          return t('media.type.setTopBox');
-        case 'streaming_box':
-          return t('media.type.streamingBox');
-        case 'soundbar':
-          return t('media.type.soundbar');
-        default:
-          return deviceClass
-            .trim()
-            .replace(/_/g, ' ')
-            .replace(/\b\w/g, (char) => char.toUpperCase());
-      }
-    };
-
-    const normalizeMetric = (
-      deviceClass: string | null,
-      friendlyName: string,
-      rawValue: number,
-      unit: unknown
-    ): { label: string; unit: string; value: number } | null => {
-      if (
-        deviceClass === 'power' ||
-        friendlyName.includes('power') ||
-        unit === 'W' ||
-        unit === 'kW' ||
-        unit === 'MW'
-      ) {
-        return { label: 'Power', value: toWatts(rawValue, unit), unit: 'W' };
-      }
-
-      if (
-        deviceClass === 'voltage' ||
-        friendlyName.includes('voltage') ||
-        unit === 'V' ||
-        unit === 'mV' ||
-        unit === 'kV'
-      ) {
-        return { label: 'Voltage', value: toVolts(rawValue, unit), unit: 'V' };
-      }
-
-      if (
-        deviceClass === 'energy' ||
-        friendlyName.includes('energy') ||
-        unit === 'Wh' ||
-        unit === 'kWh' ||
-        unit === 'MWh'
-      ) {
-        return { label: 'Energy', value: toKilowattHours(rawValue, unit), unit: 'kWh' };
-      }
-
-      return null;
-    };
-
-    const formatSensorValue = (entity: HassEntity): { value: string; unit: string } | null => {
-      const unit =
-        typeof entity.attributes?.unit_of_measurement === 'string'
-          ? entity.attributes.unit_of_measurement
-          : typeof entity.attributes?.native_unit_of_measurement === 'string'
-            ? entity.attributes.native_unit_of_measurement
-            : '';
-
-      const candidate =
-        typeof entity.state === 'string' && entity.state.length > 0
-          ? entity.state
-          : typeof entity.attributes?.native_value === 'string' ||
-              typeof entity.attributes?.native_value === 'number'
-            ? String(entity.attributes.native_value)
-            : typeof entity.attributes?.value === 'string' ||
-                typeof entity.attributes?.value === 'number'
-              ? String(entity.attributes.value)
-              : '';
-
-      if (!candidate) {
-        return null;
-      }
-
-      return { value: candidate, unit };
-    };
-
-    const helperLabelForDomain = (domain: string): string => {
-      switch (domain) {
-        case 'script':
-          return t('deviceType.script');
-        case 'input_boolean':
-          return t('deviceType.helper');
-        case 'input_number':
-        case 'input_select':
-        case 'input_text':
-        case 'input_datetime':
-        case 'button':
-        case 'input_button':
-          return t('deviceType.helper');
-        default:
-          return t('deviceType.sensor');
-      }
-    };
-
+    // Pre-pass: collect power/config metrics for switch devices
     Object.entries(entities).forEach(([entityId, entity]) => {
       const domain = entityId.split('.')[0];
       if (domain === 'sensor') {
@@ -821,7 +376,8 @@ export const useHADevices = (): DeviceCollection => {
             state: entity.state === 'on',
             entityType: formatEntityType(
               entity.attributes?.device_class,
-              t('lighting.type.switch')
+              t('lighting.type.switch'),
+              t
             ),
             power:
               parseNumberish(entity.attributes?.power) ??
@@ -847,7 +403,7 @@ export const useHADevices = (): DeviceCollection => {
             room,
             size: 'small',
             state: entity.state === 'on',
-            entityType: helperLabelForDomain(domain),
+            entityType: helperLabelForDomain(domain, t),
             serviceDomain: 'input_boolean',
           });
           break;
@@ -859,7 +415,7 @@ export const useHADevices = (): DeviceCollection => {
             room,
             size: 'small',
             state: entity.state === 'on',
-            entityType: helperLabelForDomain(domain),
+            entityType: helperLabelForDomain(domain, t),
             serviceDomain: 'script',
             serviceAction: 'turn_on',
           });
@@ -873,7 +429,7 @@ export const useHADevices = (): DeviceCollection => {
             room,
             size: 'small',
             state: false,
-            entityType: helperLabelForDomain(domain),
+            entityType: helperLabelForDomain(domain, t),
             serviceDomain: domain,
             serviceAction: 'press',
           });
@@ -901,7 +457,7 @@ export const useHADevices = (): DeviceCollection => {
           break;
 
         case 'media_player': {
-          const mediaEntityType = formatMediaEntityType(entity.attributes?.device_class);
+          const mediaEntityType = formatMediaEntityType(entity.attributes?.device_class, t);
           const entityPicture =
             (typeof entity.attributes?.entity_picture === 'string' &&
               entity.attributes.entity_picture) ||
@@ -1036,7 +592,7 @@ export const useHADevices = (): DeviceCollection => {
           const entityType =
             domain === 'sensor' || domain === 'binary_sensor'
               ? t('deviceType.sensor')
-              : helperLabelForDomain(domain);
+              : helperLabelForDomain(domain, t);
           const icon =
             domain === 'sensor' || domain === 'binary_sensor'
               ? inferMetricIcon(
@@ -1168,9 +724,9 @@ export const useHADevices = (): DeviceCollection => {
                   (typeof eventRecord.id === 'string' && eventRecord.id) ||
                   `${entityId}-${index}`,
                 title,
-                startTime: formatCalendarTime(startDate),
-                endTime: formatCalendarTime(endDate),
-                timeDisplay: formatCalendarTime(startDate),
+                startTime: formatCalendarTime(startDate, locale),
+                endTime: formatCalendarTime(endDate, locale),
+                timeDisplay: formatCalendarTime(startDate, locale),
                 isAllDay,
                 location,
                 description,
@@ -1272,8 +828,8 @@ export const useHADevices = (): DeviceCollection => {
               parseNumberish(entity.attributes?.precipitation_probability) ??
               parseNumberish(entity.attributes?.precipitation) ??
               0,
-            sunrise: formatClock(sunriseSource),
-            sunset: formatClock(sunsetSource),
+            sunrise: formatClock(sunriseSource, locale),
+            sunset: formatClock(sunsetSource, locale),
             daylight: formatDaylight(sunriseSource, sunsetSource),
             rainForecast:
               forecastSource[1] &&

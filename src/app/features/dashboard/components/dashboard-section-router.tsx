@@ -2,13 +2,6 @@ import { closestCenter, DndContext } from '@dnd-kit/core';
 import { Lightbulb } from 'lucide-react';
 import { lazy, type ReactNode, Suspense } from 'react';
 import { RoomNav } from '@/app/components/layout/room-nav';
-import {
-  LocksSection,
-  MediaSection,
-  MockEntitiesSection,
-  SecuritySection,
-  TasksSection,
-} from '@/app/components/layout/sections';
 import { EmptyState } from '@/app/components/shared/empty-state';
 import { LoadingSpinner } from '@/app/components/shared/loading-spinner';
 import { RenderProfiler } from '@/app/components/shared/render-profiler';
@@ -18,6 +11,15 @@ import { DeviceGrid } from '../device-grid';
 import type { DashboardController } from '../hooks/use-dashboard-controller';
 import { DashboardLayout } from '../shell';
 
+const lazySections = () => import('@/app/components/layout/sections');
+
+const SecuritySection = lazy(() => lazySections().then((m) => ({ default: m.SecuritySection })));
+const TasksSection = lazy(() => lazySections().then((m) => ({ default: m.TasksSection })));
+const LocksSection = lazy(() => lazySections().then((m) => ({ default: m.LocksSection })));
+const MediaSection = lazy(() => lazySections().then((m) => ({ default: m.MediaSection })));
+const MockEntitiesSection = lazy(() =>
+  lazySections().then((m) => ({ default: m.MockEntitiesSection }))
+);
 const SettingsSection = lazy(async () => {
   const module = await import('@/app/features/settings');
   return { default: module.SettingsSection };
@@ -66,11 +68,23 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
   let sectionContent: ReactNode;
 
   if (activeSection === 'security') {
-    sectionContent = <SecuritySection />;
+    sectionContent = (
+      <Suspense fallback={<LoadingSpinner />}>
+        <SecuritySection />
+      </Suspense>
+    );
   } else if (activeSection === 'tasks') {
-    sectionContent = <TasksSection />;
+    sectionContent = (
+      <Suspense fallback={<LoadingSpinner />}>
+        <TasksSection />
+      </Suspense>
+    );
   } else if (activeSection === 'locks') {
-    sectionContent = <LocksSection />;
+    sectionContent = (
+      <Suspense fallback={<LoadingSpinner />}>
+        <LocksSection />
+      </Suspense>
+    );
   } else if (activeSection === 'lights') {
     sectionContent = (
       <div {...sectionStackProps}>
@@ -103,9 +117,17 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
       </div>
     );
   } else if (activeSection === 'media') {
-    sectionContent = <MediaSection />;
+    sectionContent = (
+      <Suspense fallback={<LoadingSpinner />}>
+        <MediaSection />
+      </Suspense>
+    );
   } else if (activeSection === 'mock') {
-    sectionContent = <MockEntitiesSection />;
+    sectionContent = (
+      <Suspense fallback={<LoadingSpinner />}>
+        <MockEntitiesSection />
+      </Suspense>
+    );
   } else if (activeSection === 'settings') {
     sectionContent = (
       <Suspense fallback={<LoadingSpinner message={t('dashboard.shell.loadingSettings')} />}>

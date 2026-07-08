@@ -5,6 +5,7 @@ interface DashboardEntitiesState {
   hiddenEntityIds: string[];
   onboardingCompleted: boolean;
   completeOnboarding: (entityIds: string[], startBlank: boolean) => void;
+  markOnboardingCompleted: () => void;
   hideEntity: (entityId: string) => void;
   showEntity: (entityId: string) => void;
   showAllEntities: () => void;
@@ -22,6 +23,7 @@ export const useDashboardEntitiesStore = create<DashboardEntitiesState>()(
           hiddenEntityIds: startBlank ? entityIds : [],
           onboardingCompleted: true,
         }),
+      markOnboardingCompleted: () => set({ onboardingCompleted: true }),
       hideEntity: (entityId) =>
         set((state) => ({
           hiddenEntityIds: state.hiddenEntityIds.includes(entityId)
@@ -48,9 +50,7 @@ export const useDashboardEntitiesStore = create<DashboardEntitiesState>()(
         const onboardingCompleted =
           typeof persisted.onboardingCompleted === 'boolean'
             ? persisted.onboardingCompleted
-            : typeof persisted.mode === 'string' ||
-              Array.isArray(persisted.manualEntityIds) ||
-              hiddenEntityIds.length > 0;
+            : hiddenEntityIds.length > 0;
 
         return {
           ...currentState,

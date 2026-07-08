@@ -24,8 +24,8 @@ App Container
 
 ### Container Widths
 ```css
-Sidebar: 16rem (256px) - Fixed width on desktop
-Main Content: calc(100vw - 16rem) - Desktop
+Sidebar: 4rem (64px) - Fixed width on desktop
+Main Content: calc(100vw - 4rem) - Desktop
 Main Content: 100vw - Mobile (sidebar hidden)
 ```
 
@@ -42,20 +42,20 @@ Vertical: py-6 (24px)
 
 ### Structure
 ```tsx
-<aside className="fixed left-0 top-0 h-screen w-64 bg-black/40 backdrop-blur-xl border-r border-gray-800">
-  {/* Logo/Header */}
-  <div className="p-6">
-    <h2>Home Assistant</h2>
+<aside className="fixed left-0 top-0 h-full w-16 ...">
+  {/* Logo at top */}
+  <div className="...">
+    <NavetLogo />
   </div>
-  
-  {/* Navigation Items */}
-  <nav className="px-4 py-6 space-y-2">
-    {/* Nav Items */}
+
+  {/* Icon-only navigation stack */}
+  <nav className="...">
+    {/* Each item: icon button with tooltip, no visible label */}
   </nav>
-  
-  {/* Bottom Section */}
-  <div className="absolute bottom-0 w-full p-4">
-    {/* Settings, Profile, etc. */}
+
+  {/* Settings / user icon at bottom */}
+  <div className="absolute bottom-0 w-full ...">
+    {/* Settings icon */}
   </div>
 </aside>
 ```
@@ -66,10 +66,13 @@ Vertical: py-6 (24px)
 - **Mobile (< 768px)**: Hidden, accessible via hamburger menu
 
 ### Navigation Item Pattern
+
+Icon-only — no visible text labels in the sidebar. Each item is a square button centered in the
+64px column. Active state uses the primary color at 20% opacity.
+
 ```tsx
-<button className="w-full px-4 py-3 rounded-xl hover:bg-white/10 transition-colors">
+<button className="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-white/10 transition-colors">
   <Icon className="w-5 h-5" />
-  <span>Label</span>
 </button>
 ```
 
@@ -515,11 +518,12 @@ Consider disabling on low-end devices
 ## Future Layout Considerations
 
 ### Potential Enhancements
-1. **Drag & Drop**: Reorder cards and rooms in edit mode
-2. **Custom Layouts**: Save different layout configurations
-3. **Multi-Room View**: Grid view of multiple rooms simultaneously
-4. **Compact Mode**: Higher density layout option
-5. **Dashboard Templates**: Pre-configured layouts for common setups
+1. **Custom Layouts**: Save different layout configurations
+2. **Multi-Room View**: Grid view of multiple rooms simultaneously
+3. **Compact Mode**: Higher density layout option
+4. **Dashboard Templates**: Pre-configured layouts for common setups
+
+> Note: Drag & drop reordering of cards and rooms is already implemented via `@dnd-kit`.
 
 ### Scalability
 - Support for 100+ devices per room

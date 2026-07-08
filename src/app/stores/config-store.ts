@@ -1,0 +1,74 @@
+import { create } from 'zustand';
+import { STORAGE_KEYS } from '../constants/storage-keys';
+import {
+  clearStoredSessionConfig,
+  normalizeSessionConfig,
+  readInitialSessionConfig,
+  type SessionConfig,
+  writeStoredSessionConfig,
+} from '../session/session';
+
+export type HAConfig = SessionConfig;
+
+interface ConfigState {
+  config: HAConfig | null;
+  isConfigured: boolean;
+  saveConfig: (config: HAConfig) => Promise<boolean>;
+  testConnection: (url: string, token: string) => Promise<boolean>;
+  clearConfig: () => void;
+}
+
+const initialConfig = (() => {
+  try {
+    return readInitialSessionConfig(STORAGE_KEYS.haConfig);
+  } catch {
+    return null;
+  }
+})();
+
+export const useConfigStore = create<ConfigState>()((set) => ({
+  config: initialConfig,
+  isConfigured: initialConfig !== null,
+
+  testConnection: async (url: string, token: string): Promise<boolean> => {
+    try {
+      const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url;
+      try {
+        new URL(cleanUrl);
+      } catch {
+        return false;
+      }
+      const response = await fetch(`${cleanUrl}/api/`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        mode: 'cors',
+      });
+      return response.ok;
+    } catch {
+      return false;
+    }
+  },
+
+  saveConfig: async (newConfig: HAConfig): Promise<boolean> => {
+    try {
+      const configToSave = normalizeSessionConfig(newConfig);
+      set({ config: configToSave, isConfigured: true });
+      writeStoredSessionConfig(STORAGE_KEYS.haConfig, configToSave);
+      return true;
+    } catch {
+      return false;
+    }
+  },
+
+  clearConfig: () => {
+    set({ config: null, isConfigured: false });
+    clearStoredSessionConfig(STORAGE_KEYS.haConfig);
+  },
+}));
+
+export function useConfig() {
+  return useConfigStore();
+}

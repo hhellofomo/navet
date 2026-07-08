@@ -430,26 +430,27 @@ If this dashboard were a person:
 
 ## Design Evolution Path
 
-### Current State (v1.4)
+### Current State (v1.5)
 ✅ Core card types
 ✅ Glass morphism aesthetic
 ✅ Adaptive sizing
 ✅ Room-based filtering
 ✅ Edit mode
-✅ Authentication system
+✅ Authentication system (Zustand store)
 ✅ User management with dropdown
 ✅ Theme customization (4 modes)
 ✅ Primary color selection (built-in accents + custom accent)
 ✅ Section-based navigation
 ✅ Settings page
 ✅ Empty states for all sections
+✅ Drag & drop card and room reordering
+✅ Export/import dashboard YAML config
+✅ PWA installation
 
-### Near Future (v1.5)
-🎯 Drag & drop reordering
+### Near Future
 🎯 Animation polish
 🎯 Haptic feedback
 🎯 Additional theme refinements
-🎯 User preferences storage
 
 ### Long Term Vision (v2.0)
 🔮 AI-powered layouts

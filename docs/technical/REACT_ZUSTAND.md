@@ -4,79 +4,140 @@ Current state-management guidance for Navet.
 
 ## Summary
 
-Navet uses a mixed model on purpose:
+Navet uses **Zustand exclusively** for all shared client state. React Context is reserved only
+for cross-cutting infrastructure concerns that have no reactive state of their own (i18n provider,
+error boundary, loading orchestration). Auth and config are Zustand stores.
 
-- Zustand for shared client state that many features read and update frequently
-- React context for app-shell concerns with lifecycle or boundary behavior
-- Direct hook modules as the public API for most shared state access
+---
 
-## Current Pattern
+## State Layer Ownership
 
-### Use Zustand for shared UI state
+### Zustand stores (`src/app/stores/`)
 
-Use Zustand-backed hooks for domains such as:
+All shared, reactive state lives here. Stores self-initialize — no provider wrappers needed.
 
-- theme and primary color
-- navigation section state
-- search query state
-- edit mode
-- dashboard card layout and ordering
-- feature-specific persistent UI state such as light presets
+| Store | Responsibility |
+|---|---|
+| `auth-store` | `isAuthenticated`, `config`, `login`, `logout` |
+| `config-store` | HA connection config, `testConnection`, `saveConfig` |
+| `home-assistant-store` | WebSocket connection state, entities, registries |
+| `settings-store` | User preferences (persisted) |
+| `theme-store` | Theme mode, accent color, wallpaper (persisted) |
+| `navigation-store` | Active section, current room (persisted via Zustand persist) |
+| `edit-mode-store` | Dashboard edit mode toggle |
+| `search-store` | Search query and filtered device ids |
 
-These domains should expose direct hook APIs rather than provider wrappers.
+### React Context (`src/app/contexts/`)
 
-### Use React context for shell domains
+Only used for providers that have no reactive state:
 
-Keep React context for:
+- `I18nProvider` — locale loading and translation function
+- `LoadingProvider` — global loading overlay
+- `ErrorProvider` — error boundary
 
-- authentication
-- runtime config / bootstrap config
-- loading orchestration
-- error boundaries and error reporting
+`AuthProvider` and `ConfigProvider` still exist as identity pass-throughs to preserve import
+compatibility. They contain no state — all logic is in the stores.
 
-These areas involve side effects, startup flow, or service-like behavior where explicit providers are still useful.
+---
 
 ## Rules
 
-### Prefer hook modules over context-like import paths
+### All shared state goes in Zustand
 
-Use:
+Do not introduce new React Context for state that drives rendering. If many components need to
+read or write the same value, put it in a store.
 
-- `@/app/hooks/use-theme`
-- `@/app/hooks/use-navigation`
-- `@/app/hooks/use-search`
-- `@/app/hooks/use-home-assistant`
+### Expose stores through hook modules
 
-Avoid reintroducing passthrough provider wrappers for Zustand-backed state.
+Stores should be consumed via hook wrappers (`useAuth`, `useConfig`, `useHomeAssistant`, etc.)
+rather than imported and called directly with `useXyzStore(selector)` outside of `src/app/hooks/`
+and `src/app/stores/`.
 
-### Keep one source of truth
+### Prefer typed selectors
 
-- Do not maintain the same domain in both context and Zustand
-- Do not duplicate persistence logic across feature hooks if a shared helper already exists
-- Prefer shared utilities for theme color lookup, device room resolution, and storage key definitions
+Use selectors from `src/app/stores/selectors.ts` to subscribe to the minimum slice of state
+needed. Avoid subscribing to the full store object — this re-renders on every state change.
 
-### Persistence
+```ts
+// Good — re-renders only when connected changes
+const connected = useHomeAssistant(homeAssistantSelectors.connected);
 
-- Use shared storage helpers and shared storage keys
-- Prefer Zustand `persist` or a single storage helper path for any domain you add
-- Avoid raw `localStorage` access in scattered feature files unless there is a clear one-off reason
+// Good — one subscription for a group of related display settings
+const { disableAnimations, effectsQuality, pageZoom } = useSettingsStore(
+  settingsSelectors.displaySettings
+);
+
+// Avoid — re-renders on every store change
+const store = useHomeAssistant();
+```
+
+### One source of truth
+
+- Do not maintain the same domain in both a store and local component state
+- Do not duplicate persistence logic — use `createJSONStorage(() => localStorage)` inside
+  the store's `persist` middleware, not raw `window.localStorage` access
+- Stores own their own localStorage keys; feature components do not call `storage.set` directly
+  for store-owned domains
+
+### Persistence pattern
+
+Use Zustand `persist` middleware for any store that needs to survive a page reload:
+
+```ts
+export const useMyStore = create<MyState>()(
+  persist(
+    (set) => ({ ... }),
+    {
+      name: 'navet-my-key',
+      storage: createJSONStorage(() => localStorage),
+      merge: (persisted, current) => {
+        // Validate and normalize persisted values before rehydrating
+        return { ...current, ...sanitized };
+      },
+    }
+  )
+);
+```
+
+Never use the manual `subscribe` + `localStorage.setItem` pattern.
+
+---
+
+## Service → Store event flow
+
+`HomeAssistantService` emits typed events: `'entities' | 'config' | 'registries' | 'connection'`.
+
+The store subscribes via `addListener(event => ...)` and updates **only the affected slice**:
+
+```
+service emits 'entities'  →  store sets { entities }
+service emits 'config'    →  store sets { config }
+service emits 'registries'→  store sets { areas, deviceRegistry, entityRegistry }
+service emits 'connection'→  store sets { connected, connection, connecting }
+```
+
+Do not add a generic "re-sync everything" listener. Each event type should produce a
+minimal, targeted `set()` call.
+
+---
 
 ## Decision Guide
 
-Choose Zustand when:
+| Scenario | Use |
+|---|---|
+| State read by 2+ components | Zustand store |
+| State persisted across page loads | Zustand store + `persist` middleware |
+| Real-time data from WebSocket | Zustand store updated via typed service events |
+| Feature-scoped ephemeral UI state | `useState` / `useReducer` inside the feature hook |
+| Cross-cutting lifecycle / DI | React Context (no reactive state) |
 
-- many components read/write the same state
-- the state drives rendering across multiple features
-- persistence or selector-based subscriptions are useful
+---
 
-Choose context when:
+## Anti-patterns to avoid
 
-- the domain represents a service boundary
-- startup/bootstrap flow matters
-- the value is mostly imperative actions plus a small amount of state
-
-## Notes
-
-- Theme, navigation, search, and Home Assistant access already use direct hook APIs
-- Auth and config intentionally remain context-backed
-- If a new shared state domain is introduced, decide once whether it belongs in Zustand or context before wiring UI around it
+- Raw `window.localStorage` access outside of `src/app/utils/storage`
+- Calling `storeInstance.setState(...)` directly from a component — use the store's own actions
+- Registering a catch-all listener on the HA service that copies all fields on every event
+- Maintaining the same flag in both a Zustand store and a React Context
+- Multiple `useXyzStore(state => state.field)` calls in the same component when a combined
+  selector already exists
