@@ -33,13 +33,13 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 - **4 Theme Modes** - Liquid Glass, Dark, Light, and High Contrast
 - **Custom Accent Colors** - 8 built-in accents plus a custom accent color picker
 - **Multi-Language UI** - English, Swedish, German, French, and Spanish interface support with locale-aware date, time, and number formatting
-- **Responsive Grid** - 2 columns (mobile) → 4 (tablet) → 6 (desktop)
+- **Responsive Grid** - 2 columns (mobile) → 4 (`md`) → 6 (`xl`) → 8 (`2xl`)
 - **Adaptive Cards** - Extra-Small, Small, Medium, and Large card sizes
 
 ### 🏠 Smart Home Control
 - **Multi-Entity Support** - Lights, HVAC, switches, covers, locks, sensors, media players, vacuums, and more
 - **Unified Climate Controls** - Home Assistant climate entities now render through the HVAC card and settings flow across the dashboard
-- **Home Assistant Media Controls** - Media player cards now use live Home Assistant playback, volume, mute, metadata, elapsed-time, and artwork data instead of mock-only state
+- **Home Assistant Media Controls** - Media player cards now use live Home Assistant playback, volume, mute, metadata, remaining-time, and artwork data
 - **Real-Time Updates** - Live state updates from your smart home system
 - **Quick Actions** - Toggle, adjust, and control devices with intuitive controls
 - **Room Organization** - Organized by rooms with dedicated room views
@@ -129,7 +129,14 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
    pnpm dev
    ```
 
-5. **Open in browser**
+5. **Add the local hostname**
+
+   Add this entry to your hosts file so the Vite dev host resolves locally:
+   ```text
+   127.0.0.1 navet.homeassistant.local
+   ```
+
+6. **Open in browser**
 
    Navigate to `http://navet.homeassistant.local:5200`
 
@@ -344,7 +351,6 @@ Found a bug or have an idea? [Open an issue](https://github.com/awesomestvi/nave
 - [ ] Automations management
 - [ ] History and analytics
 - [x] Multi-language interface support
-- [ ] Voice control integration
 - [ ] Scene management
 - [x] Home Assistant calendar entity integration
 - [x] RSS feed provider integration

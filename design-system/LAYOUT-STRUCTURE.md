@@ -61,8 +61,8 @@ Vertical: py-6 (24px)
 ```
 
 ### Responsive Behavior
-- **Desktop (≥ 1024px)**: Always visible, fixed position
-- **Tablet (768px - 1023px)**: Hidden by default, slides in on toggle
+- **Desktop (≥ 1280px)**: Always visible, fixed position
+- **Tablet (768px - 1279px)**: Visible, fixed position
 - **Mobile (< 768px)**: Hidden, accessible via hamburger menu
 
 ### Navigation Item Pattern
@@ -415,14 +415,14 @@ const filteredLights = devices.lights.filter(light => light.room === activeRoom)
 - Search bar below title
 - Smaller card padding (p-4)
 
-#### Tablet (768px - 1023px)
-- Sidebar hidden, bottom navigation remains primary
+#### Tablet (768px - 1279px)
+- Sidebar visible, bottom navigation hidden
 - Fixed-width tracks continue to wrap
 - Medium padding (p-5)
 - Standard header
 - Search inline
 
-#### Desktop (≥ 1024px)
+#### Desktop (≥ 1280px)
 - Sidebar always visible
 - Fixed-width tracks wrap across available width
 - Generous padding (p-6)
