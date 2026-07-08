@@ -34,25 +34,24 @@ This project adheres to a code of conduct. By participating, you are expected to
 
 2. **Clone your fork**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/home-assistant-dashboard.git
-   cd home-assistant-dashboard
+   git clone https://github.com/YOUR_USERNAME/navet.git
+   cd navet
    ```
 
 3. **Add upstream remote**
    ```bash
-   git remote add upstream https://github.com/awesomestvi/home-assistant-dashboard.git
+   git remote add upstream https://github.com/awesomestvi/navet.git
    ```
 
 4. **Install dependencies**
    ```bash
-   npm install
-   # or
    pnpm install
+   pnpm setup:hooks
    ```
 
 5. **Start development server**
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
 ## 💻 Development Process
@@ -76,6 +75,7 @@ This project adheres to a code of conduct. By participating, you are expected to
    - Write clean, maintainable code
    - Follow existing patterns and conventions
    - Test your changes thoroughly
+   - Update docs whenever dashboard behavior, settings, workflows, or user-facing controls change
 
 3. **Commit your changes**
    ```bash
@@ -184,6 +184,24 @@ docs: update installation instructions
 style: format code with prettier
 refactor: simplify card rendering logic
 ```
+
+### Pre-commit Hooks
+
+Navet uses a repo-local pre-commit hook in `.githooks/pre-commit`.
+
+After `pnpm install`, run:
+
+```bash
+pnpm setup:hooks
+```
+
+The hook currently enforces:
+
+- `pnpm check` for Biome lint/format issues
+- TypeScript regression detection by comparing `pnpm exec tsc --noEmit` output against the recorded baseline in `.typecheck-baseline.txt`
+- A docs relevance check that blocks commits touching settings, dashboard behavior, or build/deploy workflow without a staged update to `README.md`, `CONTRIBUTING.md`, or `docs/`
+
+If you intentionally change the TypeScript baseline, update `.typecheck-baseline.txt` and the relevant docs in the same commit.
 
 ## 📤 Submitting Changes
 

@@ -78,6 +78,12 @@ Complete documentation for the Navet smart home dashboard.
 **Manage dashboard backup and restore:**
 → See [Main README -> Dashboard Config](../README.md#dashboard-config)
 
+**Understand card tap behavior and interaction styles:**
+→ See [Main README -> Card Interaction Style](../README.md#card-interaction-style)
+
+**Set up local commit checks:**
+→ See [Contributing](../CONTRIBUTING.md)
+
 ## 📖 Documentation Organization
 
 This documentation is organized into:
@@ -126,5 +132,5 @@ docs/
 
 ---
 
-**Last Updated:** March 7, 2026  
+**Last Updated:** March 8, 2026  
 **Documentation Status:** ✅ Complete and organized

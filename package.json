@@ -9,7 +9,9 @@
     "lint": "biome lint ./src",
     "format": "biome format --write ./src",
     "check": "biome check ./src",
-    "check:fix": "biome check --apply ./src"
+    "check:fix": "biome check --apply ./src",
+    "typecheck": "tsc --noEmit",
+    "setup:hooks": "node scripts/setup-hooks.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

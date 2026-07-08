@@ -31,13 +31,14 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **3 Theme Modes** - Light, Dark, and High Contrast
 - **8 Primary Colors** - Customizable accent colors
 - **Responsive Grid** - 2 columns (mobile) → 4 (tablet) → 6 (desktop)
-- **Adaptive Cards** - Small, Medium, and Large card sizes
+- **Adaptive Cards** - Extra-Small, Small, Medium, and Large card sizes
 
 ### 🏠 Smart Home Control
 - **Multi-Entity Support** - Lights, HVAC, switches, covers, locks, sensors, media players, vacuums, and more
 - **Real-Time Updates** - Live state updates from your smart home system
 - **Quick Actions** - Toggle, adjust, and control devices with intuitive controls
 - **Room Organization** - Organized by rooms with dedicated room views
+- **Configurable Card Interactions** - Choose whether card tap toggles devices or opens controls
 
 ### 🛠️ Functionality
 - **Edit Mode** - Drag-and-drop card reordering and resizing
@@ -86,6 +87,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 2. **Install dependencies**
    ```bash
    pnpm install
+   pnpm setup:hooks
    ```
 
 3. **Configure your smart home connection**
@@ -140,6 +142,12 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - Choose from **3 modes**: Light, Dark, Contrast
 - Select from **8 colors**: Blue, Purple, Green, Orange, Pink, Red, Teal, Yellow
 
+#### Card Interaction Style
+- In **Settings -> Dashboard**, choose how entity cards respond to taps
+- **Tap toggles**: tapping the card toggles the device directly
+- **Tap opens controls**: tapping the card opens the device controls instead
+- The settings screen includes a live practice card preview so you can test the interaction before leaving Settings
+
 #### Room Navigation
 - Use **room tabs** to filter by room
 - **All** view shows everything grouped by room
@@ -171,6 +179,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
   - **🖼️ Photo Frame** - Beautiful photo carousel with navigation
   - **📝 Quick Note** - Editable sticky notes for reminders
 - Available in **3 sizes**: Small, Medium, Large
+- Dashboard cards also support an **Extra-Small** `1 × 0.5` size for denser layouts
 - Widgets persist across browser sessions
 - Full drag-and-drop and delete support
 - See [WIDGETS.md](docs/WIDGETS.md) for detailed documentation
@@ -234,6 +243,7 @@ For technical documentation and developer guides, see [`/docs/README.md`](docs/R
 - Test on multiple screen sizes
 - Update documentation as needed
 - Ensure accessibility standards
+- Run `pnpm setup:hooks` once so pre-commit checks enforce Biome, TypeScript baseline drift, and docs updates for user-facing changes
 
 ## 🐛 Bug Reports & Feature Requests
 
