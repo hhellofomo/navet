@@ -10,10 +10,19 @@ export interface AutomationTask {
   currentRuns?: number;
 }
 
-export interface AutomationTaskGroup {
-  key: 'automations';
-  title: string;
-  singularLabel: string;
-  pluralLabel: string;
-  tasks: AutomationTask[];
+export interface AutomationRoutine extends AutomationTask {
+  type: 'automation';
+}
+
+export interface QuickActionRoutine {
+  id: string;
+  type: 'scene' | 'script';
+  name: string;
+  room: string;
+  state: string;
+}
+
+export interface TaskRoutineData {
+  automations: AutomationRoutine[];
+  quickActions: QuickActionRoutine[];
 }

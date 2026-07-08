@@ -1,4 +1,4 @@
-import { Bolt } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { BaseCard } from '@/app/components/primitives';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
@@ -29,7 +29,7 @@ export function EnergyNowStatusWidget({ message }: { message: string }) {
               {t('energy.widgets.now.title')}
             </div>
           </div>
-          <Bolt className={`h-4 w-4 ${stateSurface.mutedTextClassName}`} />
+          <Zap className={`h-4 w-4 ${stateSurface.mutedTextClassName}`} />
         </div>
         <div className={`relative z-10 text-sm ${surface.textSecondary}`}>{message}</div>
       </div>

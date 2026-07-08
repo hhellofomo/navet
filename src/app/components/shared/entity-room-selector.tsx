@@ -42,6 +42,7 @@ export const EntityRoomSelector = memo(function EntityRoomSelector({
   const surface = getThemeSurfaceTokens(theme);
   const [isSaving, setIsSaving] = useState(false);
   const [isEyebrowFocused, setIsEyebrowFocused] = useState(false);
+  const [isKeyboardFocus, setIsKeyboardFocus] = useState(false);
   const resolvedLabel = label ?? t('common.room');
 
   const sortedAreas = useMemo(
@@ -140,8 +141,13 @@ export const EntityRoomSelector = memo(function EntityRoomSelector({
               value={selectedAreaId}
               disabled={isSaving}
               onChange={(event) => void handleChange(event.target.value)}
+              onKeyDown={() => setIsKeyboardFocus(true)}
+              onPointerDown={() => setIsKeyboardFocus(false)}
               onFocus={() => setIsEyebrowFocused(true)}
-              onBlur={() => setIsEyebrowFocused(false)}
+              onBlur={() => {
+                setIsEyebrowFocused(false);
+                setIsKeyboardFocus(false);
+              }}
               className="absolute inset-0 z-10 w-full cursor-pointer appearance-none opacity-0 disabled:cursor-not-allowed"
             >
               <option value="">{t('common.noRoom')}</option>
@@ -157,7 +163,7 @@ export const EntityRoomSelector = memo(function EntityRoomSelector({
               isLoading={isSaving}
               forceDark={forceDark}
               visualOnly
-              focused={isEyebrowFocused}
+              focused={isEyebrowFocused && isKeyboardFocus}
               className={compactContentClassName}
               style={compactContentStyle}
             />

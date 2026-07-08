@@ -1,3 +1,4 @@
+import { Zap as EnergyIcon } from 'lucide-react';
 import type { SVGProps } from 'react';
 import type { CardTemplate } from './types';
 
@@ -7,15 +8,6 @@ function BatteryIcon(props: SVGProps<SVGSVGElement>) {
       <title>Battery</title>
       <rect x="2" y="7" width="16" height="10" rx="2" />
       <path d="M22 11v2" />
-    </svg>
-  );
-}
-
-function EnergyNowIcon(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <title>Energy now</title>
-      <path d="M13 2 5 13h5l-1 9 8-11h-5l1-9Z" />
     </svg>
   );
 }
@@ -112,7 +104,7 @@ export const cardTemplates: CardTemplate[] = [
     id: 'energy-now',
     nameKey: 'dashboard.addCard.templates.energyNow.name',
     descriptionKey: 'dashboard.addCard.templates.energyNow.description',
-    icon: <EnergyNowIcon className="w-5 h-5" />,
+    icon: <EnergyIcon className="w-5 h-5" />,
     defaultSize: 'medium',
     supportedSizes: ['small', 'medium', 'large'],
   },

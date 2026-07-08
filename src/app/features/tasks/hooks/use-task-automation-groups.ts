@@ -1,19 +1,19 @@
 import { useMemo } from 'react';
 import { useHomeAssistant, useI18n } from '@/app/hooks';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
-import type { AutomationTaskGroup } from '../types';
-import { mapAutomationTasks } from '../utils/map-automation-tasks';
+import type { TaskRoutineData } from '../types';
+import { mapTaskRoutines } from '../utils/map-task-routines';
 
-export function useTaskAutomationGroups(): AutomationTaskGroup[] {
-  const { locale, t } = useI18n();
+export function useTaskRoutines(): TaskRoutineData {
+  const { locale } = useI18n();
   const entities = useHomeAssistant(homeAssistantSelectors.entities);
   const areas = useHomeAssistant(homeAssistantSelectors.areas);
   const deviceRegistry = useHomeAssistant(homeAssistantSelectors.deviceRegistry);
   const entityRegistry = useHomeAssistant(homeAssistantSelectors.entityRegistry);
 
-  const automations = useMemo(
+  return useMemo(
     () =>
-      mapAutomationTasks({
+      mapTaskRoutines({
         entities,
         areas,
         deviceRegistry,
@@ -21,18 +21,5 @@ export function useTaskAutomationGroups(): AutomationTaskGroup[] {
         locale,
       }),
     [areas, deviceRegistry, entities, entityRegistry, locale]
-  );
-
-  return useMemo(
-    () => [
-      {
-        key: 'automations' as const,
-        title: t('sections.tasks.automations.title'),
-        singularLabel: t('sections.tasks.automations.singular'),
-        pluralLabel: t('sections.tasks.automations.plural'),
-        tasks: automations,
-      },
-    ],
-    [automations, t]
   );
 }

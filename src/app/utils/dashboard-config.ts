@@ -6,7 +6,11 @@ import { useLightPresetStore } from '@/app/features/lighting';
 import { resolveAppLanguage } from '@/app/i18n/config';
 import { isSection } from '@/app/navigation/sections';
 import { useNavigationStore } from '@/app/stores/navigation-store';
-import { defaultSettings, useSettingsStore } from '@/app/stores/settings-store';
+import {
+  defaultSettings,
+  useSettingsStore,
+  type WeatherMetricId,
+} from '@/app/stores/settings-store';
 import { useThemeStore } from '@/app/stores/theme-store';
 import { getLegacyReducedEffectsFlags, resolveEffectsQuality } from '@/app/utils/effects-quality';
 import { storage } from '@/app/utils/storage';
@@ -54,6 +58,29 @@ const pruneEmptyRecord = <T extends Record<string, unknown>>(value: T): T | unde
   Object.keys(value).length > 0 ? value : undefined;
 
 const pruneEmptyArray = <T>(value: T[]): T[] | undefined => (value.length > 0 ? value : undefined);
+
+const weatherMetricIds = new Set<WeatherMetricId>([
+  'precipitation',
+  'humidity',
+  'wind',
+  'feelsLike',
+  'windGust',
+  'pressure',
+  'uvIndex',
+  'cloudCover',
+]);
+
+function isWeatherMetricId(value: unknown): value is WeatherMetricId {
+  return typeof value === 'string' && weatherMetricIds.has(value as WeatherMetricId);
+}
+
+function resolveWeatherMetricIds(value: unknown): WeatherMetricId[] {
+  return Array.isArray(value) ? value.filter(isWeatherMetricId) : defaultSettings.weatherMetricIds;
+}
+
+function areArraysEqual<T>(left: T[], right: T[]) {
+  return left.length === right.length && left.every((item, index) => item === right[index]);
+}
 
 const buildExportedSettings = (
   settingsState: Omit<
@@ -103,6 +130,12 @@ const buildExportedSettings = (
       settingsState.entityInteractionMode !== defaultSettings.entityInteractionMode
         ? settingsState.entityInteractionMode
         : undefined,
+    weatherMetricIds: !areArraysEqual(
+      settingsState.weatherMetricIds,
+      defaultSettings.weatherMetricIds
+    )
+      ? settingsState.weatherMetricIds
+      : undefined,
     ambientLightBleed:
       settingsState.ambientLightBleed !== defaultSettings.ambientLightBleed
         ? settingsState.ambientLightBleed
@@ -257,6 +290,7 @@ export const importDashboardConfig = (value: unknown) => {
       settings.weatherForecastMode === 'hourly' || settings.weatherForecastMode === 'weekly'
         ? settings.weatherForecastMode
         : defaultSettings.weatherForecastMode,
+    weatherMetricIds: resolveWeatherMetricIds(settings.weatherMetricIds),
     ambientLightBleed:
       typeof settings.ambientLightBleed === 'boolean'
         ? settings.ambientLightBleed

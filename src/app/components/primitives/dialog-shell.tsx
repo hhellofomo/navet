@@ -1,5 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import type { CSSProperties, ReactNode } from 'react';
+import { useId, useLayoutEffect } from 'react';
 import { Button } from '@/app/components/primitives/button';
 import {
   getDialogHeightClassName,
@@ -30,12 +31,15 @@ interface DialogShellProps {
   overlayClassName: string;
   contentClassName: string;
   contentAriaDescribedBy?: string;
+  contentTitle?: string;
+  contentDescription?: string;
   disableOpenAutoFocus?: boolean;
   mobileCoverSheet?: boolean;
   contentStyle?: CSSProperties;
   contentGlowClassName?: string;
   contentGlowStyle?: CSSProperties;
   contentOverlayClassName?: string | null;
+  bodyClassName?: string;
   children: ReactNode;
 }
 
@@ -45,41 +49,78 @@ const mobileCoverSheetClassName = [
   'max-sm:!translate-x-0 max-sm:!translate-y-0 max-sm:!rounded-[30px]',
 ].join(' ');
 
+function blurActiveElement() {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  const activeElement = document.activeElement;
+  if (activeElement instanceof HTMLElement) {
+    activeElement.blur();
+  }
+}
+
 export function DialogShell({
   isOpen,
   onOpenChange,
   overlayClassName,
   contentClassName,
   contentAriaDescribedBy,
+  contentTitle,
+  contentDescription,
   disableOpenAutoFocus = false,
   mobileCoverSheet = true,
   contentStyle,
   contentGlowClassName,
   contentGlowStyle,
   contentOverlayClassName,
+  bodyClassName,
   children,
 }: DialogShellProps) {
+  const generatedDescriptionId = useId();
   const hasDecoratedContent = Boolean(
     contentGlowClassName || contentGlowStyle || contentOverlayClassName
   );
-  const bodyClassName = mobileCoverSheet ? 'min-h-0' : '';
+  const resolvedBodyClassName = bodyClassName ?? (mobileCoverSheet ? 'min-h-0' : '');
+  const resolvedAriaDescribedBy = contentDescription
+    ? generatedDescriptionId
+    : contentAriaDescribedBy;
+
+  useLayoutEffect(() => {
+    if (isOpen) {
+      blurActiveElement();
+    }
+  }, [isOpen]);
 
   return (
-    <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog.Root
+      open={isOpen}
+      onOpenChange={(nextOpen) => {
+        blurActiveElement();
+        onOpenChange(nextOpen);
+      }}
+    >
       <Dialog.Portal>
         <Dialog.Overlay className={`fixed inset-0 z-50 ${overlayClassName}`} />
         <Dialog.Content
           className={`${contentClassName} ${mobileCoverSheet ? mobileCoverSheetClassName : ''}`}
           style={contentStyle}
-          aria-describedby={contentAriaDescribedBy}
+          aria-describedby={resolvedAriaDescribedBy}
           onOpenAutoFocus={
             disableOpenAutoFocus
               ? (event) => {
                   event.preventDefault();
+                  blurActiveElement();
                 }
               : undefined
           }
         >
+          {contentTitle ? <Dialog.Title className="sr-only">{contentTitle}</Dialog.Title> : null}
+          {contentDescription ? (
+            <Dialog.Description id={generatedDescriptionId} className="sr-only">
+              {contentDescription}
+            </Dialog.Description>
+          ) : null}
           {mobileCoverSheet ? (
             <button
               type="button"
@@ -100,9 +141,9 @@ export function DialogShell({
             <div className={`pointer-events-none absolute inset-0 ${contentOverlayClassName}`} />
           ) : null}
           {hasDecoratedContent ? (
-            <div className={`relative z-[2] ${bodyClassName}`}>{children}</div>
+            <div className={`relative z-[2] ${resolvedBodyClassName}`}>{children}</div>
           ) : mobileCoverSheet ? (
-            <div className={bodyClassName}>{children}</div>
+            <div className={resolvedBodyClassName}>{children}</div>
           ) : (
             children
           )}

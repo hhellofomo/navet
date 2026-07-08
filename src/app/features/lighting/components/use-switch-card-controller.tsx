@@ -122,6 +122,7 @@ export function useSwitchCardController({
     hasControlsDialog && cardInteraction.interactionMode !== 'control-first';
 
   const { formatMetricValue, getMetricLabel, renderMetricIcon } = useSwitchMetricFormatters({
+    deviceName: name,
     labels: {
       power: t('lighting.metrics.power'),
       voltage: t('lighting.metrics.voltage'),

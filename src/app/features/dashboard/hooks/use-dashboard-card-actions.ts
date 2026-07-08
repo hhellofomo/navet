@@ -132,7 +132,9 @@ export function useDashboardCardActions({
   const handleRemoveEntity = useCallback(
     (entityId: string) => {
       hideAutoEntity(entityId);
-      toast.success(t('dashboard.feedback.entityRemoved'));
+      toast.success(t('dashboard.feedback.entityRemoved'), {
+        id: 'dashboard-entity-removed',
+      });
     },
     [hideAutoEntity, t]
   );

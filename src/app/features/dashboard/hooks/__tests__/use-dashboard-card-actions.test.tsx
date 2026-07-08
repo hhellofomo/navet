@@ -53,4 +53,46 @@ describe('useDashboardCardActions', () => {
     expect(showAutoEntity).not.toHaveBeenCalled();
     expect(toastSuccess).toHaveBeenCalledWith('dashboard.feedback.cardAddedToHome');
   });
+
+  it('reuses the entity removed toast instead of stacking duplicates', () => {
+    const showAutoEntity = vi.fn();
+    const addCard = vi.fn();
+    const addSection = vi.fn();
+    const updateCard = vi.fn();
+    const removeCard = vi.fn();
+    const hideAutoEntity = vi.fn();
+    const homeLayoutController = {
+      layout: {
+        mode: 'flow' as const,
+        sections: [],
+      },
+      addCard: vi.fn(),
+      addSection,
+    };
+
+    const { result } = renderHook(() =>
+      useDashboardCardActions({
+        activeRoom: 'All',
+        activeSection: 'home',
+        isEditMode: true,
+        addCard,
+        removeCard,
+        updateCard,
+        hideAutoEntity,
+        showAutoEntity,
+        t: (key: string) => key,
+        addCardTargetSectionId: null,
+        homeLayoutController,
+      })
+    );
+
+    act(() => {
+      result.current.handleRemoveEntity('light.kitchen');
+    });
+
+    expect(hideAutoEntity).toHaveBeenCalledWith('light.kitchen');
+    expect(toastSuccess).toHaveBeenCalledWith('dashboard.feedback.entityRemoved', {
+      id: 'dashboard-entity-removed',
+    });
+  });
 });

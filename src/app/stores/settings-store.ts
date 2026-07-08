@@ -7,6 +7,15 @@ import { storage } from '@/app/utils/storage';
 export type EntityInteractionMode = 'control-first' | 'toggle-first';
 export type EffectsQuality = 'high' | 'medium' | 'low';
 export type WeatherForecastMode = 'weekly' | 'hourly';
+export type WeatherMetricId =
+  | 'precipitation'
+  | 'humidity'
+  | 'wind'
+  | 'feelsLike'
+  | 'windGust'
+  | 'pressure'
+  | 'uvIndex'
+  | 'cloudCover';
 
 export interface UserSettings {
   username: string;
@@ -24,6 +33,7 @@ export interface UserSettings {
   entityInteractionMode: EntityInteractionMode;
   ambientLightBleed: boolean;
   weatherForecastMode: WeatherForecastMode;
+  weatherMetricIds: WeatherMetricId[];
 }
 
 interface SettingsState extends UserSettings {
@@ -48,6 +58,7 @@ export const defaultSettings: UserSettings = {
   entityInteractionMode: 'toggle-first',
   ambientLightBleed: true,
   weatherForecastMode: 'weekly',
+  weatherMetricIds: ['precipitation', 'humidity', 'wind'],
 };
 
 /**

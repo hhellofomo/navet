@@ -137,6 +137,7 @@ export const settingsSelectors = {
   entityInteractionMode: (state: SettingsState) => state.entityInteractionMode,
   ambientLightBleed: (state: SettingsState) => state.ambientLightBleed,
   weatherForecastMode: (state: SettingsState) => state.weatherForecastMode,
+  weatherMetricIds: (state: SettingsState) => state.weatherMetricIds,
 
   // Actions
   updateSettings: (state: SettingsState) => state.updateSettings,
@@ -154,6 +155,7 @@ export const settingsSelectors = {
     entityInteractionMode: state.entityInteractionMode,
     ambientLightBleed: state.ambientLightBleed,
     weatherForecastMode: state.weatherForecastMode,
+    weatherMetricIds: state.weatherMetricIds,
   }),
 };
 

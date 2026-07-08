@@ -4,6 +4,7 @@ import { iconMap } from '@/app/features/sensors';
 import type { DeviceMetric } from '@/app/types/device.types';
 
 interface UseSwitchMetricFormattersParams {
+  deviceName: string;
   labels: {
     power: string;
     voltage: string;
@@ -11,7 +12,34 @@ interface UseSwitchMetricFormattersParams {
   };
 }
 
-export function useSwitchMetricFormatters({ labels }: UseSwitchMetricFormattersParams) {
+function normalizePrefixWord(word: string) {
+  return word.replace(/[^a-z0-9]/gi, '').toLowerCase();
+}
+
+export function getSwitchMetricDisplayLabel(metricLabel: string, deviceName: string) {
+  const labelWords = metricLabel.trim().split(/\s+/);
+  const deviceWords = deviceName.trim().split(/\s+/);
+  let sharedPrefixWordCount = 0;
+
+  for (let index = 0; index < Math.min(labelWords.length, deviceWords.length); index += 1) {
+    const labelWord = normalizePrefixWord(labelWords[index]);
+    const deviceWord = normalizePrefixWord(deviceWords[index]);
+
+    if (!labelWord || labelWord !== deviceWord) {
+      break;
+    }
+
+    sharedPrefixWordCount = index + 1;
+  }
+
+  if (sharedPrefixWordCount === 0 || sharedPrefixWordCount >= labelWords.length) {
+    return metricLabel;
+  }
+
+  return labelWords.slice(sharedPrefixWordCount).join(' ');
+}
+
+export function useSwitchMetricFormatters({ deviceName, labels }: UseSwitchMetricFormattersParams) {
   const formatPower = useCallback((watts?: number) => {
     if (!watts) {
       return null;
@@ -42,10 +70,10 @@ export function useSwitchMetricFormatters({ labels }: UseSwitchMetricFormattersP
         case 'Energy':
           return labels.energy;
         default:
-          return metric.label;
+          return getSwitchMetricDisplayLabel(metric.label, deviceName);
       }
     },
-    [labels.energy, labels.power, labels.voltage]
+    [deviceName, labels.energy, labels.power, labels.voltage]
   );
 
   const renderMetricIcon = useCallback((metric: DeviceMetric, className: string) => {

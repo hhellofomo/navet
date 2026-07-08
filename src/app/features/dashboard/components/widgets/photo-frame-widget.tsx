@@ -1,21 +1,8 @@
-import { ChevronLeft, ChevronRight, MoreHorizontal, Settings2, Shuffle } from 'lucide-react';
-import type { CSSProperties } from 'react';
+import { ChevronLeft, ChevronRight, Settings2, Shuffle } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BaseCard, RoundControlButton } from '@/app/components/primitives';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
-import {
-  normalizeCustomCardTint,
-  withTintAlpha,
-} from '@/app/components/shared/theme/custom-card-tint-surface';
-import { getThemeDropdownSurfaceClasses } from '@/app/components/shared/theme/dropdown-surface-tokens';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/app/components/ui/dropdown-menu';
-import { cn } from '@/app/components/ui/utils';
 import { useAreaRooms, useI18n, useTheme } from '@/app/hooks';
 import { useAuth } from '@/app/stores/auth-store';
 import { authSelectors } from '@/app/stores/selectors';
@@ -119,28 +106,8 @@ export function PhotoFrameWidget({
     [onMediaSourceIdChange, onSourceModeChange, onUpdateUrls]
   );
   const canConfigure = photoFrameConfig !== null;
-  const hasMenuActions = showShuffleControl || canConfigure;
+  const hasQuickActions = showShuffleControl || canConfigure;
   const chromeSize = size === 'large' ? 'medium' : size;
-  const controlAccentColor = normalizeCustomCardTint(tintColor) ?? getThemeColorValue(primaryColor);
-  const dropdownItemClassName = cn(
-    'rounded-xl border border-transparent px-3 py-2 text-sm outline-none transition-colors',
-    'data-[highlighted]:bg-[var(--menu-hover-bg)] data-[highlighted]:border-[var(--menu-hover-border)]',
-    'focus:bg-[var(--menu-hover-bg)] focus:border-[var(--menu-hover-border)]'
-  );
-  const dropdownItemHoverStyle = {
-    '--menu-hover-bg':
-      theme === 'light'
-        ? withTintAlpha(controlAccentColor, 0.12)
-        : theme === 'glass'
-          ? withTintAlpha(controlAccentColor, 0.16)
-          : withTintAlpha(controlAccentColor, 0.2),
-    '--menu-hover-border':
-      theme === 'light'
-        ? withTintAlpha(controlAccentColor, 0.24)
-        : theme === 'glass'
-          ? withTintAlpha(controlAccentColor, 0.32)
-          : withTintAlpha(controlAccentColor, 0.38),
-  } as CSSProperties;
   const imageMotionClassName = useMemo(
     () => (hasCustomPhotos ? 'scale-[1.02] transition-transform duration-[1800ms] ease-out' : ''),
     [hasCustomPhotos]
@@ -197,54 +164,41 @@ export function PhotoFrameWidget({
       contentClassName="h-full"
     >
       <div className="relative z-[2] flex h-full flex-col">
-        {hasMenuActions ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+        {hasQuickActions ? (
+          <div className="absolute right-3 top-3 z-20 flex items-center gap-2">
+            {showShuffleControl ? (
+              <RoundControlButton
+                theme={theme}
+                size={chromeSize === 'small' ? 'small' : 'medium'}
+                variant="soft"
+                aria-label={t('widgets.photoFrame.shuffle')}
+                className="shrink-0"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  jumpToRandomPhoto();
+                }}
+                onPointerDown={(event) => event.stopPropagation()}
+              >
+                <Shuffle className="h-3.5 w-3.5" />
+              </RoundControlButton>
+            ) : null}
+            {canConfigure ? (
               <RoundControlButton
                 theme={theme}
                 size={chromeSize === 'small' ? 'small' : 'medium'}
                 variant="soft"
                 aria-label={t('widgets.photoFrame.settings.title')}
-                className="absolute right-3 top-3 z-20 shrink-0"
-                onClick={(event) => event.stopPropagation()}
+                className="shrink-0"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setIsSettingsOpen(true);
+                }}
                 onPointerDown={(event) => event.stopPropagation()}
               >
-                <MoreHorizontal className="h-3.5 w-3.5" />
+                <Settings2 className="h-3.5 w-3.5" />
               </RoundControlButton>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className={cn(getThemeDropdownSurfaceClasses(theme), 'min-w-40 rounded-2xl p-2')}
-              onClick={(event) => event.stopPropagation()}
-            >
-              {showShuffleControl ? (
-                <DropdownMenuItem
-                  className={dropdownItemClassName}
-                  style={dropdownItemHoverStyle}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    jumpToRandomPhoto();
-                  }}
-                >
-                  <Shuffle className="h-4 w-4" />
-                  {t('widgets.photoFrame.shuffle')}
-                </DropdownMenuItem>
-              ) : null}
-              {canConfigure ? (
-                <DropdownMenuItem
-                  className={dropdownItemClassName}
-                  style={dropdownItemHoverStyle}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setIsSettingsOpen(true);
-                  }}
-                >
-                  <Settings2 className="h-4 w-4" />
-                  {t('widgets.photoFrame.settings.title')}
-                </DropdownMenuItem>
-              ) : null}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            ) : null}
+          </div>
         ) : null}
         <div className="group relative flex-1 overflow-hidden rounded-[inherit]">
           {hasCustomPhotos ? (
