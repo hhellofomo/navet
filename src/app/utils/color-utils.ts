@@ -55,22 +55,22 @@ export const getGradientColors = (
     }
 
     return {
-      from: 'from-gray-900/32',
-      to: 'to-gray-950/24',
-      border: 'border-gray-500/10',
+      from: 'from-zinc-900',
+      to: 'to-zinc-950',
+      border: 'border-zinc-700/70',
       glow: 'transparent',
+      customGradient: 'linear-gradient(135deg, rgb(24,24,27) 0%, rgb(9,9,11) 100%)',
     };
   }
 
   if (selectedColor) {
     if (theme === 'light') {
-      // Light theme: use stronger saturation so custom colors pop through the frosted overlay
       return {
         from: '',
         to: '',
-        border: 'border-orange-300/50',
+        border: 'border-orange-300/60',
         glow: selectedColor,
-        customGradient: `linear-gradient(135deg, ${selectedColor}40 0%, ${selectedColor}55 100%)`,
+        customGradient: `linear-gradient(135deg, ${selectedColor}66 0%, ${selectedColor}8c 100%)`,
       };
     }
     const darkColor = darkenColor(selectedColor, 100);
@@ -86,9 +86,9 @@ export const getGradientColors = (
 
   return theme === 'light'
     ? {
-        from: 'from-amber-100/90',
-        to: 'to-orange-100/80',
-        border: 'border-amber-300/60',
+        from: 'from-amber-200',
+        to: 'to-orange-200',
+        border: 'border-amber-300/70',
         glow: '#ff8800',
       }
     : {

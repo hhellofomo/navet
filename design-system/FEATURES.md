@@ -83,11 +83,11 @@ Exposes global theme state including mode, effects quality, and primary color cu
 - Text: Dark gray primary, mid-gray secondary
 - Best for: Bright environments, accessibility
 
-**4. High Contrast Theme**
+**4. Black Theme**
 - Background: `#000000` (OLED black)
 - Cards: Near-pure black with stronger contrast treatment
 - Text: Pure white primary, bright accents
-- Best for: Visual accessibility, maximum contrast
+- Best for: Visual accessibility, OLED-friendly contrast
 
 #### Primary Color System
 
@@ -220,7 +220,7 @@ Manages section navigation state across desktop and mobile layouts through a dir
 - **Position**: Fixed bottom, full width
 - **Height**: Auto with safe area padding
 - **Layout**: 6 icons in horizontal row
-- **Icons**: compact icon-only buttons
+- **Icons**: compact iOS-style icon + label tabs
 - **Active state**: theme-aware shared pill treatment
 - **Inactive state**: transparent/ghost buttons; only the selected item carries the pill
 - **Scroll behavior**: slides down and hides on downward scroll, returns when the user is near the top
@@ -247,18 +247,20 @@ Full-page settings interface with card-based organization.
 #### Sections
 
 **1. Appearance**
-- **Theme Mode Selection**: 2 × 2 grid with live card previews
+- **Theme Mode Selection**: 2 × 2 grid of theme option cards
 - **Primary Color Picker**: 8 built-in accent circles plus a custom accent swatch
 - **Visual quality**: choose between High, Medium, and Low glass rendering
 - **Localized theme picker copy**: theme names and descriptions resolve through the shared i18n dictionaries
 - **Light card ambience**: global visual toggle between ambient bleed and contained light-card rendering
-- **Theme-aware live previews**: theme/accent and ambience previews share the same preview-frame primitive, and the shared `Live Preview` header localizes with the active language
+- **Theme-aware ambience preview**: the ambience preview uses the shared preview-frame primitive, and the shared `Live Preview` header localizes with the active language
 - **Shared color picker primitive**: custom accents, light colors, and Kelvin swatches reuse the same base control with size variants
+- **Brightness presets**: light cards use a compact 3-preset set (`Bright`, `Dim`, `Night`) that fits inline without an overflow menu
 - **Layout**: Left-aligned text, right-aligned selection indicator
 
 **2. Localization**
 - **Language selection**: persisted app language for interface and locale-aware formatting
-- **Localized theme picker copy**: shared previews and theme labels follow the selected locale
+- **Localized theme picker copy**: shared theme labels and descriptions follow the selected locale
+- **Onboarding step**: localization is its own first-run step before appearance, covering language, time format, and temperature unit
 
 **3. Interaction**
 - **Interaction mode**: choose between tap toggles and tap opens controls
@@ -355,7 +357,7 @@ Beautiful placeholder screens for sections without data.
 
 ### Mobile (< 768px)
 - No sidebar
-- Compact icon-only bottom navigation bar with 6 sections including Mock and Settings
+- Compact iOS-style bottom navigation bar with icon + label tabs for 6 sections including Mock and Settings
 - Grid: 2 columns
 - Settings: Full width with mobile padding
 - Dashboard header compacts greeting, search, notifications, and avatar into one top row
@@ -376,7 +378,7 @@ Beautiful placeholder screens for sections without data.
 ### Settings Customization Flow
 1. Navigate to Settings section
 2. Select Appearance card
-3. Choose theme mode (Liquid Glass/Dark/Light/Contrast)
+3. Choose theme mode (Liquid Glass/Dark/Light/Black)
 4. Select a built-in accent color or choose a custom accent
 5. Set visual quality to High, Medium, or Low when needed
 6. Changes apply immediately across entire app
@@ -469,7 +471,7 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 - Section headings for navigation
 
 ### Visual Accessibility
-- Liquid Glass and High Contrast theme options
+- Liquid Glass and Black theme options
 - Minimum 44px touch targets
 - Clear focus indicators
 - Sufficient color contrast ratios
@@ -530,7 +532,7 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 1. Use the theme hook to get current theme
 2. Define color variations for all four themes
 3. Use primary color for active/selected states
-4. Test in all theme modes, including Liquid Glass and High Contrast
+4. Test in all theme modes, including Liquid Glass and Black
 5. Ensure sufficient contrast in all modes
 
 ### When Modifying Authentication

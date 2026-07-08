@@ -4,6 +4,7 @@ import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-s
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
+import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
 import { SensorGroupSettingsDialog } from './sensor-group-settings';
 import {
@@ -46,6 +47,7 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
   } = useSensorGroup({ initialSensors: sensors });
   const { theme } = useTheme();
   const { t } = useI18n();
+  const cardShell = getCardShellSurfaceTokens(theme);
 
   // Size-specific styling with intelligent layout adaptation
   const isSmall = isCompactCardSize(size);
@@ -68,7 +70,7 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
       <button
         type="button"
         onClick={() => setIsSettingsOpen(true)}
-        className={`relative h-full w-full backdrop-blur-xl rounded-3xl ${padding} overflow-hidden cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform text-left ${shell.containerClassName}`}
+        className={`relative h-full w-full ${cardShell.backdropClassName} rounded-3xl ${padding} overflow-hidden cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform text-left ${shell.containerClassName}`}
       >
         <div className={`absolute inset-0 ${shell.glowClassName}`}></div>
         {shell.overlayClassName && <div className={`absolute inset-0 ${shell.overlayClassName}`} />}

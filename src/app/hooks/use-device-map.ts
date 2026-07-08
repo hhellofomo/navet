@@ -71,7 +71,6 @@ export const useDeviceMap = (devices: DeviceCollection) => {
     power,
     media,
     weather,
-    wifi,
     switches,
     covers,
     locks,
@@ -92,7 +91,6 @@ export const useDeviceMap = (devices: DeviceCollection) => {
       ['power', power],
       ['media', media],
       ['weather', weather],
-      ['wifi', wifi],
       ['switches', switches],
       ['covers', covers],
       ['locks', locks],
@@ -133,7 +131,6 @@ export const useDeviceMap = (devices: DeviceCollection) => {
     switches,
     vacuums,
     weather,
-    wifi,
   ]);
 
   const getDevice = useCallback(

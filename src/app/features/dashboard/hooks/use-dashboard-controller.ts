@@ -202,6 +202,7 @@ export function useDashboardController(): DashboardController {
         await importDashboardConfigFromFile(file);
         setActiveSection('home');
         changeRoom('All');
+        setDashboardArrivalVariant('import');
         setOnboardingTransition('import');
         toast.success(t('dashboard.feedback.configRestored'));
       } catch {
@@ -225,7 +226,6 @@ export function useDashboardController(): DashboardController {
       return;
     }
 
-    setDashboardArrivalVariant(onboardingTransition);
     setOnboardingTransition(null);
     setShowImportedDashboardReveal(true);
   }, [allEntityIds, completeOnboarding, onboardingTransition]);
@@ -233,12 +233,14 @@ export function useDashboardController(): DashboardController {
   const handleChooseAllEntities = useCallback(() => {
     setActiveSection('home');
     changeRoom('All');
+    setDashboardArrivalVariant('all');
     setOnboardingTransition('all');
   }, [changeRoom, setActiveSection]);
 
   const handleChooseBlankDashboard = useCallback(() => {
     setActiveSection('home');
     changeRoom('All');
+    setDashboardArrivalVariant('blank');
     setOnboardingTransition('blank');
   }, [changeRoom, setActiveSection]);
 

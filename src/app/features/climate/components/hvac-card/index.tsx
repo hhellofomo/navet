@@ -4,6 +4,7 @@ import { CardActionRow } from '@/app/components/shared/card-action-row';
 import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { CardWrapper } from '@/app/components/ui/card-wrapper';
 import { useI18n } from '@/app/hooks';
@@ -38,6 +39,7 @@ export const HVACCard = memo(function HVACCard({
     isEditMode,
     size,
   });
+  const cardShell = getCardShellSurfaceTokens(controller.theme);
   const stateSurface = getCardStateSurfaceTokens(controller.theme, controller.isOn);
   const targetTemperatureLabel =
     controller.targetTemp < controller.currentTemp
@@ -50,9 +52,9 @@ export const HVACCard = memo(function HVACCard({
     <>
       <CardWrapper
         interactionProps={controller.cardInteraction.cardProps}
-        className={`bg-gradient-to-br ${controller.cardColors.gradient} border ${controller.cardColors.border} p-4 ${stateSurface.containerClassName}`}
+        className={`bg-gradient-to-br ${controller.cardColors.gradient} ${controller.cardColors.border} p-4 ${stateSurface.containerClassName}`}
         lightOverlayClassName={controller.lightOverlay}
-        showShadow={controller.isOn}
+        showShadow={controller.isOn && controller.theme !== 'light'}
       >
         {controller.isOn && (
           <div
@@ -60,9 +62,9 @@ export const HVACCard = memo(function HVACCard({
           />
         )}
 
-        {controller.theme !== 'light' && (
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
-        )}
+        {cardShell.sheenOverlayClassName ? (
+          <div className={cardShell.sheenOverlayClassName} />
+        ) : null}
 
         {stateSurface.overlayClassName && (
           <div className={`absolute inset-0 ${stateSurface.overlayClassName}`} />

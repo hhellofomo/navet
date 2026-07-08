@@ -103,6 +103,15 @@ export const LightCardSmall = memo(function LightCardSmall({
             size="small"
             leftContent={
               <>
+                {supportsColorControl && (
+                  <CustomColorTrigger
+                    isOn={isOn}
+                    currentColor={currentColor}
+                    onColorChange={onColorChange}
+                    size="small"
+                  />
+                )}
+
                 <div className="flex min-w-0 items-center gap-1.5">
                   <BrightnessPresetsInline
                     presets={brightnessPresets}
@@ -114,15 +123,6 @@ export const LightCardSmall = memo(function LightCardSmall({
                     overflow={showPresetOverflow ? 'menu' : 'hide'}
                   />
                 </div>
-
-                {supportsColorControl && (
-                  <CustomColorTrigger
-                    isOn={isOn}
-                    currentColor={currentColor}
-                    onColorChange={onColorChange}
-                    size="small"
-                  />
-                )}
               </>
             }
             rightContent={

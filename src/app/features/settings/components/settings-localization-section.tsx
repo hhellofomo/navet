@@ -103,12 +103,12 @@ export function SettingsLocalizationSection({ controller }: SettingsLocalization
         >
           {[
             {
-              value: 'celsius' as const,
-              label: t('settings.localization.temperatureUnit.celsius'),
-            },
-            {
               value: 'fahrenheit' as const,
               label: t('settings.localization.temperatureUnit.fahrenheit'),
+            },
+            {
+              value: 'celsius' as const,
+              label: t('settings.localization.temperatureUnit.celsius'),
             },
           ].map((option) => {
             const isActive = temperatureUnit === option.value;

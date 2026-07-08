@@ -1,12 +1,12 @@
 import { memo } from 'react';
 import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
-import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import { useSettingsStore } from '@/app/stores';
 import { resolveEffectsQuality } from '@/app/utils/effects-quality';
 import { LightCardLarge } from './light-card-large';
 import { LightCardMedium } from './light-card-medium';
 import { LightCardSmall } from './light-card-small';
+import { getLightCardSurfaceTokens } from './light-card-surface-tokens';
 import { LightSettingsDialog } from './light-settings-dialog';
 import { useLightCardController } from './use-light-card-controller';
 
@@ -47,9 +47,13 @@ export const LightCard = memo(function LightCard({
     size,
     isEditMode,
   });
-  const stateSurface = getCardStateSurfaceTokens(theme, controller.isOn);
   const resolvedEffectsQuality = resolveEffectsQuality(effectsQuality, lowPowerMode);
   const showAmbientLightBleed = ambientLightBleed && resolvedEffectsQuality === 'high';
+  const surfaceTokens = getLightCardSurfaceTokens({
+    isOn: controller.isOn,
+    selectedColor: controller.selectedColor,
+    theme,
+  });
 
   const isSmall = isCompactCardSize(size);
 
@@ -64,51 +68,26 @@ export const LightCard = memo(function LightCard({
               theme === 'light' ? 'opacity-40' : 'opacity-20'
             }`}
             style={{
-              background: `radial-gradient(circle, ${controller.gradientColors.glow || 'transparent'} 0%, transparent 70%)`,
+              background: `radial-gradient(circle, ${surfaceTokens.glowColor || 'transparent'} 0%, transparent 70%)`,
             }}
           />
         )}
 
         <div
           {...controller.cardInteraction.cardProps}
-          className={`relative z-10 h-full w-full overflow-hidden rounded-3xl border ${controller.padding} transition-all duration-500 ${controller.gradientColors.border} ${stateSurface.containerClassName} ${!isEditMode ? 'cursor-pointer' : ''} ${
-            controller.gradientColors.customGradient
-              ? ''
-              : `bg-gradient-to-br ${controller.gradientColors.from} ${controller.gradientColors.to}`
-          } ${theme === 'light' && controller.isOn && resolvedEffectsQuality === 'high' ? 'shadow-md' : ''}`}
-          style={
-            controller.gradientColors.customGradient
-              ? {
-                  background: controller.gradientColors.customGradient,
-                  borderColor: controller.selectedColor
-                    ? `${controller.selectedColor}66`
-                    : undefined,
-                }
-              : {}
-          }
+          className={`relative z-10 h-full w-full overflow-hidden rounded-3xl ${theme !== 'dark' ? 'border' : ''} ${controller.padding} transition-all duration-500 ${surfaceTokens.cardClassName} ${!isEditMode ? 'cursor-pointer' : ''}`}
+          style={surfaceTokens.cardStyle}
         >
-          {theme === 'light' && (
+          {surfaceTokens.innerOverlayClassName ? (
             <div
-              className="absolute inset-0"
-              style={
-                controller.isOn
-                  ? {
-                      background: controller.selectedColor
-                        ? `linear-gradient(135deg, ${controller.selectedColor}2e 0%, rgba(255, 255, 255, 0.38) 100%)`
-                        : 'rgba(255, 251, 235, 0.3)',
-                    }
-                  : { background: 'rgba(255, 255, 255, 0.6)' }
-              }
+              className={surfaceTokens.innerOverlayClassName}
+              style={surfaceTokens.innerOverlayStyle}
             />
-          )}
+          ) : null}
 
-          {theme !== 'light' && (
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.015)_38%,transparent_68%)]" />
-          )}
-
-          {stateSurface.overlayClassName && (
-            <div className={`absolute inset-0 ${stateSurface.overlayClassName}`} />
-          )}
+          {surfaceTokens.shineOverlayClassName ? (
+            <div className={surfaceTokens.shineOverlayClassName} />
+          ) : null}
 
           <div className="relative h-full flex flex-col">
             {isSmall ? (

@@ -30,7 +30,7 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 
 ### 🎨 Design
 - **Adaptive Glass Interface** - Premium glass-inspired surfaces with visual quality tiers for high, medium, and low-power devices
-- **4 Theme Modes** - Liquid Glass, Dark, Light, and High Contrast
+- **4 Theme Modes** - Liquid Glass, Dark, Light, and Black
 - **Custom Accent Colors** - 8 built-in accents plus a custom accent color picker
 - **Multi-Language UI** - English, Swedish, German, French, and Spanish interface support with locale-aware date, time, and number formatting
 - **Responsive Grid** - 2 columns (mobile) → 4 (`md`) → 6 (`xl`) → 8 (`2xl`)
@@ -55,7 +55,7 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 - **Calendar Entities** - Home Assistant calendar entities now render through the live calendar card with per-card source selection, week/month views, and event details
 - **Person Entities** - Home Assistant `person.*` entities render as live person cards with profile images and normalized presence/location text
 - **Helpers and Scripts** - Home Assistant helper domains and scripts can be added through the existing sensor and switch-style card paths
-- **Home Assistant Notifications** - Navet notifications now show Home Assistant persistent notifications, repairs/issues, and update actions
+- **Home Assistant Notifications** - Navet notifications now show Home Assistant persistent notifications, repairs/issues, update actions, and markdown-formatted message content
 - **Card-Level Room Editing** - Supported entity cards, including calendar and weather, can reassign their room directly from the settings dialog
 - **Notifications** - System notifications panel
 - **Settings** - Comprehensive theme and customization options
@@ -135,12 +135,12 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 
    Add this entry to your hosts file so the Vite dev host resolves locally:
    ```text
-   127.0.0.1 navet.homeassistant.local
+   127.0.0.1 navet.local
    ```
 
 6. **Open in browser**
 
-   Navigate to `http://navet.homeassistant.local:5200`
+   Navigate to `http://navet.local:5200`
 
 ### Installable PWA
 
@@ -162,8 +162,8 @@ pnpm build
 
 1. **Provide Home Assistant credentials** via `.env`, Docker runtime config, or the in-app login screen
 2. **Connect System** - Ensure your Home Assistant instance is accessible
-3. **Customize Layout** - Enter Edit Mode from **Customize** to arrange rooms and cards
-4. **Choose Theme** - Select your preferred color scheme and theme mode
+3. **Finish onboarding** - Choose your route, localization, and appearance before entering the dashboard
+4. **Customize Layout** - Enter Edit Mode from **Customize** to arrange rooms and cards
 5. **Optional for slower hardware** - Lower visual quality in Settings -> Appearance
 
 ### Features Guide
@@ -190,13 +190,15 @@ pnpm build
 
 #### Themes
 - Access **Settings** from the user menu
-- Choose from **4 modes**: Liquid Glass, Dark, Light, Contrast
+- Choose from **4 modes**: Liquid Glass, Dark, Light, and Black
 - Select from **8 built-in accents** or choose a **custom accent color**
 - Choose **Visual Quality** in **Settings -> Appearance**: **High**, **Medium**, or **Low**
 - Choose the app **Language** in **Settings -> Localization** to switch locale-aware interface formatting
-- Theme mode names, descriptions, and shared **Live Preview** labels follow the selected app language
+- Theme mode names and descriptions follow the selected app language
+- First-run onboarding now gives **Localization** its own step for language, time format, and temperature unit before the appearance step
 - In **Settings -> Appearance**, choose whether active light cards use **Ambient bleed** or stay **Contained** inside the card
 - Custom accent colors, preset accent colors, light colors, and Kelvin swatches now share the same color-picker primitive and sizing language
+- Light brightness presets now use a compact **3-preset** set: **Bright**, **Dim**, and **Night**
 - Shared theme-sensitive pieces such as entity icon pills and nav/action pills now resolve through reusable shared primitives rather than per-feature inline styling
 - Inactive/off card shells and text treatment now also resolve through a shared card-state primitive instead of per-card opacity tweaks
 
@@ -236,6 +238,7 @@ pnpm build
 - Home Assistant persistent notifications appear in Navet notifications
 - Home Assistant repairs/issues appear in Navet notifications
 - Home Assistant update entities can surface `Update`, install progress, and `Restart` actions directly in Navet
+- Markdown-style notification content such as headings, links, inline code, and images is rendered inside the notification panel
 
 #### Dashboard Content
 - On first launch, choose whether to start with all discovered entities or a blank dashboard

@@ -1,5 +1,6 @@
 import { lazy, memo, Suspense } from 'react';
 import { type CardSize, getCompactCardSize } from '@/app/components/shared/card-size-selector';
+import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
@@ -49,6 +50,7 @@ export const MediaCard = memo(function MediaCard({
   isEditMode: _isEditMode,
 }: MediaCardProps) {
   const { theme, colors } = useTheme();
+  const cardShell = getCardShellSurfaceTokens(theme);
   const surface = getThemeSurfaceTokens(theme);
   const mediaSize = getCompactCardSize(size);
   const {
@@ -86,32 +88,32 @@ export const MediaCard = memo(function MediaCard({
   const padding = isSmall ? 'p-4' : isMediumVertical ? 'p-6' : 'p-5';
   const isLight = theme === 'light';
   const isGlass = theme === 'glass';
+  const hasArtwork = Boolean(resolvedAlbumArt);
   const inactiveShellBg = `bg-gradient-to-br ${colors.media.off.gradient}`;
   const inactiveShellBorder = colors.media.off.border;
-  const cardBorder = isLight
-    ? 'border-gray-200/50'
-    : isGlass
-      ? surface.border
-      : 'border-pink-700/20';
-  const cardShadow = isOff ? '' : isLight ? 'shadow-lg' : surface.cardShadow;
-  const hasArtwork = Boolean(resolvedAlbumArt);
+  const cardBorder = hasArtwork ? 'border-transparent' : surface.border;
+  const cardShadow = '';
   const shellBg = hasArtwork
-    ? 'bg-transparent'
+    ? isGlass
+      ? 'bg-transparent'
+      : isLight
+        ? 'bg-white'
+        : 'bg-zinc-950'
     : isOff
       ? inactiveShellBg
       : isLight
-        ? 'bg-white/70'
+        ? 'bg-white'
         : isGlass
           ? 'bg-white/8'
-          : 'bg-black/20';
+          : 'bg-zinc-900';
   const shellBorder = isOff ? inactiveShellBorder : cardBorder;
-  const shellBlur = hasArtwork ? '' : 'backdrop-blur-xl';
+  const shellBlur = hasArtwork ? '' : cardShell.backdropClassName;
   const shellOverlayClassName = isOff && !hasArtwork ? null : stateSurface.overlayClassName;
 
   return (
     <>
       <div
-        className={`relative h-full rounded-3xl ${padding} border ${shellBorder} ${cardShadow} ${shellBg} ${shellBlur} ${stateSurface.containerClassName} overflow-hidden`}
+        className={`relative h-full rounded-3xl ${padding} ${theme !== 'dark' ? 'border' : ''} ${shellBorder} ${cardShadow} ${shellBg} ${shellBlur} ${stateSurface.containerClassName} overflow-hidden`}
       >
         {shellOverlayClassName && (
           <div className={`absolute inset-0 ${shellOverlayClassName}`}></div>

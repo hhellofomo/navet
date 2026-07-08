@@ -21,9 +21,9 @@ export const EmptyState = memo(function EmptyState({
 }: EmptyStateProps) {
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
-  const isGlass = theme === 'glass';
+  const shouldBlur = theme === 'glass' || theme === 'light';
 
-  const panelClass = `${surface.panel} ${surface.borderStrong} ${surface.cardShadow} ${isGlass ? 'backdrop-blur-2xl' : 'backdrop-blur-xl'}`;
+  const panelClass = `${surface.panel} ${surface.borderStrong} ${surface.cardShadow} ${shouldBlur ? (theme === 'glass' ? 'backdrop-blur-2xl' : 'backdrop-blur-xl') : ''}`;
   const iconColor = surface.textMuted;
   const actionClass =
     theme === 'light'

@@ -17,7 +17,11 @@ export function DashboardPage() {
   return (
     <>
       <DashboardArrivalReveal
-        open={controller.showImportedDashboardReveal && controller.activeSection === 'home'}
+        open={
+          controller.activeSection === 'home' &&
+          controller.dashboardArrivalVariant !== null &&
+          (controller.showImportedDashboardReveal || controller.isOnboardingClosing)
+        }
         onComplete={controller.onDismissImportedDashboardReveal}
         variant={controller.dashboardArrivalVariant ?? 'import'}
       />

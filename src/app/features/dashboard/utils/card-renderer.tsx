@@ -10,7 +10,6 @@ import { CoverCard, LockCard } from '@/app/features/security';
 import { GroupedSensorCard, SensorCard, type SensorReading } from '@/app/features/sensors';
 import { VacuumCard } from '@/app/features/vacuum';
 import { WeatherCard } from '@/app/features/weather';
-import { WifiCard } from '@/app/features/wifi';
 import type { DeviceMetric } from '@/app/types/device.types';
 
 interface DeviceData {
@@ -133,18 +132,6 @@ export const renderCard = ({
           lowTemp={device.lowTemp as number}
           size="large"
           onSizeChange={() => {}}
-          isEditMode={isEditMode}
-        />
-      );
-    case 'wifi':
-      return (
-        <WifiCard
-          networkName={device.networkName as string}
-          speed={device.speed as number}
-          uploadSpeed={device.uploadSpeed as string}
-          downloadSpeed={device.downloadSpeed as string}
-          size={size}
-          onSizeChange={handleSizeChange}
           isEditMode={isEditMode}
         />
       );

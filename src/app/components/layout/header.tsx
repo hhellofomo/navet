@@ -60,7 +60,6 @@ export const Header = memo(function Header() {
       { domain: 'climate', type: 'climate', items: devices.climate },
       { domain: 'weather', type: 'weather', items: devices.weather },
       { domain: 'sensor', type: 'power', items: devices.power },
-      { domain: 'sensor', type: 'wifi', items: devices.wifi },
     ] as const;
 
     const matchingIds = deviceGroups.flatMap(({ domain, type, items }) =>
@@ -107,6 +106,7 @@ export const Header = memo(function Header() {
   const textPrimary = surface.textPrimary;
   const textSecondary = surface.textSecondary;
   const inputBg = surface.inputBg;
+  const border = surface.border;
   const placeholder = surface.placeholder;
   const hoverBg = surface.hoverBg;
   const dividerColor = surface.textMuted;
@@ -274,7 +274,7 @@ export const Header = memo(function Header() {
               onChange={handleSearchChange}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
-              className={`${inputBg} border rounded-[22px] pl-10 pr-10 py-2 text-sm ${textPrimary} ${placeholder} focus:outline-none w-full md:w-64`}
+              className={`${inputBg} border ${border} rounded-[22px] pl-10 pr-10 py-2 text-sm ${textPrimary} ${placeholder} focus:outline-none w-full md:w-64`}
               style={{
                 borderColor: isSearchFocused ? activeColorValue : undefined,
                 boxShadow: isSearchFocused ? `0 0 0 2px ${activeColorValue}22` : undefined,
@@ -339,7 +339,7 @@ export const Header = memo(function Header() {
                 setIsMobileSearchOpen(false);
               }
             }}
-            className={`${inputBg} border rounded-[22px] pl-10 pr-10 py-2 text-sm ${textPrimary} ${placeholder} focus:outline-none w-full`}
+            className={`${inputBg} border ${border} rounded-[22px] pl-10 pr-10 py-2 text-sm ${textPrimary} ${placeholder} focus:outline-none w-full`}
             style={{
               borderColor: isSearchFocused ? activeColorValue : undefined,
               boxShadow: isSearchFocused ? `0 0 0 2px ${activeColorValue}22` : undefined,

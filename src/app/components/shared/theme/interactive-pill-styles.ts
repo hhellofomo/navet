@@ -30,8 +30,8 @@ export function getInteractivePillStyles({
           : theme === 'glass'
             ? 'border border-transparent bg-transparent text-white/72 hover:bg-white/8'
             : theme === 'contrast'
-              ? 'border border-transparent bg-transparent text-gray-300 hover:bg-white/10'
-              : 'border border-transparent bg-transparent text-gray-400 hover:bg-white/5';
+              ? 'border border-transparent bg-transparent text-gray-300 hover:bg-zinc-900'
+              : 'border border-transparent bg-transparent text-gray-400 hover:bg-zinc-800';
 
       return { className: `${inactiveClass} transition-colors` };
     }
@@ -42,7 +42,7 @@ export function getInteractivePillStyles({
         : theme === 'glass'
           ? 'border border-white/12 bg-white/8 text-white/72 hover:bg-white/12'
           : theme === 'contrast'
-            ? 'border border-white/16 bg-black text-gray-300 hover:bg-white/10'
+            ? 'border border-zinc-700 bg-black text-gray-300 hover:bg-zinc-900'
             : `border ${surface.border} ${surface.subtleBg} ${surface.textSecondary} ${surface.hoverBg}`;
 
     return { className: `${inactiveClass} transition-colors` };
@@ -76,7 +76,7 @@ export function getInteractivePillStyles({
       className: 'border text-white transition-colors',
       style: {
         backgroundColor: '#000000',
-        borderColor: 'rgba(255,255,255,0.28)',
+        borderColor: '#3f3f46',
       },
     };
   }
@@ -84,9 +84,9 @@ export function getInteractivePillStyles({
   return {
     className: 'border text-white transition-colors',
     style: {
-      backgroundColor: `${accent}20`,
-      borderColor: `${accent}24`,
-      color: accent,
+      backgroundColor: '#18181b',
+      borderColor: '#3f3f46',
+      color: '#ffffff',
     },
   };
 }

@@ -1,8 +1,13 @@
 import { InteractivePill } from '@/app/components/shared/interactive-pill';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { useAuth } from '@/app/contexts/auth-context';
 import { type PrimaryColor, type ThemeType, useI18n } from '@/app/hooks';
 import { getNotificationSurfaceTokens } from './notification-surface-tokens';
-import { getNotificationColor, getNotificationIcon } from './notification-utils';
+import {
+  getNotificationColor,
+  getNotificationIcon,
+  renderNotificationMarkdown,
+} from './notification-utils';
 import type { Notification } from './use-notifications';
 
 interface NotificationItemProps {
@@ -23,6 +28,7 @@ export function NotificationItem({
   formatTimestamp,
 }: NotificationItemProps) {
   const { t } = useI18n();
+  const { config } = useAuth();
   const surface = getNotificationSurfaceTokens(theme);
   const NotificationIcon = getNotificationIcon(notification.type);
   const primaryActionLabel =
@@ -37,18 +43,24 @@ export function NotificationItem({
       : t('notifications.action.delete');
   const accentColor = getNotificationColor(notification.type, primaryColor);
   const unreadIndicatorColor = getThemeColorValue(primaryColor);
-  const iconColor =
-    notification.type === 'warning'
-      ? 'currentColor'
-      : getNotificationColor(notification.type, primaryColor);
-  const iconShellClassName =
-    theme === 'light'
-      ? 'border border-gray-200 bg-white/90'
-      : theme === 'glass'
-        ? 'border border-white/14 bg-white/10 backdrop-blur-xl'
+  const iconToneClassName =
+    notification.type === 'success'
+      ? theme === 'light'
+        ? 'border-emerald-200 bg-emerald-50 text-emerald-600'
         : theme === 'contrast'
-          ? 'border border-white/20 bg-black'
-          : 'border border-white/10 bg-white/6';
+          ? 'border-emerald-400/40 bg-emerald-400/10 text-emerald-300'
+          : 'border-emerald-400/20 bg-emerald-500/10 text-emerald-300'
+      : notification.type === 'error'
+        ? theme === 'light'
+          ? 'border-red-200 bg-red-50 text-red-600'
+          : theme === 'contrast'
+            ? 'border-red-400/40 bg-red-400/10 text-red-300'
+            : 'border-red-400/20 bg-red-500/10 text-red-300'
+        : theme === 'light'
+          ? 'border-amber-200 bg-amber-50 text-amber-600'
+          : theme === 'contrast'
+            ? 'border-amber-400/40 bg-amber-400/10 text-amber-300'
+            : 'border-amber-400/20 bg-amber-500/10 text-amber-300';
 
   return (
     <div
@@ -57,14 +69,9 @@ export function NotificationItem({
       <div className="flex gap-3">
         {/* Icon */}
         <div
-          className={`h-8 w-8 rounded-2xl flex items-center justify-center flex-shrink-0 ${iconShellClassName} ${
-            notification.type === 'warning' ? surface.textSecondary : ''
-          }`}
+          className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-2xl border ${iconToneClassName}`}
         >
-          <NotificationIcon
-            className="w-4 h-4"
-            style={notification.type === 'warning' ? undefined : { color: iconColor }}
-          />
+          <NotificationIcon className="h-4 w-4" />
         </div>
 
         {/* Content */}
@@ -85,9 +92,9 @@ export function NotificationItem({
               {formatTimestamp(notification.timestamp)}
             </span>
           </div>
-          <p className={`mb-2 text-xs leading-relaxed ${surface.textSecondary}`}>
-            {notification.message}
-          </p>
+          <div className={`mb-2 space-y-2 text-xs leading-relaxed ${surface.textSecondary}`}>
+            {renderNotificationMarkdown(notification.message, config?.url)}
+          </div>
 
           {notification.source === 'update' &&
           notification.isBusy &&

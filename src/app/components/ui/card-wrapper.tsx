@@ -5,6 +5,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from 'react';
+import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 
@@ -39,6 +40,7 @@ export const CardWrapper = memo(function CardWrapper({
 }: CardWrapperProps) {
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
+  const cardShell = getCardShellSurfaceTokens(theme);
   const { className: interactionClassName, ...restInteractionProps } = interactionProps || {};
 
   return (
@@ -58,10 +60,17 @@ export const CardWrapper = memo(function CardWrapper({
           onClick(e);
         }
       }}
-      className={`relative h-full rounded-3xl border overflow-hidden transition-all duration-500 ${onClick && !isDisabled ? 'cursor-pointer' : ''} ${showShadow ? surface.cardShadow : ''} ${interactionClassName || ''} ${className}`}
+      className={`relative h-full rounded-3xl overflow-hidden transition-all duration-500 ${theme !== 'dark' ? 'border' : ''} ${onClick && !isDisabled ? 'cursor-pointer' : ''} ${showShadow ? surface.cardShadow : ''} ${interactionClassName || ''} ${className}`}
       {...restInteractionProps}
     >
       {children}
+      {cardShell.sheenOverlayClassName && (
+        <>
+          <div className="pointer-events-none absolute inset-x-5 top-0 z-[1] h-16 rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.24),transparent_72%)] opacity-75 blur-xl" />
+          <div className="pointer-events-none absolute inset-y-5 right-0 z-[1] w-20 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent)] opacity-60 blur-lg" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-10 bg-[linear-gradient(180deg,transparent,rgba(255,255,255,0.05))]" />
+        </>
+      )}
       {surface.lightOverlay && (
         <div
           className={`absolute inset-0 z-[1] pointer-events-none ${lightOverlayClassName || surface.lightOverlay}`}

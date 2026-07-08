@@ -249,10 +249,14 @@ export const frMessages = {
   'dashboard.feedback.configRestored': 'Configuration du tableau restaurée',
   'dashboard.onboarding.welcome': 'Bienvenue',
   'dashboard.onboarding.heading.route': 'Comment Navet doit-il lancer votre tableau de bord ?',
+  'dashboard.onboarding.heading.localization':
+    'Choisissez la langue et les formats de votre première vue.',
   'dashboard.onboarding.heading.theme':
-    'Definissez le look initial avant la premiere apparition du tableau de bord.',
+    'Définissez l’apparence et la langue avant la première apparition du tableau de bord.',
   'dashboard.onboarding.body.route':
     'Choisissez une route de départ une seule fois. L’import passe directement à la restauration, tandis qu’un démarrage neuf vous laisse choisir le thème initial d’abord.',
+  'dashboard.onboarding.body.localization':
+    'Choisissez la langue ainsi que les formats d’heure et de température que Navet doit utiliser dès le départ.',
   'dashboard.onboarding.body.theme':
     'Choisissez le thème de base et la couleur d’accent que Navet doit appliquer avant la première apparition du tableau de bord.',
   'dashboard.onboarding.route.all.title': 'Commencer avec toutes les entités',
@@ -268,8 +272,11 @@ export const frMessages = {
     'Restaurez une configuration YAML Navet exportée précédemment au lieu de repartir de zéro.',
   'dashboard.onboarding.route.import.closingBody':
     'L’expérience d’onboarding se referme et la transition vers votre tableau restauré commence.',
-  'dashboard.onboarding.theme.stepLabel': 'Étape 2 sur 2 : configuration initiale du thème',
+  'dashboard.onboarding.theme.stepLabel': 'Étape 2 sur 2 : apparence et langue',
+  'dashboard.onboarding.localization.description':
+    'Choisissez la langue de l’interface ainsi que les formats d’heure et de température dès le départ.',
   'dashboard.onboarding.back': 'Retour',
+  'dashboard.onboarding.next': 'Suivant',
   'dashboard.onboarding.continue': 'Continuer vers mon tableau',
   'dashboard.arrival.all.bakingKicker': 'Votre maison se reveille',
   'dashboard.arrival.all.bakingHeading': 'Chaque pièce et chaque entité sont mises en vue.',
@@ -296,6 +303,7 @@ export const frMessages = {
   'dashboard.arrival.import.revealHeading': 'Votre tableau a été restauré.',
   'dashboard.arrival.import.revealBody':
     'Tout ce qui était dans votre sauvegarde est en place et prêt à votre retour.',
+  'dashboard.arrival.enter': 'Entrer dans mon tableau',
   'interactionPreview.cardTitle': 'Toucher la carte',
   'interactionPreview.iconTitle': 'Icone',
   'interactionPreview.trailingButtonTitle': 'Bouton lateral',
@@ -373,8 +381,9 @@ export const frMessages = {
   'themeOption.dark.description': 'Dégradés subtils aux couleurs atténuées',
   'themeOption.light.label': 'Clair',
   'themeOption.light.description': 'Pastels lumineux avec des accents doux',
-  'themeOption.contrast.label': 'Haut contraste',
-  'themeOption.contrast.description': 'Couleurs vives pour une meilleure visibilité',
+  'themeOption.contrast.label': 'Noir',
+  'themeOption.contrast.description':
+    'Surfaces noires profondes avec un contraste idéal pour l’OLED.',
   'weather.subtitle': 'Météo',
   'weather.settings.title': 'Réglages de {name}',
   'weather.precipitation': 'Précipitations',
@@ -538,8 +547,6 @@ export const frMessages = {
   'power.usingLess': '{amount} kW de moins que sur la même période le mois dernier',
   'power.currentUsage': 'Consommation actuelle',
   'power.lastMonth': 'Mois dernier',
-  'wifi.title': 'Wi-Fi',
-  'wifi.subtitle': 'Reseau',
   'lighting.type.outlet': 'Prise',
   'security.lock': 'Serrure',
   'security.locked': 'Verrouille',
@@ -593,7 +600,6 @@ export const frMessages = {
   'deviceType.power': 'Alimentation',
   'deviceType.media': 'Media',
   'deviceType.weather': 'Météo',
-  'deviceType.wifi': 'Wi-Fi',
   'deviceType.switch': 'Interrupteur',
   'deviceType.cover': 'Volet',
   'deviceType.lock': 'Serrure',

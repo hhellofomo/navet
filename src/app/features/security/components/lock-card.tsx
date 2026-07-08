@@ -3,6 +3,7 @@ import { memo, useState } from 'react';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
+import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
 import { getSecurityCardSurfaceTokens } from './security-card-surface-tokens';
 
@@ -19,13 +20,14 @@ export const LockCard = memo(function LockCard({
   const [isLocked, setIsLocked] = useState(initialState);
   const { t } = useI18n();
   const { theme, colors } = useTheme();
+  const cardShell = getCardShellSurfaceTokens(theme);
   const securitySurface = getSecurityCardSurfaceTokens(theme);
 
   const cardColors = isLocked ? colors.lock.locked : colors.lock.unlocked;
 
   return (
     <div
-      className={`relative h-full overflow-hidden rounded-3xl border bg-gradient-to-br p-4 backdrop-blur-xl transition-all duration-500 ${cardColors.gradient} ${cardColors.border} ${securitySurface.containerShadowClassName}`}
+      className={`relative h-full overflow-hidden rounded-3xl bg-gradient-to-br p-4 ${theme !== 'dark' ? 'border' : ''} ${cardShell.backdropClassName} transition-all duration-500 ${cardColors.gradient} ${cardColors.border} ${securitySurface.containerShadowClassName}`}
     >
       <div
         className={`absolute inset-0 bg-gradient-to-br ${cardColors.glow} to-transparent transition-all duration-500`}

@@ -15,9 +15,11 @@ interface NotificationSurfaceTokens {
 
 export function getNotificationSurfaceTokens(theme: ThemeType): NotificationSurfaceTokens {
   const surface = getThemeSurfaceTokens(theme);
+  const blurClassName =
+    theme === 'glass' ? 'backdrop-blur-xl' : theme === 'light' ? 'backdrop-blur-xl' : '';
 
   return {
-    panelClassName: `${surface.panel} backdrop-blur-xl border ${surface.border} rounded-2xl shadow-2xl`,
+    panelClassName: `${surface.panel} ${blurClassName} border ${surface.border} rounded-2xl shadow-2xl`,
     borderClassName:
       theme === 'light'
         ? 'border-gray-200'

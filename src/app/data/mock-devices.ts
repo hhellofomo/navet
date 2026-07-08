@@ -12,7 +12,6 @@ export const DEVICES: DeviceCollection = {
   power: [],
   media: [],
   weather: [],
-  wifi: [],
   switches: [],
   covers: [],
   locks: [],

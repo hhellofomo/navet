@@ -4,21 +4,23 @@ import { memo } from 'react';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
+import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import type { SwitchCardProps } from './switch-card.types';
 import { useSwitchCardController } from './use-switch-card-controller';
 
 export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 'room'>) {
   const controller = useSwitchCardController(props);
+  const cardShell = getCardShellSurfaceTokens(controller.theme);
   const stateSurface = getCardStateSurfaceTokens(controller.theme, controller.isOn);
 
   return (
     <>
       <div
         {...controller.cardInteraction.cardProps}
-        className={`relative h-full w-full bg-gradient-to-br ${controller.cardColors.gradient} backdrop-blur-xl rounded-3xl border ${controller.cardColors.border} overflow-hidden transition-all duration-500 ${
+        className={`relative h-full w-full bg-gradient-to-br ${controller.cardColors.gradient} ${cardShell.backdropClassName} rounded-3xl ${controller.theme !== 'dark' ? 'border' : ''} ${controller.cardColors.border} overflow-hidden transition-all duration-500 ${
           props.isEditMode ? 'cursor-move active:cursor-grabbing' : 'cursor-pointer'
-        } ${controller.isExtraSmall ? 'px-3.5 pb-3.5 pt-3' : 'p-4'} ${stateSurface.containerClassName} ${controller.theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
+        } ${controller.isExtraSmall ? 'px-3.5 pb-3.5 pt-3' : 'p-4'} ${stateSurface.containerClassName}`}
       >
         {controller.isOn && (
           <div
@@ -28,9 +30,9 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
 
         {controller.theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
 
-        {controller.theme !== 'light' && (
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
-        )}
+        {cardShell.sheenOverlayClassName ? (
+          <div className={cardShell.sheenOverlayClassName} />
+        ) : null}
 
         {stateSurface.overlayClassName && (
           <div className={`absolute inset-0 ${stateSurface.overlayClassName}`} />

@@ -15,13 +15,21 @@ interface UseMediaCardControllerParams {
   initialPositionUpdatedAt?: string;
 }
 
-function normalizeMediaArtworkUrl(entityPicture: string, hassUrl?: string) {
+function normalizeMediaArtworkUrl(
+  entityPicture: string,
+  hassUrl?: string,
+  preferRelativeProxy = false
+) {
   if (!entityPicture) {
     return null;
   }
 
   if (entityPicture.startsWith('/api/') || entityPicture.startsWith('/media/')) {
-    return hassUrl ? `${hassUrl}${entityPicture}` : entityPicture;
+    return preferRelativeProxy
+      ? entityPicture
+      : hassUrl
+        ? `${hassUrl}${entityPicture}`
+        : entityPicture;
   }
 
   if (!entityPicture.startsWith('http://') && !entityPicture.startsWith('https://')) {
@@ -40,7 +48,9 @@ function normalizeMediaArtworkUrl(entityPicture: string, hassUrl?: string) {
       resolvedArtworkUrl.origin === resolvedHassUrl.origin &&
       resolvedArtworkUrl.pathname.startsWith('/api/')
     ) {
-      return `${resolvedArtworkUrl.pathname}${resolvedArtworkUrl.search}`;
+      return preferRelativeProxy
+        ? `${resolvedArtworkUrl.pathname}${resolvedArtworkUrl.search}`
+        : entityPicture;
     }
   } catch {
     return entityPicture;
@@ -112,7 +122,11 @@ export function useMediaCardController({
       return null;
     }
 
-    const normalizedArtworkUrl = normalizeMediaArtworkUrl(entityPicture, authConfig?.url);
+    const normalizedArtworkUrl = normalizeMediaArtworkUrl(
+      entityPicture,
+      authConfig?.url,
+      import.meta.env.DEV
+    );
     if (!normalizedArtworkUrl || normalizedArtworkUrl === failedArtworkUrl) {
       return null;
     }

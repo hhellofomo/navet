@@ -22,22 +22,19 @@ export function getRSSFeedCardSurfaceTokens(theme: ThemeType, primaryColor: Prim
     accentColor,
     containerShadowClassName: theme === 'light' ? 'shadow-lg' : 'shadow-lg hover:shadow-xl',
     overlayClassName:
-      theme === 'light'
-        ? 'bg-white/60 backdrop-blur-sm'
-        : theme === 'glass'
-          ? 'bg-white/[0.03] backdrop-blur-sm'
-          : 'bg-black/20 backdrop-blur-sm',
+      theme === 'light' ? '' : theme === 'glass' ? 'bg-white/[0.03] backdrop-blur-sm' : '',
     textSecondaryClassName: theme === 'light' ? 'text-gray-500' : surface.textMuted,
-    dividerClassName: theme === 'light' ? 'bg-gray-200' : 'bg-white/10',
+    dividerClassName:
+      theme === 'light' ? 'bg-gray-200' : theme === 'glass' ? 'bg-white/10' : 'bg-zinc-800',
     hoverClassName: theme === 'light' ? 'hover:bg-gray-100/80' : surface.hoverBg,
     dotClassName: theme === 'light' ? 'text-gray-300' : 'text-white/40',
     excerptClassName: theme === 'light' ? 'text-gray-500' : 'text-white/70',
     readMoreClassName: theme === 'light' ? 'text-gray-600' : 'text-white/80',
-    iconWrapClassName: theme === 'light' ? '' : 'backdrop-blur-sm',
+    iconWrapClassName: '',
     iconBackgroundColor: theme === 'light' ? accentColor.soft : `${accentColor.base}33`,
     iconColor: theme === 'light' ? accentColor.base : '#ffffff',
     sourceColor: theme === 'light' ? accentColor.strong : accentColor.soft,
     thumbnailClassName:
-      theme === 'light' ? 'bg-gray-100' : theme === 'glass' ? 'bg-white/8' : 'bg-white/10',
+      theme === 'light' ? 'bg-gray-100' : theme === 'glass' ? 'bg-white/8' : 'bg-zinc-800',
   };
 }

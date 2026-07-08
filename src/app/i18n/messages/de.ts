@@ -248,10 +248,13 @@ export const deMessages = {
   'dashboard.feedback.configRestored': 'Dashboard-Konfiguration wiederhergestellt',
   'dashboard.onboarding.welcome': 'Willkommen',
   'dashboard.onboarding.heading.route': 'Wie soll Navet dein Dashboard starten?',
+  'dashboard.onboarding.heading.localization': 'Wähle Sprache und Formate für deine erste Ansicht.',
   'dashboard.onboarding.heading.theme':
-    'Lege den ersten Look fest, bevor dein Dashboard zum ersten Mal erscheint.',
+    'Lege Look und Sprache fest, bevor dein Dashboard zum ersten Mal erscheint.',
   'dashboard.onboarding.body.route':
     'Wähle einmal deinen Startweg. Import springt direkt in die Wiederherstellung, während frische Starts zuerst das Anfangsthema festlegen lassen.',
+  'dashboard.onboarding.body.localization':
+    'Wähle Sprache sowie Standardformate für Zeit und Temperatur, die Navet direkt zum Start nutzen soll.',
   'dashboard.onboarding.body.theme':
     'Wähle Grundthema und Akzentfarbe, die Navet vor dem ersten Anzeigen des Dashboards anwenden soll.',
   'dashboard.onboarding.route.all.title': 'Mit allen Geräten starten',
@@ -267,8 +270,11 @@ export const deMessages = {
     'Stelle eine zuvor exportierte Navet-YAML-Dashboard-Konfiguration wieder her, statt von vorne zu beginnen.',
   'dashboard.onboarding.route.import.closingBody':
     'Das Onboarding wird abgeschlossen und in dein wiederhergestelltes Dashboard übergeleitet.',
-  'dashboard.onboarding.theme.stepLabel': 'Schritt 2 von 2: ursprüngliches Theme-Setup',
+  'dashboard.onboarding.theme.stepLabel': 'Schritt 2 von 2: Look und Sprache',
+  'dashboard.onboarding.localization.description':
+    'Wähle die Sprache der Oberfläche sowie Zeit- und Temperaturformat direkt zum Start.',
   'dashboard.onboarding.back': 'Zurück',
+  'dashboard.onboarding.next': 'Weiter',
   'dashboard.onboarding.continue': 'Weiter zu meinem Dashboard',
   'dashboard.arrival.all.bakingKicker': 'Dein Zuhause wacht auf',
   'dashboard.arrival.all.bakingHeading': 'Jeder Raum und jedes Gerät wird sichtbar gemacht.',
@@ -295,6 +301,7 @@ export const deMessages = {
   'dashboard.arrival.import.revealHeading': 'Dein Dashboard wurde wiederhergestellt.',
   'dashboard.arrival.import.revealBody':
     'Alles aus deinem Backup ist wieder vorhanden und bereit für deine Rückkehr.',
+  'dashboard.arrival.enter': 'Zu meinem Dashboard',
   'interactionPreview.cardTitle': 'Karte tippen',
   'interactionPreview.iconTitle': 'Icon',
   'interactionPreview.trailingButtonTitle': 'Zusatzbutton',
@@ -372,8 +379,8 @@ export const deMessages = {
   'themeOption.dark.description': 'Subtile Verläufe mit gedämpften Farben',
   'themeOption.light.label': 'Hell',
   'themeOption.light.description': 'Helle Pastelltöne mit weichen Akzenten',
-  'themeOption.contrast.label': 'Hoher Kontrast',
-  'themeOption.contrast.description': 'Kräftige Farben für bessere Sichtbarkeit',
+  'themeOption.contrast.label': 'Schwarz',
+  'themeOption.contrast.description': 'Tiefschwarze Flächen mit OLED-freundlichem Kontrast.',
   'weather.subtitle': 'Wetter',
   'weather.settings.title': '{name}-Einstellungen',
   'weather.precipitation': 'Niederschlag',
@@ -537,8 +544,6 @@ export const deMessages = {
   'power.usingLess': '{amount} kW weniger als im gleichen Zeitraum des letzten Monats',
   'power.currentUsage': 'Aktueller Verbrauch',
   'power.lastMonth': 'Letzter Monat',
-  'wifi.title': 'Wi-Fi',
-  'wifi.subtitle': 'Netzwerk',
   'lighting.type.outlet': 'Steckdose',
   'security.lock': 'Schloss',
   'security.locked': 'Verriegelt',
@@ -592,7 +597,6 @@ export const deMessages = {
   'deviceType.power': 'Strom',
   'deviceType.media': 'Medien',
   'deviceType.weather': 'Wetter',
-  'deviceType.wifi': 'Wi-Fi',
   'deviceType.switch': 'Schalter',
   'deviceType.cover': 'Abdeckung',
   'deviceType.lock': 'Schloss',

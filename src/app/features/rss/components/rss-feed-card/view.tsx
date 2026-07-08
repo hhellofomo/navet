@@ -2,6 +2,7 @@ import { ChevronRight, Rss } from 'lucide-react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { getCardShellSurfaceTokens } from '@/app/components/shared/theme/card-shell-surface-tokens';
 import { type PrimaryColor, type ThemeType, useI18n } from '@/app/hooks';
 import { getRSSFeedCardSurfaceTokens } from './surface-tokens';
 import type { RSSItem } from './types';
@@ -52,6 +53,7 @@ export function RSSFeedCardView({
   onOpenSettings,
 }: RSSFeedCardViewProps) {
   const { t } = useI18n();
+  const cardShell = getCardShellSurfaceTokens(theme);
   const rssSurface = getRSSFeedCardSurfaceTokens(theme, primaryColor);
   const isEmpty = !latestArticle && !isLoading;
   const emptyMessage = !hasConfiguredProviders
@@ -68,7 +70,7 @@ export function RSSFeedCardView({
         relative group overflow-hidden
         h-full w-full rounded-3xl
         bg-gradient-to-br ${colors.rss.gradient}
-        backdrop-blur-xl border ${colors.rss.border}
+        ${cardShell.backdropClassName} border ${colors.rss.border}
         ${rssSurface.containerShadowClassName}
         transition-all duration-300
         ${inEditMode ? 'cursor-move' : 'cursor-default'}
