@@ -1,5 +1,7 @@
 import { createContext, type ReactNode, useContext } from 'react';
 import type { CardSize } from '../components/card-size-selector';
+import { useEditModeStore } from '../stores/edit-mode-store';
+import { editModeSelectors } from '../stores/selectors';
 
 interface EditModeContextType {
 	isEditMode: boolean;
@@ -24,5 +26,16 @@ interface EditModeProviderProps {
 }
 
 export const EditModeProvider = ({ children, value }: EditModeProviderProps) => {
-	return <EditModeContext.Provider value={value}>{children}</EditModeContext.Provider>;
+	// Use the edit mode store for the edit mode state
+	const isEditMode = useEditModeStore(editModeSelectors.isEditMode);
+	const toggleEditMode = useEditModeStore(editModeSelectors.toggleEditMode);
+
+	// Combine store state with passed value
+	const contextValue = {
+		...value,
+		isEditMode,
+		toggleEditMode,
+	};
+
+	return <EditModeContext.Provider value={contextValue}>{children}</EditModeContext.Provider>;
 };

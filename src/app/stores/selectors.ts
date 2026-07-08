@@ -3,11 +3,14 @@
  * Use these to prevent unnecessary re-renders
  */
 
-import type { CustomCardsState } from './custom-cards-store';
-import type { EditModeState } from './edit-mode-store';
-import type { NavigationState } from './navigation-store';
-import type { SearchState } from './search-store';
-import type { SettingsState } from './settings-store';
+import type {
+	CustomCardsState,
+	EditModeState,
+	NavigationState,
+	SearchState,
+	SettingsState,
+	ThemeState,
+} from './types';
 
 /**
  * Theme Store Selectors
@@ -28,6 +31,11 @@ export const themeSelectors = {
 	themeAndColor: (state: ThemeState) => ({
 		theme: state.theme,
 		primaryColor: state.primaryColor,
+	}),
+	allValues: (state: ThemeState) => ({
+		theme: state.theme,
+		primaryColor: state.primaryColor,
+		wallpaper: state.wallpaper,
 	}),
 	allActions: (state: ThemeState) => ({
 		setTheme: state.setTheme,

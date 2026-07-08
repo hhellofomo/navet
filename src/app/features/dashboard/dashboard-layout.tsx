@@ -1,6 +1,6 @@
+import { Sidebar } from 'lucide-react';
 import { memo, type ReactNode } from 'react';
-import { Header } from '../../components/header';
-import { Sidebar } from '../../components/sidebar';
+import { Header } from '@/app/components/layout/header';
 import { useTheme } from '../../contexts/theme-context';
 
 interface DashboardLayoutProps {

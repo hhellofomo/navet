@@ -1,13 +1,13 @@
 import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { memo, useCallback } from 'react';
-import { getCardSpanClass } from '../../components/card-size-selector';
-import { DraggableCard } from '../../components/draggable-card';
-import { WidgetCard } from '../../components/widget-card';
+import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-size-selector';
+import { DraggableCard } from '@/app/components/shared/draggable-card';
 import { useEditModeContext } from '../../contexts/edit-mode-context';
 import { useSearch } from '../../contexts/search-context';
 import type { CustomCard } from '../../hooks/use-custom-cards';
 import type { DeviceWithType } from '../../types/device.types';
 import { renderCard } from '../../utils/card-renderer';
+import { WidgetCard } from './components/widget-card';
 
 interface DeviceGridProps {
 	orderedCardIds: string[];

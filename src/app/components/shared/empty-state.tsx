@@ -1,0 +1,36 @@
+import { memo } from 'react';
+import { useTheme } from '../../contexts/theme-context';
+
+interface EmptyStateProps {
+	icon: React.ComponentType<{ className?: string }>;
+	title: string;
+	description: string;
+}
+
+export const EmptyState = memo(function EmptyState({
+	icon: Icon,
+	title,
+	description,
+}: EmptyStateProps) {
+	const { theme } = useTheme();
+
+	const bgColor = theme === 'light' ? 'bg-white' : 'bg-[#1c1c1e]';
+	const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
+	const descColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+	const iconBg = theme === 'light' ? 'bg-gray-100' : 'bg-white/5';
+	const iconColor = theme === 'light' ? 'text-gray-400' : 'text-gray-600';
+
+	return (
+		<div className="h-full flex items-center justify-center p-6">
+			<div className={`${bgColor} rounded-3xl p-12 max-w-md w-full text-center backdrop-blur-xl`}>
+				<div
+					className={`${iconBg} w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6`}
+				>
+					<Icon className={`w-10 h-10 ${iconColor}`} />
+				</div>
+				<h2 className={`text-xl font-semibold ${textColor} mb-2`}>{title}</h2>
+				<p className={`${descColor} text-sm leading-relaxed`}>{description}</p>
+			</div>
+		</div>
+	);
+});
