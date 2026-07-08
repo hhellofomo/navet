@@ -1,4 +1,5 @@
 import { memo, type ReactNode } from 'react';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 
 interface CardHeaderProps {
   title: string;
@@ -6,7 +7,7 @@ interface CardHeaderProps {
   iconBgColor?: string;
   iconColor?: string;
   titleColor?: string;
-  size?: 'small' | 'medium' | 'large';
+  size?: CardSize;
 }
 
 /**
@@ -21,7 +22,7 @@ export const CardHeader = memo(function CardHeader({
   titleColor = 'text-white',
   size = 'medium',
 }: CardHeaderProps) {
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const iconSize = isSmall ? 'w-8 h-8' : 'w-10 h-10';
   const iconInnerSize = isSmall ? 'w-4 h-4' : 'w-5 h-5';
   const titleSize = isSmall ? 'text-xs' : 'text-sm';

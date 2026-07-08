@@ -28,7 +28,7 @@ export const SensorCard = memo(function SensorCard({
   const { theme } = useTheme();
 
   // Size-specific styling
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const padding = isSmall ? 'p-4' : 'p-5';
 
   const IconComponent =
@@ -39,7 +39,7 @@ export const SensorCard = memo(function SensorCard({
     theme === 'light' ? 'from-white to-teal-50/80' : 'from-teal-900/90 to-teal-950/95';
   const cardBorder = theme === 'light' ? 'border-gray-200/80' : 'border-teal-700/30';
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
+  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
   const iconBg = theme === 'light' ? 'bg-teal-100' : 'bg-teal-500/20';
   const iconColor = theme === 'light' ? 'text-teal-600' : 'text-teal-400';
   const accentColor = theme === 'light' ? 'text-teal-700' : 'text-teal-400';
@@ -69,7 +69,7 @@ export const SensorCard = memo(function SensorCard({
             >
               {name}
             </h3>
-            <p className="text-[10px] text-gray-400 truncate mt-0.5">Sensor</p>
+            <p className="text-[10px] text-gray-300 truncate mt-0.5">Sensor</p>
             {!isSmall && <p className={`text-xs ${textSecondary}`}>{room}</p>}
           </div>
           <div

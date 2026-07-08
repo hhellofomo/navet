@@ -17,6 +17,7 @@ import {
   SecuritySection,
   TasksSection,
 } from './components/layout/sections';
+import type { CardSize } from './components/shared/card-size-selector';
 import { EmptyState } from './components/shared/empty-state';
 import { LoadingSpinner } from './components/shared/loading-spinner';
 import { RenderProfiler } from './components/shared/render-profiler';
@@ -178,7 +179,7 @@ function Dashboard() {
 
   // Handle adding a new card
   const handleAddCard = useCallback(
-    (type: CardType, size: 'small' | 'medium' | 'large') => {
+    (type: CardType, size: CardSize) => {
       addCard(type, size, activeRoom);
       toast.success(`Added ${type} widget to ${activeRoom}!`);
     },

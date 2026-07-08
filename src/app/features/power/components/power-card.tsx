@@ -24,7 +24,7 @@ export const PowerCard = memo(function PowerCard({
   const { theme } = useTheme();
 
   // Size-specific styling with intelligent layout adaptation
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const _isLarge = size === 'large';
   const padding = isSmall ? 'p-4' : 'p-5';
@@ -42,7 +42,7 @@ export const PowerCard = memo(function PowerCard({
     theme === 'light' ? 'from-white to-yellow-50/80' : 'from-yellow-900/90 to-yellow-950/95';
   const cardBorder = theme === 'light' ? 'border-gray-200/80' : 'border-yellow-700/30';
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
+  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
   const iconBg = theme === 'light' ? 'bg-cyan-100' : 'bg-cyan-500/20';
   const iconColor = theme === 'light' ? 'text-cyan-600' : 'text-cyan-400';
   const accentColor = theme === 'light' ? 'text-cyan-700' : 'text-cyan-400';
@@ -76,7 +76,7 @@ export const PowerCard = memo(function PowerCard({
             >
               Energy Usage
             </h3>
-            <p className="text-[10px] text-gray-400 truncate mt-0.5">Power</p>
+            <p className="text-[10px] text-gray-300 truncate mt-0.5">Power</p>
           </div>
           <div
             className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${iconBg} flex items-center justify-center flex-shrink-0`}

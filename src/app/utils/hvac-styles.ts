@@ -77,12 +77,12 @@ export const getHVACModeButtonColor = (
       case 'fan':
         return 'bg-gradient-to-br from-green-400 to-green-600 text-white';
       default:
-        return theme === 'light' ? 'bg-gray-100 text-gray-500' : 'bg-white/10 text-gray-400';
+        return theme === 'light' ? 'bg-gray-100 text-gray-500' : 'bg-white/10 text-gray-300';
     }
   }
   return theme === 'light'
     ? 'bg-gray-900/10 text-gray-500 hover:bg-gray-900/20'
-    : 'bg-white/10 text-gray-400 hover:bg-white/20';
+    : 'bg-white/10 text-gray-300 hover:bg-white/20';
 };
 
 export const getHVACGaugeColor = (

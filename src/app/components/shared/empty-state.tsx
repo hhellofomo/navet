@@ -20,9 +20,9 @@ export const EmptyState = memo(function EmptyState({
 
   const bgColor = theme === 'light' ? 'bg-white' : 'bg-[#1c1c1e]';
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const descColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+  const descColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
   const iconBg = theme === 'light' ? 'bg-gray-100' : 'bg-white/5';
-  const iconColor = theme === 'light' ? 'text-gray-400' : 'text-gray-600';
+  const iconColor = theme === 'light' ? 'text-gray-300' : 'text-gray-600';
 
   return (
     <div className="h-full flex items-center justify-center p-6">

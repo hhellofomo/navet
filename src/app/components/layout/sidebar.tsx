@@ -10,7 +10,7 @@ export const Sidebar = memo(function Sidebar() {
 
   const bgColor = theme === 'light' ? 'bg-white border-gray-200' : 'bg-[#0a0a0a] border-white/5';
   const inactiveColor =
-    theme === 'light' ? 'text-gray-400 hover:text-gray-900' : 'text-gray-600 hover:text-gray-400';
+    theme === 'light' ? 'text-gray-300 hover:text-gray-900' : 'text-gray-600 hover:text-gray-300';
   const getColorValue = (color: typeof primaryColor) => {
     const colors = {
       orange: '#f97316',

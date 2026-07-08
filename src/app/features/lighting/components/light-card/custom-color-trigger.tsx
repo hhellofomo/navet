@@ -1,10 +1,11 @@
 import { memo } from 'react';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 
 interface CustomColorTriggerProps {
   isOn: boolean;
   currentColor: string;
   onColorChange: (color: string) => void;
-  size: 'small' | 'medium' | 'large';
+  size: CardSize;
 }
 
 export const CustomColorTrigger = memo(function CustomColorTrigger({
@@ -17,13 +18,15 @@ export const CustomColorTrigger = memo(function CustomColorTrigger({
     typeof currentColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(currentColor)
       ? currentColor
       : '#ffa500';
-  const triggerSize = size === 'small' ? 'w-7 h-7' : size === 'medium' ? 'w-8 h-8' : 'w-12 h-12';
-  const innerSize = size === 'small' ? 'w-3.5 h-3.5' : size === 'medium' ? 'w-4 h-4' : 'w-6 h-6';
-  const dotSize = size === 'small' ? 'w-1.5 h-1.5' : size === 'medium' ? 'w-2 h-2' : 'w-3 h-3';
+  const isCompact = size === 'extra-small' || size === 'small';
+  const triggerSize = isCompact ? 'w-7 h-7' : size === 'medium' ? 'w-8 h-8' : 'w-12 h-12';
+  const innerSize = isCompact ? 'w-3.5 h-3.5' : size === 'medium' ? 'w-4 h-4' : 'w-6 h-6';
+  const dotSize = isCompact ? 'w-1.5 h-1.5' : size === 'medium' ? 'w-2 h-2' : 'w-3 h-3';
 
   return (
     <label
-      className={`${triggerSize} rounded-full hover:scale-105 transition-all flex items-center justify-center cursor-pointer relative overflow-hidden`}
+      data-card-interactive
+      className={`${triggerSize} shrink-0 rounded-full hover:scale-105 transition-all flex items-center justify-center cursor-pointer relative overflow-hidden`}
       title="Custom color"
       aria-label="Choose custom color"
       onClick={(e) => e.stopPropagation()}

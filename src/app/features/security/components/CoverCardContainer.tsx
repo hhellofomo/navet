@@ -90,13 +90,13 @@ export const CoverCardContainer = memo(function CoverCardContainer({
   const getStateDisplay = () => {
     switch (coverState) {
       case 'open':
-        return { text: 'Open', color: theme === 'light' ? 'text-gray-600' : 'text-gray-400' };
+        return { text: 'Open', color: theme === 'light' ? 'text-gray-600' : 'text-gray-300' };
       case 'closed':
-        return { text: 'Closed', color: theme === 'light' ? 'text-gray-600' : 'text-gray-400' };
+        return { text: 'Closed', color: theme === 'light' ? 'text-gray-600' : 'text-gray-300' };
       case 'opening':
-        return { text: 'Opening...', color: theme === 'light' ? 'text-gray-600' : 'text-gray-400' };
+        return { text: 'Opening...', color: theme === 'light' ? 'text-gray-600' : 'text-gray-300' };
       case 'closing':
-        return { text: 'Closing...', color: theme === 'light' ? 'text-gray-600' : 'text-gray-400' };
+        return { text: 'Closing...', color: theme === 'light' ? 'text-gray-600' : 'text-gray-300' };
     }
   };
 

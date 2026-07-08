@@ -91,6 +91,7 @@ export const settingsSelectors = {
   defaultView: (state: SettingsState) => state.defaultView,
   compactMode: (state: SettingsState) => state.compactMode,
   disableAnimations: (state: SettingsState) => state.disableAnimations,
+  entityInteractionMode: (state: SettingsState) => state.entityInteractionMode,
 
   // Actions
   updateSettings: (state: SettingsState) => state.updateSettings,
@@ -102,6 +103,7 @@ export const settingsSelectors = {
     temperatureUnit: state.temperatureUnit,
     compactMode: state.compactMode,
     disableAnimations: state.disableAnimations,
+    entityInteractionMode: state.entityInteractionMode,
   }),
   notificationSettings: (state: SettingsState) => ({
     showNotifications: state.showNotifications,

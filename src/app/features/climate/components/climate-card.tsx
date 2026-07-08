@@ -41,7 +41,7 @@ export const ClimateCard = memo(function ClimateCard({
   } = useClimateTheme(theme);
 
   // Size-specific styling with intelligent layout adaptation
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const _isLarge = size === 'large';
   const padding = isSmall ? 'p-4' : 'p-5';
@@ -67,19 +67,19 @@ export const ClimateCard = memo(function ClimateCard({
       {theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
 
       <div className="relative h-full flex flex-col">
-        <div className={`flex items-start justify-between ${isSmall ? 'mb-1' : 'mb-2'}`}>
+        <div className={`flex items-start gap-3 ${isSmall ? 'mb-1' : 'mb-2'}`}>
+          <div
+            className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${resolvedIconBg} flex items-center justify-center flex-shrink-0`}
+          >
+            <Thermometer className={`${isSmall ? 'w-4 h-4' : 'w-5 h-5'} ${resolvedIconColor}`} />
+          </div>
           <div className="min-w-0 flex-1">
             <h3
               className={`font-semibold ${textPrimary} truncate ${isSmall ? 'text-xs' : 'text-sm'}`}
             >
               {name}
             </h3>
-            <p className="text-[10px] text-gray-400 truncate mt-0.5">Climate</p>
-          </div>
-          <div
-            className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${resolvedIconBg} flex items-center justify-center flex-shrink-0`}
-          >
-            <Thermometer className={`${isSmall ? 'w-4 h-4' : 'w-5 h-5'} ${resolvedIconColor}`} />
+            <p className="text-[10px] text-gray-300 truncate mt-0.5">Climate</p>
           </div>
         </div>
 

@@ -86,7 +86,7 @@ export const DeviceGrid = memo(function DeviceGrid({
 
   return (
     <SortableContext items={allCardIds} strategy={rectSortingStrategy}>
-      <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-2 md:gap-3 lg:gap-4 auto-rows-[180px] md:auto-rows-[190px]">
+      <div className="grid justify-start grid-flow-col-dense grid-cols-[repeat(auto-fit,190px)] gap-2 md:gap-3 lg:gap-4 auto-rows-[91px] md:auto-rows-[89px] lg:auto-rows-[87px]">
         {allCards.map((item, index) => {
           if (item.type === 'device') {
             const device = deviceMap.get(item.id);

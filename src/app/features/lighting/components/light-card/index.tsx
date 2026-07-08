@@ -1,8 +1,9 @@
 import type { HassEntity } from 'home-assistant-js-websocket';
-import { Settings } from 'lucide-react';
+import { Settings2 } from 'lucide-react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { DEFAULT_LIGHT_ICON, LIGHT_ICON_MAP } from '@/app/constants/icon-map';
 import { TEMP_OPTIONS } from '@/app/constants/light-constants';
 import { useHomeAssistantContext } from '@/app/contexts/home-assistant-context';
@@ -51,7 +52,7 @@ export const LightCard = memo(function LightCard({
   const [applyBrightnessPresetsToAll, setApplyBrightnessPresetsToAll] = useState(true);
   const [selectedIcon, setSelectedIcon] = useState(DEFAULT_LIGHT_ICON);
   const { connection, entities } = useHomeAssistantContext();
-  const { colors, theme } = useTheme();
+  const { theme } = useTheme();
   const brightnessPresets = useBrightnessPresets(id);
   const rememberLightState = useLightMemoryStore((state) => state.rememberState);
   const setBrightnessPresetValue = useLightPresetStore((state) => state.setBrightnessPresetValue);
@@ -68,8 +69,10 @@ export const LightCard = memo(function LightCard({
   const stateSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingTempRef = useRef<number | null>(null);
   const tempSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastKnownColorRef = useRef<string | null>(null);
 
-  const gradientColors = getGradientColors(isOn, selectedColor, theme);
+  const effectiveSelectedColor = selectedColor ?? (isOn ? lastKnownColorRef.current : null);
+  const gradientColors = getGradientColors(isOn, effectiveSelectedColor, theme);
   const IconComponent = LIGHT_ICON_MAP[selectedIcon] || LIGHT_ICON_MAP[DEFAULT_LIGHT_ICON];
   const isHomeAssistantLight = Boolean(connection) && id.startsWith('light.');
   const supportsColorTemperature = supportsColorTemperatureControl(liveEntity);
@@ -79,7 +82,7 @@ export const LightCard = memo(function LightCard({
     (option) => option.value >= minColorTemp && option.value <= maxColorTemp
   );
 
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const padding = isSmall ? 'p-4' : 'p-5';
   const settingsButtonSize = isSmall ? 'w-7 h-7' : 'w-8 h-8';
@@ -260,6 +263,7 @@ export const LightCard = memo(function LightCard({
     const reportedColor = getReportedColorHex(liveEntity);
     setSelectedColor(reportedColor);
     if (reportedColor) {
+      lastKnownColorRef.current = reportedColor;
       setCustomColor(reportedColor);
     }
   }, [isAdjustingTemp, liveEntity]);
@@ -342,6 +346,7 @@ export const LightCard = memo(function LightCard({
       lastColorTempRef.current = nextTemp;
       rememberLightState(id, { colorTemp: nextTemp });
       setSelectedColor(null);
+      lastKnownColorRef.current = null;
       if (!isOn) setIsOn(true);
     },
     [id, isOn, maxColorTemp, minColorTemp, rememberLightState]
@@ -363,6 +368,7 @@ export const LightCard = memo(function LightCard({
         tempSyncTimeoutRef.current = null;
       }, 1500);
       setSelectedColor(null);
+      lastKnownColorRef.current = null;
       if (!isOn) setIsOn(true);
       void syncLightWithHomeAssistant({
         state: 'on',
@@ -375,6 +381,7 @@ export const LightCard = memo(function LightCard({
   const handleColorChange = useCallback(
     (color: string) => {
       setSelectedColor(color);
+      lastKnownColorRef.current = color;
       if (!isOn) setIsOn(true);
 
       const rgbColor = hexToRgb(color);
@@ -453,6 +460,17 @@ export const LightCard = memo(function LightCard({
     [brightness, id, maxColorTemp, minColorTemp, selectedColor, syncLightWithHomeAssistant]
   );
 
+  const cardInteraction = useEntityCardInteractionController({
+    ariaLabel: `${name} light`,
+    ariaPressed: isOn,
+    isEditMode,
+    onToggle: () => toggleLightState(!isOn),
+    onOpenControls: handleSettingsClick,
+    onOpenSettings: handleSettingsClick,
+  });
+  const showSettingsButton = cardInteraction.interactionMode !== 'control-first';
+  const showPresetOverflow = showSettingsButton || isSmall;
+
   const handleCustomColorChange = useCallback(
     (color: string) => {
       setCustomColor(color);
@@ -463,51 +481,28 @@ export const LightCard = memo(function LightCard({
 
   return (
     <>
-      {/* biome-ignore lint/a11y/useSemanticElements: This card contains nested interactive controls, so a semantic button wrapper is not valid here. */}
       <div
-        role="button"
-        aria-label={`${name} light, currently ${isOn ? 'on' : 'off'}`}
-        aria-pressed={isOn}
-        aria-disabled={isEditMode}
-        tabIndex={!isEditMode ? 0 : -1}
+        {...cardInteraction.cardProps}
         className={`relative h-full w-full backdrop-blur-xl rounded-3xl ${padding} border overflow-hidden transition-all duration-500 ${!isEditMode ? 'cursor-pointer' : ''} ${
           gradientColors.customGradient
-            ? `border-orange-500/30`
-            : `bg-gradient-to-br ${colors.light.gradient} border ${colors.light.border}`
+            ? ''
+            : `bg-gradient-to-br ${gradientColors.from} ${gradientColors.to} ${gradientColors.border}`
         } ${!isOn ? 'grayscale opacity-40' : ''} ${theme === 'light' && isOn ? 'shadow-lg' : ''}`}
         style={
           gradientColors.customGradient
-            ? { background: gradientColors.customGradient, borderColor: 'rgba(251, 146, 60, 0.3)' }
+            ? {
+                background: gradientColors.customGradient,
+                borderColor: effectiveSelectedColor ? `${effectiveSelectedColor}66` : undefined,
+              }
             : {}
         }
-        onClick={() => {
-          if (isEditMode) {
-            return;
-          }
-
-          toggleLightState(!isOn);
-        }}
-        onKeyDown={(e) => {
-          if (e.target !== e.currentTarget) {
-            return;
-          }
-          if (!isEditMode && (e.key === 'Enter' || e.key === ' ')) {
-            e.preventDefault();
-            toggleLightState(!isOn);
-          }
-        }}
       >
-        {!isEditMode && !isSmall && !isMedium && (
+        {!isEditMode && !isSmall && !isMedium && showSettingsButton && (
           <button
-            type="button"
-            aria-label={`Open settings for ${name}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleSettingsClick();
-            }}
+            {...cardInteraction.settingsButtonProps}
             className={`absolute right-3 bottom-3 z-20 ${settingsButtonSize} rounded-full ${settingsButtonBg} transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center cursor-pointer`}
           >
-            <Settings className={`${settingsIconSize} ${settingsButtonText}`} />
+            <Settings2 className={`${settingsIconSize} ${settingsButtonText}`} />
           </button>
         )}
 
@@ -535,8 +530,8 @@ export const LightCard = memo(function LightCard({
             style={
               isOn
                 ? {
-                    background: selectedColor
-                      ? `linear-gradient(135deg, ${selectedColor}2e 0%, rgba(255, 255, 255, 0.38) 100%)`
+                    background: effectiveSelectedColor
+                      ? `linear-gradient(135deg, ${effectiveSelectedColor}2e 0%, rgba(255, 255, 255, 0.38) 100%)`
                       : 'rgba(255, 251, 235, 0.3)',
                   }
                 : { background: 'rgba(255, 255, 255, 0.6)' }
@@ -554,39 +549,46 @@ export const LightCard = memo(function LightCard({
               name={name}
               room={room}
               brightness={brightness}
-              currentColor={selectedColor ?? customColor}
+              currentColor={effectiveSelectedColor ?? customColor}
               brightnessPresets={brightnessPresets}
               isOn={isOn}
               IconComponent={IconComponent}
+              iconButtonProps={cardInteraction.iconButtonProps}
+              settingsButtonProps={cardInteraction.settingsButtonProps}
+              showSettingsButton={showSettingsButton}
+              showPresetOverflow={showPresetOverflow}
               supportsColorControl={supportsColorControl}
               onBrightnessChange={handleBrightnessChange}
               onBrightnessCommit={handleBrightnessCommit}
               onColorChange={handleColorChange}
-              onSettingsClick={handleSettingsClick}
             />
           ) : isMedium ? (
             <LightCardMedium
               name={name}
               brightness={brightness}
-              currentColor={selectedColor ?? customColor}
+              currentColor={effectiveSelectedColor ?? customColor}
               brightnessPresets={brightnessPresets}
               isOn={isOn}
               IconComponent={IconComponent}
+              iconButtonProps={cardInteraction.iconButtonProps}
+              settingsButtonProps={cardInteraction.settingsButtonProps}
+              showSettingsButton={showSettingsButton}
+              showPresetOverflow={showPresetOverflow}
               supportsColorControl={supportsColorControl}
               onBrightnessChange={handleBrightnessChange}
               onBrightnessCommit={handleBrightnessCommit}
               onColorChange={handleColorChange}
-              onSettingsClick={handleSettingsClick}
             />
           ) : (
             <LightCardLarge
               name={name}
               brightness={brightness}
               brightnessPresets={brightnessPresets}
-              selectedColor={selectedColor}
-              currentColor={selectedColor ?? customColor}
+              selectedColor={effectiveSelectedColor}
+              currentColor={effectiveSelectedColor ?? customColor}
               isOn={isOn}
               IconComponent={IconComponent}
+              iconButtonProps={cardInteraction.iconButtonProps}
               supportsColorControl={supportsColorControl}
               onBrightnessChange={handleBrightnessChange}
               onBrightnessCommit={handleBrightnessCommit}
@@ -608,7 +610,7 @@ export const LightCard = memo(function LightCard({
         maxColorTemp={maxColorTemp}
         colorTemp={colorTemp}
         brightnessPresets={brightnessPresets}
-        selectedColor={selectedColor}
+        selectedColor={effectiveSelectedColor}
         customColor={customColor}
         brightness={brightness}
         selectedIcon={selectedIcon}

@@ -10,7 +10,7 @@ export function BatteryIndicator({ battery, theme }: BatteryIndicatorProps) {
     return 'from-red-500 to-red-600';
   };
 
-  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
+  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
 
   return (
     <div className="flex items-center gap-2">

@@ -3,6 +3,7 @@ import type { LucideIcon } from 'lucide-react';
 import { MoreHorizontal } from 'lucide-react';
 import { memo } from 'react';
 import { useTheme } from '../../contexts/theme-context';
+import type { CardSize } from './card-size-selector';
 
 interface BrightnessPreset {
   icon: LucideIcon;
@@ -16,7 +17,7 @@ interface BrightnessPresetsInlineProps {
   currentBrightness: number;
   isOn: boolean;
   onBrightnessChange: (brightness: number) => void;
-  size?: 'small' | 'medium' | 'large';
+  size?: CardSize;
   maxVisible?: number;
   overflow?: 'hide' | 'menu';
 }
@@ -31,8 +32,9 @@ export const BrightnessPresetsInline = memo(function BrightnessPresetsInline({
   overflow = 'hide',
 }: BrightnessPresetsInlineProps) {
   const { theme, primaryColor } = useTheme();
-  const buttonSize = size === 'small' ? 'w-7 h-7' : size === 'medium' ? 'w-8 h-8' : 'w-9 h-9';
-  const iconSize = size === 'small' ? 'w-3 h-3' : size === 'medium' ? 'w-4 h-4' : 'w-4 h-4';
+  const isCompact = size === 'extra-small' || size === 'small';
+  const buttonSize = isCompact ? 'w-7 h-7' : size === 'medium' ? 'w-8 h-8' : 'w-9 h-9';
+  const iconSize = isCompact ? 'w-3 h-3' : size === 'medium' ? 'w-4 h-4' : 'w-4 h-4';
   const gap = size === 'large' ? 'gap-2' : 'gap-1.5';
   const visiblePresets = maxVisible ? presets.slice(0, maxVisible) : presets;
   const overflowPresets = maxVisible ? presets.slice(maxVisible) : [];
@@ -63,7 +65,11 @@ export const BrightnessPresetsInline = memo(function BrightnessPresetsInline({
       : 'cursor-not-allowed opacity-50';
 
   return (
-    <fieldset className={`flex items-center self-center ${gap}`} aria-label="Brightness presets">
+    <fieldset
+      data-card-interactive
+      className={`shrink-0 flex items-center self-center ${gap}`}
+      aria-label="Brightness presets"
+    >
       {visiblePresets.map((preset) => {
         const IconComponent = preset.icon;
         const isSelected = Math.abs(currentBrightness - preset.brightness) <= 2;

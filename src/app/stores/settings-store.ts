@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+export type EntityInteractionMode = 'control-first' | 'toggle-first';
+
 interface UserSettings {
   username: string;
   email: string;
@@ -11,6 +13,7 @@ interface UserSettings {
   defaultView: 'all' | string;
   compactMode: boolean;
   disableAnimations: boolean;
+  entityInteractionMode: EntityInteractionMode;
 }
 
 interface SettingsState extends UserSettings {
@@ -28,6 +31,7 @@ const defaultSettings: UserSettings = {
   defaultView: 'all',
   compactMode: false,
   disableAnimations: false,
+  entityInteractionMode: 'toggle-first',
 };
 
 export const useSettingsStore = create<SettingsState>()(

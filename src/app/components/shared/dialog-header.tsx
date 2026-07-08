@@ -17,12 +17,12 @@ export const DialogHeader = memo(function DialogHeader({
     <div className="flex items-start justify-between mb-6">
       <div>
         <Dialog.Title
-          className={`text-xl font-semibold transition-colors duration-500 ${isOn ? 'text-white' : 'text-gray-400'}`}
+          className={`text-xl font-semibold transition-colors duration-500 ${isOn ? 'text-white' : 'text-gray-300'}`}
         >
           {title}
         </Dialog.Title>
         <Dialog.Description
-          className={`text-sm mt-1 transition-colors duration-500 ${isOn ? 'text-gray-400' : 'text-gray-600'}`}
+          className={`text-sm mt-1 transition-colors duration-500 ${isOn ? 'text-gray-300' : 'text-gray-600'}`}
         >
           {description}
         </Dialog.Description>
@@ -36,7 +36,7 @@ export const DialogHeader = memo(function DialogHeader({
           }`}
         >
           <X
-            className={`w-5 h-5 transition-colors duration-500 ${isOn ? 'text-gray-400' : 'text-gray-600'}`}
+            className={`w-5 h-5 transition-colors duration-500 ${isOn ? 'text-gray-300' : 'text-gray-600'}`}
           />
         </button>
       </Dialog.Close>

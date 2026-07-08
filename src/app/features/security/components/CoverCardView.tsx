@@ -1,6 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import * as Slider from '@radix-ui/react-slider';
-import { ChevronDown, ChevronUp, Settings, Square } from 'lucide-react';
+import { ChevronDown, ChevronUp, Settings2, Square } from 'lucide-react';
 import type { CardSize } from '../../../components/shared/card-size-selector';
 import { CardSizeSelector } from '../../../components/shared/card-size-selector';
 import type { ThemeType } from '../../../contexts/theme-context';
@@ -70,12 +70,12 @@ export function CoverCardView({
   setDeviceClass,
 }: CoverCardViewProps) {
   // Size-specific styling with intelligent layout adaptation
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const padding = isSmall ? 'p-4' : 'p-5';
 
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const secondaryTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+  const secondaryTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
   const buttonBg =
     theme === 'light' ? 'bg-gray-900/10 hover:bg-gray-900/20' : 'bg-white/10 hover:bg-white/20';
   const buttonText = theme === 'light' ? 'text-gray-900' : 'text-white';
@@ -178,7 +178,7 @@ export function CoverCardView({
                 }}
                 className={`w-7 h-7 rounded-full ${settingsBtnClass} transition-all flex items-center justify-center`}
               >
-                <Settings className={`w-3 h-3 ${buttonText}`} />
+                <Settings2 className={`w-3 h-3 ${buttonText}`} />
               </button>
             </div>
           </div>
@@ -244,7 +244,7 @@ export function CoverCardView({
                 }}
                 className={`w-7 h-7 rounded-full ${settingsBtnClass} transition-all flex items-center justify-center`}
               >
-                <Settings className={`w-3 h-3 ${buttonText}`} />
+                <Settings2 className={`w-3 h-3 ${buttonText}`} />
               </button>
             </div>
           </>
@@ -310,7 +310,7 @@ export function CoverCardView({
                 }}
                 className={`w-8 h-8 rounded-full ${settingsBtnClass} transition-all flex items-center justify-center`}
               >
-                <Settings className={`w-3.5 h-3.5 ${buttonText}`} />
+                <Settings2 className={`w-3.5 h-3.5 ${buttonText}`} />
               </button>
             </div>
           </>
@@ -325,7 +325,7 @@ export function CoverCardView({
             <Dialog.Title className="text-xl font-semibold text-white mb-2">
               Device Type
             </Dialog.Title>
-            <Dialog.Description className="text-sm text-gray-400 mb-6">
+            <Dialog.Description className="text-sm text-gray-300 mb-6">
               Select the type of cover for {name}
             </Dialog.Description>
 
@@ -353,12 +353,12 @@ export function CoverCardView({
                         }`}
                       >
                         <Icon
-                          className={`w-6 h-6 ${isSelected ? 'text-indigo-400' : 'text-gray-400'}`}
+                          className={`w-6 h-6 ${isSelected ? 'text-indigo-400' : 'text-gray-300'}`}
                         />
                       </div>
                       <span
                         className={`text-xs font-medium text-center ${
-                          isSelected ? 'text-white' : 'text-gray-400'
+                          isSelected ? 'text-white' : 'text-gray-300'
                         }`}
                       >
                         {config.label}

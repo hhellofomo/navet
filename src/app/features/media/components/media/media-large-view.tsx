@@ -41,7 +41,7 @@ export function MediaLargeView({
         <div className={`font-bold truncate text-lg ${isLight ? 'text-gray-900' : 'text-white'}`}>
           {title}
         </div>
-        <div className={`text-sm truncate ${isLight ? 'text-gray-500' : 'text-gray-400'}`}>
+        <div className={`text-sm truncate ${isLight ? 'text-gray-500' : 'text-gray-300'}`}>
           {artist}
         </div>
       </div>
@@ -103,7 +103,7 @@ export function MediaLargeView({
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
         </div>
-        <span className={`text-xs w-8 text-right ${isLight ? 'text-gray-500' : 'text-gray-400'}`}>
+        <span className={`text-xs w-8 text-right ${isLight ? 'text-gray-500' : 'text-gray-300'}`}>
           {isMuted ? 0 : volume}%
         </span>
       </div>

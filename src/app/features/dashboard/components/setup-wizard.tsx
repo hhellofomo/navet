@@ -19,7 +19,7 @@ export function SetupWizard() {
   const cardBg =
     theme === 'light' ? 'bg-white' : theme === 'contrast' ? 'bg-gray-950' : 'bg-gray-900';
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+  const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
   const borderColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
   const inputBg = theme === 'light' ? 'bg-gray-50' : 'bg-white/5';
   const inputBorder = theme === 'light' ? 'border-gray-300' : 'border-white/10';

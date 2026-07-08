@@ -2,7 +2,7 @@ import * as Popover from '@radix-ui/react-popover';
 import { Maximize2 } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
 
-export type CardSize = 'small' | 'medium' | 'large';
+export type CardSize = 'extra-small' | 'small' | 'medium' | 'large';
 
 interface CardSizeSelectorProps {
   currentSize: CardSize;
@@ -10,7 +10,7 @@ interface CardSizeSelectorProps {
   allowedSizes?: CardSize[];
 }
 
-// iOS Widget Sizes based on Apple's Human Interface Guidelines
+// Widget size labels reflect the actual responsive dashboard grid sizing
 const sizes: {
   value: CardSize;
   label: string;
@@ -19,24 +19,31 @@ const sizes: {
   preview: string;
 }[] = [
   {
+    value: 'extra-small',
+    label: 'Extra-Small',
+    description: '1 × 0.5',
+    dimensions: 'Compact tile',
+    preview: 'w-7 h-3.5',
+  },
+  {
     value: 'small',
     label: 'Small',
-    description: '170×170 pt',
-    dimensions: '1×1 grid',
+    description: '1 × 1',
+    dimensions: 'Single tile',
     preview: 'w-7 h-7',
   },
   {
     value: 'medium',
     label: 'Medium',
-    description: '364×170 pt',
-    dimensions: '2×1 grid',
+    description: '2 × 1',
+    dimensions: 'Wide tile',
     preview: 'w-14 h-7',
   },
   {
     value: 'large',
     label: 'Large',
-    description: '364×382 pt',
-    dimensions: '2×2 grid',
+    description: '2 × 2',
+    dimensions: 'Large tile',
     preview: 'w-14 h-14',
   },
 ];
@@ -88,7 +95,7 @@ export const CardSizeSelector = memo(function CardSizeSelector({
           sideOffset={8}
         >
           <div className="space-y-1.5">
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-1">
+            <h3 className="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 px-1">
               Widget Size
             </h3>
             {availableSizes.map((size) => (
@@ -136,13 +143,23 @@ export const CardSizeSelector = memo(function CardSizeSelector({
 // Helper function to get grid span classes based on iOS widget size
 export function getCardSpanClass(size: CardSize): string {
   switch (size) {
-    case 'small':
-      return 'col-span-1 row-span-1'; // 170×170 pt
-    case 'medium':
-      return 'col-span-2 row-span-1'; // 364×170 pt (2.14× width) - always 2 columns wide
-    case 'large':
-      return 'col-span-2 row-span-2'; // 364×382 pt (2.25× height) - always 2 columns wide
-    default:
+    case 'extra-small':
       return 'col-span-1 row-span-1';
+    case 'small':
+      return 'col-span-1 row-span-2'; // 1 column × 1 row
+    case 'medium':
+      return 'col-span-2 row-span-2'; // 2 columns × 1 row
+    case 'large':
+      return 'col-span-2 row-span-4'; // 2 columns × 2 rows
+    default:
+      return 'col-span-1 row-span-2';
   }
+}
+
+export function getCompactCardSize(size: CardSize): Exclude<CardSize, 'extra-small'> {
+  if (size === 'extra-small') {
+    return 'small';
+  }
+
+  return size;
 }

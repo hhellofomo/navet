@@ -7,13 +7,15 @@ import {
   DoorOpen,
   Fence,
   Home,
-  Settings,
+  Settings2,
   ShieldCheck,
   Square,
   SunDim,
 } from 'lucide-react';
 import { memo, useState } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { useTheme } from '@/app/contexts/theme-context';
 
 type CoverState = 'open' | 'closed' | 'opening' | 'closing';
@@ -70,7 +72,7 @@ export const CoverCard = memo(function CoverCard({
   const { colors, theme } = useTheme();
 
   // Size-specific styling with intelligent layout adaptation
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const _isLarge = size === 'large';
   const padding = isSmall ? 'p-4' : 'p-5';
@@ -78,7 +80,7 @@ export const CoverCard = memo(function CoverCard({
   // Get colors based on cover state
   const cardColors = position > 50 ? colors.cover.open : colors.cover.closed;
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const secondaryTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+  const secondaryTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
   const buttonBg =
     theme === 'light' ? 'bg-gray-900/10 hover:bg-gray-900/20' : 'bg-white/10 hover:bg-white/20';
   const buttonText = theme === 'light' ? 'text-gray-900' : 'text-white';
@@ -141,9 +143,24 @@ export const CoverCard = memo(function CoverCard({
   const stateDisplay = getStateDisplay();
 
   const cardId = `cover-${name.toLowerCase().replace(/ /g, '-')}`;
+  const cardInteraction = useEntityCardInteractionController({
+    ariaLabel: `${name} cover`,
+    ariaPressed: position > 0,
+    isEditMode,
+    onToggle: () => {
+      if (position > 0) {
+        handleClose();
+        return;
+      }
+      handleOpen();
+    },
+    onOpenControls: () => setIsSettingsOpen(true),
+    onOpenSettings: () => setIsSettingsOpen(true),
+  });
 
   return (
     <div
+      {...cardInteraction.cardProps}
       className={`relative h-full bg-gradient-to-br ${cardColors.gradient} backdrop-blur-xl rounded-3xl ${padding} border ${cardColors.border} overflow-hidden ${theme === 'light' ? 'shadow-lg' : ''}`}
     >
       {isEditMode && (
@@ -165,7 +182,7 @@ export const CoverCard = memo(function CoverCard({
             >
               {name}
             </h3>
-            <p className="text-[10px] text-gray-400 truncate mt-0.5">
+            <p className="text-[10px] text-gray-300 truncate mt-0.5">
               {deviceClassConfig[deviceClass].label}
             </p>
             {!isSmall && (
@@ -175,11 +192,14 @@ export const CoverCard = memo(function CoverCard({
               </div>
             )}
           </div>
-          <div
-            className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${cardColors.iconBg} flex items-center justify-center flex-shrink-0`}
-          >
-            <DeviceIcon className={`${isSmall ? 'w-4 h-4' : 'w-5 h-5'} ${cardColors.accent}`} />
-          </div>
+          <EntityCardHeaderIcon
+            IconComponent={DeviceIcon}
+            isActive={position > 50}
+            size={size}
+            ariaLabel={cardInteraction.iconButtonProps['aria-label']}
+            onClick={cardInteraction.iconButtonProps.onClick}
+            onPointerDown={cardInteraction.iconButtonProps.onPointerDown}
+          />
         </div>
 
         {isSmall ? (
@@ -228,14 +248,10 @@ export const CoverCard = memo(function CoverCard({
 
               {/* Settings button */}
               <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsSettingsOpen(true);
-                }}
+                {...cardInteraction.settingsButtonProps}
                 className={`w-7 h-7 rounded-full ${settingsBtnClass} transition-all flex items-center justify-center`}
               >
-                <Settings className={`w-3 h-3 ${buttonText}`} />
+                <Settings2 className={`w-3 h-3 ${buttonText}`} />
               </button>
             </div>
           </div>
@@ -294,14 +310,10 @@ export const CoverCard = memo(function CoverCard({
 
               {/* Settings button */}
               <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsSettingsOpen(true);
-                }}
+                {...cardInteraction.settingsButtonProps}
                 className={`w-7 h-7 rounded-full ${settingsBtnClass} transition-all flex items-center justify-center`}
               >
-                <Settings className={`w-3 h-3 ${buttonText}`} />
+                <Settings2 className={`w-3 h-3 ${buttonText}`} />
               </button>
             </div>
           </>
@@ -360,14 +372,10 @@ export const CoverCard = memo(function CoverCard({
 
               {/* Settings button */}
               <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsSettingsOpen(true);
-                }}
+                {...cardInteraction.settingsButtonProps}
                 className={`w-8 h-8 rounded-full ${settingsBtnClass} transition-all flex items-center justify-center`}
               >
-                <Settings className={`w-3.5 h-3.5 ${buttonText}`} />
+                <Settings2 className={`w-3.5 h-3.5 ${buttonText}`} />
               </button>
             </div>
           </>
@@ -382,7 +390,7 @@ export const CoverCard = memo(function CoverCard({
             <Dialog.Title className="text-xl font-semibold text-white mb-2">
               Device Type
             </Dialog.Title>
-            <Dialog.Description className="text-sm text-gray-400 mb-6">
+            <Dialog.Description className="text-sm text-gray-300 mb-6">
               Select the type of cover for {name}
             </Dialog.Description>
 
@@ -410,12 +418,12 @@ export const CoverCard = memo(function CoverCard({
                         }`}
                       >
                         <Icon
-                          className={`w-6 h-6 ${isSelected ? 'text-indigo-400' : 'text-gray-400'}`}
+                          className={`w-6 h-6 ${isSelected ? 'text-indigo-400' : 'text-gray-300'}`}
                         />
                       </div>
                       <span
                         className={`text-xs font-medium text-center ${
-                          isSelected ? 'text-white' : 'text-gray-400'
+                          isSelected ? 'text-white' : 'text-gray-300'
                         }`}
                       >
                         {config.label}

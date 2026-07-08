@@ -36,7 +36,7 @@ export const CalendarCard = memo(function CalendarCard({
     moreEventsColor,
   } = useCalendarTheme(theme);
 
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const _isLarge = size === 'large';
 

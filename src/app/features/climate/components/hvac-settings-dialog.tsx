@@ -75,11 +75,11 @@ export const HVACSettingsDialog = memo(function HVACSettingsDialog({
               <div className="space-y-8">
                 {/* Temperature Display */}
                 <div>
-                  <div className="text-xs text-gray-400 mb-3">Temperature</div>
+                  <div className="text-xs text-gray-300 mb-3">Temperature</div>
                   <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-xs text-gray-400">Target</div>
+                        <div className="text-xs text-gray-300">Target</div>
                         <div
                           className={`text-4xl font-bold ${isOn ? 'text-white' : 'text-gray-500'} leading-none mt-1`}
                         >
@@ -87,8 +87,8 @@ export const HVACSettingsDialog = memo(function HVACSettingsDialog({
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-xs text-gray-400">Current</div>
-                        <div className="text-2xl font-bold text-gray-400 leading-none mt-1">
+                        <div className="text-xs text-gray-300">Current</div>
+                        <div className="text-2xl font-bold text-gray-300 leading-none mt-1">
                           {currentTemp}°C
                         </div>
                       </div>
@@ -98,7 +98,7 @@ export const HVACSettingsDialog = memo(function HVACSettingsDialog({
 
                 {/* Mode Selection */}
                 <div>
-                  <div className="text-xs text-gray-400 mb-3">Mode</div>
+                  <div className="text-xs text-gray-300 mb-3">Mode</div>
                   <div className="grid grid-cols-3 gap-3">
                     <button
                       type="button"
@@ -152,7 +152,7 @@ export const HVACSettingsDialog = memo(function HVACSettingsDialog({
 
                 {/* Power Control */}
                 <div>
-                  <div className="text-xs text-gray-400 mb-3">Power</div>
+                  <div className="text-xs text-gray-300 mb-3">Power</div>
                   <button
                     type="button"
                     onClick={onTogglePower}
@@ -174,7 +174,7 @@ export const HVACSettingsDialog = memo(function HVACSettingsDialog({
                     </div>
                     <div
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        isOn ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'
+                        isOn ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-300'
                       }`}
                     >
                       {isOn ? 'ON' : 'OFF'}

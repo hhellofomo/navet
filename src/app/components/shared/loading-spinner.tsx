@@ -15,7 +15,7 @@ export const LoadingSpinner = memo(function LoadingSpinner({
 
   const bgColor = theme === 'light' ? 'bg-gray-50' : 'bg-[#0a0a0a]';
   const _textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+  const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
 
   const getColorValue = (color: string): string => {
     const colors: Record<string, string> = {

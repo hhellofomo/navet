@@ -74,7 +74,7 @@ export const RSSFeedCard = memo(function RSSFeedCard({
   onSizeChange,
 }: RSSFeedCardProps) {
   const { theme, colors, primaryColor } = useTheme();
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const _isLarge = size === 'large';
   const colorMap = {
@@ -134,7 +134,7 @@ export const RSSFeedCard = memo(function RSSFeedCard({
         <div className={`flex items-start justify-between ${isSmall ? 'mb-2' : 'mb-3'}`}>
           <div className="min-w-0 flex-1 text-left">
             <span className={`font-semibold ${textPrimary} text-sm text-left`}>News Feed</span>
-            <p className="text-[10px] text-gray-400 truncate mt-0.5">RSS Feed</p>
+            <p className="text-[10px] text-gray-300 truncate mt-0.5">RSS Feed</p>
           </div>
 
           <div

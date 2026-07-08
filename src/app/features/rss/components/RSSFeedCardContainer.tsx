@@ -74,7 +74,7 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
   onSizeChange,
 }: RSSFeedCardContainerProps) {
   const { theme, colors, primaryColor } = useTheme();
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const _isLarge = size === 'large';
 

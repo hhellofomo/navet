@@ -11,7 +11,7 @@ export function LicenseSection({ theme, showLicense, setShowLicense }: LicenseSe
   const cardBg =
     theme === 'light' ? 'bg-white' : theme === 'contrast' ? 'bg-gray-950' : 'bg-gray-900';
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+  const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
   const subtleColor = theme === 'light' ? 'text-gray-500' : 'text-gray-500';
   const borderColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
   const hoverBg = theme === 'light' ? 'hover:bg-gray-50' : 'hover:bg-white/5';

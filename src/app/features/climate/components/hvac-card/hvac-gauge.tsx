@@ -31,11 +31,11 @@ export const HVACGauge = memo(function HVACGauge({
     theme === 'light'
       ? isOn
         ? 'text-gray-900'
-        : 'text-gray-400'
+        : 'text-gray-300'
       : isOn
         ? 'text-white'
         : 'text-gray-500';
-  const currentTempColor = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
+  const currentTempColor = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
   const tickColor = theme === 'light' ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.2)';
   const arcBgStroke = theme === 'light' ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.05)';
   const arcInnerStroke = theme === 'light' ? 'rgba(0, 0, 0, 0.04)' : 'rgba(0, 0, 0, 0.3)';

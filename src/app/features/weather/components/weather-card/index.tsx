@@ -59,7 +59,7 @@ export const WeatherCard = memo(function WeatherCard({
   isEditMode,
 }: WeatherCardProps) {
   const { theme } = useTheme();
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const _isMedium = size === 'medium';
   const isLarge = size === 'large';
 
@@ -79,7 +79,7 @@ export const WeatherCard = memo(function WeatherCard({
       ? 'bg-gradient-to-br from-white to-slate-50/80 border-gray-200/80'
       : 'bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-slate-700/30';
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
+  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
   const iconBg = theme === 'light' ? 'bg-blue-100' : 'bg-blue-500/20';
   const glowOverlay =
     theme === 'light'
@@ -108,7 +108,7 @@ export const WeatherCard = memo(function WeatherCard({
             >
               {location}
             </h3>
-            <p className="text-[10px] text-gray-400 truncate mt-0.5">Weather</p>
+            <p className="text-[10px] text-gray-300 truncate mt-0.5">Weather</p>
             {!isSmall && <p className={`text-xs ${textSecondary}`}>{dateTime}</p>}
           </div>
           <div
@@ -178,7 +178,7 @@ export const WeatherCard = memo(function WeatherCard({
                     <WeatherIcon condition={day.condition} className="w-8 h-8 mx-auto mb-2" />
                     <div className={`text-xs font-medium ${textPrimary} mb-1`}>{day.high}°</div>
                     <div
-                      className={`text-xs ${theme === 'light' ? 'text-gray-400' : 'text-gray-500'}`}
+                      className={`text-xs ${theme === 'light' ? 'text-gray-300' : 'text-gray-500'}`}
                     >
                       {day.low}°
                     </div>

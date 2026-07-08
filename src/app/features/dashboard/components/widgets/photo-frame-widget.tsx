@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
 import { useState } from 'react';
 import { ImageWithFallback } from '@/app/components/figma/ImageWithFallback';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useTheme } from '@/app/contexts/theme-context';
 
 const mockPhotos = [
@@ -12,7 +13,7 @@ const mockPhotos = [
 ];
 
 interface PhotoFrameWidgetProps {
-  size?: 'small' | 'medium' | 'large';
+  size?: CardSize;
 }
 
 export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
@@ -63,7 +64,7 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
         </div>
         <div className="flex-1 min-w-0">
           <h3 className={`text-sm font-semibold ${textPrimary}`}>Photo Frame</h3>
-          <p className="text-[10px] text-gray-400 truncate mt-0.5">Widget</p>
+          <p className="text-[10px] text-gray-300 truncate mt-0.5">Widget</p>
         </div>
       </div>
 
@@ -76,7 +77,7 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
         />
 
         {/* Navigation Buttons */}
-        {size !== 'small' && (
+        {size !== 'extra-small' && size !== 'small' && (
           <>
             <button
               type="button"
@@ -97,7 +98,7 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
       </div>
 
       {/* Thumbnail Dots */}
-      {size !== 'small' && (
+      {size !== 'extra-small' && size !== 'small' && (
         <div className="flex justify-center gap-2">
           {mockPhotos.map((_, index) => (
             <button

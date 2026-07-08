@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useTheme } from '../../../contexts/theme-context';
 import { AddCardDialogView } from './AddCardDialogView';
 
 interface AddCardDialogContainerProps {
   open: boolean;
   onClose: () => void;
-  onAddCard: (type: CardType, size: 'small' | 'medium' | 'large') => void;
+  onAddCard: (type: CardType, size: CardSize) => void;
   currentRoom: string;
 }
 
@@ -16,7 +17,7 @@ interface CardTemplate {
   name: string;
   description: string;
   icon: React.ReactNode;
-  defaultSize: 'small' | 'medium' | 'large';
+  defaultSize: CardSize;
 }
 
 const cardTemplates: CardTemplate[] = [
@@ -122,7 +123,7 @@ export function AddCardDialogContainer({
 }: AddCardDialogContainerProps) {
   const { theme, primaryColor } = useTheme();
   const [selectedType, setSelectedType] = useState<CardType | null>(null);
-  const [selectedSize, setSelectedSize] = useState<'small' | 'medium' | 'large'>('medium');
+  const [selectedSize, setSelectedSize] = useState<CardSize>('medium');
 
   const getColorValue = (color: string) => {
     const colors: Record<string, string> = {

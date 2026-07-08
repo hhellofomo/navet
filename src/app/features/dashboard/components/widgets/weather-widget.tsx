@@ -1,4 +1,5 @@
 import { Cloud, CloudRain, CloudSnow, Droplets, Sun, Wind } from 'lucide-react';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useTheme } from '@/app/contexts/theme-context';
 
 interface WeatherForecast {
@@ -17,7 +18,7 @@ const mockForecast: WeatherForecast[] = [
 ];
 
 interface WeatherWidgetProps {
-  size?: 'small' | 'medium' | 'large';
+  size?: CardSize;
 }
 
 export function WeatherWidget({ size = 'medium' }: WeatherWidgetProps) {
@@ -27,7 +28,7 @@ export function WeatherWidget({ size = 'medium' }: WeatherWidgetProps) {
     theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : 'bg-white/10';
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
   const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-400';
+    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
   const border = theme === 'light' ? 'border-gray-200/50' : 'border-white/10';
 
   const getColorValue = (color: string) => {
@@ -59,7 +60,10 @@ export function WeatherWidget({ size = 'medium' }: WeatherWidgetProps) {
     }
   };
 
-  const displayForecast = size === 'small' ? [] : mockForecast.slice(0, size === 'medium' ? 3 : 5);
+  const displayForecast =
+    size === 'extra-small' || size === 'small'
+      ? []
+      : mockForecast.slice(0, size === 'medium' ? 3 : 5);
 
   return (
     <div
@@ -86,7 +90,7 @@ export function WeatherWidget({ size = 'medium' }: WeatherWidgetProps) {
       </div>
 
       {/* Weather Details */}
-      {size !== 'small' && (
+      {size !== 'extra-small' && size !== 'small' && (
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div
             className="p-3 rounded-xl"

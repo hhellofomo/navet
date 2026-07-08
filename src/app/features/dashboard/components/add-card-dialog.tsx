@@ -1,11 +1,12 @@
 import { Calendar, Cloud, Image, Newspaper, StickyNote, X } from 'lucide-react';
 import { useState } from 'react';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useTheme } from '@/app/contexts/theme-context';
 
 interface AddCardDialogProps {
   open: boolean;
   onClose: () => void;
-  onAddCard: (type: CardType, size: 'small' | 'medium' | 'large') => void;
+  onAddCard: (type: CardType, size: CardSize) => void;
   currentRoom: string;
 }
 
@@ -16,7 +17,7 @@ interface CardTemplate {
   name: string;
   description: string;
   icon: React.ReactNode;
-  defaultSize: 'small' | 'medium' | 'large';
+  defaultSize: CardSize;
 }
 
 const cardTemplates: CardTemplate[] = [
@@ -60,13 +61,13 @@ const cardTemplates: CardTemplate[] = [
 export function AddCardDialog({ open, onClose, onAddCard, currentRoom }: AddCardDialogProps) {
   const { theme, primaryColor } = useTheme();
   const [selectedType, setSelectedType] = useState<CardType | null>(null);
-  const [selectedSize, setSelectedSize] = useState<'small' | 'medium' | 'large'>('medium');
+  const [selectedSize, setSelectedSize] = useState<CardSize>('medium');
 
   if (!open) return null;
 
   const bgColor = theme === 'light' ? 'bg-white' : 'bg-gray-900';
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+  const mutedColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
   const borderColor = theme === 'light' ? 'border-gray-200' : 'border-white/10';
   const cardBg = theme === 'light' ? 'bg-gray-50' : 'bg-white/5';
   const hoverBg = theme === 'light' ? 'hover:bg-gray-100' : 'hover:bg-white/10';
@@ -175,7 +176,7 @@ export function AddCardDialog({ open, onClose, onAddCard, currentRoom }: AddCard
             <div>
               <h3 className={`text-sm font-medium ${textColor} mb-3`}>Choose a size</h3>
               <div className="flex gap-3">
-                {(['small', 'medium', 'large'] as const).map((size) => (
+                {(['extra-small', 'small', 'medium', 'large'] as const).map((size) => (
                   <button
                     type="button"
                     key={size}
@@ -193,8 +194,22 @@ export function AddCardDialog({ open, onClose, onAddCard, currentRoom }: AddCard
                       <div
                         className="mx-auto mb-2 rounded"
                         style={{
-                          width: size === 'small' ? '24px' : size === 'medium' ? '40px' : '56px',
-                          height: size === 'small' ? '24px' : size === 'medium' ? '40px' : '56px',
+                          width:
+                            size === 'extra-small'
+                              ? '24px'
+                              : size === 'small'
+                                ? '24px'
+                                : size === 'medium'
+                                  ? '40px'
+                                  : '56px',
+                          height:
+                            size === 'extra-small'
+                              ? '12px'
+                              : size === 'small'
+                                ? '24px'
+                                : size === 'medium'
+                                  ? '24px'
+                                  : '48px',
                           backgroundColor:
                             selectedSize === size
                               ? getColorValue(primaryColor)

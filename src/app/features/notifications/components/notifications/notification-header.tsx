@@ -24,7 +24,7 @@ export function NotificationHeader({
 }: NotificationHeaderProps) {
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
   const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-400';
+    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
   const border =
     theme === 'light'
       ? 'border-gray-200'

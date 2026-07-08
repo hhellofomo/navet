@@ -24,7 +24,7 @@ export const PersonCard = memo(function PersonCard({
   const { theme, colors } = useTheme();
 
   // Size-specific styling
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const padding = isSmall ? 'p-4' : 'p-5';
 
   const cardColors = state === 'home' ? colors.person.home : colors.person.away;
@@ -40,9 +40,9 @@ export const PersonCard = memo(function PersonCard({
     theme === 'light'
       ? state === 'home'
         ? 'text-gray-600'
-        : 'text-gray-400'
+        : 'text-gray-300'
       : state === 'home'
-        ? 'text-gray-400'
+        ? 'text-gray-300'
         : 'text-gray-600';
   const avatarAwayBg = theme === 'light' ? 'bg-gray-200' : 'bg-gray-700/30';
   const statusPillBg = theme === 'light' ? 'bg-gray-100' : 'bg-white/5';
@@ -53,9 +53,9 @@ export const PersonCard = memo(function PersonCard({
         ? 'text-gray-700'
         : 'text-gray-500'
       : state === 'home'
-        ? 'text-gray-400'
-        : 'text-gray-400';
-  const awayIconColor = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
+        ? 'text-gray-300'
+        : 'text-gray-300';
+  const awayIconColor = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
 
   return (
     <div
@@ -81,7 +81,7 @@ export const PersonCard = memo(function PersonCard({
             >
               {name}
             </h3>
-            <p className="text-[10px] text-gray-400 truncate mt-0.5">Person</p>
+            <p className="text-[10px] text-gray-300 truncate mt-0.5">Person</p>
             {!isSmall && <p className={`text-xs ${subTextColor}`}>{location}</p>}
           </div>
         </div>

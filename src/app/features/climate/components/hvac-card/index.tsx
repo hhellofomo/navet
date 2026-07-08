@@ -1,6 +1,8 @@
-import { Settings, Wind } from 'lucide-react';
+import { Settings2, Wind } from 'lucide-react';
 import { memo, useState } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { CardWrapper } from '@/app/components/ui/card-wrapper';
 import { useTheme } from '@/app/contexts/theme-context';
 import { HVACSettingsDialog } from '../hvac-settings-dialog';
@@ -41,7 +43,7 @@ export const HVACCard = memo(function HVACCard({
   const { colors, theme } = useTheme();
 
   // Size-specific styling
-  const isSmall = size === 'small';
+  const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const _isLarge = size === 'large';
 
@@ -66,11 +68,19 @@ export const HVACCard = memo(function HVACCard({
         : 'text-gray-500'
       : isOn
         ? 'text-white'
-        : 'text-gray-400';
-  const secondaryTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+        : 'text-gray-300';
+  const secondaryTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
   const buttonBg =
     theme === 'light' ? 'bg-gray-900/10 hover:bg-gray-900/20' : 'bg-white/10 hover:bg-white/20';
   const buttonText = theme === 'light' ? 'text-gray-900' : 'text-white';
+  const cardInteraction = useEntityCardInteractionController({
+    ariaLabel: `${name} hvac`,
+    ariaPressed: isOn,
+    isEditMode,
+    onToggle: () => setIsOn((current) => !current),
+    onOpenControls: () => setIsSettingsOpen(true),
+    onOpenSettings: () => setIsSettingsOpen(true),
+  });
 
   // Light theme overlay - tinted when active, neutral when off
   const lightOverlay =
@@ -87,7 +97,7 @@ export const HVACCard = memo(function HVACCard({
   return (
     <>
       <CardWrapper
-        onClick={() => setIsOn(!isOn)}
+        interactionProps={cardInteraction.cardProps}
         className={`bg-gradient-to-br ${cardColors.gradient} border ${cardColors.border} p-4 ${!isOn ? 'grayscale opacity-40' : ''}`}
         lightOverlayClassName={lightOverlay}
         showShadow={isOn}
@@ -103,6 +113,15 @@ export const HVACCard = memo(function HVACCard({
           className={`absolute inset-0 bg-gradient-to-br ${cardColors.glow} to-transparent transition-all duration-500`}
         ></div>
 
+        {!isEditMode && (
+          <button
+            {...cardInteraction.settingsButtonProps}
+            className={`absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full ${buttonBg} transition-all`}
+          >
+            <Settings2 className={`h-3.5 w-3.5 ${buttonText}`} />
+          </button>
+        )}
+
         <div className="relative z-[2] h-full flex flex-col">
           {/* Header */}
           <div className={`flex items-start justify-between ${isSmall ? 'mb-1' : 'mb-2'}`}>
@@ -112,19 +131,16 @@ export const HVACCard = memo(function HVACCard({
               >
                 {name}
               </h3>
-              <p className="text-[10px] text-gray-400 truncate mt-0.5">HVAC</p>
+              <p className="text-[10px] text-gray-300 truncate mt-0.5">HVAC</p>
             </div>
-            <div
-              className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-500 ${
-                !isOn && theme === 'light' ? 'bg-gray-300/70' : cardColors.iconBg
-              }`}
-            >
-              <Wind
-                className={`${isSmall ? 'w-4 h-4' : 'w-5 h-5'} transition-colors duration-500 ${
-                  !isOn && theme === 'light' ? 'text-gray-600' : cardColors.accent
-                }`}
-              />
-            </div>
+            <EntityCardHeaderIcon
+              IconComponent={Wind}
+              isActive={isOn}
+              size={size}
+              ariaLabel={cardInteraction.iconButtonProps['aria-label']}
+              onClick={cardInteraction.iconButtonProps.onClick}
+              onPointerDown={cardInteraction.iconButtonProps.onPointerDown}
+            />
           </div>
 
           {/* Content area - adaptive based on size */}
@@ -154,18 +170,6 @@ export const HVACCard = memo(function HVACCard({
 
                 {/* Spacer */}
                 <div className="flex-1" />
-
-                {/* Settings button */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsSettingsOpen(true);
-                  }}
-                  className={`w-7 h-7 rounded-full ${buttonBg} hover:scale-105 transition-all flex items-center justify-center ${!isOn ? 'opacity-50' : ''}`}
-                >
-                  <Settings className={`w-3 h-3 ${buttonText}`} />
-                </button>
               </div>
             </div>
           ) : isMedium ? (

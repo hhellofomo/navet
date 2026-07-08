@@ -1,9 +1,10 @@
 import { Check, Edit2, StickyNote } from 'lucide-react';
 import { useState } from 'react';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useTheme } from '@/app/contexts/theme-context';
 
 interface NoteWidgetProps {
-  size?: 'small' | 'medium' | 'large';
+  size?: CardSize;
   initialNote?: string;
   onNoteChange?: (note: string) => void;
 }
@@ -18,7 +19,7 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
     theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : 'bg-white/10';
   const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
   const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-400';
+    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
   const border = theme === 'light' ? 'border-gray-200/50' : 'border-white/10';
 
   const getColorValue = (color: string) => {
@@ -70,7 +71,7 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
         </div>
         <div className="flex-1 min-w-0">
           <h3 className={`text-sm font-semibold ${textPrimary}`}>Quick Note</h3>
-          <p className="text-[10px] text-gray-400 truncate mt-0.5">Widget</p>
+          <p className="text-[10px] text-gray-300 truncate mt-0.5">Widget</p>
         </div>
         {!isEditing && (
           <button

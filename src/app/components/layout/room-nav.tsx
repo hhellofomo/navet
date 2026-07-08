@@ -37,7 +37,7 @@ export const RoomNav = memo(function RoomNav({
   );
 
   const textSecondary =
-    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-400';
+    theme === 'light' ? 'text-gray-600' : theme === 'contrast' ? 'text-gray-300' : 'text-gray-300';
   const textPrimary =
     theme === 'light' ? 'text-gray-900' : theme === 'contrast' ? 'text-white' : 'text-white';
   const inactiveBg =

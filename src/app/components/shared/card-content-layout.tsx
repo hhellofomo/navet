@@ -22,7 +22,7 @@ interface CardContentLayoutProps {
  * <CardContentLayout
  *   primaryValue="72%"
  *   primaryValueColor="text-white"
- *   caption={<span className="text-xs text-gray-400">Battery</span>}
+ *   caption={<span className="text-xs text-gray-300">Battery</span>}
  *   actions={<button>Start</button>}
  *   layout="between"
  * />

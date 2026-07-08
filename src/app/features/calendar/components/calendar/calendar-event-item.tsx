@@ -54,7 +54,7 @@ export function CalendarEventItem({
         <div className="w-14 flex-shrink-0 pt-0.5 text-left">
           <div className={`text-xs font-medium ${textPrimary}`}>{event.timeDisplay}</div>
           {showEndTime && (
-            <div className={`text-xs ${theme === 'light' ? 'text-gray-400' : 'text-white/50'}`}>
+            <div className={`text-xs ${theme === 'light' ? 'text-gray-300' : 'text-white/50'}`}>
               {event.endTime}
             </div>
           )}

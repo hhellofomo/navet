@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { memo } from 'react';
+import { type ButtonHTMLAttributes, memo } from 'react';
 import { BrightnessPresetsInline } from '@/app/components/shared/brightness-presets-inline';
 import { BrightnessSlider } from '@/app/components/shared/brightness-slider';
 import { ColorPicker } from '@/app/components/shared/color-picker';
@@ -7,6 +7,11 @@ import { PRESET_COLORS } from '@/app/constants/light-constants';
 import { useTheme } from '@/app/contexts/theme-context';
 import { CustomColorTrigger } from './custom-color-trigger';
 import { LightCardHeader } from './light-card-header';
+
+type HeaderIconButtonProps = Pick<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'aria-label' | 'onClick' | 'onPointerDown'
+>;
 
 interface LightCardLargeProps {
   name: string;
@@ -21,6 +26,7 @@ interface LightCardLargeProps {
   onBrightnessChange: (value: number) => void;
   onBrightnessCommit: (value: number) => void;
   onColorChange: (color: string) => void;
+  iconButtonProps: HeaderIconButtonProps;
 }
 
 export const LightCardLarge = memo(function LightCardLarge({
@@ -35,14 +41,23 @@ export const LightCardLarge = memo(function LightCardLarge({
   onBrightnessChange,
   onBrightnessCommit,
   onColorChange,
+  iconButtonProps,
 }: Omit<LightCardLargeProps, 'room'>) {
   const { theme } = useTheme();
-  const secondaryTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-400';
+  const secondaryTextColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
 
   return (
     <>
-      <LightCardHeader name={name} isOn={isOn} IconComponent={IconComponent} size="large" />
+      <LightCardHeader
+        name={name}
+        isOn={isOn}
+        IconComponent={IconComponent}
+        size="large"
+        iconAriaLabel={iconButtonProps['aria-label']}
+        onIconClick={iconButtonProps.onClick}
+        onIconPointerDown={iconButtonProps.onPointerDown}
+      />
 
       <div className="flex-1 flex flex-col justify-between">
         {/* Brightness section */}

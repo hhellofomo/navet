@@ -1,5 +1,6 @@
 import { Flame, Snowflake, Wind } from 'lucide-react';
 import { memo } from 'react';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useTheme } from '@/app/contexts/theme-context';
 import { getHVACModeButtonColor } from '@/app/utils/hvac-styles';
 
@@ -7,7 +8,7 @@ interface HVACModeControlsProps {
   mode: string;
   isOn: boolean;
   onModeChange: (mode: string) => void;
-  size?: 'small' | 'medium' | 'large';
+  size?: CardSize;
 }
 
 export const HVACModeControls = memo(function HVACModeControls({

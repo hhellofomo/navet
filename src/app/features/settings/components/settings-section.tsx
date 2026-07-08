@@ -17,11 +17,13 @@ import {
 } from 'lucide-react';
 import { type ReactNode, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { InteractionPreviewCard } from '@/app/components/shared/interaction-preview-card';
 import { useAuth } from '@/app/contexts/auth-context';
 import { useConfig } from '@/app/contexts/config-context';
 import { type ThemeType, useTheme } from '@/app/contexts/theme-context';
 import {
   type DashboardEntityMode,
+  type EntityInteractionMode,
   type PrimaryColor,
   useDashboardEntitiesStore,
   useSettingsStore,
@@ -117,6 +119,7 @@ export function SettingsSection() {
   const { logout, config } = useAuth();
   const { clearConfig } = useConfig();
   const disableAnimations = useSettingsStore((state) => state.disableAnimations);
+  const entityInteractionMode = useSettingsStore((state) => state.entityInteractionMode);
   const updateSettings = useSettingsStore((state) => state.updateSettings);
   const dashboardMode = useDashboardEntitiesStore((state) => state.mode);
   const setDashboardMode = useDashboardEntitiesStore((state) => state.setMode);
@@ -260,7 +263,7 @@ export function SettingsSection() {
   const insetBg = theme === 'light' ? 'bg-white' : 'bg-black/20';
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
   const mutedColor = theme === 'light' ? 'text-gray-700' : 'text-gray-300';
-  const subtleColor = theme === 'light' ? 'text-gray-500' : 'text-gray-400';
+  const subtleColor = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
   const borderColor = theme === 'light' ? 'border-gray-200/80' : 'border-white/10';
   const dividerColor = theme === 'light' ? 'divide-gray-200/80' : 'divide-white/10';
   const lineColor = theme === 'light' ? 'border-gray-200/80' : 'border-white/10';
@@ -533,6 +536,53 @@ export function SettingsSection() {
             <p className={`mt-3 text-xs leading-relaxed ${subtleColor}`}>
               Auto keeps discovery hands-off. Manual only shows entities you explicitly add.
             </p>
+          </SettingsItem>
+
+          <SettingsItem
+            title="Card interaction style"
+            description="Choose whether tapping the card should toggle the device right away or open its controls first."
+            textColor={textColor}
+            subtleColor={subtleColor}
+          >
+            <div className={`inline-flex rounded-full p-1 ${softBg}`}>
+              {(
+                [
+                  { value: 'toggle-first', label: 'Tap toggles' },
+                  { value: 'control-first', label: 'Tap opens controls' },
+                ] as Array<{ value: EntityInteractionMode; label: string }>
+              ).map((option) => {
+                const isActive = entityInteractionMode === option.value;
+                return (
+                  <button
+                    type="button"
+                    key={option.value}
+                    onClick={() => updateSettings({ entityInteractionMode: option.value })}
+                    className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
+                      isActive ? 'shadow-sm' : ''
+                    }`}
+                    style={
+                      isActive
+                        ? {
+                            backgroundColor: accentColor,
+                            color: '#ffffff',
+                          }
+                        : {
+                            color: theme === 'light' ? '#4b5563' : '#d1d5db',
+                          }
+                    }
+                    aria-pressed={isActive}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <InteractionPreviewCard
+              mode={entityInteractionMode}
+              accentColor={accentColor}
+              isLightTheme={theme === 'light'}
+            />
           </SettingsItem>
 
           <SettingsItem
