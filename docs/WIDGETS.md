@@ -190,7 +190,7 @@ Currently use mock data. Future updates will add settings dialogs for customizat
 
 ```tsx
 import { Icon } from 'lucide-react';
-import { useTheme } from '../../contexts/theme-context';
+import { useTheme } from '@/app/hooks';
 
 interface MyWidgetProps {
   size?: 'small' | 'medium' | 'large';
@@ -266,6 +266,7 @@ export function MyWidget({ size = 'medium' }: MyWidgetProps) {
 - Include rounded corners (`rounded-2xl`)
 - Add theme-aware colors
 - Support all three theme modes
+- Keep `extra-small` as an optional dense layout path only when the widget genuinely benefits from it
 - Respect size constraints
 - Include proper spacing (4px grid system)
 - Add loading states if needed

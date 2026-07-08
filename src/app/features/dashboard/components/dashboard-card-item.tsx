@@ -34,6 +34,11 @@ export const DashboardCardItem = memo(function DashboardCardItem({
   onRemoveEntity,
   allowEntityRemoval = false,
 }: DashboardCardItemProps) {
+  const isCompact = size === 'extra-small' || size === 'small';
+  const removeButtonPosition = isCompact ? 'top-4 left-4' : 'top-5 left-5';
+  const removeButtonSize = isCompact ? 'w-8 h-8' : 'w-10 h-10';
+  const removeIconSize = isCompact ? 'w-4 h-4' : 'w-5 h-5';
+
   return (
     <DraggableCard id={id} index={index} isEditMode={isEditMode} className={getCardSpanClass(size)}>
       {device && isEditMode && allowEntityRemoval && onRemoveEntity && (
@@ -43,10 +48,10 @@ export const DashboardCardItem = memo(function DashboardCardItem({
             event.stopPropagation();
             onRemoveEntity(id);
           }}
-          className="absolute top-2 left-2 z-20 w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow-lg"
+          className={`absolute ${removeButtonPosition} z-20 ${removeButtonSize} rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow-lg`}
           aria-label="Remove entity from dashboard"
         >
-          <X className="w-4 h-4 text-white" />
+          <X className={`${removeIconSize} text-white`} />
         </button>
       )}
       {device

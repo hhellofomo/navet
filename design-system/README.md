@@ -12,7 +12,7 @@ Comprehensive design system covering:
 - Icon sizing standards
 - Glass morphism effects
 - Interactive states and animations
-- Card size system (small/medium/large)
+- Card size system (extra-small/small/medium/large)
 - Accessibility guidelines
 - Component patterns
 - Best practices
@@ -58,7 +58,7 @@ Complete feature implementation guide:
 1. **iOS Widget Aesthetic** - Frosted glass, rounded corners, semantic colors
 2. **Adaptive Layouts** - Content rearranges intelligently based on card size
 3. **Room-Based Organization** - Filter devices by physical location
-4. **Consistent Icon Sizing** - Small cards: 8×8 container / 4×4 icon, Medium/Large: 10×10 / 5×5
+4. **Consistent Icon Sizing** - Extra-small: 7×7 container / 3.5×3.5 icon, Small: 8×8 / 4×4, Medium/Large: 10×10 / 5×5
 5. **Smooth Transitions** - 500ms for state changes, 200ms for interactions
 6. **Theme Customization** - Three theme modes (Dark, Light, High Contrast) with 8 primary color options
 7. **Section-Based Navigation** - Organized into dedicated sections (Home, Security, Tasks, Locks, Lights, Media, Settings)
@@ -94,9 +94,13 @@ Complete feature implementation guide:
 - **Borders**: `border-{color}-700/20` (20% opacity) or `border-gray-200` (light theme)
 
 ### Card Sizes
-- **Small (1×1)**: Minimal info, quick toggle, `p-4`
-- **Medium (2×1)**: Primary controls + info, `p-5`
-- **Large (2×2)**: Full controls + advanced features, `p-6`
+- **Extra-Small (1×0.5)**: Dense status or single-control layouts, compact padding and minimal controls
+  Light cards keep an unlabeled brightness slider visible here; tap behavior determines whether a compact settings action shares that row or the slider uses the full width.
+- **Small (1×1)**: Minimal info, quick toggle, `p-4`, minimum `190px × 190px`
+- **Medium (2×1)**: Primary controls + info, `p-5`, minimum `396px` wide and `190px` tall
+- **Large (2×2)**: Full controls + advanced features, `p-6`, minimum `396px × 396px`
+
+Dashboard cards use `repeat(auto-fit, minmax(190px, 1fr))`, so cards can grow wider when the container has more space.
 
 ### Responsive Breakpoints
 - **Mobile**: `< 768px` - 2 column grid, hidden sidebar
@@ -111,8 +115,8 @@ When creating a new card component:
 - [ ] Import icons from `lucide-react`
 - [ ] Use `memo()` for performance
 - [ ] Accept `size: CardSize` prop
-- [ ] Implement all three size layouts (small, medium, large)
-- [ ] Place icon in top right corner with consistent sizing
+- [ ] Implement all supported size layouts, including `extra-small` when the feature needs a dense mode
+- [ ] Place the primary entity icon in the card header with consistent sizing
 - [ ] Use `truncate` class for text overflow
 - [ ] Add `flex-shrink-0` to icon containers
 - [ ] Implement 500ms transitions for state changes
@@ -129,8 +133,8 @@ When creating a new card component:
 /src/app/components/empty-state.tsx → Empty state component for sections
 /src/app/components/card-size-selector.tsx → Size selection logic
 /src/app/contexts/auth-context.tsx → Authentication state management
-/src/app/contexts/theme-context.tsx → Theme and color customization
-/src/app/contexts/navigation-context.tsx → Section navigation state
+/src/app/hooks/use-theme.ts      → Theme and color customization
+/src/app/hooks/use-navigation.ts → Section navigation state
 /src/app/features/auth/login-page.tsx → Login interface
 /src/styles/theme.css         → Design tokens and variables
 /src/styles/tailwind.css      → Tailwind configuration

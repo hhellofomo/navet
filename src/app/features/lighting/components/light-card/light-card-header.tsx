@@ -25,12 +25,15 @@ export const LightCardHeader = memo(function LightCardHeader({
 }: LightCardHeaderProps) {
   const { theme } = useTheme();
   const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
+  const isExtraSmall = size === 'extra-small';
   const isCompact = size === 'extra-small' || size === 'small';
   const titleSize = isCompact ? 'text-xs' : 'text-sm';
-  const marginBottom = 'mb-2';
+  const marginBottom = isExtraSmall ? 'mb-1' : 'mb-2';
+  const headerGap = isExtraSmall ? 'gap-2' : 'gap-3';
+  const subtitleMarginTop = isExtraSmall ? 'mt-0' : 'mt-0.5';
 
   return (
-    <div className={`flex items-start gap-3 ${marginBottom}`}>
+    <div className={`flex items-start ${headerGap} ${marginBottom}`}>
       <EntityCardHeaderIcon
         IconComponent={IconComponent}
         isActive={isOn}
@@ -41,7 +44,7 @@ export const LightCardHeader = memo(function LightCardHeader({
       />
       <div className="min-w-0 flex-1">
         <h3 className={`font-semibold ${titleSize} ${textColor} truncate`}>{name}</h3>
-        <p className="text-[10px] text-gray-300 truncate mt-0.5">Light</p>
+        <p className={`text-[10px] text-gray-300 truncate ${subtitleMarginTop}`}>Light</p>
       </div>
     </div>
   );

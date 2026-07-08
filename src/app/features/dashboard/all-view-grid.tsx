@@ -4,7 +4,7 @@ import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useSearch, useTheme } from '../../hooks';
 import type { CustomCard } from '../../hooks/use-custom-cards';
 import type { DeviceWithType } from '../../types/device.types';
-import { getDeviceRoom, UNKNOWN_ROOM_LABEL } from '../../utils/device-location';
+import { getDeviceRoomLabel, UNKNOWN_ROOM_LABEL } from '../../utils/device-location';
 import { DashboardCardItem } from './components/dashboard-card-item';
 
 interface AllViewGridProps {
@@ -117,7 +117,7 @@ const RoomSection = memo(function RoomSection({
 
       {isVisible ? (
         <SortableContext items={orderedRoomIds} strategy={rectSortingStrategy}>
-          <div className="grid justify-start grid-flow-col-dense grid-cols-[repeat(auto-fit,190px)] gap-2 md:gap-3 lg:gap-4 auto-rows-[91px] md:auto-rows-[89px] lg:auto-rows-[87px]">
+          <div className="grid w-full grid-flow-row-dense grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-4 auto-rows-[87px]">
             {orderedRoomIds.map((id, index) => {
               const device = deviceMap.get(id);
               if (device) {
@@ -210,13 +210,11 @@ export const AllViewGrid = memo(function AllViewGrid({
         return;
       }
 
-      const room = getDeviceRoom(device);
-      if (room) {
-        if (!grouped[room]) {
-          grouped[room] = [];
-        }
-        grouped[room].push(device);
+      const room = getDeviceRoomLabel(device);
+      if (!grouped[room]) {
+        grouped[room] = [];
       }
+      grouped[room].push(device);
     });
 
     return grouped;
