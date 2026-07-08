@@ -84,6 +84,13 @@ export const LightCardSmall = memo(function LightCardSmall({
 						className="w-7 h-7 rounded-full transition-all duration-300 flex items-center justify-center cursor-pointer relative overflow-hidden bg-gradient-to-r from-amber-600 via-yellow-200 to-blue-200 hover:scale-105"
 						title="Color Temperature"
 						onClick={(e) => e.stopPropagation()}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								(e.currentTarget.querySelector('input[type="color"]') as HTMLInputElement)?.click();
+							}
+						}}
+						tabIndex={isOn ? 0 : -1}
 					>
 						<input
 							type="color"
@@ -120,6 +127,13 @@ export const LightCardSmall = memo(function LightCardSmall({
 						className="w-7 h-7 rounded-full bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 hover:scale-105 transition-all flex items-center justify-center cursor-pointer relative overflow-hidden"
 						title="Custom color"
 						onClick={(e) => e.stopPropagation()}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								(e.currentTarget.querySelector('input[type="color"]') as HTMLInputElement)?.click();
+							}
+						}}
+						tabIndex={isOn ? 0 : -1}
 					>
 						<input
 							type="color"
@@ -140,6 +154,7 @@ export const LightCardSmall = memo(function LightCardSmall({
 
 					{/* Settings button */}
 					<button
+						type="button"
 						onClick={(e) => {
 							e.stopPropagation();
 							onSettingsClick();

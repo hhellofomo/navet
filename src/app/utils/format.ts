@@ -22,7 +22,14 @@ export function formatTime(date: Date, use24Hour: boolean = false): string {
  * Formats a date in a human-readable format
  */
 export function formatDate(date: Date): string {
-	return format(date, 'MMM d, yyyy');
+	return format(date, 'MMMM d, yyyy');
+}
+
+/**
+ * Formats a date with time in 24-hour format (hours and minutes only)
+ */
+export function formatDateWithTime(date: Date): string {
+	return format(date, 'MMMM d, yyyy HH:mm');
 }
 
 /**
@@ -86,4 +93,13 @@ export function toTitleCase(text: string): string {
 		.split(' ')
 		.map((word) => capitalize(word))
 		.join(' ');
+}
+
+/**
+ * Calculates the week number for a given date
+ */
+export function getWeekNumber(date: Date): number {
+	const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+	const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
+	return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
 }

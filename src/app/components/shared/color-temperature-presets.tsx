@@ -39,6 +39,7 @@ export const ColorTemperaturePresets = memo(function ColorTemperaturePresets({
 		<>
 			{options.map((option) => (
 				<button
+					type="button"
 					key={option.value}
 					onClick={(e) => {
 						e.stopPropagation();

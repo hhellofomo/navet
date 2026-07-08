@@ -2,6 +2,7 @@ import { Clipboard, Home, Lightbulb, Lock, Settings, Tv, Video } from 'lucide-re
 import { memo } from 'react';
 import { type Section, useNavigation } from '../contexts/navigation-context';
 import { useTheme } from '../contexts/theme-context';
+import { ImageWithFallback } from './figma/ImageWithFallback';
 
 export const Sidebar = memo(function Sidebar() {
 	const { theme } = useTheme();
@@ -61,23 +62,26 @@ export const Sidebar = memo(function Sidebar() {
 		<>
 			{/* Desktop Sidebar */}
 			<div
-				className={`fixed left-0 top-0 h-full w-16 ${bgColor} border-r flex-col items-center py-6 gap-4 hidden md:flex z-50`}
+				className={`fixed left-0 top-0 h-full w-16 ${bgColor} border-r flex-col items-center py-6 gap-8 hidden md:flex z-50`}
 			>
 				<div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center mb-4">
-					<Home className="w-6 h-6 text-white" />
+					<ImageWithFallback src="/logo.svg" alt="Brand Logo" className="w-10 h-10" />
 				</div>
 
-				{menuItems.map((item, index) => (
-					<button
-						key={index}
-						onClick={item.onClick}
-						className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
-							item.section && activeSection === item.section ? activeColor : inactiveColor
-						}`}
-					>
-						<item.icon className="w-5 h-5" />
-					</button>
-				))}
+				<div className="flex flex-col gap-4">
+					{menuItems.map((item, index) => (
+						<button
+							type="button"
+							key={index}
+							onClick={item.onClick}
+							className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+								item.section && activeSection === item.section ? activeColor : inactiveColor
+							}`}
+						>
+							<item.icon className="w-5 h-5" />
+						</button>
+					))}
+				</div>
 			</div>
 
 			{/* Mobile Bottom Navigation */}
@@ -87,6 +91,7 @@ export const Sidebar = memo(function Sidebar() {
 				{[menuItems[0], menuItems[1], menuItems[4], menuItems[5], menuItems[6]].map(
 					(item, index) => (
 						<button
+							type="button"
 							key={index}
 							onClick={item.onClick}
 							className={`flex flex-col items-center gap-1 py-2 px-2 rounded-lg transition-colors ${

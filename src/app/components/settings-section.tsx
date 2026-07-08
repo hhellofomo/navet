@@ -155,10 +155,13 @@ export function SettingsSection() {
 					<div className="p-4 space-y-5">
 						{/* Theme Mode */}
 						<div>
-							<label className={`text-xs font-medium ${textColor} block mb-2`}>Theme Mode</label>
+							<label htmlFor="theme-mode" className={`text-xs font-medium ${textColor} block mb-2`}>
+								Theme Mode
+							</label>
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-2">
 								{themeOptions.map((option) => (
 									<button
+										type="button"
 										key={option.value}
 										onClick={() => setTheme(option.value)}
 										className={`
@@ -206,13 +209,19 @@ export function SettingsSection() {
 
 						{/* Primary Color */}
 						<div>
-							<label className={`text-xs font-medium ${textColor} block mb-2`}>Primary Color</label>
+							<label
+								htmlFor="primary-color"
+								className={`text-xs font-medium ${textColor} block mb-2`}
+							>
+								Primary Color
+							</label>
 							<p className={`text-xs ${subtleColor} mb-3`}>
 								Choose a color that will be used for active states throughout your dashboard
 							</p>
 							<div className="flex items-center gap-2.5">
 								{colorOptions.map((option) => (
 									<button
+										type="button"
 										key={option.value}
 										onClick={() => setPrimaryColor(option.value)}
 										className={`w-10 h-10 rounded-full transition-all duration-300 flex-shrink-0 ${
@@ -231,7 +240,7 @@ export function SettingsSection() {
 
 						{/* Background Wallpaper */}
 						<div>
-							<label className={`text-xs font-medium ${textColor} block mb-2`}>
+							<label htmlFor="wallpaper" className={`text-xs font-medium ${textColor} block mb-2`}>
 								Background Wallpaper
 							</label>
 							<p className={`text-xs ${subtleColor} mb-3`}>
@@ -258,6 +267,7 @@ export function SettingsSection() {
 										/>
 									</div>
 									<button
+										type="button"
 										onClick={handleRemoveWallpaper}
 										className={`absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center ${
 											theme === 'light' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
@@ -338,6 +348,7 @@ export function SettingsSection() {
 						{/* Reset Connection Button */}
 						{config?.url && (
 							<button
+								type="button"
 								onClick={handleResetConnection}
 								className={`w-full p-3 rounded-xl border ${borderColor} ${theme === 'light' ? 'bg-gray-50' : 'bg-white/5'} ${hoverBg} transition-all text-left flex items-center gap-3`}
 							>
@@ -410,6 +421,7 @@ export function SettingsSection() {
 						</div>
 
 						<button
+							type="button"
 							onClick={() => setShowLicense(!showLicense)}
 							className={`w-full p-3 rounded-xl border ${borderColor} ${hoverBg} transition-all text-left flex items-center justify-between`}
 						>
@@ -495,6 +507,7 @@ export function SettingsSection() {
 						</div>
 
 						<button
+							type="button"
 							onClick={() => setShowTerms(!showTerms)}
 							className={`w-full p-3 rounded-xl border ${borderColor} ${hoverBg} transition-all text-left flex items-center justify-between`}
 						>
@@ -619,6 +632,7 @@ export function SettingsSection() {
 				{/* Logout Section */}
 				<section>
 					<button
+						type="button"
 						onClick={handleLogout}
 						className={`w-full p-4 rounded-2xl border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 transition-all text-left flex items-center gap-3`}
 					>

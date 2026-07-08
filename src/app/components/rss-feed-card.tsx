@@ -167,9 +167,12 @@ export const RSSFeedCard = memo(function RSSFeedCard({
 					<div className="flex-1 overflow-hidden">
 						<div className="space-y-3">
 							{mediumArticles.map((item, index) => (
-								<div
+								<a
 									key={item.id}
-									className={`group/item cursor-pointer ${hoverBg} rounded-lg p-2 -m-2 transition-colors text-left`}
+									href={item.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className={`group/item cursor-pointer ${hoverBg} rounded-lg p-2 -m-2 transition-colors text-left block no-underline`}
 									onClick={(e) => {
 										e.stopPropagation();
 										handleArticleClick(item.url);
@@ -188,7 +191,7 @@ export const RSSFeedCard = memo(function RSSFeedCard({
 									{index < mediumArticles.length - 1 && (
 										<div className={`h-px ${dividerColor} mt-3`} />
 									)}
-								</div>
+								</a>
 							))}
 						</div>
 					</div>
@@ -197,9 +200,12 @@ export const RSSFeedCard = memo(function RSSFeedCard({
 					<div className="flex-1 overflow-hidden">
 						<div className="space-y-2">
 							{largeArticles.map((item, index) => (
-								<div
+								<a
 									key={item.id}
-									className={`group/item cursor-pointer ${hoverBg} rounded-xl p-2 -m-2 transition-colors text-left`}
+									href={item.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className={`group/item cursor-pointer ${hoverBg} rounded-xl p-2 -m-2 transition-colors text-left block no-underline`}
 									onClick={(e) => {
 										e.stopPropagation();
 										handleArticleClick(item.url);
@@ -241,7 +247,7 @@ export const RSSFeedCard = memo(function RSSFeedCard({
 									{index < largeArticles.length - 1 && (
 										<div className={`h-px ${dividerColor} mt-2`} />
 									)}
-								</div>
+								</a>
 							))}
 						</div>
 					</div>

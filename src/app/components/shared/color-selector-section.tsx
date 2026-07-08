@@ -29,6 +29,7 @@ export const ColorSelectorSection = memo(function ColorSelectorSection({
 			<div className="grid grid-cols-6 gap-3">
 				{colors.map((color) => (
 					<button
+						type="button"
 						key={color}
 						onClick={() => onColorChange(color)}
 						disabled={!isOn}

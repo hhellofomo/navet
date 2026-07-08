@@ -20,7 +20,7 @@ import { WifiCard } from '../components/wifi-card';
 interface DeviceData {
 	id: string;
 	type: string;
-	[key: string]: any;
+	[key: string]: string | number | boolean | undefined;
 }
 
 interface CardRendererOptions {

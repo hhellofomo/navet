@@ -8,7 +8,7 @@ interface NoteWidgetProps {
 	onNoteChange?: (note: string) => void;
 }
 
-export function NoteWidget({ size = 'small', initialNote = '', onNoteChange }: NoteWidgetProps) {
+export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetProps, 'size'>) {
 	const { theme, primaryColor } = useTheme();
 	const [note, setNote] = useState(initialNote || 'Click to add a note...');
 	const [isEditing, setIsEditing] = useState(false);
@@ -73,6 +73,7 @@ export function NoteWidget({ size = 'small', initialNote = '', onNoteChange }: N
 				</div>
 				{!isEditing && (
 					<button
+						type="button"
 						onClick={handleStartEdit}
 						className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
 						style={{ backgroundColor: theme === 'light' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.05)' }}
@@ -98,6 +99,7 @@ export function NoteWidget({ size = 'small', initialNote = '', onNoteChange }: N
 						/>
 						<div className="flex gap-2 mt-3">
 							<button
+								type="button"
 								onClick={handleCancel}
 								className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${textSecondary}`}
 								style={{
@@ -107,6 +109,7 @@ export function NoteWidget({ size = 'small', initialNote = '', onNoteChange }: N
 								Cancel
 							</button>
 							<button
+								type="button"
 								onClick={handleSave}
 								className="flex-1 py-2 rounded-lg text-xs font-medium text-white transition-colors"
 								style={{ backgroundColor: getColorValue(primaryColor) }}
@@ -119,15 +122,16 @@ export function NoteWidget({ size = 'small', initialNote = '', onNoteChange }: N
 						</div>
 					</>
 				) : (
-					<div
+					<button
+						type="button"
 						onClick={handleStartEdit}
-						className={`flex-1 p-3 rounded-xl text-sm cursor-pointer transition-colors ${
+						className={`flex-1 p-3 rounded-xl text-sm cursor-pointer transition-colors text-left ${
 							note === 'Click to add a note...' ? textSecondary : textPrimary
 						}`}
 						style={{ backgroundColor: theme === 'light' ? '#f3f4f6' : 'rgba(255, 255, 255, 0.05)' }}
 					>
 						<p className="whitespace-pre-wrap">{note}</p>
-					</div>
+					</button>
 				)}
 			</div>
 		</div>

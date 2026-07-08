@@ -233,4 +233,8 @@ For complete brand guidelines, see:
 
 ---
 
+<<<<<<< HEAD
 **Last Updated:** March 5, 2026
+=======
+**Last Updated:** March 5, 2026
+>>>>>>> 9122518 (fix: resolve Biome linting issues and improve accessibility)

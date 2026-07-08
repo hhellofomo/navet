@@ -24,6 +24,7 @@ export const ColorPicker = memo(function ColorPicker({
 		<>
 			{colors.map((color) => (
 				<button
+					type="button"
 					key={color}
 					onClick={(e) => {
 						e.stopPropagation();

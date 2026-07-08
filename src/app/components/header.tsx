@@ -3,6 +3,7 @@ import { memo, useEffect, useState } from 'react';
 import { useSearch } from '../contexts/search-context';
 import { useTheme } from '../contexts/theme-context';
 import { useDevices } from '../hooks/use-devices';
+import { formatDateWithTime, getWeekNumber } from '../utils/format';
 import { NotificationPanel } from './notification-panel';
 import { UserDropdown } from './user-dropdown';
 
@@ -25,7 +26,7 @@ export const Header = memo(function Header() {
 		const matchingIds: string[] = [];
 
 		// Search through all device types
-		const searchInDevices = <T extends Record<string, any>>(
+		const searchInDevices = <T extends Record<string, string | number | boolean | undefined>>(
 			deviceArray: T[] | undefined,
 			searchFields: (keyof T)[]
 		) => {
@@ -103,7 +104,7 @@ export const Header = memo(function Header() {
 				<div>
 					<h1 className={`text-2xl md:text-4xl font-bold ${textPrimary} mb-1`}>Hello, Vishal!</h1>
 					<p className={`${textSecondary} text-xs md:text-sm`}>
-						Take full control of your home instantly
+						{formatDateWithTime(new Date())} | Week {getWeekNumber(new Date())}
 					</p>
 				</div>
 			</div>

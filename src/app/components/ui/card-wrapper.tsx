@@ -3,7 +3,7 @@ import { useTheme } from '../../contexts/theme-context';
 
 interface CardWrapperProps {
 	children: ReactNode;
-	onClick?: () => void;
+	onClick?: (event: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => void;
 	className?: string;
 	isDisabled?: boolean;
 	lightOverlayClassName?: string;
@@ -26,7 +26,15 @@ export const CardWrapper = memo(function CardWrapper({
 
 	return (
 		<div
+			role={onClick && !isDisabled ? 'button' : undefined}
+			tabIndex={onClick && !isDisabled ? 0 : undefined}
 			onClick={!isDisabled ? onClick : undefined}
+			onKeyDown={(e) => {
+				if (onClick && !isDisabled && (e.key === 'Enter' || e.key === ' ')) {
+					e.preventDefault();
+					onClick(e);
+				}
+			}}
 			className={`relative h-full backdrop-blur-xl rounded-3xl border overflow-hidden transition-all duration-500 ${onClick && !isDisabled ? 'cursor-pointer' : ''} ${theme === 'light' && showShadow ? 'shadow-lg' : ''} ${className}`}
 		>
 			{children}

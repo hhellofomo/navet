@@ -8,7 +8,10 @@ interface LockCardProps {
 	initialState?: boolean; // true = locked, false = unlocked
 }
 
-export const LockCard = memo(function LockCard({ name, room, initialState = true }: LockCardProps) {
+export const LockCard = memo(function LockCard({
+	name,
+	initialState = true,
+}: Omit<LockCardProps, 'room'>) {
 	const [isLocked, setIsLocked] = useState(initialState);
 	const { theme, colors } = useTheme();
 
@@ -46,6 +49,7 @@ export const LockCard = memo(function LockCard({ name, room, initialState = true
 
 				<div className="flex-1 flex flex-col items-center justify-center">
 					<button
+						type="button"
 						onClick={() => setIsLocked(!isLocked)}
 						className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-105 ${
 							isLocked

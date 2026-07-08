@@ -373,6 +373,7 @@ export const SensorGroupSettingsDialog = memo(function SensorGroupSettingsDialog
 
 									<Dialog.Close asChild>
 										<button
+											type="button"
 											onClick={handleCancel}
 											className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all"
 										>
@@ -398,7 +399,7 @@ export const SensorGroupSettingsDialog = memo(function SensorGroupSettingsDialog
 													const Icon = sensor.icon ? iconMap[sensor.icon] : Gauge;
 													return (
 														<div
-															key={index}
+															key={sensor.id}
 															className="bg-white/5 rounded-2xl p-3 border border-white/10 flex items-center justify-between"
 														>
 															<div className="flex items-center gap-2 min-w-0 flex-1">
@@ -417,6 +418,7 @@ export const SensorGroupSettingsDialog = memo(function SensorGroupSettingsDialog
 																</div>
 															</div>
 															<button
+																type="button"
 																onClick={() => handleRemoveSensor(index)}
 																className="w-7 h-7 rounded-full bg-red-500/20 hover:bg-red-500/30 flex items-center justify-center transition-colors flex-shrink-0"
 																aria-label="Remove sensor"
@@ -514,19 +516,25 @@ export const SensorGroupSettingsDialog = memo(function SensorGroupSettingsDialog
 																		'gi'
 																	);
 																	const parts = text.split(regex);
-																	return parts.map((part, i) =>
-																		regex.test(part) ? (
-																			<span key={i} className={`${colors.iconColor}`}>
+																	return parts.map((part, i) => {
+																		const isMatch = part
+																			.toLowerCase()
+																			.includes(query.toLowerCase());
+																		// Create a stable key that doesn't rely on array index
+																		const key = `${part}-${i}-${isMatch ? 'match' : 'text'}`;
+																		return isMatch ? (
+																			<span key={key} className={`${colors.iconColor}`}>
 																				{part}
 																			</span>
 																		) : (
 																			part
-																		)
-																	);
+																		);
+																	});
 																};
 
 																return (
 																	<button
+																		type="button"
 																		key={sensor.id}
 																		onMouseDown={(e) => {
 																			e.preventDefault(); // Prevent blur
@@ -587,12 +595,14 @@ export const SensorGroupSettingsDialog = memo(function SensorGroupSettingsDialog
 					{/* Footer Actions */}
 					<div className="p-6 border-t border-white/10 flex gap-3">
 						<button
+							type="button"
 							onClick={handleCancel}
 							className="flex-1 py-3 px-4 rounded-2xl bg-white/5 hover:bg-white/10 text-white font-medium transition-colors"
 						>
 							Cancel
 						</button>
 						<button
+							type="button"
 							onClick={handleSave}
 							className={`flex-1 py-3 px-4 rounded-2xl ${colors.iconBg} ${colors.hover} text-white font-medium transition-colors`}
 						>

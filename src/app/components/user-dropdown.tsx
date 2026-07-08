@@ -71,6 +71,7 @@ export function UserDropdown() {
 		<div className="relative" ref={dropdownRef}>
 			{/* Avatar Button */}
 			<button
+				type="button"
 				onClick={() => setIsOpen(!isOpen)}
 				className="flex items-center gap-2 group cursor-pointer"
 			>
@@ -115,6 +116,7 @@ export function UserDropdown() {
 					{/* Logout Button */}
 					<div className="p-2 border-t border-white/10">
 						<button
+							type="button"
 							onClick={handleLogout}
 							className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-500/10 transition-all`}
 						>
