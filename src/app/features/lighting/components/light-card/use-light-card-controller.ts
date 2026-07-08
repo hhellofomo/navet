@@ -7,6 +7,7 @@ import { DEFAULT_LIGHT_ICON, LIGHT_ICON_MAP } from '@/app/constants/icon-map';
 import { TEMP_OPTIONS } from '@/app/constants/light-constants';
 import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
+import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { getGradientColors } from '@/app/utils/color-utils';
 import { useBrightnessPresets } from '../../hooks/use-brightness-presets';
 import { useLightMemoryStore } from '../../stores/light-memory-store';
@@ -92,7 +93,8 @@ export function useLightCardController({
   const [isOpen, setIsOpen] = useState(false);
   const [applyBrightnessPresetsToAll, setApplyBrightnessPresetsToAll] = useState(true);
   const [selectedIcon, setSelectedIcon] = useState(DEFAULT_LIGHT_ICON);
-  const { connection, entities } = useHomeAssistant();
+  const connection = useHomeAssistant(homeAssistantSelectors.connection);
+  const entities = useHomeAssistant(homeAssistantSelectors.entities);
   const { theme } = useTheme();
   const { t } = useI18n();
   const brightnessPresets = useBrightnessPresets(id);

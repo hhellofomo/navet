@@ -1,6 +1,7 @@
 import type { Connection, HassEntity } from 'home-assistant-js-websocket';
 import { useEffect, useMemo, useState } from 'react';
 import { useI18n } from '../i18n';
+import { homeAssistantSelectors } from '../stores/selectors';
 import type {
   CalendarDevice,
   ClimateDevice,
@@ -90,7 +91,11 @@ async function fetchCalendarEvents(
  * Maps Home Assistant entities to Navet device structure
  */
 export const useHADevices = (): DeviceCollection => {
-  const { areas, connection, deviceRegistry, entities, entityRegistry } = useHomeAssistant();
+  const areas = useHomeAssistant(homeAssistantSelectors.areas);
+  const connection = useHomeAssistant(homeAssistantSelectors.connection);
+  const deviceRegistry = useHomeAssistant(homeAssistantSelectors.deviceRegistry);
+  const entities = useHomeAssistant(homeAssistantSelectors.entities);
+  const entityRegistry = useHomeAssistant(homeAssistantSelectors.entityRegistry);
   const { locale, t } = useI18n();
   const primaryWeatherEntityId = useMemo(() => {
     if (!entities) {

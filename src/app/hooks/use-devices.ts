@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { DEVICES } from '../data/mock-devices';
+import { homeAssistantSelectors } from '../stores/selectors';
 import type { DeviceCollection } from '../types/device.types';
 import { getAllRooms } from '../utils/device-location';
 import { useHADevices } from './use-ha-devices';
@@ -21,7 +22,7 @@ import { useHomeAssistant } from './use-home-assistant';
  * For now, returns mock data
  */
 export const useDevices = (): DeviceCollection => {
-  const { connected } = useHomeAssistant();
+  const connected = useHomeAssistant(homeAssistantSelectors.connected);
   const haDevices = useHADevices();
   const fallbackDevices = useMemo(
     () => ({
