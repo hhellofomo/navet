@@ -1,8 +1,6 @@
 services:
   navet:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/awesomestvi/navet:latest
     environment:
       NAVET_HASS_URL: ${NAVET_HASS_URL}
       NAVET_HASS_TOKEN: ${NAVET_HASS_TOKEN}
