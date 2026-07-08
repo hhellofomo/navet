@@ -16,6 +16,12 @@ export const EnergyConsumersWidget = memo(function EnergyConsumersWidget({
 
   return (
     <EnergyWidgetShell title="Top consumers" eyebrow="Action priority">
+      {consumers.length === 0 ? (
+        <p className={`text-sm ${surface.textMuted}`}>
+          No individual devices configured. Add device monitors in your HA Energy settings, then
+          re-run auto-detect.
+        </p>
+      ) : null}
       <div className="space-y-3">
         {consumers.slice(0, 5).map((consumer) => (
           <div
@@ -31,8 +37,19 @@ export const EnergyConsumersWidget = memo(function EnergyConsumersWidget({
                   {consumer.room} • {(consumer.shareOfLoad * 100).toFixed(0)}% of load
                 </div>
               </div>
-              <div className={`text-right text-sm font-semibold ${surface.textPrimary}`}>
-                {(consumer.powerW / 1000).toFixed(1)} kW
+              <div className="text-right">
+                {consumer.powerW > 0 ? (
+                  <div className={`text-sm font-semibold ${surface.textPrimary}`}>
+                    {(consumer.powerW / 1000).toFixed(1)} kW
+                  </div>
+                ) : null}
+                {consumer.energyKWh > 0 ? (
+                  <div
+                    className={`text-sm font-semibold ${consumer.powerW > 0 ? surface.textSecondary : surface.textPrimary}`}
+                  >
+                    {consumer.energyKWh.toFixed(2)} kWh today
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>

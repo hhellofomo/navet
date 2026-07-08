@@ -1,4 +1,6 @@
 import { memo, useId } from 'react';
+import { useTheme } from '@/app/hooks';
+import { getEnergyChartTokens } from './energy-chart-tokens';
 
 export interface EnergySparklinePoint {
   value: number;
@@ -6,7 +8,7 @@ export interface EnergySparklinePoint {
 
 interface EnergySparklineProps {
   data: EnergySparklinePoint[];
-  color?: string;
+  accentColor: string;
   /** Height in viewBox units — controls aspect ratio (default 40) */
   height?: number;
 }
@@ -39,10 +41,12 @@ function smoothPath(pts: { x: number; y: number }[]): string {
 
 export const EnergySparkline = memo(function EnergySparkline({
   data,
-  color = '#22d3ee',
+  accentColor,
   height = 40,
 }: EnergySparklineProps) {
+  const { theme } = useTheme();
   const id = useId();
+  const tokens = getEnergyChartTokens(theme, accentColor);
 
   if (data.length < 2) return null;
 
@@ -73,26 +77,36 @@ export const EnergySparkline = memo(function EnergySparkline({
     >
       <defs>
         <linearGradient id={`${id}-sg`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.35" />
-          <stop offset="100%" stopColor={color} stopOpacity="0.02" />
+          <stop offset="0%" stopColor={tokens.accent} stopOpacity="0.2" />
+          <stop offset="100%" stopColor={tokens.accent} stopOpacity="0.01" />
         </linearGradient>
       </defs>
 
-      {/* Filled area */}
-      <path d={area} fill={`url(#${id}-sg)`} />
+      <line
+        x1={PAD_X}
+        y1={baseline}
+        x2={VB_W - PAD_X}
+        y2={baseline}
+        stroke={tokens.grid}
+        strokeWidth="1"
+      />
 
-      {/* Smooth stroke */}
+      <path d={area} fill={`url(#${id}-sg)`} />
       <path
         d={line}
         fill="none"
-        stroke={color}
+        stroke={tokens.accent}
         strokeWidth="1.5"
         strokeLinejoin="round"
         strokeLinecap="round"
       />
-
-      {/* Live dot at the last point */}
-      <circle cx={pts[pts.length - 1].x} cy={pts[pts.length - 1].y} r="2.5" fill={color} />
+      <circle
+        cx={pts[pts.length - 1].x}
+        cy={pts[pts.length - 1].y}
+        r="4"
+        fill={tokens.accentGlow}
+      />
+      <circle cx={pts[pts.length - 1].x} cy={pts[pts.length - 1].y} r="2.2" fill={tokens.accent} />
     </svg>
   );
 });

@@ -16,6 +16,14 @@ export const FLOW_TONE_GRADIENT: Record<EnergyFlowDatum['tone'], string> = {
   load: 'linear-gradient(90deg, #a78bfa, #60a5fa)',
 };
 
+export const FLOW_TONE_ACCENT: Record<EnergyFlowDatum['tone'], string> = {
+  solar: '#f59e0b',
+  battery: '#34d399',
+  grid: '#60a5fa',
+  heating: '#f97316',
+  load: '#8b5cf6',
+};
+
 export const HEATING_CATEGORIES: ReadonlySet<EnergyConsumerCategory> = new Set([
   'water_heater',
   'toilet_heater',

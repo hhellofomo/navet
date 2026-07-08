@@ -6,13 +6,19 @@ import { EnergyWidgetShell } from '../energy-widget-shell';
 
 interface EnergyStatusWidgetProps {
   liveStats: EnergyStat[];
+  importTodayKWh?: number;
+  solarTodayKWh?: number;
 }
 
 export const EnergyStatusWidget = memo(function EnergyStatusWidget({
   liveStats,
+  importTodayKWh,
+  solarTodayKWh,
 }: EnergyStatusWidgetProps) {
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
+
+  const showToday = importTodayKWh !== undefined || solarTodayKWh !== undefined;
 
   return (
     <EnergyWidgetShell title="Current state" eyebrow="Overview">
@@ -29,6 +35,32 @@ export const EnergyStatusWidget = memo(function EnergyStatusWidget({
           </div>
         ))}
       </div>
+
+      {showToday && (
+        <div className={`mt-3 rounded-3xl border p-4 ${surface.border} ${surface.panelMuted}`}>
+          <div className={`mb-3 text-xs uppercase tracking-[0.16em] ${surface.textMuted}`}>
+            Today
+          </div>
+          <div className="flex flex-wrap gap-6">
+            {importTodayKWh !== undefined && (
+              <div>
+                <div className={`text-2xl font-semibold ${surface.textPrimary}`}>
+                  {importTodayKWh.toFixed(1)} kWh
+                </div>
+                <div className={`mt-0.5 text-xs ${surface.textMuted}`}>grid import</div>
+              </div>
+            )}
+            {solarTodayKWh !== undefined && solarTodayKWh > 0 && (
+              <div>
+                <div className={`text-2xl font-semibold ${surface.textPrimary}`}>
+                  {solarTodayKWh.toFixed(1)} kWh
+                </div>
+                <div className={`mt-0.5 text-xs ${surface.textMuted}`}>solar generated</div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </EnergyWidgetShell>
   );
 });

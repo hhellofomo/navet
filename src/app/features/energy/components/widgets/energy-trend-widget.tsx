@@ -1,4 +1,6 @@
 import { memo } from 'react';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { useTheme } from '@/app/hooks';
 import type { EnergySeriesPoint } from '../../types/energy.types';
 import { EnergyAreaChart } from '../charts/energy-area-chart';
 import { EnergyBarChart } from '../charts/energy-bar-chart';
@@ -13,6 +15,8 @@ export const EnergyTrendWidget = memo(function EnergyTrendWidget({
   trend,
   accentColor,
 }: EnergyTrendWidgetProps) {
+  const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const barData = trend.map((p) => ({
     label: p.label,
     value: Math.round(p.value * 10) / 10,
@@ -26,9 +30,39 @@ export const EnergyTrendWidget = memo(function EnergyTrendWidget({
 
   return (
     <EnergyWidgetShell title="Trends over time" eyebrow="Usage vs solar">
-      <div className="space-y-4">
-        <EnergyBarChart data={barData} color={accentColor} />
-        <EnergyAreaChart data={areaData} color="#22d3ee" yUnit="%" yTicks={[0, 25, 50, 75, 100]} />
+      <div className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className={`rounded-3xl border p-4 ${surface.border} ${surface.panelMuted}`}>
+          <div className={`mb-3 flex items-end justify-between gap-3`}>
+            <div>
+              <div className={`text-xs uppercase tracking-[0.16em] ${surface.textMuted}`}>
+                Consumption
+              </div>
+              <div className={`mt-1 text-sm ${surface.textSecondary}`}>Near-term load trend</div>
+            </div>
+            <div className={`text-xs ${surface.textMuted}`}>kW</div>
+          </div>
+          <EnergyBarChart data={barData} accentColor={accentColor} />
+        </div>
+
+        <div className={`rounded-3xl border p-4 ${surface.border} ${surface.panelMuted}`}>
+          <div className={`mb-3 flex items-end justify-between gap-3`}>
+            <div>
+              <div className={`text-xs uppercase tracking-[0.16em] ${surface.textMuted}`}>
+                Solar share
+              </div>
+              <div className={`mt-1 text-sm ${surface.textSecondary}`}>
+                Relative production support
+              </div>
+            </div>
+            <div className={`text-xs ${surface.textMuted}`}>%</div>
+          </div>
+          <EnergyAreaChart
+            data={areaData}
+            accentColor={accentColor}
+            yUnit="%"
+            yTicks={[0, 50, 100]}
+          />
+        </div>
       </div>
     </EnergyWidgetShell>
   );

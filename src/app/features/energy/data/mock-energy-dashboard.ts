@@ -221,6 +221,8 @@ export function getMockEnergyOverview(range: EnergyRange): EnergyOverview {
       batteryPercent: 82,
       importW: 2000,
       exportW: 0,
+      importTodayKWh: 14.2,
+      solarTodayKWh: 31.6,
       gasTodayKWh: 12.4,
       hotWaterTodayKWh: 8.1,
       costToday: 17.42,

@@ -1,30 +1,25 @@
+import { Settings } from 'lucide-react';
 import { memo } from 'react';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import { useEnergyDashboard } from '../hooks/use-energy-dashboard';
 import type { EnergyRange, EnergyWidgetId } from '../types/energy.types';
-import { EnergyConsumersWidget } from './widgets/energy-consumers-widget';
-import { EnergyCostWidget } from './widgets/energy-cost-widget';
-import { EnergyDrilldownWidget } from './widgets/energy-drilldown-widget';
-import { EnergyFlowWidget } from './widgets/energy-flow-widget';
-import { EnergyHeatingWidget } from './widgets/energy-heating-widget';
-import { EnergyInsightsWidget } from './widgets/energy-insights-widget';
+import { EnergySetupPanel } from './energy-setup-panel';
+import { EnergyBatteryDevicesWidget } from './widgets/energy-battery-devices-widget';
+import { EnergyDeviceTotalsWidget } from './widgets/energy-device-totals-widget';
+import { EnergyGridAllocationWidget } from './widgets/energy-grid-allocation-widget';
+import { EnergyNowWidget } from './widgets/energy-now-widget';
 import { EnergyStatusWidget } from './widgets/energy-status-widget';
-import { EnergyStorageWidget } from './widgets/energy-storage-widget';
-import { EnergyTrendWidget } from './widgets/energy-trend-widget';
 
 const rangeOptions: EnergyRange[] = ['live', 'day', 'week', 'month'];
 
-const widgetLabels: Record<EnergyWidgetId, string> = {
-  status: 'Status',
-  flow: 'Flow',
-  consumers: 'Consumers',
-  cost: 'Cost',
-  trend: 'Trend',
-  storage: 'Storage',
-  heating: 'Heating',
-  insights: 'Insights',
-};
+const widgetOptions: Array<{ id: EnergyWidgetId; label: string }> = [
+  { id: 'status', label: 'Summary' },
+  { id: 'flow', label: 'In use now' },
+  { id: 'consumers', label: 'Device totals' },
+  { id: 'cost', label: 'Grid split' },
+  { id: 'battery', label: 'Battery devices' },
+];
 
 export const EnergySection = memo(function EnergySection() {
   const { theme, accentColor } = useTheme();
@@ -33,11 +28,21 @@ export const EnergySection = memo(function EnergySection() {
     overview,
     range,
     setRange,
-    selectedNode,
-    setSelectedNodeId,
     visibleWidgetSet,
     toggleWidgetVisibility,
-    heatingConsumers,
+    isConfigured,
+    sourceConfig,
+    showSetup,
+    openSetup,
+    closeSetup,
+    handleSaveConfig,
+    bathroomToiletTodayKWh,
+    bathroomToiletPowerW,
+    topDeviceTotals,
+    gridAllocation,
+    recentLoadTrend,
+    periodTotals,
+    batteryDevices,
   } = useEnergyDashboard();
 
   return (
@@ -55,16 +60,26 @@ export const EnergySection = memo(function EnergySection() {
             <h1
               className={`mt-2 text-2xl font-semibold tracking-tight md:text-3xl ${surface.textPrimary}`}
             >
-              Actionable household energy across solar, storage, grid, gas, hot water, and major
-              loads.
+              Your own energy workspace with live load, period totals, device usage, and battery
+              status.
             </h1>
             <p className={`mt-3 max-w-2xl text-sm leading-6 ${surface.textSecondary}`}>
-              Current state, cost pressure, top consumers, and anomaly signals are separated from
-              detailed drill-downs so the dashboard stays fast and extensible.
+              Built around user-selected widgets so each household can shape a different dashboard.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {isConfigured && (
+              <button
+                type="button"
+                onClick={openSetup}
+                title="Reconfigure energy sensors"
+                className={`flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-medium transition-colors ${surface.border} ${surface.textMuted} ${surface.hoverBg}`}
+              >
+                <Settings className="h-3.5 w-3.5" />
+                Reconfigure
+              </button>
+            )}
             {rangeOptions.map((option) => (
               <button
                 key={option}
@@ -84,13 +99,13 @@ export const EnergySection = memo(function EnergySection() {
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2">
-          {Object.entries(widgetLabels).map(([widgetId, label]) => {
-            const active = visibleWidgetSet.has(widgetId as EnergyWidgetId);
+          {widgetOptions.map(({ id, label }) => {
+            const active = visibleWidgetSet.has(id);
             return (
               <button
-                key={widgetId}
+                key={id}
                 type="button"
-                onClick={() => toggleWidgetVisibility(widgetId as EnergyWidgetId)}
+                onClick={() => toggleWidgetVisibility(id)}
                 className={`rounded-full border px-3 py-2 text-xs font-medium transition-colors ${
                   active
                     ? 'border-transparent text-white'
@@ -105,42 +120,103 @@ export const EnergySection = memo(function EnergySection() {
         </div>
       </section>
 
-      <div className="grid gap-6 xl:grid-cols-[1.55fr_1fr]">
+      {/* Demo data notice — shown when no HA config is set */}
+      {!isConfigured && !showSetup && (
+        <div
+          className={`flex flex-wrap items-center justify-between gap-4 rounded-2xl border px-5 py-4 ${surface.border} ${surface.panelMuted}`}
+        >
+          <p className={`text-sm ${surface.textSecondary}`}>
+            Showing demo data.{' '}
+            <span className={surface.textMuted}>
+              Connect your Home Assistant energy sensors to see live readings.
+            </span>
+          </p>
+          <button
+            type="button"
+            onClick={openSetup}
+            className="rounded-full px-4 py-2 text-sm font-medium text-white"
+            style={{ backgroundColor: accentColor }}
+          >
+            Connect to HA Energy
+          </button>
+        </div>
+      )}
+
+      {/* Inline setup panel */}
+      {showSetup && (
+        <EnergySetupPanel
+          initialConfig={sourceConfig ?? undefined}
+          onSave={handleSaveConfig}
+          onCancel={closeSetup}
+        />
+      )}
+
+      <div className="grid gap-6 xl:grid-cols-[1.12fr_0.88fr]">
         <div className="grid gap-6">
-          {visibleWidgetSet.has('status') && <EnergyStatusWidget liveStats={overview.liveStats} />}
+          {visibleWidgetSet.has('status') && (
+            <EnergyStatusWidget
+              liveStats={[
+                {
+                  label: 'Today consumed',
+                  value: `${periodTotals.today.toFixed(1)} kWh`,
+                  tone: 'default',
+                },
+                {
+                  label: 'This week',
+                  value: `${periodTotals.week.toFixed(1)} kWh`,
+                  tone: 'default',
+                },
+                {
+                  label: 'This month',
+                  value: `${periodTotals.month.toFixed(1)} kWh`,
+                  tone: 'default',
+                },
+                {
+                  label: 'In use now',
+                  value: `${(overview.totals.currentLoadW / 1000).toFixed(1)} kW`,
+                  tone: 'default',
+                },
+                {
+                  label: 'Bathroom + toilet today',
+                  value: `${bathroomToiletTodayKWh.toFixed(1)} kWh`,
+                  tone: 'default',
+                },
+                {
+                  label: 'Bathroom + toilet now',
+                  value: `${(bathroomToiletPowerW / 1000).toFixed(1)} kW`,
+                  tone: 'default',
+                },
+              ]}
+              importTodayKWh={undefined}
+              solarTodayKWh={undefined}
+            />
+          )}
+
           {visibleWidgetSet.has('flow') && (
-            <EnergyFlowWidget flow={overview.flow} onNodeSelect={setSelectedNodeId} />
+            <EnergyNowWidget
+              currentLoadW={overview.totals.currentLoadW}
+              gridImportW={overview.totals.importW}
+              trend={recentLoadTrend}
+              accentColor={accentColor}
+            />
           )}
-          {visibleWidgetSet.has('trend') && (
-            <EnergyTrendWidget trend={overview.trend} accentColor={accentColor} />
+
+          {visibleWidgetSet.has('consumers') && (
+            <EnergyDeviceTotalsWidget consumers={topDeviceTotals} />
           )}
-          <div className="grid gap-6 lg:grid-cols-2">
-            {visibleWidgetSet.has('consumers') && (
-              <EnergyConsumersWidget consumers={overview.topConsumers} />
-            )}
-            {visibleWidgetSet.has('cost') && (
-              <EnergyCostWidget
-                costToday={overview.totals.costToday}
-                projectedMonthCost={overview.totals.projectedMonthCost}
-              />
-            )}
-          </div>
         </div>
 
         <div className="grid gap-6">
-          {visibleWidgetSet.has('storage') && (
-            <EnergyStorageWidget
-              batteryPercent={overview.totals.batteryPercent}
-              solarW={overview.totals.solarW}
-              currentLoadW={overview.totals.currentLoadW}
-              importW={overview.totals.importW}
+          {visibleWidgetSet.has('cost') && (
+            <EnergyGridAllocationWidget
+              importTodayKWh={periodTotals.today}
+              allocation={gridAllocation}
             />
           )}
-          {visibleWidgetSet.has('heating') && <EnergyHeatingWidget consumers={heatingConsumers} />}
-          {visibleWidgetSet.has('insights') && (
-            <EnergyInsightsWidget insights={overview.insights} />
+
+          {visibleWidgetSet.has('battery') && (
+            <EnergyBatteryDevicesWidget devices={batteryDevices} />
           )}
-          <EnergyDrilldownWidget node={selectedNode} />
         </div>
       </div>
     </div>

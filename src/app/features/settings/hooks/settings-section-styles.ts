@@ -12,15 +12,8 @@ export function getSettingsSectionStyles(
   return {
     accentColor: getThemeColorValue(primaryColor),
     borderColor: surface.borderStrong,
-    cardBg:
-      theme === 'light'
-        ? 'bg-white/92'
-        : theme === 'contrast'
-          ? 'bg-black'
-          : theme === 'glass'
-            ? 'bg-white/[0.10]'
-            : 'bg-gray-900/88',
-    chipBg: theme === 'contrast' ? 'bg-black' : surface.subtleBg,
+    cardBg: surface.panel,
+    chipBg: surface.subtleBg,
     chipHoverBg:
       theme === 'light'
         ? 'hover:bg-gray-200'
@@ -38,20 +31,13 @@ export function getSettingsSectionStyles(
     hoverBg: theme === 'light' ? 'hover:bg-gray-100/90' : surface.hoverBg,
     iconBg: surface.iconBg,
     isLightTheme: theme === 'light',
-    insetBg: theme === 'light' ? 'bg-white' : theme === 'glass' ? 'bg-white/[0.06]' : 'bg-black',
+    insetBg: surface.panelMuted,
     lineColor: surface.borderStrong,
     mixBlendMode: theme === 'light' ? 'multiply' : 'screen',
     mutedColor: theme === 'light' ? 'text-gray-700' : surface.textSecondary,
     ringClass: theme === 'light' ? 'ring-black/30' : 'ring-white/40',
     ringOffsetClass: theme === 'light' ? 'ring-offset-white' : 'ring-offset-gray-900',
-    softBg:
-      theme === 'light'
-        ? 'bg-gray-50/90'
-        : theme === 'contrast'
-          ? 'bg-black'
-          : theme === 'glass'
-            ? 'bg-white/[0.06]'
-            : 'bg-white/[0.04]',
+    softBg: surface.panelMuted,
     subtleColor: surface.textMuted,
     textColor: surface.textPrimary,
   };
