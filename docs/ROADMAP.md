@@ -25,10 +25,6 @@ Planned and in-progress features. Check off items as they ship. Add new ideas to
 - [ ] **Gauge card** — radial gauge for numeric sensor entities
 - [ ] **Badges** — compact row of entity states at the top of a view, no full card footprint
 
-### Energy
-
-- [ ] **Energy history** — per-device and per-source consumption over time with drill-down to individual appliances
-
 ### Multi-user
 
 - [ ] **Per-user dashboard** — show different dashboards or hide cards based on logged-in user
@@ -47,7 +43,6 @@ Planned and in-progress features. Check off items as they ship. Add new ideas to
 
 ### Smart Home
 
-- [ ] **Automations management** — view, trigger, enable, and disable Home Assistant automations
 - [ ] **Light group card** — control a group of lights as one unit (brightness, color, on/off)
 - [ ] **Alarm panel card** — arm, disarm, and show state of `alarm_control_panel.*` entities
 - [ ] **Timer card** — start, pause, and cancel Home Assistant timers from the dashboard
@@ -58,6 +53,14 @@ Planned and in-progress features. Check off items as they ship. Add new ideas to
 
 ## Shipped
 
+- [x] **Public demo mode** — `/demo` renders a generated smart home environment with bundled assets and no Home Assistant connection, suitable for public previews without exposing private instances or tokens
+- [x] **Public launch deployment hardening** — Docker and Home Assistant add-on deployments share nginx security headers; runtime config keeps Home Assistant tokens server-only; RSS proxying, imported dashboard config, external URLs, and custom button service calls validate public-facing inputs
+- [x] **Home Assistant add-on image publishing** — add-on CI/CD builds pull request images and publishes `main` branch images to GHCR for supported architectures
+- [x] **Automation management** — Tasks section lists Home Assistant automations, shows active/disabled filters, displays last-run metadata and read-only config details, and supports trigger plus enable/disable actions
+- [x] **Security camera dashboard** — dedicated security camera dashboard model and view with camera live viewing support, entity mapping, stories, and tests
+- [x] **Energy history** — per-device and per-source consumption over time with Home Assistant Energy prefs, recorder statistics, source diagnostics, tracked-device sparklines, and drill-down to individual appliances
+- [x] **Energy dashboard refresh** — richer energy data panels, load history handling, live HA service tests, generated mock energy data, and expanded Storybook coverage
+- [x] **Dashboard data panel polish** — refreshed home cards, dashboard card metrics, security/task/light/vacuum presentation details, and localized copy across the updated panel experience
 - [x] **Zone-based Home screen layout** — Home view organises all devices into `hero`, `actions`, `status`, and `analytics` zone bands; per-card zone overrides persist through dashboard layout state and YAML export; `extra-large` cards use a 3 logical column x 2 row footprint for large hero-style cards; responsive grids derive rendered spans from the shared card-size registry
 - [x] **Custom accent color picker** — custom color input alongside 8 built-in accent presets in Settings → Appearance
 - [x] **Widget settings** — RSS Feed, Quick Note, and Photo Frame widgets support post-creation configuration (feed URLs, note content, photo URLs)
@@ -66,7 +69,6 @@ Planned and in-progress features. Check off items as they ship. Add new ideas to
 - [x] **Room ordering** — rooms display in their natural Home Assistant area order
 - [x] **Export / import dashboard config** — YAML backup and restore of layout and preferences
 - [x] **PWA install** — manifest, service worker, offline shell, install prompt
-- [x] **Page zoom setting** — scale the whole dashboard without browser zoom
 - [x] **Entity visibility control** — add/remove entities from the dashboard per room
 - [x] **Card resizing** — per-card supported sizes, including compact (`tiny`, `extra-small`) and extended (`extra-large`) options where supported
 - [x] **All view grouping modes** — custom, room, type, or flat grouping in the All view
@@ -94,8 +96,14 @@ Planned and in-progress features. Check off items as they ship. Add new ideas to
 - [x] **OS appearance auto-follow** — optional "Follow system appearance" mode switches between light and dark using `prefers-color-scheme`
 - [x] **Energy dashboard** — dedicated energy section with live stats, solar/battery/grid flow diagram, trend charts, storage gauges, top consumers, cost projection, heating breakdown, smart insights, and node drill-down; backed by custom zero-bundle SVG chart primitives (bar chart, area chart, semi-circle gauge, segmented quality bar, Catmull-Rom sparkline)
 - [x] **Energy live HA wiring** — setup panel with auto-detect from HA `energy/get_prefs`, per-device power sensor mapping, datalist autocomplete; live entity state reading via `useEnergyHaData`; today's kWh via `recorder/statistics_during_period` polled every 5 min; conditional display hides unconfigured solar/battery gauges; bathroom/toilet and device-level energy breakdowns
-- [x] **Camera card** — snapshot display for `camera.*` entities via HA camera proxy; manual refresh; unavailable placeholder; dark card with name/room overlay
+- [x] **Camera card** — snapshot and live viewing for `camera.*` entities via Home Assistant camera proxy; manual refresh; unavailable placeholder; dark card with name/room overlay
 - [x] **Section resize actions** — −/+ buttons resize by rendered-column units at the current breakpoint; the row neighbor compensates automatically and stacked descendant sections in the same column update together; controls appear only when two or more sections share the same row
 - [x] **Media player grouping controls** — media cards support attaching and detaching compatible players in a speaker group directly from the dialog (`join` / `unjoin`)
 - [x] **Home section creation (sectioned layout)** — Home layout edit mode supports adding, renaming, and removing user-defined sections in `sectioned` mode
 - [x] **Map card** — custom widget showing all `person.*` and `device_tracker.*` entities with GPS on an interactive Leaflet map; circular avatar markers with entity pictures or initials; GPS accuracy circles; home/away border accent; dark and light CartoDB tile variants follow the active theme; added from the card library like other widgets
+
+---
+
+## Removed
+
+- [x] **Page zoom setting** — removed after responsive card sizing and breakpoint behavior moved into the shared card-size registry and layout system

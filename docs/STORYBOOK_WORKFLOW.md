@@ -46,7 +46,7 @@ The approved top-level roots are enforced by `pnpm check:stories`:
 
 Do not create ad hoc top-level groups for temporary work. If a story does not fit, update the
 taxonomy intentionally in `.storybook/preview.tsx`, `scripts/check-storybook-standards.mjs`, and
-`design-system/STORYBOOK_FOUNDATION.md` together.
+`design-system/README.md` together.
 
 ## UI-Kit Discovery Stories
 
@@ -107,10 +107,9 @@ changing Storybook taxonomy.
 
 Keep this page aligned with:
 
-- `design-system/STORYBOOK_FOUNDATION.md`
 - `design-system/README.md`
 - `.storybook/preview.tsx`
 - `scripts/check-storybook-standards.mjs`
 - `src/app/ui-kit/*.stories.tsx`
 
-Last updated: May 15, 2026
+Last updated: May 17, 2026

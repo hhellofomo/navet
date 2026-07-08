@@ -132,8 +132,6 @@ Primary feature folders under [`src/app/features/`](src/app/features/) currently
 - `vacuum`
 - `weather`
 
-There is also a `power/` folder in the tree, but it is not currently an active feature entrypoint.
-
 Cross-feature UI lives under [`src/app/components/`](src/app/components/):
 
 - `primitives/` for low-level reusable UI
@@ -322,8 +320,7 @@ Storybook is the main visual review surface for:
 - layout components and navigation surfaces
 - dashboard and energy widgets
 
-See [design-system/STORYBOOK_FOUNDATION.md](design-system/STORYBOOK_FOUNDATION.md).
-For story placement, fixture rules, UI-kit discovery updates, and review checklists, see
+For Storybook structure, story placement, fixture rules, UI-kit discovery updates, and review checklists, see
 [docs/STORYBOOK_WORKFLOW.md](docs/STORYBOOK_WORKFLOW.md).
 
 ## Documentation

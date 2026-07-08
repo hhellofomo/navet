@@ -6,6 +6,46 @@
 
 This document summarizes the major changes, migrations, and optimizations made to Navet.
 
+## May 17, 2026 - Public Launch Preparation
+
+### Changes
+- Added a public demo mode with generated smart home data and a bundled demo background
+- Hardened public deployment paths for runtime config, RSS proxying, imported dashboards, external URLs, and custom button service calls
+- Kept Home Assistant tokens server-only for Docker and add-on runtime configuration
+- Added shared nginx security headers for Docker and Home Assistant add-on deployments
+- Updated add-on publishing workflow for pull request image builds and `main` branch GHCR publishing
+- Documented public launch security decisions and refreshed Docker/Home Assistant add-on guidance
+
+### Files Updated
+- Deployment workflow, Docker, nginx, and add-on runtime configuration
+- Demo app entry points and runtime config handling
+- Dashboard config, URL security, RSS proxy security, and related tests
+- Public launch and add-on deployment documentation
+
+**Status:** ✅ Complete
+
+---
+
+## May 16, 2026 - Dashboard Cards and Data Panels
+
+### Changes
+- Refreshed the energy dashboard with richer panels, mock data, load history handling, and Storybook coverage
+- Added camera live viewing support and a security camera dashboard model
+- Improved security, task, light, vacuum, and dashboard card presentation details
+- Expanded Home Assistant camera and vacuum device mapping support
+- Updated localized strings for the refreshed card and panel experiences
+- Tuned Vite configuration for the updated dashboard and Storybook surface
+
+### Files Updated
+- Energy dashboard components, hooks, service tests, and stories
+- Camera card, security dashboard, and security dashboard model tests
+- Vacuum card views, controls, settings, and stories
+- Dashboard card rendering, metrics, interactive controls, and i18n messages
+
+**Status:** ✅ Complete
+
+---
+
 ## March 5, 2026 - Rebranding to Navet
 
 ### Changes

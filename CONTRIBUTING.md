@@ -58,7 +58,6 @@ This project adheres to a code of conduct. By participating, you are expected to
 ### Branch Strategy
 
 - `main` - Production-ready code
-- `develop` - Integration branch for features
 - `feature/*` - New features
 - `bugfix/*` - Bug fixes
 - `hotfix/*` - Critical production fixes

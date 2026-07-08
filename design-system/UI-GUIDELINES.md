@@ -6,7 +6,7 @@ Use it together with:
 
 - [README.md](README.md)
 - [FEATURES.md](FEATURES.md)
-- [STORYBOOK_FOUNDATION.md](STORYBOOK_FOUNDATION.md)
+- [../docs/STORYBOOK_WORKFLOW.md](../docs/STORYBOOK_WORKFLOW.md)
 
 ## Design Goals
 
@@ -20,7 +20,7 @@ Navet's UI should feel:
 ## Foundations
 
 Shared first-layer foundations live in
-[`src/app/components/system/tokens/foundations.ts`](/Users/vishal/Development/Github/Navet/Navet/src/app/components/system/tokens/foundations.ts).
+[`src/app/components/system/tokens/foundations.ts`](../src/app/components/system/tokens/foundations.ts).
 
 Navet is platform-neutral. iOS `pt`, Android `dp`, CSS px, and desktop logical px are
 implementation units, not the design-system foundation.
