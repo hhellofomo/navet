@@ -142,7 +142,7 @@ const store = useHomeAssistant();
 - Tailwind CSS 4 only — no inline style objects except for dynamic numeric values
   (e.g. `style={{ width: `${pct}%` }}`).
 - Glass aesthetic: `backdrop-blur-xl`, `bg-white/5–10`, `border border-white/10–20`.
-- 4 themes: `glass` (default), `dark`, `light`, `black` — applied via `data-theme` on `<html>`.
+- 4 themes: `glass` (default), `dark`, `light`, `contrast` — applied via `data-theme` on `<html>`. The `contrast` theme is labelled "Black" in the UI.
 
 ---
 
