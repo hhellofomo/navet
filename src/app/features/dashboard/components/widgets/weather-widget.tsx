@@ -27,11 +27,17 @@ interface WeatherWidgetProps {
 export function WeatherWidget({ size = 'medium' }: WeatherWidgetProps) {
   const { theme, primaryColor } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
-  const bgColor = theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : surface.panel;
+  const bgColor =
+    theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : surface.panel;
   const textPrimary = surface.textPrimary;
   const textSecondary = surface.textSecondary;
   const border = theme === 'light' ? 'border-gray-200/50' : surface.border;
-  const subtleFill = theme === 'light' ? '#f3f4f6' : theme === 'contrast' ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.08)';
+  const subtleFill =
+    theme === 'light'
+      ? '#f3f4f6'
+      : theme === 'contrast'
+        ? 'rgba(255,255,255,0.05)'
+        : 'rgba(255,255,255,0.08)';
 
   const displayForecast =
     size === 'extra-small' || size === 'small'
@@ -65,20 +71,14 @@ export function WeatherWidget({ size = 'medium' }: WeatherWidgetProps) {
       {/* Weather Details */}
       {size !== 'extra-small' && size !== 'small' && (
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <div
-            className="p-3 rounded-xl"
-            style={{ backgroundColor: subtleFill }}
-          >
+          <div className="p-3 rounded-xl" style={{ backgroundColor: subtleFill }}>
             <div className="flex items-center gap-2 mb-1">
               <Wind className={`w-4 h-4 ${textSecondary}`} />
               <p className={`text-xs ${textSecondary}`}>Wind</p>
             </div>
             <p className={`text-lg font-semibold ${textPrimary}`}>8 mph</p>
           </div>
-          <div
-            className="p-3 rounded-xl"
-            style={{ backgroundColor: subtleFill }}
-          >
+          <div className="p-3 rounded-xl" style={{ backgroundColor: subtleFill }}>
             <div className="flex items-center gap-2 mb-1">
               <Droplets className={`w-4 h-4 ${textSecondary}`} />
               <p className={`text-xs ${textSecondary}`}>Humidity</p>

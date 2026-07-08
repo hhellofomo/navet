@@ -36,16 +36,11 @@ const ARRIVAL_COPY = {
       'Navet is restoring your saved setup and preparing the reveal so you can step right back in.',
     revealKicker: 'Welcome Back',
     revealHeading: 'Your dashboard has been restored.',
-    revealBody:
-      'Everything from your backup is in place and ready for you to return to.',
+    revealBody: 'Everything from your backup is in place and ready for you to return to.',
   },
 } as const;
 
-export function DashboardArrivalReveal({
-  open,
-  onComplete,
-  variant,
-}: DashboardArrivalRevealProps) {
+export function DashboardArrivalReveal({ open, onComplete, variant }: DashboardArrivalRevealProps) {
   const { theme, primaryColor } = useTheme();
   const [phase, setPhase] = useState<'baking' | 'revealed' | 'exiting'>('baking');
 
@@ -76,8 +71,7 @@ export function DashboardArrivalReveal({
     theme === 'light' ? 'rgba(255, 255, 255, 0.72)' : 'rgba(10, 10, 10, 0.55)';
   const textColor = theme === 'light' ? '#111827' : '#ffffff';
   const subtleColor = theme === 'light' ? '#4b5563' : 'rgba(255,255,255,0.78)';
-  const backdropColor =
-    theme === 'light' ? 'rgba(248, 250, 252, 0.84)' : 'rgba(3, 7, 18, 0.78)';
+  const backdropColor = theme === 'light' ? 'rgba(248, 250, 252, 0.84)' : 'rgba(3, 7, 18, 0.78)';
 
   return (
     <div
@@ -212,13 +206,13 @@ export function DashboardArrivalReveal({
                     backgroundColor: accentColor,
                     boxShadow: `0 0 24px ${accentColor}88`,
                     transformOrigin: `0 ${index === 1 ? 56 : 46}px`,
-                  animation:
-                    phase === 'baking'
-                      ? `navet-dashboard-bake-orbit 2.6s linear ${index * 0.32}s infinite`
-                      : undefined,
-                }}
-              />
-            ))}
+                    animation:
+                      phase === 'baking'
+                        ? `navet-dashboard-bake-orbit 2.6s linear ${index * 0.32}s infinite`
+                        : undefined,
+                  }}
+                />
+              ))}
               <div
                 className="absolute inset-0 flex items-center justify-center"
                 style={{
@@ -236,9 +230,7 @@ export function DashboardArrivalReveal({
               style={{
                 color: subtleColor,
                 animation:
-                  phase === 'baking'
-                    ? 'navet-dashboard-bake-copy 6.2s ease forwards'
-                    : undefined,
+                  phase === 'baking' ? 'navet-dashboard-bake-copy 6.2s ease forwards' : undefined,
               }}
             >
               {copy.bakingKicker}
@@ -248,9 +240,7 @@ export function DashboardArrivalReveal({
               style={{
                 color: textColor,
                 animation:
-                  phase === 'baking'
-                    ? 'navet-dashboard-bake-copy 6.2s ease forwards'
-                    : undefined,
+                  phase === 'baking' ? 'navet-dashboard-bake-copy 6.2s ease forwards' : undefined,
               }}
             >
               {copy.bakingHeading}
@@ -260,9 +250,7 @@ export function DashboardArrivalReveal({
               style={{
                 color: subtleColor,
                 animation:
-                  phase === 'baking'
-                    ? 'navet-dashboard-bake-copy 6.2s ease forwards'
-                    : undefined,
+                  phase === 'baking' ? 'navet-dashboard-bake-copy 6.2s ease forwards' : undefined,
               }}
             >
               {copy.bakingBody}
@@ -314,7 +302,7 @@ export function DashboardArrivalReveal({
                 ? 'navet-dashboard-reveal-card 1.05s cubic-bezier(0.22, 1, 0.36, 1) forwards'
                 : phase === 'exiting'
                   ? 'navet-dashboard-exit-card 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards'
-                : undefined,
+                  : undefined,
             opacity: phase === 'revealed' || phase === 'exiting' ? 1 : 0,
           }}
         >
@@ -326,7 +314,7 @@ export function DashboardArrivalReveal({
                   ? 'navet-dashboard-reveal-logo 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards'
                   : phase === 'exiting'
                     ? 'navet-dashboard-exit-card 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards'
-                  : undefined,
+                    : undefined,
               opacity: phase === 'revealed' || phase === 'exiting' ? 1 : 0,
             }}
           >
@@ -341,7 +329,7 @@ export function DashboardArrivalReveal({
                   ? 'navet-dashboard-reveal-line 1.4s ease-out 0.25s forwards'
                   : phase === 'exiting'
                     ? 'navet-dashboard-exit-shell 0.9s ease forwards'
-                  : undefined,
+                    : undefined,
               opacity: phase === 'revealed' || phase === 'exiting' ? 1 : 0,
             }}
           />
@@ -351,10 +339,16 @@ export function DashboardArrivalReveal({
           >
             {copy.revealKicker}
           </p>
-          <h2 className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: textColor }}>
+          <h2
+            className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl"
+            style={{ color: textColor }}
+          >
             {copy.revealHeading}
           </h2>
-          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed md:text-base" style={{ color: subtleColor }}>
+          <p
+            className="mx-auto mt-4 max-w-md text-sm leading-relaxed md:text-base"
+            style={{ color: subtleColor }}
+          >
             {copy.revealBody}
           </p>
           <button

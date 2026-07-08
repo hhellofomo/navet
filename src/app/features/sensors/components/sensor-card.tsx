@@ -46,11 +46,18 @@ export const SensorCard = memo(function SensorCard({
       : isGlass
         ? 'from-white/16 via-teal-200/10 to-white/[0.03]'
         : 'from-teal-900/90 to-teal-950/95';
-  const cardBorder = theme === 'light' ? 'border-gray-200/80' : isGlass ? surface.border : 'border-teal-700/30';
+  const cardBorder =
+    theme === 'light' ? 'border-gray-200/80' : isGlass ? surface.border : 'border-teal-700/30';
   const textPrimary = surface.textPrimary;
   const textSecondary = theme === 'light' ? 'text-gray-500' : surface.textSecondary;
-  const accentColor = theme === 'light' ? 'text-teal-700' : isGlass ? 'text-teal-200' : 'text-teal-400';
-  const glowGradient = theme === 'light' ? 'from-teal-50/40' : isGlass ? 'from-white/10 via-teal-300/10' : 'from-teal-500/5';
+  const accentColor =
+    theme === 'light' ? 'text-teal-700' : isGlass ? 'text-teal-200' : 'text-teal-400';
+  const glowGradient =
+    theme === 'light'
+      ? 'from-teal-50/40'
+      : isGlass
+        ? 'from-white/10 via-teal-300/10'
+        : 'from-teal-500/5';
 
   return (
     <div
@@ -67,7 +74,9 @@ export const SensorCard = memo(function SensorCard({
 
       {/* Light theme frosted overlay */}
       {(theme === 'light' || isGlass) && (
-        <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`} />
+        <div
+          className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`}
+        />
       )}
 
       <div className="relative h-full flex flex-col">

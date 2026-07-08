@@ -1,9 +1,9 @@
 import { Bot } from 'lucide-react';
 import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
-import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import { useVacuumControl } from '../vacuum/use-vacuum-control';
@@ -65,7 +65,11 @@ export const VacuumCard = memo(function VacuumCard({
   const cardBorder =
     theme === 'light' ? 'border-gray-200/80' : isGlass ? surface.border : 'border-gray-700/30';
   const glowGradient =
-    theme === 'light' ? 'from-gray-50/40' : isGlass ? 'from-white/10 via-cyan-300/8' : 'from-gray-500/5';
+    theme === 'light'
+      ? 'from-gray-50/40'
+      : isGlass
+        ? 'from-white/10 via-cyan-300/8'
+        : 'from-gray-500/5';
 
   return (
     <div className="h-full w-full relative">

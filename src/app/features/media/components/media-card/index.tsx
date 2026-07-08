@@ -51,15 +51,22 @@ export const MediaCard = memo(function MediaCard({
   const padding = isSmall ? 'p-4' : isLarge ? 'p-6' : 'p-5';
   const isLight = theme === 'light';
   const isGlass = theme === 'glass';
-  const cardBorder = isLight ? 'border-gray-200/50' : isGlass ? surface.border : 'border-pink-700/20';
+  const cardBorder = isLight
+    ? 'border-gray-200/50'
+    : isGlass
+      ? surface.border
+      : 'border-pink-700/20';
   const cardShadow = isLight ? 'shadow-lg' : surface.cardShadow;
-  const artworkOverlay =
-    isLight
-      ? 'bg-gradient-to-b from-white/70 via-white/50 to-white/80'
-      : isGlass
-        ? 'bg-gradient-to-b from-slate-950/52 via-slate-950/34 to-slate-950/66'
-        : 'bg-gradient-to-b from-black/60 via-black/40 to-black/80';
-  const artworkGlow = isLight ? 'from-pink-200/20' : isGlass ? 'from-white/12 via-pink-300/10' : 'from-pink-500/10';
+  const artworkOverlay = isLight
+    ? 'bg-gradient-to-b from-white/70 via-white/50 to-white/80'
+    : isGlass
+      ? 'bg-gradient-to-b from-slate-950/52 via-slate-950/34 to-slate-950/66'
+      : 'bg-gradient-to-b from-black/60 via-black/40 to-black/80';
+  const artworkGlow = isLight
+    ? 'from-pink-200/20'
+    : isGlass
+      ? 'from-white/12 via-pink-300/10'
+      : 'from-pink-500/10';
   const artworkOpacity = isLight ? 'opacity-30' : isGlass ? 'opacity-34' : 'opacity-40';
   const shellBg = isLight ? 'bg-white/70' : isGlass ? 'bg-white/8' : 'bg-black/20';
 
@@ -84,9 +91,7 @@ export const MediaCard = memo(function MediaCard({
           <div className={`absolute inset-0 ${artworkOverlay}`}></div>
         </div>
 
-        <div
-          className={`absolute inset-0 bg-gradient-to-br ${artworkGlow} to-transparent`}
-        ></div>
+        <div className={`absolute inset-0 bg-gradient-to-br ${artworkGlow} to-transparent`}></div>
 
         <div className="relative h-full flex flex-col">
           {isSmall ? (

@@ -46,16 +46,31 @@ export const PowerCard = memo(function PowerCard({
       : isGlass
         ? 'from-white/16 via-yellow-200/10 to-white/[0.03]'
         : 'from-yellow-900/90 to-yellow-950/95';
-  const cardBorder = theme === 'light' ? 'border-gray-200/80' : isGlass ? surface.border : 'border-yellow-700/30';
+  const cardBorder =
+    theme === 'light' ? 'border-gray-200/80' : isGlass ? surface.border : 'border-yellow-700/30';
   const textPrimary = surface.textPrimary;
   const textSecondary = theme === 'light' ? 'text-gray-500' : surface.textSecondary;
-  const iconBg = theme === 'light' ? 'bg-cyan-100' : isGlass ? 'bg-cyan-300/24 border border-cyan-100/20' : 'bg-cyan-500/24 border border-cyan-300/18';
-  const iconColor = theme === 'light' ? 'text-cyan-700' : isGlass ? 'text-cyan-100' : 'text-cyan-300';
-  const accentColor = theme === 'light' ? 'text-cyan-700' : isGlass ? 'text-cyan-200' : 'text-cyan-400';
-  const glowGradient = theme === 'light' ? 'from-yellow-50/40' : isGlass ? 'from-white/10 via-cyan-300/10' : 'from-blue-500/5';
+  const iconBg =
+    theme === 'light'
+      ? 'bg-cyan-100'
+      : isGlass
+        ? 'bg-cyan-300/24 border border-cyan-100/20'
+        : 'bg-cyan-500/24 border border-cyan-300/18';
+  const iconColor =
+    theme === 'light' ? 'text-cyan-700' : isGlass ? 'text-cyan-100' : 'text-cyan-300';
+  const accentColor =
+    theme === 'light' ? 'text-cyan-700' : isGlass ? 'text-cyan-200' : 'text-cyan-400';
+  const glowGradient =
+    theme === 'light'
+      ? 'from-yellow-50/40'
+      : isGlass
+        ? 'from-white/10 via-cyan-300/10'
+        : 'from-blue-500/5';
   const progressBg = theme === 'light' ? 'bg-gray-200' : isGlass ? 'bg-white/12' : 'bg-white/10';
-  const savingBg = theme === 'light' ? 'bg-green-100' : isGlass ? 'bg-green-300/16' : 'bg-green-500/20';
-  const savingText = theme === 'light' ? 'text-green-700' : isGlass ? 'text-green-200' : 'text-green-400';
+  const savingBg =
+    theme === 'light' ? 'bg-green-100' : isGlass ? 'bg-green-300/16' : 'bg-green-500/20';
+  const savingText =
+    theme === 'light' ? 'text-green-700' : isGlass ? 'text-green-200' : 'text-green-400';
   const infoBg = theme === 'light' ? 'bg-gray-100' : isGlass ? 'bg-white/8' : 'bg-white/5';
 
   return (
@@ -73,7 +88,9 @@ export const PowerCard = memo(function PowerCard({
 
       {/* Light theme frosted overlay */}
       {(theme === 'light' || isGlass) && (
-        <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`} />
+        <div
+          className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`}
+        />
       )}
 
       <div className="relative h-full flex flex-col">

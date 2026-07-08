@@ -60,7 +60,7 @@ Complete feature implementation guide:
 3. **Room-Based Organization** - Filter devices by physical location
 4. **Consistent Icon Sizing** - Extra-small: 7×7 container / 3.5×3.5 icon, Small: 8×8 / 4×4, Medium/Large: 10×10 / 5×5
 5. **Smooth Transitions** - 500ms for state changes, 200ms for interactions
-6. **Theme Customization** - Three theme modes (Dark, Light, High Contrast) with 8 primary color options
+6. **Theme Customization** - Four theme modes (Liquid Glass, Dark, Light, High Contrast) with 8 primary color options
 7. **Section-Based Navigation** - Organized into dedicated sections (Home, Security, Tasks, Locks, Lights, Media, Mock, Settings)
 
 ### Authentication System
@@ -69,10 +69,11 @@ Complete feature implementation guide:
 - **Persistent Session** - Auth state persists across browser sessions
 
 ### Theme System
-- **Theme Modes**: 
-  - Dark (default) - Subtle gradients with muted colors
+- **Theme Modes**:
+  - Liquid Glass - Frosted translucent panels with luminous accents
+  - Dark - Subtle gradients with muted colors
   - Light - Bright pastels with soft accents
-  - High Contrast - Vibrant colors for better visibility
+  - High Contrast - OLED-black surfaces with stronger contrast
 - **Primary Colors**: Orange (default), Blue, Green, Purple, Pink, Red, Yellow, Teal
 - **Dynamic Theming** - All active states, buttons, and indicators adapt to selected primary color
 

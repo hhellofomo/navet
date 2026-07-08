@@ -19,7 +19,9 @@ export function CardSettingsActionButton({
   const iconSize = size === 'small' ? 'h-3 w-3' : size === 'large' ? 'h-5 w-5' : 'h-3.5 w-3.5';
   const surface = getThemeSurfaceTokens(theme);
   const buttonBg =
-    theme === 'light' ? 'bg-gray-900/15 hover:bg-gray-900/25' : `${surface.subtleBg} ${surface.hoverBg}`;
+    theme === 'light'
+      ? 'bg-gray-900/15 hover:bg-gray-900/25'
+      : `${surface.subtleBg} ${surface.hoverBg}`;
   const iconColor = theme === 'light' ? 'text-gray-900' : 'text-white';
 
   return (

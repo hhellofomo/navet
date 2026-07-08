@@ -40,12 +40,24 @@ export const WifiCard = memo(function WifiCard({
       : isGlass
         ? 'from-white/16 via-green-200/10 to-white/[0.03]'
         : 'from-green-900/90 to-green-950/95';
-  const cardBorder = theme === 'light' ? 'border-gray-200/80' : isGlass ? surface.border : 'border-green-700/30';
+  const cardBorder =
+    theme === 'light' ? 'border-gray-200/80' : isGlass ? surface.border : 'border-green-700/30';
   const textPrimary = surface.textPrimary;
   const textSecondary = theme === 'light' ? 'text-gray-500' : surface.textSecondary;
-  const iconBg = theme === 'light' ? 'bg-green-100' : isGlass ? 'bg-green-300/24 border border-green-100/20' : 'bg-green-500/24 border border-green-300/18';
-  const iconColor = theme === 'light' ? 'text-green-700' : isGlass ? 'text-green-100' : 'text-green-300';
-  const glowGradient = theme === 'light' ? 'from-green-50/40' : isGlass ? 'from-white/10 via-green-300/10' : 'from-green-500/5';
+  const iconBg =
+    theme === 'light'
+      ? 'bg-green-100'
+      : isGlass
+        ? 'bg-green-300/24 border border-green-100/20'
+        : 'bg-green-500/24 border border-green-300/18';
+  const iconColor =
+    theme === 'light' ? 'text-green-700' : isGlass ? 'text-green-100' : 'text-green-300';
+  const glowGradient =
+    theme === 'light'
+      ? 'from-green-50/40'
+      : isGlass
+        ? 'from-white/10 via-green-300/10'
+        : 'from-green-500/5';
 
   return (
     <div
@@ -62,7 +74,9 @@ export const WifiCard = memo(function WifiCard({
 
       {/* Light theme frosted overlay */}
       {(theme === 'light' || isGlass) && (
-        <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`} />
+        <div
+          className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`}
+        />
       )}
 
       <div className="relative h-full flex flex-col">

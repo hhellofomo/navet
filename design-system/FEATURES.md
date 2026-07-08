@@ -65,21 +65,27 @@ Exposes global theme state including mode and primary color customization throug
 
 #### Theme Modes
 
-**1. Dark Theme (Default)**
+**1. Liquid Glass Theme**
+- Background: deep blue-black stage with luminous blur
+- Cards: translucent frosted panels with brighter borders
+- Text: white primary, softened white secondary
+- Best for: glass-heavy immersive presentation
+
+**2. Dark Theme**
 - Background: `#0a0a0a` (deep black)
 - Cards: Dark gray with subtle gradients
 - Text: White primary, gray secondary
 - Best for: Low-light environments, OLED screens
 
-**2. Light Theme**
+**3. Light Theme**
 - Background: `#f9fafb` (soft gray)
 - Cards: White with subtle shadows
 - Text: Dark gray primary, mid-gray secondary
 - Best for: Bright environments, accessibility
 
-**3. High Contrast Theme**
-- Background: `#030712` (deepest black)
-- Cards: Pure black with vibrant accents
+**4. High Contrast Theme**
+- Background: `#000000` (OLED black)
+- Cards: Near-pure black with stronger contrast treatment
 - Text: Pure white primary, bright accents
 - Best for: Visual accessibility, maximum contrast
 
@@ -182,7 +188,7 @@ Full-page settings interface with card-based organization.
 #### Sections
 
 **1. Appearance**
-- **Theme Mode Selection**: 3-column grid with theme options
+- **Theme Mode Selection**: 2 × 2 grid with live card previews
 - **Primary Color Picker**: 8 color circles in a row
 - **Visual feedback**: Selected items show primary color indicator
 - **Layout**: Left-aligned text, right-aligned selection indicator
@@ -220,11 +226,11 @@ Full-page settings interface with card-based organization.
 - Gap between sections: 16px (space-y-4)
 
 **Theme Selection**
-- Grid: 3 columns on all screen sizes
-- Button padding: 12px (p-3)
-- Selection indicator: 16px circle, right side
-- Border: 2px when selected (primary color)
-- Background: 10% opacity primary color when selected
+- Grid: 2 columns on medium+ screens
+- Preview: 190px miniature card stage matching the light-card skeleton
+- Button padding: 16px (p-4)
+- Border: primary-color border when selected
+- Background: shared settings surface styling with theme-aware preview scenes
 
 **Color Selection**
 - Layout: Horizontal flexbox
@@ -302,7 +308,7 @@ Beautiful placeholder screens for sections without data.
 ### Settings Customization Flow
 1. Navigate to Settings section
 2. Select Appearance card
-3. Choose theme mode (Dark/Light/Contrast)
+3. Choose theme mode (Liquid Glass/Dark/Light/Contrast)
 4. Select primary color from 8 options
 5. Changes apply immediately across entire app
 6. Theme persists across sessions
@@ -341,7 +347,7 @@ interface AuthContextType {
 **Theme hook**
 ```tsx
 interface ThemeState {
-  theme: 'dark' | 'light' | 'contrast';
+  theme: 'glass' | 'dark' | 'light' | 'contrast';
   setTheme: (theme: ThemeType) => void;
   primaryColor: PrimaryColor;
   setPrimaryColor: (color: PrimaryColor) => void;
@@ -394,7 +400,7 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 - Section headings for navigation
 
 ### Visual Accessibility
-- High contrast theme option
+- Liquid Glass and High Contrast theme options
 - Minimum 44px touch targets
 - Clear focus indicators
 - Sufficient color contrast ratios
@@ -453,9 +459,9 @@ Theme system uses CSS custom properties defined in `/src/styles/theme.css`:
 
 ### When Adding Theme-Dependent Styling
 1. Use the theme hook to get current theme
-2. Define color variations for all three themes
+2. Define color variations for all four themes
 3. Use primary color for active/selected states
-4. Test in all theme modes
+4. Test in all theme modes, including Liquid Glass and High Contrast
 5. Ensure sufficient contrast in all modes
 
 ### When Modifying Authentication

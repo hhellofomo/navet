@@ -26,7 +26,7 @@ The name perfectly captures what this application does: it serves as the **centr
 - **Logo**: Hub network node design (center with radiating connections)
 - **Primary Color**: Orange (#f97316) with gradient to #ea580c
 - **Color System**: 8 customizable primary colors
-- **Theme Modes**: Light, Dark, High Contrast
+- **Theme Modes**: Liquid Glass, Dark, Light, High Contrast
 - **Typography**: System UI fonts for native feel
 
 ## Voice & Tone

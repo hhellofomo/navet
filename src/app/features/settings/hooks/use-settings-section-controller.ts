@@ -157,13 +157,11 @@ export function useSettingsSectionController() {
           ? 'hover:bg-white/20'
           : theme === 'glass'
             ? 'hover:bg-white/16'
-          : 'hover:bg-white/10',
+            : 'hover:bg-white/10',
     chipTextColor: theme === 'light' ? 'text-gray-600' : surface.textSecondary,
     dividerColor: surface.divider,
     elevatedShadow:
-      theme === 'light'
-        ? '0 10px 30px rgba(15, 23, 42, 0.06)'
-        : '0 10px 30px rgba(0, 0, 0, 0.18)',
+      theme === 'light' ? '0 10px 30px rgba(15, 23, 42, 0.06)' : '0 10px 30px rgba(0, 0, 0, 0.18)',
     floatingButtonBg: theme === 'light' ? 'bg-gray-900' : 'bg-white',
     floatingButtonText: theme === 'light' ? 'text-white' : 'text-gray-900',
     hoverBg: theme === 'light' ? 'hover:bg-gray-100/90' : surface.hoverBg,
@@ -175,7 +173,12 @@ export function useSettingsSectionController() {
     mutedColor: theme === 'light' ? 'text-gray-700' : surface.textSecondary,
     ringClass: theme === 'light' ? 'ring-black/30' : 'ring-white/40',
     ringOffsetClass: theme === 'light' ? 'ring-offset-white' : 'ring-offset-gray-900',
-    softBg: theme === 'light' ? 'bg-gray-50/90' : theme === 'glass' ? 'bg-white/[0.06]' : 'bg-white/[0.04]',
+    softBg:
+      theme === 'light'
+        ? 'bg-gray-50/90'
+        : theme === 'glass'
+          ? 'bg-white/[0.06]'
+          : 'bg-white/[0.04]',
     subtleColor: surface.textMuted,
     textColor: surface.textPrimary,
   };

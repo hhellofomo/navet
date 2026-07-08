@@ -26,7 +26,8 @@ export function useCalendarTheme(theme: ThemeType): CalendarThemeColors {
       : theme === 'glass'
         ? 'bg-indigo-300/24 border border-indigo-100/20 backdrop-blur-sm'
         : 'bg-white/10 border border-white/14 backdrop-blur-sm';
-  const iconColor = theme === 'light' ? 'text-indigo-700' : theme === 'glass' ? 'text-indigo-100' : 'text-white';
+  const iconColor =
+    theme === 'light' ? 'text-indigo-700' : theme === 'glass' ? 'text-indigo-100' : 'text-white';
   const dividerColor = theme === 'light' ? 'bg-gray-200' : 'bg-white/12';
   const hoverBg = theme === 'light' ? 'hover:bg-gray-100/80' : 'hover:bg-white/5';
   const hoverText =

@@ -34,9 +34,15 @@ export function MediaLargeView({
   onVolumeChange,
 }: MediaLargeViewProps) {
   const surface = getThemeSurfaceTokens(theme);
-  const buttonSurface = isLight ? 'bg-gray-900/10 hover:bg-gray-900/20' : `${surface.subtleBg} ${surface.hoverBg}`;
+  const buttonSurface = isLight
+    ? 'bg-gray-900/10 hover:bg-gray-900/20'
+    : `${surface.subtleBg} ${surface.hoverBg}`;
   const iconColor = isLight ? 'text-gray-800' : surface.textPrimary;
-  const volumeTrack = isLight ? 'bg-gray-900/15' : theme === 'glass' ? 'bg-white/12' : 'bg-white/20';
+  const volumeTrack = isLight
+    ? 'bg-gray-900/15'
+    : theme === 'glass'
+      ? 'bg-white/12'
+      : 'bg-white/20';
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-4">
       <img
@@ -46,9 +52,7 @@ export function MediaLargeView({
       />
 
       <div className="text-center w-full">
-        <div className={`font-bold truncate text-lg ${surface.textPrimary}`}>
-          {title}
-        </div>
+        <div className={`font-bold truncate text-lg ${surface.textPrimary}`}>{title}</div>
         <div className={`text-sm truncate ${isLight ? 'text-gray-500' : surface.textSecondary}`}>
           {artist}
         </div>
@@ -95,9 +99,7 @@ export function MediaLargeView({
             <Volume2 className={`w-4 h-4 ${iconColor}`} />
           )}
         </button>
-        <div
-          className={`flex-1 relative h-1 ${volumeTrack} rounded-full overflow-hidden`}
-        >
+        <div className={`flex-1 relative h-1 ${volumeTrack} rounded-full overflow-hidden`}>
           <div
             className="absolute left-0 top-0 h-full bg-pink-500 transition-all duration-150"
             style={{ width: isMuted ? '0%' : `${volume}%` }}
@@ -111,7 +113,9 @@ export function MediaLargeView({
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
         </div>
-        <span className={`text-xs w-8 text-right ${isLight ? 'text-gray-500' : surface.textSecondary}`}>
+        <span
+          className={`text-xs w-8 text-right ${isLight ? 'text-gray-500' : surface.textSecondary}`}
+        >
           {isMuted ? 0 : volume}%
         </span>
       </div>

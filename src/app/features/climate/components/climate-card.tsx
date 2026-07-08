@@ -67,7 +67,9 @@ export const ClimateCard = memo(function ClimateCard({
 
       {/* Light theme frosted overlay */}
       {(theme === 'light' || isGlass) && (
-        <div className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`} />
+        <div
+          className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`}
+        />
       )}
 
       <div className="relative h-full flex flex-col">

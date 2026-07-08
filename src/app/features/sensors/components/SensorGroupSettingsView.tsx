@@ -99,7 +99,9 @@ export function SensorGroupSettingsView({
 
                 {selectedSensors.length === 0 ? (
                   <div className={`rounded-2xl p-4 text-center ${surface.subtleBg}`}>
-                    <p className={`text-xs ${surface.textSecondary}`}>Search and add sensors below</p>
+                    <p className={`text-xs ${surface.textSecondary}`}>
+                      Search and add sensors below
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -267,7 +269,9 @@ export function SensorGroupSettingsView({
                                   <Icon className={`w-4 h-4 ${colors.iconColor}`} />
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                  <p className={`text-xs font-medium truncate ${surface.textPrimary}`}>
+                                  <p
+                                    className={`text-xs font-medium truncate ${surface.textPrimary}`}
+                                  >
                                     {highlightMatch(sensor.label)}
                                   </p>
                                   <p className={`text-xs ${surface.textSecondary}`}>
@@ -275,7 +279,9 @@ export function SensorGroupSettingsView({
                                   </p>
                                 </div>
                                 {isSelected ? (
-                                  <span className={`text-xs flex-shrink-0 ${surface.textMuted}`}>Added</span>
+                                  <span className={`text-xs flex-shrink-0 ${surface.textMuted}`}>
+                                    Added
+                                  </span>
                                 ) : !isDisabled ? (
                                   <Plus className={`w-4 h-4 flex-shrink-0 ${surface.textMuted}`} />
                                 ) : null}
