@@ -147,6 +147,20 @@ export interface RSSFeedDevice extends BaseDevice {
 // Calendar device
 export interface CalendarDevice extends BaseDevice {
   room: string;
+  events: Array<{
+    id: string;
+    title: string;
+    startTime: string;
+    endTime: string;
+    timeDisplay: string;
+    location?: string;
+    type: 'meeting' | 'call' | 'event';
+    color: string;
+    attendees?: number;
+    sortKey?: string;
+    sourceId?: string;
+    sourceName?: string;
+  }>;
 }
 
 // Grouped Sensor device

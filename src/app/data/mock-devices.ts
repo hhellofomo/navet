@@ -6,7 +6,47 @@ import type { DeviceCollection } from '../types/device.types';
  */
 export const DEVICES: DeviceCollection = {
   rssFeeds: [{ id: 'rss-1', name: 'News Feed', room: 'Living Room', size: 'medium' }],
-  calendars: [{ id: 'calendar-1', name: 'Calendar', room: 'Living Room', size: 'medium' }],
+  calendars: [
+    {
+      id: 'calendar-1',
+      name: 'Calendar',
+      room: 'Living Room',
+      size: 'medium',
+      events: [
+        {
+          id: 'calendar-1-event-1',
+          title: 'Team Standup',
+          startTime: '9:00 AM',
+          endTime: '9:30 AM',
+          timeDisplay: '9:00 AM',
+          type: 'call',
+          color: 'bg-blue-500',
+          attendees: 8,
+        },
+        {
+          id: 'calendar-1-event-2',
+          title: 'Design Review',
+          startTime: '10:30 AM',
+          endTime: '11:30 AM',
+          timeDisplay: '10:30 AM',
+          location: 'Conference Room A',
+          type: 'meeting',
+          color: 'bg-purple-500',
+          attendees: 5,
+        },
+        {
+          id: 'calendar-1-event-3',
+          title: 'Lunch with Client',
+          startTime: '12:00 PM',
+          endTime: '1:00 PM',
+          timeDisplay: '12:00 PM',
+          location: 'Downtown Bistro',
+          type: 'event',
+          color: 'bg-green-500',
+        },
+      ],
+    },
+  ],
   lights: [],
   hvac: [
     {

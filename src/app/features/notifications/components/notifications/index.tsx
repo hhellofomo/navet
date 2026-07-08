@@ -16,8 +16,14 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const { theme, primaryColor } = useTheme();
   const surface = getNotificationSurfaceTokens(theme);
-  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, clearAll } =
-    useNotifications();
+  const {
+    notifications,
+    unreadCount,
+    runPrimaryAction,
+    markAllAsRead,
+    deleteNotification,
+    clearAll,
+  } = useNotifications();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -59,7 +65,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
               <NotificationItem
                 key={notification.id}
                 notification={notification}
-                onMarkAsRead={markAsRead}
+                onPrimaryAction={runPrimaryAction}
                 onDelete={deleteNotification}
                 theme={theme}
                 primaryColor={primaryColor}

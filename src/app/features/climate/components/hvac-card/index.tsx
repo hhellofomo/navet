@@ -230,6 +230,7 @@ export const HVACCard = memo(function HVACCard({
       </CardWrapper>
 
       <HVACSettingsDialog
+        entityId={id}
         isOpen={controller.isSettingsOpen}
         onOpenChange={controller.setIsSettingsOpen}
         name={name}

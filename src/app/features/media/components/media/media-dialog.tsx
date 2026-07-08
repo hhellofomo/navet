@@ -1,5 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
+import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
@@ -8,6 +9,7 @@ import { formatMediaTime } from './media-time';
 import { useMediaArtworkColors } from './use-media-artwork-colors';
 
 interface MediaDialogProps {
+  entityId: string;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   artwork?: string | null;
@@ -24,6 +26,7 @@ interface MediaDialogProps {
 }
 
 export function MediaDialog({
+  entityId,
   isOpen,
   onOpenChange,
   artwork,
@@ -64,12 +67,17 @@ export function MediaDialog({
           }`}
         >
           <div className="mb-6">
-            <Dialog.Title className={`text-xl font-semibold ${surface.textPrimary}`}>
-              {title}
-            </Dialog.Title>
-            <Dialog.Description className={`text-sm mt-1 ${surface.textSecondary}`}>
-              {artist}
-            </Dialog.Description>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <Dialog.Title className={`text-xl font-semibold ${surface.textPrimary}`}>
+                  {title}
+                </Dialog.Title>
+                <Dialog.Description className={`text-sm mt-1 ${surface.textSecondary}`}>
+                  {artist}
+                </Dialog.Description>
+              </div>
+              <EntityRoomSelector entityId={entityId} label="Room" compact className="w-32" />
+            </div>
           </div>
 
           <div className="space-y-6">

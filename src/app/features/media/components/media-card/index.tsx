@@ -219,6 +219,7 @@ export const MediaCard = memo(function MediaCard({
       {isOpen && (
         <Suspense fallback={null}>
           <MediaDialog
+            entityId={id}
             isOpen={isOpen}
             onOpenChange={closeDialog}
             artwork={resolvedAlbumArt}

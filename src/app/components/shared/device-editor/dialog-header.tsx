@@ -1,18 +1,20 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
-import { memo } from 'react';
+import { memo, type ReactNode } from 'react';
 import { getDeviceEditorSurfaceTokens } from './device-editor-surface-tokens';
 
 interface DialogHeaderProps {
   title: string;
   description: string;
   isOn: boolean;
+  trailing?: ReactNode;
 }
 
 export const DialogHeader = memo(function DialogHeader({
   title,
   description,
   isOn,
+  trailing,
 }: DialogHeaderProps) {
   const editorSurface = getDeviceEditorSurfaceTokens(isOn);
 
@@ -31,16 +33,20 @@ export const DialogHeader = memo(function DialogHeader({
         </Dialog.Description>
       </div>
 
-      <Dialog.Close asChild>
-        <button
-          type="button"
-          className={`rounded-lg p-2 transition-all duration-300 ${editorSurface.closeButtonClassName}`}
-        >
-          <X
-            className={`h-5 w-5 transition-colors duration-500 ${editorSurface.closeIconClassName}`}
-          />
-        </button>
-      </Dialog.Close>
+      <div className="ml-4 flex items-start gap-2">
+        {trailing}
+
+        <Dialog.Close asChild>
+          <button
+            type="button"
+            className={`rounded-lg p-2 transition-all duration-300 ${editorSurface.closeButtonClassName}`}
+          >
+            <X
+              className={`h-5 w-5 transition-colors duration-500 ${editorSurface.closeIconClassName}`}
+            />
+          </button>
+        </Dialog.Close>
+      </div>
     </div>
   );
 });

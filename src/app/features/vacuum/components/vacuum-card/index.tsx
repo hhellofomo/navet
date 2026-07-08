@@ -150,11 +150,13 @@ export const VacuumCard = memo(function VacuumCard({
       </div>
 
       <VacuumSettingsDialog
+        entityId={id}
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         onStartCleaning={handleStartCleaning}
         onReturnHome={handleReturnHome}
         name={name}
+        room={room}
         theme={theme}
         accentColorValue={cardColors.accent}
       />

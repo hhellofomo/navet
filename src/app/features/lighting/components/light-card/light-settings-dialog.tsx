@@ -9,12 +9,14 @@ import {
   DialogHeader,
   IconPicker,
 } from '@/app/components/shared/device-editor';
+import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { PRESET_COLORS } from '@/app/constants/light-constants';
 import { useTheme } from '@/app/hooks';
 import type { BrightnessPresetKey } from '../../stores/light-preset-store';
 import type { LightBrightnessPreset } from './light-card-types';
 
 interface LightSettingsDialogProps {
+  entityId: string;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   name: string;
@@ -44,6 +46,7 @@ interface LightSettingsDialogProps {
 }
 
 export const LightSettingsDialog = memo(function LightSettingsDialog({
+  entityId,
   isOpen,
   onOpenChange,
   name,
@@ -97,7 +100,12 @@ export const LightSettingsDialog = memo(function LightSettingsDialog({
         >
           <CustomScrollbar isOn={isOn}>
             <div className="p-8">
-              <DialogHeader title="Light Settings" description={`${name} - ${room}`} isOn={isOn} />
+              <DialogHeader
+                title="Light Settings"
+                description={`${name} - ${room}`}
+                isOn={isOn}
+                trailing={<EntityRoomSelector entityId={entityId} label="Room" compact />}
+              />
 
               <div className="space-y-8">
                 {supportsColorTemperature && (

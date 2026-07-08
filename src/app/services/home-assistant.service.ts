@@ -273,6 +273,21 @@ class HomeAssistantService {
     await callHassService(this.connection, domain, service, normalizedServiceData, target);
   }
 
+  async updateEntityArea(entityId: string, areaId: string | null): Promise<void> {
+    if (!this.connection) {
+      throw new Error('Home Assistant is not connected');
+    }
+
+    await this.connection.sendMessagePromise({
+      type: 'config/entity_registry/update',
+      entity_id: entityId,
+      area_id: areaId,
+    });
+
+    await this.loadRegistries();
+    this.notifyListeners();
+  }
+
   /**
    * Update a light entity using Home Assistant light services.
    */

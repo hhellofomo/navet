@@ -2,10 +2,12 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Flame, Power, Snowflake, Wind } from 'lucide-react';
 import { memo } from 'react';
 import { CustomScrollbar, DialogHeader } from '@/app/components/shared/device-editor';
+import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { getHVACSettingsDialogStyles } from './styles';
 import type { HVACSettingsDialogProps } from './types';
 
 export const HVACSettingsDialog = memo(function HVACSettingsDialog({
+  entityId,
   isOpen,
   onOpenChange,
   name,
@@ -28,7 +30,12 @@ export const HVACSettingsDialog = memo(function HVACSettingsDialog({
         >
           <CustomScrollbar isOn={isOn}>
             <div className="p-8">
-              <DialogHeader title="HVAC Settings" description={`${name} - ${room}`} isOn={isOn} />
+              <DialogHeader
+                title="HVAC Settings"
+                description={`${name} - ${room}`}
+                isOn={isOn}
+                trailing={<EntityRoomSelector entityId={entityId} label="Room" compact />}
+              />
 
               <div className="space-y-8">
                 {/* Temperature Display */}

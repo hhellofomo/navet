@@ -47,7 +47,10 @@ export function CalendarEventItem({
     <button
       type="button"
       className={`group/item w-full text-left ${hoverBg} rounded-lg p-2 -m-2 transition-colors`}
-      onClick={onItemClick}
+      onClick={(event) => {
+        event.stopPropagation();
+        onItemClick?.();
+      }}
       onKeyDown={handleKeyDown}
     >
       <div className="flex items-start gap-2.5">

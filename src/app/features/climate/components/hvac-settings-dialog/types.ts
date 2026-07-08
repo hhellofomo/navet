@@ -1,4 +1,5 @@
 export interface HVACSettingsDialogProps {
+  entityId: string;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   name: string;
