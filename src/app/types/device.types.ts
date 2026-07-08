@@ -115,6 +115,8 @@ export type HelperDevice = Pick<
 export interface CoverDevice extends BaseDevice {
   room: string;
   position: number;
+  supportedFeatures?: number;
+  hasPosition?: boolean;
 }
 
 // Lock device

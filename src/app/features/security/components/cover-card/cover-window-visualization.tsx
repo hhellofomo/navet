@@ -6,6 +6,7 @@ interface CoverWindowVisualizationProps {
   theme: ThemeType;
   ariaLabel: string;
   onSetPosition: (newPosition: number) => void;
+  disabled?: boolean;
 }
 
 const CASSETTE_HEIGHT = 12;
@@ -16,6 +17,7 @@ export function CoverWindowVisualization({
   theme,
   ariaLabel,
   onSetPosition,
+  disabled = false,
 }: CoverWindowVisualizationProps) {
   const blindCoverage = Math.max(0, Math.min(1, (100 - position) / 100));
   const isLight = theme === 'light';
@@ -28,11 +30,17 @@ export function CoverWindowVisualization({
       max={100}
       step={1}
       inverted
+      disabled={disabled}
       onValueChange={(values) => {
+        if (disabled) {
+          return;
+        }
         const v = values[0];
         if (typeof v === 'number') onSetPosition(100 - v);
       }}
-      className="relative flex h-full min-h-52 w-full max-w-40 touch-none select-none items-center justify-center"
+      className={`relative flex h-full min-h-52 w-full max-w-40 touch-none select-none items-center justify-center ${
+        disabled ? 'cursor-not-allowed opacity-70' : ''
+      }`}
       aria-label={ariaLabel}
       onPointerDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
@@ -95,7 +103,11 @@ export function CoverWindowVisualization({
         </div>
       </div>
 
-      <Slider.Track className="absolute inset-0 h-full w-full cursor-ns-resize opacity-0" />
+      <Slider.Track
+        className={`absolute inset-0 h-full w-full opacity-0 ${
+          disabled ? 'cursor-not-allowed' : 'cursor-ns-resize'
+        }`}
+      />
       <Slider.Thumb
         className="absolute h-0.5 w-full opacity-0 outline-none"
         aria-label={ariaLabel}

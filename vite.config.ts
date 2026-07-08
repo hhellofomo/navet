@@ -360,6 +360,7 @@ export default defineConfig(({ mode }) => {
         workbox: {
           navigateFallback: './index.html',
           globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest}'],
+          globIgnores: ['config.js'],
         },
       })
     )

@@ -25,7 +25,7 @@ import { getLegacyReducedEffectsFlags, resolveEffectsQuality } from '@/app/utils
 import { storage } from '@/app/utils/storage';
 import { sanitizeExternalUrl, sanitizeImageUrl } from '@/app/utils/url-security';
 
-interface DashboardConfigPayload {
+export interface DashboardConfigPayload {
   version: 3;
   app: 'navet';
   exportedAt: string;
@@ -608,6 +608,21 @@ export const importDashboardConfigFromFile = async (file: File) => {
   }
 
   const content = (await file.text()).replace(/^\uFEFF/, '');
+  const parsed = parseYaml(content);
+  importDashboardConfig(parsed);
+};
+
+export const importDashboardConfigFromUrl = async (url: string) => {
+  const response = await fetch(url, {
+    cache: 'no-store',
+    credentials: 'same-origin',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Unable to load dashboard config from ${url}`);
+  }
+
+  const content = (await response.text()).replace(/^\uFEFF/, '');
   const parsed = parseYaml(content);
   importDashboardConfig(parsed);
 };

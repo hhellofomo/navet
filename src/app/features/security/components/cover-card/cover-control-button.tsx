@@ -8,6 +8,7 @@ interface CoverControlButtonProps {
   size: CardSize | 'large';
   label: string;
   onClick: () => void;
+  disabled?: boolean;
   children: ReactNode;
 }
 
@@ -16,6 +17,7 @@ export function CoverControlButton({
   size,
   label,
   onClick,
+  disabled = false,
   children,
 }: CoverControlButtonProps) {
   return (
@@ -23,11 +25,16 @@ export function CoverControlButton({
       theme={theme}
       size={size}
       variant="soft"
+      disabled={disabled}
       onClick={(event) => {
         event.stopPropagation();
+        if (disabled) {
+          return;
+        }
         onClick();
       }}
       title={label}
+      className={disabled ? 'cursor-not-allowed opacity-45' : ''}
     >
       {children}
     </RoundControlButton>

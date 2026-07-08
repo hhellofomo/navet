@@ -1,3 +1,4 @@
+import { getRuntimeConfig } from '../config/runtime-config';
 import { storage } from '../utils/storage';
 
 export interface SessionConfig {
@@ -35,7 +36,16 @@ export function clearStoredSessionConfig(key: string): void {
 }
 
 export function readRuntimeSessionConfig(): SessionConfig | null {
-  return null;
+  const runtimeConfig = getRuntimeConfig();
+
+  if (!runtimeConfig.hassUrl || !runtimeConfig.hassToken) {
+    return null;
+  }
+
+  return normalizeSessionConfig({
+    url: runtimeConfig.hassUrl,
+    token: runtimeConfig.hassToken,
+  });
 }
 
 export function readInitialSessionConfig(key: string): SessionConfig | null {

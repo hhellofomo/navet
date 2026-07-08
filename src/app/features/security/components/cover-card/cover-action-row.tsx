@@ -15,6 +15,9 @@ interface CoverActionRowProps {
   onOpen: () => void;
   onStop: () => void;
   onClose: () => void;
+  canOpen: boolean;
+  canStop: boolean;
+  canClose: boolean;
 }
 
 export function CoverActionRow({
@@ -25,6 +28,9 @@ export function CoverActionRow({
   onOpen,
   onStop,
   onClose,
+  canOpen,
+  canStop,
+  canClose,
 }: CoverActionRowProps) {
   const { t } = useI18n();
   const gap = size === 'small' ? 'gap-1.5' : 'gap-2.5';
@@ -35,13 +41,31 @@ export function CoverActionRow({
       size={size}
       leftContent={
         <div className={`flex items-center ${gap}`}>
-          <CoverControlButton theme={theme} size={size} label={t('cover.open')} onClick={onOpen}>
+          <CoverControlButton
+            theme={theme}
+            size={size}
+            label={t('cover.open')}
+            onClick={onOpen}
+            disabled={!canOpen}
+          >
             <ChevronUp className="h-3.5 w-3.5" />
           </CoverControlButton>
-          <CoverControlButton theme={theme} size={size} label={t('cover.stop')} onClick={onStop}>
+          <CoverControlButton
+            theme={theme}
+            size={size}
+            label={t('cover.stop')}
+            onClick={onStop}
+            disabled={!canStop}
+          >
             <CoverPauseIcon />
           </CoverControlButton>
-          <CoverControlButton theme={theme} size={size} label={t('cover.close')} onClick={onClose}>
+          <CoverControlButton
+            theme={theme}
+            size={size}
+            label={t('cover.close')}
+            onClick={onClose}
+            disabled={!canClose}
+          >
             <ChevronDown className="h-3.5 w-3.5" />
           </CoverControlButton>
         </div>

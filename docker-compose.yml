@@ -8,4 +8,9 @@ services:
       - .env
     ports:
       - "8080:80"
+    volumes:
+      - navet-data:/data
     restart: unless-stopped
+
+volumes:
+  navet-data:

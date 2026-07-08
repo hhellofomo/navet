@@ -3,9 +3,9 @@ import { create } from 'storybook/theming';
 export const navetStorybookTheme = create({
   base: 'dark',
   brandTitle: 'Navet UI',
-  brandUrl: '/',
+  brandUrl: './',
   brandTarget: '_self',
-  brandImage: '/logo-horizontal-light.svg',
+  brandImage: './logo-horizontal-light.svg',
   colorPrimary: '#f97316',
   colorSecondary: '#fb923c',
   appBg: '#050816',
