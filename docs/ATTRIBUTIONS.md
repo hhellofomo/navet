@@ -23,6 +23,12 @@ This project includes photos from [Unsplash](https://unsplash.com) used under [U
 - **Apple iOS** - Human Interface Guidelines
 - **Frosted Glass** - iOS widget aesthetics
 
+## Project Inspiration
+
+- [`ha-fusion`](https://github.com/matt8707/ha-fusion) was the inspiration for starting Navet.
+- Mattias' work has been incredible, and it is sad that he stopped contributing.
+- Tack sa mycket, Mattias.
+
 ---
 
 Copyright © 2026 Navet Contributors
