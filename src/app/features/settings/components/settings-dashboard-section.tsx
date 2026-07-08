@@ -63,7 +63,7 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
             className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${
               hiddenEntityIds.length === 0
                 ? 'cursor-not-allowed opacity-50'
-                : `${styles.softBg} ${styles.hoverBg} ${styles.textColor}`
+                : `border ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`
             }`}
           >
             <LayoutGrid className="h-4 w-4" />
@@ -72,7 +72,7 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
           <button
             type="button"
             onClick={() => setShowRestartOnboardingConfirm(true)}
-            className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
+            className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
           >
             <Scale className="h-4 w-4" />
             <span>Restart onboarding</span>
@@ -130,7 +130,9 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
         description="Choose whether tapping the card should toggle the device right away or open its controls first."
         styles={styles}
       >
-        <div className={`inline-flex rounded-full p-1 ${styles.softBg}`}>
+        <div
+          className={`inline-flex rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
+        >
           {INTERACTION_OPTIONS.map((option) => {
             const isActive = entityInteractionMode === option.value;
             return (
@@ -181,7 +183,7 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
           <button
             type="button"
             onClick={handleExportDashboardConfig}
-            className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
+            className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
           >
             <Download className="h-4 w-4" />
             <span>Export config</span>
@@ -189,7 +191,7 @@ export function SettingsDashboardSection({ controller }: SettingsDashboardSectio
           <button
             type="button"
             onClick={() => importInputRef.current?.click()}
-            className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
+            className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
           >
             <Upload className="h-4 w-4" />
             <span>Import config</span>

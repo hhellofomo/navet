@@ -3,7 +3,7 @@ import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dn
 import { CSS } from '@dnd-kit/utilities';
 import { Check, Edit3, LayoutGrid, Lightbulb } from 'lucide-react';
 import { memo } from 'react';
-import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { InteractivePill } from '@/app/components/shared/interactive-pill';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 
@@ -30,7 +30,7 @@ export const RoomNav = memo(function RoomNav({
   onAddEntity,
   addEntityLabel = 'Add Entity',
 }: RoomNavProps) {
-  const { theme, primaryColor } = useTheme();
+  const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const visibleRooms = ['All', ...rooms];
   const sensors = useSensors(
@@ -42,12 +42,10 @@ export const RoomNav = memo(function RoomNav({
   );
 
   const textSecondary = surface.textSecondary;
-  const textPrimary = surface.textPrimary;
   const inactiveBg = surface.subtleBg;
   const hoverBg = surface.hoverBg;
   const border = surface.border;
   const dividerClass = theme === 'light' ? 'bg-gray-200' : surface.border;
-  const activeColorValue = getThemeColorValue(primaryColor);
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) {
@@ -62,11 +60,13 @@ export const RoomNav = memo(function RoomNav({
   };
 
   return (
-    <div className={`flex items-center gap-2 pb-4 md:pb-6 border-b ${border} mb-6 md:mb-8`}>
+    <div
+      className={`flex items-center gap-1 pb-4 md:gap-1.5 md:pb-6 border-b ${border} mb-6 md:mb-8`}
+    >
       <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           <SortableContext items={visibleRooms} strategy={horizontalListSortingStrategy}>
-            <div className="flex items-center gap-2 min-w-max">
+            <div className="flex items-center gap-1 min-w-max md:gap-1.5">
               {visibleRooms.map((room) => (
                 <RoomNavItem
                   key={room}
@@ -74,9 +74,7 @@ export const RoomNav = memo(function RoomNav({
                   activeRoom={activeRoom}
                   isEditMode={isEditMode}
                   textSecondary={textSecondary}
-                  textPrimary={textPrimary}
                   hoverBg={hoverBg}
-                  activeColorValue={activeColorValue}
                   onRoomChange={onRoomChange}
                 />
               ))}
@@ -85,55 +83,57 @@ export const RoomNav = memo(function RoomNav({
         </DndContext>
       </div>
 
-      <div className="flex items-center gap-2 flex-shrink-0 pl-2">
+      <div className="flex items-center gap-1 flex-shrink-0 pl-1 md:gap-1.5 md:pl-1.5">
         {isEditMode && onAddEntity && (
-          <button
-            type="button"
+          <InteractivePill
             onClick={onAddEntity}
-            className={`p-2 rounded-lg transition-colors flex items-center gap-2 px-3 ${inactiveBg} ${hoverBg}`}
+            intent="action"
+            className={`flex items-center gap-2 rounded-lg p-2 px-3 transition-colors ${inactiveBg} ${hoverBg}`}
           >
             <Lightbulb className={`w-4 h-4 ${textSecondary}`} />
             <span className={`text-xs font-medium hidden md:inline ${textSecondary}`}>
               {addEntityLabel}
             </span>
-          </button>
+          </InteractivePill>
         )}
 
         {isEditMode && onAddCard && (
-          <button
-            type="button"
+          <InteractivePill
             onClick={onAddCard}
-            className={`p-2 rounded-lg transition-colors flex items-center gap-2 px-3 ${inactiveBg} ${hoverBg}`}
+            intent="action"
+            className={`flex items-center gap-2 rounded-lg p-2 px-3 transition-colors ${inactiveBg} ${hoverBg}`}
           >
             <LayoutGrid className={`w-4 h-4 ${textSecondary}`} />
             <span className={`text-xs font-medium hidden md:inline ${textSecondary}`}>
               Add Card
             </span>
-          </button>
+          </InteractivePill>
         )}
 
         {isEditMode && <div aria-hidden="true" className={`mx-1 h-6 w-px ${dividerClass}`} />}
 
-        <button
-          type="button"
+        <InteractivePill
           onClick={onToggleEditMode}
-          className={`p-2 rounded-lg transition-colors flex items-center gap-2 px-3 ${
-            isEditMode ? 'text-white shadow-sm' : `${inactiveBg} ${hoverBg}`
+          active={isEditMode}
+          intent="action"
+          className={`flex h-[30px] w-[30px] items-center justify-center rounded-lg p-1.5 transition-colors md:h-[38px] md:w-auto md:gap-2 md:px-3 md:py-2 ${
+            isEditMode ? 'shadow-sm' : `${inactiveBg} ${hoverBg}`
           }`}
-          style={isEditMode ? { backgroundColor: activeColorValue } : undefined}
         >
           {isEditMode ? (
             <>
               <Check className="w-4 h-4 text-white" />
-              <span className="text-xs font-medium text-white">Done Editing</span>
+              <span className="hidden text-xs font-medium text-white md:inline">Done Editing</span>
             </>
           ) : (
             <>
               <Edit3 className={`w-4 h-4 ${textSecondary}`} />
-              <span className={`text-xs font-medium ${textSecondary}`}>Customize</span>
+              <span className={`hidden text-xs font-medium md:inline ${textSecondary}`}>
+                Customize
+              </span>
             </>
           )}
-        </button>
+        </InteractivePill>
       </div>
     </div>
   );
@@ -144,9 +144,7 @@ interface RoomNavItemProps {
   activeRoom: string;
   isEditMode: boolean;
   textSecondary: string;
-  textPrimary: string;
   hoverBg: string;
-  activeColorValue: string;
   onRoomChange: (room: string) => void;
 }
 
@@ -155,9 +153,7 @@ const RoomNavItem = memo(function RoomNavItem({
   activeRoom,
   isEditMode,
   textSecondary,
-  textPrimary,
   hoverBg,
-  activeColorValue,
   onRoomChange,
 }: RoomNavItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -166,17 +162,16 @@ const RoomNavItem = memo(function RoomNavItem({
   });
 
   return (
-    <button
-      type="button"
+    <InteractivePill
       ref={setNodeRef}
+      active={activeRoom === room}
       onClick={() => onRoomChange(room)}
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
-        backgroundColor: activeRoom === room ? activeColorValue : undefined,
       }}
-      className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
-        activeRoom === room ? 'text-white' : `${textSecondary} ${hoverBg} hover:${textPrimary}`
+      className={`px-2.5 md:px-3 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+        activeRoom === room ? 'text-white' : `${textSecondary} ${hoverBg}`
       } ${isEditMode && room !== 'All' ? 'cursor-move active:cursor-grabbing' : ''} ${
         isDragging ? 'opacity-50' : ''
       }`}
@@ -184,6 +179,6 @@ const RoomNavItem = memo(function RoomNavItem({
       {...(isEditMode && room !== 'All' ? listeners : {})}
     >
       {room}
-    </button>
+    </InteractivePill>
   );
 });

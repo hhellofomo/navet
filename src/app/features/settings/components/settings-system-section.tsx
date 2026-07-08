@@ -22,7 +22,9 @@ export function SettingsSystemSection({ controller }: SettingsSystemSectionProps
         description="Useful for slower devices like Raspberry Pis. Turns off transitions and animated effects across the app."
         styles={styles}
       >
-        <div className={`inline-flex rounded-full p-1 ${styles.softBg}`}>
+        <div
+          className={`inline-flex rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
+        >
           {[
             { value: false, label: 'Off' },
             { value: true, label: 'On' },
@@ -75,7 +77,7 @@ export function SettingsSystemSection({ controller }: SettingsSystemSectionProps
               href={config.url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
+              className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
             >
               <ExternalLink className="h-4 w-4" />
               <span>Open Homeassistant</span>
@@ -84,7 +86,7 @@ export function SettingsSystemSection({ controller }: SettingsSystemSectionProps
             <button
               type="button"
               onClick={handleResetConnection}
-              className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
+              className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
             >
               <Settings2 className="h-4 w-4" />
               <span>Reset connection</span>

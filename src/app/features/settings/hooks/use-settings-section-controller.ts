@@ -145,16 +145,16 @@ export function useSettingsSectionController() {
       theme === 'light'
         ? 'bg-white/92'
         : theme === 'contrast'
-          ? 'bg-gray-950'
+          ? 'bg-black'
           : theme === 'glass'
             ? 'bg-white/[0.10]'
             : 'bg-gray-900/88',
-    chipBg: theme === 'contrast' ? 'bg-black/50' : surface.subtleBg,
+    chipBg: theme === 'contrast' ? 'bg-black' : surface.subtleBg,
     chipHoverBg:
       theme === 'light'
         ? 'hover:bg-gray-200'
         : theme === 'contrast'
-          ? 'hover:bg-white/20'
+          ? 'hover:bg-black'
           : theme === 'glass'
             ? 'hover:bg-white/16'
             : 'hover:bg-white/10',
@@ -167,7 +167,7 @@ export function useSettingsSectionController() {
     hoverBg: theme === 'light' ? 'hover:bg-gray-100/90' : surface.hoverBg,
     iconBg: surface.iconBg,
     isLightTheme: theme === 'light',
-    insetBg: theme === 'light' ? 'bg-white' : theme === 'glass' ? 'bg-white/[0.06]' : 'bg-black/20',
+    insetBg: theme === 'light' ? 'bg-white' : theme === 'glass' ? 'bg-white/[0.06]' : 'bg-black',
     lineColor: surface.borderStrong,
     mixBlendMode: theme === 'light' ? 'multiply' : 'screen',
     mutedColor: theme === 'light' ? 'text-gray-700' : surface.textSecondary,
@@ -176,9 +176,11 @@ export function useSettingsSectionController() {
     softBg:
       theme === 'light'
         ? 'bg-gray-50/90'
-        : theme === 'glass'
-          ? 'bg-white/[0.06]'
-          : 'bg-white/[0.04]',
+        : theme === 'contrast'
+          ? 'bg-black'
+          : theme === 'glass'
+            ? 'bg-white/[0.06]'
+            : 'bg-white/[0.04]',
     subtleColor: surface.textMuted,
     textColor: surface.textPrimary,
   };

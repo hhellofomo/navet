@@ -62,6 +62,7 @@ Complete feature implementation guide:
 5. **Smooth Transitions** - 500ms for state changes, 200ms for interactions
 6. **Theme Customization** - Four theme modes (Liquid Glass, Dark, Light, High Contrast) with 8 primary color options
 7. **Section-Based Navigation** - Organized into dedicated sections (Home, Security, Tasks, Locks, Lights, Media, Mock, Settings)
+8. **Shared Primitives First** - Cross-theme icon pills and nav/action pills should resolve through shared primitives before feature-level custom styling is added
 
 ### Authentication System
 - **Login Page** - Secure authentication with Home Assistant URL and long-lived access token
@@ -81,6 +82,7 @@ Complete feature implementation guide:
 - **Sections**: Home (dashboard), Security, Tasks, Locks, Lights, Media, Mock, Settings
 - **Desktop**: Fixed vertical sidebar on left (16px wide)
 - **Mobile**: Bottom navigation bar with 6 key sections including Mock and Settings
+- **Mobile Scroll Behavior**: Bottom navigation hides on downward scroll and returns near the top of the document
 - **Empty States**: Beautiful placeholder screens for sections without data
 
 ### Color System at a Glance
@@ -139,6 +141,7 @@ When creating a new card component:
 - [ ] Add edit mode size selector support
 - [ ] Use the shared header pattern: icon top-left, title, then subtitle
 - [ ] Use the shared bottom action-row pattern when the card exposes left actions plus a controls/settings opener
+- [ ] Reuse shared theme primitives such as entity icon pills or interactive pills before introducing new theme branches in feature code
 
 ### Key Files
 ```

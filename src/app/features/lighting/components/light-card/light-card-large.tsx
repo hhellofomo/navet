@@ -72,6 +72,7 @@ export const LightCardLarge = memo(function LightCardLarge({
             value={brightness}
             onChange={onBrightnessChange}
             onCommit={onBrightnessCommit}
+            isOn={isOn}
             showLabel={false}
             size="large"
             onClick={(e) => e.stopPropagation()}

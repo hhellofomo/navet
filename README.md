@@ -55,6 +55,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
   - ✅ Search query
   - ✅ Custom widgets and layouts
   - ✅ User preferences
+- **Installable PWA Shell** - Manifest, service worker, offline app shell, update prompt, and install assets for mobile/desktop install surfaces
 
 ### 🔐 Security
 - **Local First** - Runs entirely on your device
@@ -73,6 +74,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **Feature-Owned Modules** - Dashboard, lighting, settings, sensors, weather, and other major areas expose feature-level entry points under `src/app/features/*`
 - **Feature-Colocated State** - Dashboard and lighting hooks/stores live with their owning features instead of generic global folders
 - **Shared UI Foundation** - Cross-feature pieces such as card sizing, empty states, interaction previews, and theme color helpers live under shared component modules
+- **Shared Visual Primitives** - Cross-theme icon pills and interactive nav/action pills are centralized behind reusable shared primitives instead of feature-level inline theme branches
 - **Consistent Persistence** - Storage keys plus dashboard/light preference persistence are standardized behind shared helpers and feature stores
 
 ## 🚀 Installation
@@ -118,6 +120,19 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 
    Navigate to `http://navet.homeassistant.local:5200`
 
+### Installable PWA
+
+- Navet now ships with a service worker, install manifest, offline shell, and update prompt
+- The app can be installed from supported desktop and mobile browsers
+- Offline mode currently preserves the app shell and clearly signals that live Home Assistant data still requires connectivity
+
+### Build Verification
+
+```bash
+pnpm typecheck
+pnpm build
+```
+
 ## 📖 Usage
 
 ### First Time Setup
@@ -149,6 +164,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - Access **Settings** from the user menu
 - Choose from **4 modes**: Liquid Glass, Dark, Light, Contrast
 - Select from **8 colors**: Blue, Purple, Green, Orange, Pink, Red, Teal, Yellow
+- Shared theme-sensitive pieces such as entity icon pills and nav/action pills now resolve through reusable shared primitives rather than per-feature inline styling
 
 #### Card Interaction Style
 - In **Settings -> Dashboard**, choose how entity cards respond to taps
@@ -204,6 +220,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **Security**, **Tasks**, **Locks**, **Lights**, and **Media** as dedicated sections
 - **Mock** as a temporary flat staging area for mock entities that are not yet integrated into room-based dashboard flow
 - **Settings** for appearance, dashboard, config export/import, and onboarding reset
+- On mobile, the bottom navigation hides on downward scroll and reappears when you return near the top of the page
 
 ## 🏗️ Tech Stack
 

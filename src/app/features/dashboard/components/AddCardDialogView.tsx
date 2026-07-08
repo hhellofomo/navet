@@ -38,8 +38,7 @@ export function AddCardDialogView({
   if (!open) return null;
 
   const surface = getThemeSurfaceTokens(theme);
-  const bgColor =
-    theme === 'light' ? 'bg-white' : theme === 'contrast' ? 'bg-gray-900' : surface.panel;
+  const bgColor = theme === 'light' ? 'bg-white' : surface.panel;
   const textColor = surface.textPrimary;
   const mutedColor = surface.textSecondary;
   const borderColor = surface.border;

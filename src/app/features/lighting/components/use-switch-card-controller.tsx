@@ -156,23 +156,15 @@ export function useSwitchCardController({
   const hasMetrics = availableMetrics.length > 0;
   const hasControlsDialog = hasMetrics;
 
-  const cardColors = isOn
-    ? colors.switch.on
-    : {
-        gradient: colors.light.gradient,
-        border: colors.light.border,
-        iconBg: colors.light.iconBg,
-        accent: theme === 'light' ? 'text-gray-300' : 'text-gray-500',
-        glow: colors.light.glow,
-      };
+  const cardColors = isOn ? colors.switch.on : colors.switch.off;
   const textColor =
     theme === 'light'
       ? isOn
         ? 'text-gray-900'
-        : 'text-gray-500'
+        : 'text-gray-700'
       : isOn
         ? 'text-white'
-        : 'text-gray-500';
+        : 'text-gray-100';
   const valueColor = theme === 'light' ? 'text-gray-900' : 'text-white';
   const labelColor = theme === 'light' ? 'text-gray-600' : 'text-gray-300';
   const settingsButtonClass =

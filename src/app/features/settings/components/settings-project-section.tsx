@@ -41,7 +41,7 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
           href="https://github.com/awesomestvi/"
           target="_blank"
           rel="noopener noreferrer"
-          className={`inline-flex items-center gap-3 rounded-full px-4 py-3 text-sm font-medium transition-colors ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
+          className={`inline-flex items-center gap-3 rounded-full border px-4 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
         >
           <Github className="h-4 w-4" />
           <span>awesomestvi</span>
@@ -64,7 +64,7 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
         <button
           type="button"
           onClick={() => setShowLicense(!showLicense)}
-          className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
+          className={`inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
         >
           <Scale className="h-4 w-4" />
           <span>{showLicense ? 'Hide full license' : 'View full license'}</span>
@@ -110,7 +110,7 @@ export function SettingsProjectSection({ controller }: SettingsProjectSectionPro
         <button
           type="button"
           onClick={() => setShowTerms(!showTerms)}
-          className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium transition-colors ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
+          className={`inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
         >
           <FileText className="h-4 w-4" />
           <span>{showTerms ? 'Hide terms of use' : 'View terms of use'}</span>
