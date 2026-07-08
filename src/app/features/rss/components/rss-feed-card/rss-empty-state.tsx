@@ -1,5 +1,4 @@
 import { Settings2 } from 'lucide-react';
-import { Button } from '@/app/components/primitives';
 import { useI18n } from '@/app/hooks';
 import type { RSSFeedCardSurfaceTokens } from './surface-tokens';
 
@@ -30,7 +29,7 @@ export function RSSEmptyState({
         : t('rss.empty.noArticles');
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center text-center">
+    <div className="flex flex-1 flex-col justify-center text-left">
       <p className="mt-2 text-sm leading-relaxed" style={{ color: rssSurface.textSecondaryColor }}>
         {emptyMessage}
       </p>
@@ -43,21 +42,19 @@ export function RSSEmptyState({
           {t('rss.configureProviders')}
         </div>
       ) : (
-        <Button
+        <button
           type="button"
-          variant="secondary"
-          size="small"
-          leading={<Settings2 className="h-3.5 w-3.5" />}
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => {
             e.stopPropagation();
             onOpenSettings();
           }}
-          className={`mt-4 ${rssSurface.hoverClassName}`}
+          className={`mt-4 inline-flex w-fit items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium transition-opacity hover:opacity-70 ${rssSurface.hoverClassName}`}
           style={{ color: rssSurface.textPrimaryColor }}
         >
+          <Settings2 className="h-3.5 w-3.5" />
           {t('rss.configureProviders')}
-        </Button>
+        </button>
       )}
     </div>
   );

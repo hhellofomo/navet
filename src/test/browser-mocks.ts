@@ -174,7 +174,6 @@ export function resetBrowserMocks() {
   setVisualViewportSize(1024, 768);
   localStorage.clear();
   sessionStorage.clear();
-  window.__NAVET_CONFIG__ = undefined;
   vi.restoreAllMocks();
   window.history.replaceState({}, '', '/');
   document.documentElement.removeAttribute('style');

@@ -5,14 +5,7 @@ import { readFileSync } from 'node:fs'
 import type { ServerResponse } from 'node:http'
 import { isIP } from 'node:net'
 import path from 'path'
-import {
-  defineConfig,
-  loadEnv,
-  type PluginOption,
-  type PreviewServer,
-  type ProxyOptions,
-  type ViteDevServer,
-} from 'vite'
+import { defineConfig, loadEnv, type PluginOption, type PreviewServer, type ViteDevServer } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import {
   isAllowedRSSContentType,
@@ -296,23 +289,6 @@ function homeAssistantPreviewProxyPlugin(hassUrl?: string, hassToken?: string) {
   }
 }
 
-function configureHomeAssistantDevProxyAuth(hassToken?: string) {
-  const configure: ProxyOptions['configure'] = (proxy) => {
-    proxy.on('proxyReq', (proxyReq, req) => {
-      const requestAuthorization = Array.isArray(req.headers.authorization)
-        ? req.headers.authorization[0]
-        : req.headers.authorization
-      const authorization = requestAuthorization ?? (hassToken ? `Bearer ${hassToken}` : undefined)
-
-      if (authorization) {
-        proxyReq.setHeader('Authorization', authorization)
-      }
-    })
-  }
-
-  return configure
-}
-
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const hassUrl = env.NAVET_HASS_URL?.trim().replace(/\/$/, '')
@@ -384,7 +360,6 @@ export default defineConfig(({ mode }) => {
         workbox: {
           navigateFallback: './index.html',
           globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest}'],
-          globIgnores: ['config.js'],
         },
       })
     )
@@ -475,13 +450,21 @@ export default defineConfig(({ mode }) => {
             target: hassUrl,
             changeOrigin: true,
             secure: false,
-            configure: configureHomeAssistantDevProxyAuth(hassToken),
+            headers: hassToken
+              ? {
+                Authorization: `Bearer ${hassToken}`,
+              }
+              : undefined,
           },
           '/__navet_ha_proxy__': {
             target: hassUrl,
             changeOrigin: true,
             secure: false,
-            configure: configureHomeAssistantDevProxyAuth(hassToken),
+            headers: hassToken
+              ? {
+                Authorization: `Bearer ${hassToken}`,
+              }
+              : undefined,
             rewrite: (path) => path.replace(/^\/__navet_ha_proxy__/, ''),
           },
         }

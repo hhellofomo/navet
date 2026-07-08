@@ -27,8 +27,6 @@ const meta = {
     name: 'Living Room Blind',
     room: 'Living Room',
     initialPosition: 72,
-    hasPosition: true,
-    supportedFeatures: 15,
     initialDeviceClass: 'blind',
     size: 'medium',
     isEditMode: false,

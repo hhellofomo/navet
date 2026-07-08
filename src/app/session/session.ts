@@ -1,7 +1,4 @@
-import { getRuntimeConfig } from '../config/runtime-config';
 import { storage } from '../utils/storage';
-
-const HOME_ASSISTANT_INGRESS_PREFIX = '/api/hassio_ingress/';
 
 export interface SessionConfig {
   url: string;
@@ -38,30 +35,9 @@ export function clearStoredSessionConfig(key: string): void {
 }
 
 export function readRuntimeSessionConfig(): SessionConfig | null {
-  const runtimeConfig = getRuntimeConfig();
-
-  if (!runtimeConfig.hassUrl || !runtimeConfig.hassToken) {
-    return null;
-  }
-
-  return normalizeSessionConfig({
-    url: runtimeConfig.hassUrl,
-    token: runtimeConfig.hassToken,
-  });
-}
-
-function isHomeAssistantIngressSession(): boolean {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-
-  return window.location.pathname.includes(HOME_ASSISTANT_INGRESS_PREFIX);
+  return null;
 }
 
 export function readInitialSessionConfig(key: string): SessionConfig | null {
-  if (isHomeAssistantIngressSession()) {
-    return readRuntimeSessionConfig() ?? readStoredSessionConfig(key);
-  }
-
   return readStoredSessionConfig(key) ?? readRuntimeSessionConfig();
 }

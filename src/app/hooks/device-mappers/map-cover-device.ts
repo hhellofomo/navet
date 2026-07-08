@@ -7,16 +7,11 @@ export function mapCoverDevice(
   name: string,
   room: string
 ): CoverDevice {
-  const currentPosition = entity.attributes?.current_position;
-  const supportedFeatures = entity.attributes?.supported_features;
-
   return {
     id: entityId,
     name,
     room,
     size: 'medium',
-    position: typeof currentPosition === 'number' ? currentPosition : 0,
-    supportedFeatures: typeof supportedFeatures === 'number' ? supportedFeatures : undefined,
-    hasPosition: typeof currentPosition === 'number',
+    position: entity.attributes?.current_position || 0,
   };
 }

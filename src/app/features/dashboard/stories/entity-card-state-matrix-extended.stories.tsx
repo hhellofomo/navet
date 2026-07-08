@@ -252,8 +252,6 @@ function StateMatrixExtendedPage() {
           name="Living Room Blind"
           room="Living Room"
           initialPosition={72}
-          hasPosition
-          supportedFeatures={15}
           initialDeviceClass="blind"
           size="medium"
           onSizeChange={() => {}}
@@ -264,8 +262,6 @@ function StateMatrixExtendedPage() {
           name="Living Room Blind"
           room="Living Room"
           initialPosition={0}
-          hasPosition
-          supportedFeatures={15}
           initialDeviceClass="blind"
           size="small"
           onSizeChange={() => {}}
@@ -276,8 +272,6 @@ function StateMatrixExtendedPage() {
           name="Patio Curtain"
           room="Patio"
           initialPosition={92}
-          hasPosition
-          supportedFeatures={15}
           initialDeviceClass="curtain"
           size="large"
           onSizeChange={() => {}}

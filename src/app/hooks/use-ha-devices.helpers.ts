@@ -32,7 +32,6 @@ const PRIMARY_CARD_DOMAINS = new Set([
   'light',
   'switch',
   'climate',
-  'water_heater',
   'cover',
   'lock',
   'media_player',
@@ -311,7 +310,7 @@ export function buildDeviceIndexes(
       indexes.deviceIdsWithVacuumEntity.add(deviceId);
     }
 
-    if ((domain === 'climate' || domain === 'water_heater') && deviceId) {
+    if (domain === 'climate' && deviceId) {
       indexes.deviceIdsWithClimateEntity.add(deviceId);
     }
 

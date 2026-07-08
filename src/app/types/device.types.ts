@@ -39,8 +39,6 @@ export interface ClimateDevice extends BaseDevice {
   currentTemperature: number;
   mode: string;
   action?: string;
-  supportedHvacModes?: string[];
-  serviceDomain?: 'climate' | 'water_heater';
 }
 
 // Weather device
@@ -117,8 +115,6 @@ export type HelperDevice = Pick<
 export interface CoverDevice extends BaseDevice {
   room: string;
   position: number;
-  supportedFeatures?: number;
-  hasPosition?: boolean;
 }
 
 // Lock device

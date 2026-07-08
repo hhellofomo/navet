@@ -19,7 +19,6 @@ export interface HVACSettingsDialogProps {
   step?: number;
   temperaturePresets?: HVACTemperaturePreset[];
   siblingEntities?: HVACSiblingEntity[];
-  supportedHvacModes?: string[];
   onModeChange: (mode: string) => void;
   onTargetTempChange: (temp: number) => void;
   onTargetTempCommit?: (temp: number) => void;
