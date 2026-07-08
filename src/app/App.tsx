@@ -23,11 +23,13 @@ function AppContent() {
   const disableAnimations = useSettingsStore((state) => state.disableAnimations);
   const lowPowerMode = useSettingsStore((state) => state.lowPowerMode);
   const effectsQuality = useSettingsStore((state) => state.effectsQuality);
+  const pageZoom = useSettingsStore((state) => state.pageZoom);
   const resolvedEffectsQuality = resolveEffectsQuality(
     effectsQuality,
     disableAnimations || lowPowerMode
   );
   const reducedEffectsEnabled = resolvedEffectsQuality === 'low';
+  const pageZoomScale = pageZoom / 100;
   const [isOnline, setIsOnline] = useState(() =>
     typeof navigator === 'undefined' ? true : navigator.onLine
   );
@@ -54,6 +56,14 @@ function AppContent() {
       delete document.documentElement.dataset.effectsQuality;
     };
   }, [reducedEffectsEnabled, resolvedEffectsQuality]);
+
+  useEffect(() => {
+    document.documentElement.style.zoom = String(pageZoomScale);
+
+    return () => {
+      document.documentElement.style.zoom = '';
+    };
+  }, [pageZoomScale]);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);

@@ -25,7 +25,19 @@ export function DashboardPage() {
         onComplete={controller.onDismissImportedDashboardReveal}
         variant={controller.dashboardArrivalVariant ?? 'import'}
       />
-      <DashboardSectionRouter controller={controller} />
+      <div
+        aria-hidden={controller.showAddEntityDialog}
+        style={
+          controller.showAddEntityDialog
+            ? {
+                visibility: 'hidden',
+                contentVisibility: 'hidden',
+              }
+            : undefined
+        }
+      >
+        <DashboardSectionRouter controller={controller} />
+      </div>
       <DashboardOverlays controller={controller} />
     </>
   );

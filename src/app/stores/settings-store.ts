@@ -4,6 +4,7 @@ import { type AppLanguage, getNavigatorLanguage } from '@/app/i18n/config';
 
 export type EntityInteractionMode = 'control-first' | 'toggle-first';
 export type EffectsQuality = 'high' | 'medium' | 'low';
+export type PageZoom = 75 | 85 | 100;
 
 export interface UserSettings {
   username: string;
@@ -18,6 +19,7 @@ export interface UserSettings {
   disableAnimations: boolean;
   lowPowerMode: boolean;
   effectsQuality: EffectsQuality;
+  pageZoom: PageZoom;
   entityInteractionMode: EntityInteractionMode;
   ambientLightBleed: boolean;
 }
@@ -40,6 +42,7 @@ export const defaultSettings: UserSettings = {
   disableAnimations: false,
   lowPowerMode: false,
   effectsQuality: 'high',
+  pageZoom: 100,
   entityInteractionMode: 'toggle-first',
   ambientLightBleed: true,
 };

@@ -38,6 +38,9 @@ export const svMessages = {
   'settings.appearance.wallpaper.title': 'Bakgrund',
   'settings.appearance.wallpaper.description':
     'Lägg till en bakgrundsbild som blandar sig med aktiv accentfärg och tema.',
+  'settings.appearance.pageZoom.title': 'Sidzoom',
+  'settings.appearance.pageZoom.description':
+    'Skala hela gränssnittet så att mer får plats på skärmen. 100 % behåller standardlayouten.',
   'settings.appearance.wallpaper.previewAlt': 'Förhandsvisning av bakgrund',
   'settings.appearance.wallpaper.replace': 'Byt bakgrund',
   'settings.appearance.wallpaper.upload': 'Ladda upp bakgrund',

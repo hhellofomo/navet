@@ -100,6 +100,7 @@ export const settingsSelectors = {
   disableAnimations: (state: SettingsState) => state.disableAnimations,
   lowPowerMode: (state: SettingsState) => state.lowPowerMode,
   effectsQuality: (state: SettingsState) => state.effectsQuality,
+  pageZoom: (state: SettingsState) => state.pageZoom,
   entityInteractionMode: (state: SettingsState) => state.entityInteractionMode,
   ambientLightBleed: (state: SettingsState) => state.ambientLightBleed,
 
@@ -116,6 +117,7 @@ export const settingsSelectors = {
     disableAnimations: state.disableAnimations,
     lowPowerMode: state.lowPowerMode,
     effectsQuality: state.effectsQuality,
+    pageZoom: state.pageZoom,
     entityInteractionMode: state.entityInteractionMode,
     ambientLightBleed: state.ambientLightBleed,
   }),
