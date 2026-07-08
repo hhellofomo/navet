@@ -112,8 +112,6 @@ export function useLightCardController({
   const brightnessSendTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const queuedBrightnessRef = useRef<number | null>(null);
   const brightnessRequestInFlightRef = useRef(false);
-  const pendingStateRef = useRef<boolean | null>(null);
-  const stateSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingTempRef = useRef<number | null>(null);
   const tempSyncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastKnownColorRef = useRef<string | null>(null);
@@ -167,18 +165,6 @@ export function useLightCardController({
     }
 
     const nextIsOn = liveEntity.state === 'on';
-    if (pendingStateRef.current !== null && nextIsOn !== pendingStateRef.current) {
-      return;
-    }
-
-    if (pendingStateRef.current !== null) {
-      pendingStateRef.current = null;
-      if (stateSyncTimeoutRef.current) {
-        clearTimeout(stateSyncTimeoutRef.current);
-        stateSyncTimeoutRef.current = null;
-      }
-    }
-
     setIsOn(nextIsOn);
   }, [liveEntity]);
 
@@ -218,9 +204,6 @@ export function useLightCardController({
       }
       if (brightnessSendTimeoutRef.current) {
         clearTimeout(brightnessSendTimeoutRef.current);
-      }
-      if (stateSyncTimeoutRef.current) {
-        clearTimeout(stateSyncTimeoutRef.current);
       }
       if (tempSyncTimeoutRef.current) {
         clearTimeout(tempSyncTimeoutRef.current);
@@ -323,17 +306,6 @@ export function useLightCardController({
     [id, isHomeAssistantLight, t]
   );
 
-  const schedulePendingStateReset = useCallback((nextIsOn: boolean, delayMs = 1500) => {
-    pendingStateRef.current = nextIsOn;
-    if (stateSyncTimeoutRef.current) {
-      clearTimeout(stateSyncTimeoutRef.current);
-    }
-    stateSyncTimeoutRef.current = setTimeout(() => {
-      pendingStateRef.current = null;
-      stateSyncTimeoutRef.current = null;
-    }, delayMs);
-  }, []);
-
   const flushQueuedBrightnessSync = useCallback(() => {
     if (brightnessRequestInFlightRef.current || queuedBrightnessRef.current === null) {
       return;
@@ -395,14 +367,8 @@ export function useLightCardController({
       rememberLightState(id, { brightness: nextBrightness });
       if (!isOn) {
         setIsOn(true);
-        schedulePendingStateReset(true);
         void syncLightWithHomeAssistant({ state: 'on', brightnessPct: nextBrightness }).catch(
           () => {
-            pendingStateRef.current = null;
-            if (stateSyncTimeoutRef.current) {
-              clearTimeout(stateSyncTimeoutRef.current);
-              stateSyncTimeoutRef.current = null;
-            }
             setIsOn(false);
           }
         );
@@ -411,14 +377,7 @@ export function useLightCardController({
 
       queueBrightnessSync(nextBrightness);
     },
-    [
-      id,
-      isOn,
-      queueBrightnessSync,
-      rememberLightState,
-      schedulePendingStateReset,
-      syncLightWithHomeAssistant,
-    ]
+    [id, isOn, queueBrightnessSync, rememberLightState, syncLightWithHomeAssistant]
   );
 
   const onBrightnessCommit = useCallback(
@@ -537,30 +496,15 @@ export function useLightCardController({
           tempSyncTimeoutRef.current = null;
         }, 2500);
       }
-      schedulePendingStateReset(nextIsOn);
-
       void syncLightWithHomeAssistant({
         state: nextIsOn ? 'on' : 'off',
         brightnessPct: nextIsOn ? brightnessToRestore : undefined,
         kelvin: nextIsOn && !selectedColor ? rememberedColorTemp : undefined,
       }).catch(() => {
-        pendingStateRef.current = null;
-        if (stateSyncTimeoutRef.current) {
-          clearTimeout(stateSyncTimeoutRef.current);
-          stateSyncTimeoutRef.current = null;
-        }
         setIsOn(!nextIsOn);
       });
     },
-    [
-      brightness,
-      id,
-      maxColorTemp,
-      minColorTemp,
-      schedulePendingStateReset,
-      selectedColor,
-      syncLightWithHomeAssistant,
-    ]
+    [brightness, id, maxColorTemp, minColorTemp, selectedColor, syncLightWithHomeAssistant]
   );
 
   const handleSettingsClick = useCallback(() => {

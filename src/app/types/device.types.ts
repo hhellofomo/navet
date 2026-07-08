@@ -99,6 +99,8 @@ export interface SwitchDevice extends BaseDevice {
   room: string;
   state: boolean;
   entityType?: string;
+  serviceDomain?: string;
+  serviceAction?: string;
   power?: number;
   voltage?: number;
   energy?: number;
@@ -119,8 +121,10 @@ export interface LockDevice extends BaseDevice {
 
 // Person device
 export interface PersonDevice extends BaseDevice {
+  room: string;
   location: string;
   state: 'home' | 'away';
+  entityPicture?: string;
 }
 
 // Sensor device
@@ -128,6 +132,8 @@ export interface SensorDevice extends BaseDevice {
   room: string;
   value: string;
   unit: string;
+  icon?: SensorIconType;
+  entityType?: string;
 }
 
 // Vacuum device

@@ -158,7 +158,7 @@ export const Sidebar = memo(function Sidebar() {
           ) : null}
 
           <div
-            className={`relative flex items-center justify-around px-1.5 py-1.5 ${
+            className={`relative flex min-h-[49px] items-stretch justify-around px-1 py-1 ${
               isGlass ? surface.panelMuted : surface.shellPanel
             }`}
           >
@@ -175,11 +175,14 @@ export const Sidebar = memo(function Sidebar() {
                 onClick={item.onClick}
                 aria-label={item.label}
                 active={activeSection === item.section}
-                className={`flex h-11 min-w-0 flex-1 basis-0 items-center justify-center rounded-[22px] px-1.5 py-1.5 transition-colors ${
+                className={`flex h-[49px] min-w-0 flex-1 basis-0 flex-col items-center justify-center gap-[3px] rounded-[24px] px-1 py-1 transition-colors ${
                   activeSection === item.section ? '' : inactiveColor
                 }`}
               >
-                <item.icon className="h-5 w-5 shrink-0" />
+                <item.icon className="h-[1.2rem] w-[1.2rem] shrink-0" />
+                <span className="max-w-full truncate text-[0.64rem] font-medium leading-none tracking-[-0.01em]">
+                  {item.label}
+                </span>
               </InteractivePill>
             ))}
           </div>

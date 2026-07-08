@@ -124,7 +124,9 @@ export function AddEntityDialog({
       }
 
       const name = typeof device.name === 'string' ? device.name : device.id;
-      const typeLabel = getDeviceTypeLabel(device.type, t);
+      const typeLabel =
+        ('entityType' in device && typeof device.entityType === 'string' && device.entityType) ||
+        getDeviceTypeLabel(device.type, t);
 
       devices.push({
         device,

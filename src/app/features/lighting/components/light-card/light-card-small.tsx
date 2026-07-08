@@ -62,10 +62,10 @@ export const LightCardSmall = memo(function LightCardSmall({
       />
 
       <div
-        className={`flex-1 flex flex-col ${isExtraSmall ? 'justify-start gap-1' : 'justify-end gap-4'}`}
+        className={`flex-1 flex flex-col ${isExtraSmall ? 'justify-start gap-0.5 -mt-0.5' : 'justify-end gap-4'}`}
       >
         {isExtraSmall ? (
-          <div className="flex min-h-7 items-center gap-2.5">
+          <div className="flex min-h-6 items-center gap-1.5">
             <div className="min-w-0 flex-1">
               <BrightnessSlider
                 value={brightness}
@@ -81,7 +81,7 @@ export const LightCardSmall = memo(function LightCardSmall({
               <CardSettingsActionButton
                 {...settingsButtonProps}
                 theme={theme}
-                size="small"
+                size="extra-small"
                 tone={isOn ? 'default' : 'muted'}
               />
             )}

@@ -4,6 +4,16 @@ export type EditControlVariant = 'neutral' | 'destructive';
 export type EditControlPlacement = 'top-left' | 'top-right';
 
 export function getEditControlLayout(size: CardSize) {
+  if (size === 'extra-small') {
+    return {
+      isCompact: true,
+      topLeftPosition: 'top-3 left-3.5',
+      topRightPosition: 'top-3 right-3.5',
+      buttonSize: 'h-7 w-7',
+      iconSize: 'w-3.5 h-3.5',
+    };
+  }
+
   const isCompact = size !== 'large';
 
   return {

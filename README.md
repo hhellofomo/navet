@@ -37,7 +37,7 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 - **Adaptive Cards** - Extra-Small, Small, Medium, and Large card sizes
 
 ### 🏠 Smart Home Control
-- **Multi-Entity Support** - Lights, HVAC, switches, covers, locks, sensors, media players, vacuums, and more
+- **Multi-Entity Support** - Lights, HVAC, switches, covers, locks, sensors, helpers, scripts, people, media players, vacuums, and more
 - **Unified Climate Controls** - Home Assistant climate entities now render through the HVAC card and settings flow across the dashboard
 - **Home Assistant Media Controls** - Media player cards now use live Home Assistant playback, volume, mute, metadata, remaining-time, and artwork data
 - **Real-Time Updates** - Live state updates from your smart home system
@@ -53,8 +53,10 @@ Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONIN
 - **All View Modes** - Switch the `All` room between custom, room, type, or flat grouping
 - **Live Weather Entity Card** - Home Assistant weather entities now render as the dashboard weather card with forecast and solar data from Home Assistant
 - **Calendar Entities** - Home Assistant calendar entities now render through the live calendar card with per-card source selection, week/month views, and event details
+- **Person Entities** - Home Assistant `person.*` entities render as live person cards with profile images and normalized presence/location text
+- **Helpers and Scripts** - Home Assistant helper domains and scripts can be added through the existing sensor and switch-style card paths
 - **Home Assistant Notifications** - Navet notifications now show Home Assistant persistent notifications, repairs/issues, and update actions
-- **Card-Level Room Editing** - Supported entity cards can reassign their room directly from the settings dialog
+- **Card-Level Room Editing** - Supported entity cards, including calendar and weather, can reassign their room directly from the settings dialog
 - **Notifications** - System notifications panel
 - **Settings** - Comprehensive theme and customization options
 - **User Management** - Login system with user profiles
@@ -218,6 +220,16 @@ pnpm build
 - Home Assistant `calendar.*` entities can be added directly to the dashboard
 - Each calendar card can choose which calendars it aggregates
 - Calendar cards support **This Week** and **This Month** views
+- Calendar cards can also be reassigned to a room from their settings dialog
+
+#### Weather Cards
+- Home Assistant weather entities can be added directly to the dashboard
+- Weather cards support room reassignment from their settings dialog
+
+#### Person, Helper, and Script Cards
+- Home Assistant `person.*` entities render as live person cards with profile images when available
+- Helper/value entities such as `number`, `select`, `text`, `date`, and related domains map into the sensor-card path
+- Actionable helper domains such as `input_boolean`, `button`, `input_button`, and `script` map into the switch-style card path
 - Clicking an event opens a details dialog with time, notes, location, and an **Open Map** action when location is available
 
 #### Notifications
