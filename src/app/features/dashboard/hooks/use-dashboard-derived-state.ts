@@ -1,11 +1,9 @@
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import type { DeviceWithType } from '@/app/types/device.types';
-import { getDeviceRoom, getDeviceRoomLabel } from '@/app/utils/device-location';
-import type { CustomCard } from './use-custom-cards';
+import { getDeviceRoom } from '@/app/utils/device-location';
 
 interface UseDashboardDerivedStateParams {
   activeRoom: string;
-  allCustomCards: CustomCard[];
   availableDeviceMap: Map<string, DeviceWithType>;
   cardOrders: Record<string, string[]>;
   deviceMap: Map<string, DeviceWithType>;
@@ -15,7 +13,6 @@ interface UseDashboardDerivedStateParams {
 
 export function useDashboardDerivedState({
   activeRoom,
-  allCustomCards,
   availableDeviceMap,
   cardOrders,
   deviceMap,
@@ -31,19 +28,6 @@ export function useDashboardDerivedState({
   const lightDeviceMap = useMemo(
     () => new Map(Array.from(deviceMap.entries()).filter(([, device]) => device.type === 'lights')),
     [deviceMap]
-  );
-
-  const getCardRoom = useCallback(
-    (cardId: string) => {
-      const device = deviceMap.get(cardId);
-      if (device) {
-        return getDeviceRoomLabel(device);
-      }
-
-      const customCard = allCustomCards.find((card) => card.id === cardId);
-      return customCard?.room ?? null;
-    },
-    [allCustomCards, deviceMap]
   );
 
   const lightRooms = useMemo(() => {
@@ -62,7 +46,6 @@ export function useDashboardDerivedState({
   return {
     addableEntityIds,
     allEntityIds,
-    getCardRoom,
     lightDeviceMap,
     lightRooms,
     orderedCardIds,

@@ -1,5 +1,4 @@
-import type { DragEndEvent, DragOverEvent, DragStartEvent, useSensors } from '@dnd-kit/core';
-import { useCallback, useEffect, useState } from 'react';
+import { startTransition, useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
@@ -24,7 +23,6 @@ import { useCardOrdering } from './use-card-ordering';
 import { useCustomCards } from './use-custom-cards';
 import { useDashboardDerivedState } from './use-dashboard-derived-state';
 import { type DashboardDialogs, useDashboardDialogs } from './use-dashboard-dialogs';
-import { useDashboardDnd } from './use-dashboard-dnd';
 import { type OnboardingController, useOnboardingController } from './use-onboarding-controller';
 import { useRoomOrdering } from './use-room-ordering';
 
@@ -50,9 +48,6 @@ export type DashboardController = OnboardingController &
     handleAddCard: (type: CardType, size: CardSize) => void;
     handleAddEntity: (entityId: string) => void;
     handleDeleteCard: (cardId: string) => void;
-    handleDragEnd: (_event: DragEndEvent) => void;
-    handleDragOver: (event: DragOverEvent) => void;
-    handleDragStart: (event: DragStartEvent) => void;
     handleRemoveEntity: (entityId: string) => void;
     handleUpdateCard: (cardId: string, data: Record<string, unknown>) => void;
     hiddenEntityIds: string[];
@@ -64,7 +59,6 @@ export type DashboardController = OnboardingController &
     onMoveRoom: (activeRoom: string, overRoom: string) => void;
     onSetAllViewGrouping: (grouping: AllViewGrouping) => void;
     roomOrder: string[];
-    sensors: ReturnType<typeof useSensors>;
     setActiveSection: (section: Section) => void;
     updateCardSize: ReturnType<typeof useCardState>['updateCardSize'];
   };
@@ -99,33 +93,19 @@ export function useDashboardController(): DashboardController {
   const allCustomCards = getCardsForRoom('All');
   const { isEditMode, toggleEditMode } = useEditMode();
   const { cardSizes, updateCardSize } = useCardState(devices);
-  const { cardOrders, moveCard } = useCardOrdering(devices, rooms, allCustomCards);
+  const { cardOrders } = useCardOrdering(devices, rooms, allCustomCards);
   const { roomOrder, moveRoom } = useRoomOrdering(rooms);
   const { deviceMap } = useDeviceMap(devices);
   const { deviceMap: availableDeviceMap } = useDeviceMap(allDevices);
-  const {
-    addableEntityIds,
-    allEntityIds,
-    getCardRoom,
-    lightDeviceMap,
-    lightRooms,
-    orderedCardIds,
-  } = useDashboardDerivedState({
-    activeRoom,
-    allCustomCards,
-    availableDeviceMap,
-    cardOrders,
-    deviceMap,
-    hiddenEntityIds,
-    roomOrder,
-  });
-  const { activeCardOrders, handleDragEnd, handleDragOver, handleDragStart, sensors } =
-    useDashboardDnd({
+  const { addableEntityIds, allEntityIds, lightDeviceMap, lightRooms, orderedCardIds } =
+    useDashboardDerivedState({
+      activeRoom,
+      availableDeviceMap,
       cardOrders,
-      getCardRoom,
-      moveCard,
+      deviceMap,
+      hiddenEntityIds,
+      roomOrder,
     });
-
   const dialogs = useDashboardDialogs();
   const onboarding = useOnboardingController({ allEntityIds, changeRoom });
 
@@ -177,7 +157,7 @@ export function useDashboardController(): DashboardController {
     allEntityIds,
     allViewGrouping,
     availableDeviceMap,
-    cardOrders: activeCardOrders,
+    cardOrders,
     cardSizes,
     changeRoom,
     customCards,
@@ -187,9 +167,6 @@ export function useDashboardController(): DashboardController {
     handleAddCard,
     handleAddEntity,
     handleDeleteCard,
-    handleDragEnd,
-    handleDragOver,
-    handleDragStart,
     handleRemoveEntity,
     handleUpdateCard,
     hiddenEntityIds,
@@ -198,10 +175,9 @@ export function useDashboardController(): DashboardController {
     lightRooms,
     onMoveRoom: moveRoom,
     onSetAllViewGrouping: setAllViewGrouping,
-    onToggleEditMode: toggleEditMode,
+    onToggleEditMode: () => startTransition(toggleEditMode),
     orderedCardIds,
     roomOrder,
-    sensors,
     setActiveSection,
     updateCardSize,
     // Onboarding

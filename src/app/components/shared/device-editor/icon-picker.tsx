@@ -29,7 +29,7 @@ import {
   ZapOff,
 } from 'lucide-react';
 import type React from 'react';
-import { memo, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useI18n, useTheme } from '@/app/hooks';
 import type { TranslationKey } from '@/app/i18n';
@@ -86,6 +86,14 @@ export const IconPicker = memo(function IconPicker({
   const activeColor = getThemeColorValue(primaryColor);
   const editorSurface = getDeviceEditorSurfaceTokens(isLightOn);
 
+  const handleIconButtonClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      const iconName = e.currentTarget.dataset.icon;
+      if (iconName) onIconChange(iconName);
+    },
+    [onIconChange]
+  );
+
   // Filter icons based on search query
   const filteredIcons = searchQuery
     ? lightIcons.filter(
@@ -139,8 +147,9 @@ export const IconPicker = memo(function IconPicker({
             <button
               type="button"
               key={icon.name}
-              onClick={() => onIconChange(icon.name)}
+              data-icon={icon.name}
               disabled={!isLightOn}
+              onClick={handleIconButtonClick}
               className={`w-full aspect-square rounded-full flex items-center justify-center transition-all duration-300 border-2 ${
                 selectedIcon === icon.name
                   ? isLightOn

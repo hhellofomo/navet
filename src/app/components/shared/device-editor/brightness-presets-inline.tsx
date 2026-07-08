@@ -1,7 +1,7 @@
 import * as Popover from '@radix-ui/react-popover';
 import type { LucideIcon } from 'lucide-react';
 import { MoreHorizontal } from 'lucide-react';
-import { memo } from 'react';
+import { type MouseEvent, memo, useCallback } from 'react';
 import { isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { useI18n, useTheme } from '@/app/hooks';
 import { getCardActionControlSizes } from '../card-action-control-sizes';
@@ -55,6 +55,15 @@ export const BrightnessPresetsInline = memo(function BrightnessPresetsInline({
   const disabledSelectedClasses = 'cursor-not-allowed text-white ring-2 scale-105 opacity-70';
   const disabledUnselectedClasses = roundControl.disabledButton;
 
+  const handlePresetButtonClick = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      const brightness = Number(e.currentTarget.dataset.brightness);
+      if (!Number.isNaN(brightness)) onBrightnessChange(brightness);
+    },
+    [onBrightnessChange]
+  );
+
   return (
     <fieldset
       data-card-interactive
@@ -69,16 +78,14 @@ export const BrightnessPresetsInline = memo(function BrightnessPresetsInline({
           <button
             type="button"
             key={preset.key ?? preset.brightness}
+            data-brightness={preset.brightness}
             disabled={!isOn}
             aria-label={t('deviceEditor.brightnessPresetAria', {
               label: preset.label,
               brightness: preset.brightness,
             })}
             aria-pressed={isSelected}
-            onClick={(e) => {
-              e.stopPropagation();
-              onBrightnessChange(preset.brightness);
-            }}
+            onClick={handlePresetButtonClick}
             style={
               isSelected ? getBrightnessPresetSelectedStyle(theme, activeColor, isOn) : undefined
             }
@@ -133,6 +140,16 @@ const BrightnessOverflowMenu = memo(function BrightnessOverflowMenu({
   const roundControl = getRoundControlStyles(theme);
   const selectedClasses = `${roundControl.selectedText} ring-2 scale-105`;
   const unselectedClasses = roundControl.defaultButton;
+
+  const handleOverflowButtonClick = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      const brightness = Number(e.currentTarget.dataset.brightness);
+      if (!Number.isNaN(brightness)) onBrightnessChange(brightness);
+    },
+    [onBrightnessChange]
+  );
+
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
@@ -169,15 +186,13 @@ const BrightnessOverflowMenu = memo(function BrightnessOverflowMenu({
                 <button
                   type="button"
                   key={preset.key ?? preset.brightness}
+                  data-brightness={preset.brightness}
                   aria-label={t('deviceEditor.brightnessPresetAria', {
                     label: preset.label,
                     brightness: preset.brightness,
                   })}
                   aria-pressed={isSelected}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onBrightnessChange(preset.brightness);
-                  }}
+                  onClick={handleOverflowButtonClick}
                   style={
                     isSelected
                       ? getBrightnessPresetSelectedStyle(theme, activeColor, true)

@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useI18n, useTheme } from '@/app/hooks';
@@ -22,7 +22,16 @@ export const CoverCardContainer = memo(function CoverCardContainer({
     initialPosition === 100 ? 'open' : initialPosition === 0 ? 'closed' : 'open'
   );
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const coverTimerRef = useRef<number | null>(null);
   const { t } = useI18n();
+
+  useEffect(() => {
+    return () => {
+      if (coverTimerRef.current !== null) {
+        clearTimeout(coverTimerRef.current);
+      }
+    };
+  }, []);
   const { colors, theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
 
@@ -34,12 +43,12 @@ export const CoverCardContainer = memo(function CoverCardContainer({
     // Set state based on movement
     if (newPosition > oldPosition) {
       setCoverState('opening');
-      setTimeout(() => {
+      coverTimerRef.current = window.setTimeout(() => {
         setCoverState(newPosition === 100 ? 'open' : 'opening');
       }, 500);
     } else if (newPosition < oldPosition) {
       setCoverState('closing');
-      setTimeout(() => {
+      coverTimerRef.current = window.setTimeout(() => {
         setCoverState(newPosition === 0 ? 'closed' : 'closing');
       }, 500);
     }

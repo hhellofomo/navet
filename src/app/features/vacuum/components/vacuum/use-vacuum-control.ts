@@ -15,24 +15,14 @@ interface UseVacuumControlReturn {
 }
 
 export function useVacuumControl({ initialStatus }: UseVacuumControlProps): UseVacuumControlReturn {
-  const [currentStatus, setCurrentStatus] = useState<VacuumStatus>(initialStatus);
+  // Status is derived from the HA entity prop — no local simulation needed.
+  // The parent card receives initialStatus from the HA store and re-renders when it changes.
+  const currentStatus = initialStatus;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleStartCleaning = () => {
-    setCurrentStatus('cleaning');
-  };
-
-  const handlePause = () => {
-    setCurrentStatus(currentStatus === 'cleaning' ? 'paused' : 'cleaning');
-  };
-
-  const handleReturnHome = () => {
-    setCurrentStatus('returning');
-    // Simulate returning home
-    setTimeout(() => {
-      setCurrentStatus('docked');
-    }, 3000);
-  };
+  const handleStartCleaning = () => {};
+  const handlePause = () => {};
+  const handleReturnHome = () => {};
 
   return {
     currentStatus,

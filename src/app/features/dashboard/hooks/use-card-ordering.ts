@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import type { Device, DeviceCollection } from '@/app/types/device.types';
 import { getDeviceRoomLabel } from '@/app/utils/device-location';
@@ -12,7 +12,32 @@ export const useCardOrdering = (
 ) => {
   const safeCustomCards = Array.isArray(customCards) ? customCards : [];
 
+  // Extract only id+room — stable across HA state-only updates (brightness, temperature, etc.)
+  const deviceIdRoomPairs = useMemo(() => {
+    const pairs: { id: string; room: string }[] = [];
+    Object.values(devices).forEach((deviceArray) => {
+      (deviceArray as Device[]).forEach((device: Device) => {
+        pairs.push({ id: device.id, room: getDeviceRoomLabel(device) });
+      });
+    });
+    return pairs;
+  }, [devices]);
+
+  // Stable string key — only changes when device ids or room assignments change.
+  // This gates ordering rebuilds so HA state-only updates (temp, brightness) don't trigger them.
+  const deviceIdentityKey = useMemo(
+    () => deviceIdRoomPairs.map((p) => `${p.id}:${p.room}`).join(','),
+    [deviceIdRoomPairs]
+  );
+
+  // Keep a ref so buildOrders can read the latest pairs without having them as a dep.
+  // This avoids rebuilding buildOrders on every devices reference change.
+  const deviceIdRoomPairsRef = useRef(deviceIdRoomPairs);
+  deviceIdRoomPairsRef.current = deviceIdRoomPairs;
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: deviceIdentityKey gates recreation so ordering only rebuilds when device ids/rooms change, not on every HA state update. Pairs are read via ref (always current).
   const buildOrders = useCallback(() => {
+    const pairs = deviceIdRoomPairsRef.current;
     const orders: Record<string, string[]> = {};
     const orderedRooms = Array.from(
       new Set([...rooms, ...safeCustomCards.map((card) => card.room)])
@@ -20,12 +45,10 @@ export const useCardOrdering = (
 
     orderedRooms.forEach((room) => {
       const roomCards: string[] = [];
-      Object.values(devices).forEach((deviceArray) => {
-        (deviceArray as Device[]).forEach((device: Device) => {
-          if (getDeviceRoomLabel(device) === room) {
-            roomCards.push(device.id);
-          }
-        });
+      pairs.forEach(({ id, room: deviceRoom }) => {
+        if (deviceRoom === room) {
+          roomCards.push(id);
+        }
       });
       safeCustomCards.forEach((card) => {
         if (card.room === room || card.room === 'All') {
@@ -36,16 +59,12 @@ export const useCardOrdering = (
     });
 
     return orders;
-  }, [devices, rooms, safeCustomCards]);
+  }, [deviceIdentityKey, rooms, safeCustomCards]);
 
   const [cardOrders, setCardOrders] = useState<Record<string, string[]>>(() => {
     const stored = storage.get<Record<string, string[]> | null>(STORAGE_KEYS.cardOrders, null);
     if (stored) {
-      const allDeviceIds = new Set(
-        Object.values(devices)
-          .flat()
-          .map((d) => d.id)
-      );
+      const allDeviceIds = new Set(deviceIdRoomPairs.map((p) => p.id));
       safeCustomCards.forEach((card) => {
         allDeviceIds.add(card.id);
       });
@@ -63,11 +82,7 @@ export const useCardOrdering = (
   });
 
   useEffect(() => {
-    const allDeviceIds = new Set(
-      Object.values(devices)
-        .flat()
-        .map((device) => device.id)
-    );
+    const allDeviceIds = new Set(deviceIdRoomPairsRef.current.map((p) => p.id));
     safeCustomCards.forEach((card) => {
       allDeviceIds.add(card.id);
     });
@@ -111,22 +126,11 @@ export const useCardOrdering = (
 
       return mergedOrders;
     });
-  }, [buildOrders, devices, safeCustomCards]);
+  }, [buildOrders, safeCustomCards]);
 
   useEffect(() => {
     storage.set(STORAGE_KEYS.cardOrders, cardOrders);
   }, [cardOrders]);
 
-  const moveCard = useCallback((room: string, dragIndex: number, hoverIndex: number) => {
-    setCardOrders((prev) => {
-      const newOrders = { ...prev };
-      const roomCards = [...newOrders[room]];
-      const [removed] = roomCards.splice(dragIndex, 1);
-      roomCards.splice(hoverIndex, 0, removed);
-      newOrders[room] = roomCards;
-      return newOrders;
-    });
-  }, []);
-
-  return { cardOrders, moveCard };
+  return { cardOrders };
 };

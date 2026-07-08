@@ -2,7 +2,6 @@ import { EyeOff, X } from 'lucide-react';
 import { memo } from 'react';
 import { CardEditActionButton } from '@/app/components/shared/card-edit-action-button';
 import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-size-selector';
-import { DraggableCard } from '@/app/components/shared/draggable-card';
 import type { DeviceWithType } from '@/app/types/device.types';
 import type { CustomCard } from '../stores/custom-cards-store';
 import { renderCard } from '../utils/card-renderer';
@@ -88,18 +87,13 @@ export const DashboardCardItem = memo(function DashboardCardItem({
     </>
   );
 
-  if (!isEditMode) {
-    return (
-      <div className={`relative h-full [contain:layout_style_paint] ${spanClass}`}>
-        {cardContent}
-      </div>
-    );
-  }
-
   return (
-    <DraggableCard id={id} isEditMode={isEditMode} className={spanClass}>
+    <div
+      className={`relative h-full [contain:layout_style_paint] ${spanClass}`}
+      data-draggable-card="true"
+    >
       {cardContent}
-    </DraggableCard>
+    </div>
   );
 }, areDashboardCardItemPropsEqual);
 

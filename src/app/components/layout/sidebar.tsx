@@ -4,6 +4,7 @@ import { InteractivePill } from '@/app/components/shared/interactive-pill';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { type Section, useI18n, useMediaQuery, useNavigation, useTheme } from '@/app/hooks';
 import { useSettingsStore } from '@/app/stores';
+import { resolveEffectsQuality } from '@/app/utils/effects-quality';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 
 export const Sidebar = memo(function Sidebar() {
@@ -11,9 +12,11 @@ export const Sidebar = memo(function Sidebar() {
   const { t } = useI18n();
   const { activeSection, setActiveSection } = useNavigation();
   const effectsQuality = useSettingsStore((state) => state.effectsQuality);
-  const surface = getThemeSurfaceTokens(theme, effectsQuality);
+  const lowPowerMode = useSettingsStore((state) => state.lowPowerMode);
+  const resolvedEffectsQuality = resolveEffectsQuality(effectsQuality, lowPowerMode);
+  const surface = getThemeSurfaceTokens(theme, resolvedEffectsQuality);
   const isGlass = theme === 'glass';
-  const isHighEffects = effectsQuality === 'high';
+  const isHighEffects = resolvedEffectsQuality === 'high';
   const inactiveColor = `${surface.textMuted} ${surface.hoverBg}`;
   const [isMobileNavHidden, setIsMobileNavHidden] = useState(false);
   const lastScrollYRef = useRef(0);

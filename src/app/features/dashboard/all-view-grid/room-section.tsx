@@ -1,4 +1,3 @@
-import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { memo, startTransition, useEffect, useRef, useState } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useI18n } from '@/app/hooks';
@@ -253,13 +252,7 @@ export const RoomSection = memo(function RoomSection({
           onRemoveEntity={onRemoveEntity}
           onSizeChange={handleSizeChange}
         >
-          {isEditMode ? (
-            <SortableContext items={visibleOrderedIds} strategy={rectSortingStrategy}>
-              {gridContent}
-            </SortableContext>
-          ) : (
-            gridContent
-          )}
+          {gridContent}
         </DashboardEditActions>
       ) : (
         <div className="w-full" style={{ minHeight: `${placeholderHeight}px` }} />

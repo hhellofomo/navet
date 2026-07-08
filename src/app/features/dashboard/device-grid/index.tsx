@@ -1,4 +1,3 @@
-import { rectSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import { memo, useCallback, useDeferredValue, useMemo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useSearch } from '@/app/hooks';
@@ -70,11 +69,6 @@ export const DeviceGrid = memo(function DeviceGrid({
     [customCardMap, deviceMap, displayedCardIds]
   );
 
-  // Get all IDs for SortableContext
-  const allCardIds = useMemo(
-    () => allCards.map((item) => (item.type === 'device' ? item.id : item.card.id)),
-    [allCards]
-  );
   const gridContent = (
     <div className="grid w-full grid-flow-row-dense grid-cols-2 gap-2 auto-rows-[87px] md:grid-cols-4 md:gap-3 xl:grid-cols-6 lg:gap-4 2xl:grid-cols-8">
       {allCards.map((item) => {
@@ -127,13 +121,7 @@ export const DeviceGrid = memo(function DeviceGrid({
       onRemoveEntity={onRemoveEntity}
       onSizeChange={handleSizeChange}
     >
-      {isEditMode ? (
-        <SortableContext items={allCardIds} strategy={rectSortingStrategy}>
-          {gridContent}
-        </SortableContext>
-      ) : (
-        gridContent
-      )}
+      {gridContent}
     </DashboardEditActions>
   );
 });

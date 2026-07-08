@@ -56,48 +56,28 @@ export function useMediaCardController({
       : resolveHomeAssistantAbsoluteUrl(entityPicture, authConfig?.url)
     : null;
 
+  // Single effect syncs all HA-driven fields in one batch, producing one re-render per entity
+  // update instead of 5–7 sequential re-renders from separate effects.
   useEffect(() => {
     setState(initialState);
-  }, [initialState]);
-
-  useEffect(() => {
+    setElapsedSeconds(initialElapsedSeconds ?? 0);
+    setDurationSeconds(initialDurationSeconds ?? 0);
     setVolume(initialVolume);
     if (initialVolume > 0) {
       setPreviousVolume(initialVolume);
     }
-  }, [initialVolume]);
-
-  useEffect(() => {
     setIsMuted(initialMuted || initialVolume === 0);
-  }, [initialMuted, initialVolume]);
+  }, [initialState, initialVolume, initialMuted, initialElapsedSeconds, initialDurationSeconds]);
 
+  // Artwork key changing means a new track — reset failed URL then resolve new artwork.
   useEffect(() => {
-    setElapsedSeconds(initialElapsedSeconds ?? 0);
-  }, [initialElapsedSeconds]);
-
-  useEffect(() => {
-    setDurationSeconds(initialDurationSeconds ?? 0);
-  }, [initialDurationSeconds]);
-
-  useEffect(() => {
-    if (!artworkRequestKey) {
-      setResolvedAlbumArt(
-        isFailedArtworkCandidate(fallbackArtwork, failedArtworkUrl) ? null : fallbackArtwork
-      );
-      return;
+    if (artworkRequestKey) {
+      setFailedArtworkUrl(null);
     }
     setResolvedAlbumArt(
       isFailedArtworkCandidate(fallbackArtwork, failedArtworkUrl) ? null : fallbackArtwork
     );
-  }, [artworkRequestKey, failedArtworkUrl, fallbackArtwork]);
-
-  useEffect(() => {
-    if (!artworkRequestKey) {
-      return;
-    }
-
-    setFailedArtworkUrl(null);
-  }, [artworkRequestKey]);
+  }, [artworkRequestKey, fallbackArtwork, failedArtworkUrl]);
 
   const isPlaying = state === 'playing';
 
