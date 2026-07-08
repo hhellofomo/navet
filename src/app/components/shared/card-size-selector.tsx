@@ -1,8 +1,11 @@
 import * as Popover from '@radix-ui/react-popover';
 import { Maximize2 } from 'lucide-react';
 import { memo, useEffect, useRef, useState } from 'react';
+import { useTheme } from '@/app/hooks';
 import { CardEditActionButton } from './card-edit-action-button';
 import type { CardSize } from './card-size';
+import { getThemeColorValue } from './theme/theme-colors';
+import { getThemeSurfaceTokens } from './theme/theme-surface-tokens';
 
 export type { CardSize } from './card-size';
 
@@ -10,6 +13,14 @@ interface CardSizeSelectorProps {
   currentSize: CardSize;
   onSizeChange: (size: CardSize) => void;
   allowedSizes?: CardSize[];
+  triggerSize?: CardSize;
+  options?: {
+    value: CardSize;
+    label: string;
+    description: string;
+    dimensions: string;
+    preview: string;
+  }[];
 }
 
 // Widget size labels reflect the actual responsive dashboard grid sizing
@@ -54,13 +65,19 @@ export const CardSizeSelector = memo(function CardSizeSelector({
   currentSize,
   onSizeChange,
   allowedSizes,
+  triggerSize,
+  options,
 }: CardSizeSelectorProps) {
+  const { theme, primaryColor } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const accentColor = getThemeColorValue(primaryColor);
 
+  const sourceSizes = options ?? sizes;
   const availableSizes = allowedSizes
-    ? sizes.filter((size) => allowedSizes.includes(size.value))
-    : sizes;
+    ? sourceSizes.filter((size) => allowedSizes.includes(size.value))
+    : sourceSizes;
 
   useEffect(() => {
     const draggableCard = triggerRef.current?.closest('[data-draggable-card="true"]');
@@ -84,7 +101,7 @@ export const CardSizeSelector = memo(function CardSizeSelector({
       <Popover.Trigger asChild>
         <CardEditActionButton
           ref={triggerRef}
-          cardSize={currentSize}
+          cardSize={triggerSize ?? currentSize}
           Icon={Maximize2}
           placement="top-right"
           className="z-50 group cursor-pointer"
@@ -93,11 +110,13 @@ export const CardSizeSelector = memo(function CardSizeSelector({
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content
-          className="bg-[#1c1c1e]/98 backdrop-blur-xl border border-white/10 rounded-2xl p-3 shadow-2xl z-50 min-w-[260px]"
+          className={`z-50 min-w-[260px] rounded-2xl border p-3 shadow-2xl backdrop-blur-xl ${surface.panel} ${surface.border}`}
           sideOffset={8}
         >
           <div className="space-y-1.5">
-            <h3 className="text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2 px-1">
+            <h3
+              className={`mb-2 px-1 text-xs font-semibold uppercase tracking-wider ${surface.textSecondary}`}
+            >
               Widget Size
             </h3>
             {availableSizes.map((size) => (
@@ -109,33 +128,63 @@ export const CardSizeSelector = memo(function CardSizeSelector({
                   onSizeChange(size.value);
                   setOpen(false); // Close popover after selection
                 }}
-                className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${
+                className={`w-full flex items-center gap-3 rounded-xl border p-3 text-left transition-all duration-200 ${
                   currentSize === size.value
-                    ? 'bg-orange-500/20 border border-orange-500/40'
-                    : 'bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06]'
+                    ? ''
+                    : `${surface.subtleBg} ${surface.hoverBg} ${surface.border}`
                 }`}
+                style={
+                  currentSize === size.value
+                    ? {
+                        backgroundColor:
+                          theme === 'light' ? `${accentColor}12` : `${accentColor}18`,
+                        borderColor: `${accentColor}55`,
+                      }
+                    : undefined
+                }
               >
-                <div className="flex items-center justify-center w-16 h-16 bg-black/30 rounded-lg border border-white/5">
+                <div
+                  className={`flex h-16 w-16 items-center justify-center rounded-lg border ${
+                    theme === 'light' ? 'bg-black/[0.03]' : 'bg-black/20'
+                  }`}
+                  style={{
+                    borderColor:
+                      theme === 'light' ? 'rgba(15, 23, 42, 0.08)' : 'rgba(255,255,255,0.06)',
+                  }}
+                >
                   <div
-                    className={`bg-gradient-to-br from-orange-400 to-orange-600 rounded-md shadow-lg ${size.preview}`}
-                  ></div>
+                    className={`rounded-md shadow-lg ${size.preview}`}
+                    style={{
+                      background:
+                        currentSize === size.value
+                          ? `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`
+                          : theme === 'light'
+                            ? 'linear-gradient(135deg, rgba(148,163,184,0.9), rgba(100,116,139,0.92))'
+                            : 'linear-gradient(135deg, rgba(255,255,255,0.28), rgba(255,255,255,0.12))',
+                    }}
+                  />
                 </div>
                 <div className="flex-1 text-left">
                   <div
-                    className={`text-sm font-semibold mb-0.5 ${currentSize === size.value ? 'text-white' : 'text-gray-200'}`}
+                    className={`mb-0.5 text-sm font-semibold ${
+                      currentSize === size.value ? surface.textPrimary : surface.textPrimary
+                    }`}
                   >
                     {size.label}
                   </div>
-                  <div className="text-xs text-gray-500">{size.dimensions}</div>
-                  <div className="text-[10px] text-gray-600">{size.description}</div>
+                  <div className={`text-xs ${surface.textSecondary}`}>{size.dimensions}</div>
+                  <div className={`text-[10px] ${surface.textSecondary}`}>{size.description}</div>
                 </div>
                 {currentSize === size.value && (
-                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse"></div>
+                  <div
+                    className="h-1.5 w-1.5 rounded-full animate-pulse"
+                    style={{ backgroundColor: accentColor }}
+                  />
                 )}
               </button>
             ))}
           </div>
-          <Popover.Arrow className="fill-[#1c1c1e]" />
+          <Popover.Arrow className={theme === 'light' ? 'fill-white' : 'fill-[#1c1c1e]'} />
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>
@@ -164,4 +213,12 @@ export function getCompactCardSize(size: CardSize): Exclude<CardSize, 'extra-sma
   }
 
   return size;
+}
+
+export function isExtraSmallCardSize(size: CardSize): boolean {
+  return size === 'extra-small';
+}
+
+export function isCompactCardSize(size: CardSize): boolean {
+  return size === 'extra-small' || size === 'small';
 }

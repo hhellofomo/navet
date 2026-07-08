@@ -28,15 +28,15 @@ export const EmptyState = memo(function EmptyState({
   const actionClass =
     theme === 'light'
       ? 'bg-gray-900 text-white hover:bg-gray-800'
-      : `${surface.subtleBg} ${surface.hoverBg} ${surface.textPrimary}`;
+      : `${surface.iconBg} ${surface.hoverBg} ${surface.textPrimary}`;
 
   return (
-    <div className="h-full flex items-center justify-center p-6">
+    <div className="flex h-full items-center justify-center p-6">
       <div className={`max-w-md w-full rounded-3xl border p-12 text-center ${panelClass}`}>
         <div
           className={`${surface.iconBg} mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl`}
         >
-          <Icon className={`w-10 h-10 ${iconColor}`} />
+          <Icon className={`h-10 w-10 ${iconColor}`} />
         </div>
         <h2 className={`mb-2 text-xl font-semibold ${surface.textPrimary}`}>{title}</h2>
         <p className={`text-sm leading-relaxed ${surface.textSecondary}`}>{description}</p>

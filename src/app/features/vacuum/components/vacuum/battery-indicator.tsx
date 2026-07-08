@@ -1,3 +1,4 @@
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import { getVacuumBatteryGradientClass } from './vacuum-utils';
 
@@ -7,7 +8,7 @@ interface BatteryIndicatorProps {
 }
 
 export function BatteryIndicator({ battery, theme }: BatteryIndicatorProps) {
-  const textSecondary = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
+  const surface = getThemeSurfaceTokens(theme);
 
   return (
     <div className="flex items-center gap-2">
@@ -19,7 +20,7 @@ export function BatteryIndicator({ battery, theme }: BatteryIndicatorProps) {
           />
         </div>
       </div>
-      <span className={`text-xs font-medium ${textSecondary}`}>{battery}%</span>
+      <span className={`text-xs font-medium ${surface.textSubtle}`}>{battery}%</span>
     </div>
   );
 }

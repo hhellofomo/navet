@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import { NotificationEmptyState } from './notification-empty-state';
 import { NotificationHeader } from './notification-header';
 import { NotificationItem } from './notification-item';
+import { getNotificationSurfaceTokens } from './notification-surface-tokens';
 import { formatTimestamp, getColorValue } from './notification-utils';
 import { useNotifications } from './use-notifications';
 
@@ -15,7 +15,7 @@ interface NotificationPanelProps {
 export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const { theme, primaryColor } = useTheme();
-  const surface = getThemeSurfaceTokens(theme);
+  const surface = getNotificationSurfaceTokens(theme);
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, clearAll } =
     useNotifications();
 
@@ -32,15 +32,12 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
     }
   }, [isOpen, onClose]);
 
-  const cardBg = surface.panel;
-  const border = surface.border;
-
   if (!isOpen) return null;
 
   return (
     <div
       ref={panelRef}
-      className={`absolute right-0 top-full mt-2 w-[90vw] md:w-96 ${cardBg} backdrop-blur-xl border ${border} rounded-2xl shadow-2xl overflow-hidden z-50`}
+      className={`absolute right-0 top-full z-50 mt-2 w-[90vw] overflow-hidden md:w-96 ${surface.panelClassName}`}
     >
       <NotificationHeader
         onClose={onClose}
@@ -57,7 +54,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
         {notifications.length === 0 ? (
           <NotificationEmptyState theme={theme} />
         ) : (
-          <div className="divide-y divide-white/5">
+          <div className={`divide-y ${surface.dividerClassName}`}>
             {notifications.map((notification) => (
               <NotificationItem
                 key={notification.id}

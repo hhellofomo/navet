@@ -1,24 +1,19 @@
 import { DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Check, ChevronDown, Edit3, LayoutGrid, Lightbulb, type LucideIcon } from 'lucide-react';
-import { memo, type ReactNode, useEffect, useRef, useState } from 'react';
+import { Check, ChevronDown, Edit3, LayoutGrid, Lightbulb } from 'lucide-react';
+import { type ButtonHTMLAttributes, forwardRef, memo, useEffect, useRef, useState } from 'react';
 import { InteractivePill } from '@/app/components/shared/interactive-pill';
 import { getStickyBarSurfaceClass } from '@/app/components/shared/theme/sticky-bar-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import {
-  ThemeDropdownContent,
-  ThemeDropdownSubContent,
-} from '@/app/components/shared/theme-dropdown-content';
+import { ThemeDropdownContent } from '@/app/components/shared/theme-dropdown-content';
 import {
   DropdownMenu,
   DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/app/components/ui/dropdown-menu';
-import type { AllViewGrouping } from '@/app/features/dashboard/all-view-grid.types';
+import type { AllViewGrouping } from '@/app/features/dashboard/all-view-grid';
 import { useTheme } from '@/app/hooks';
 
 interface RoomNavProps {
@@ -28,7 +23,6 @@ interface RoomNavProps {
   allViewGrouping?: AllViewGrouping;
   isEditMode: boolean;
   onAllViewGroupingChange?: (grouping: AllViewGrouping) => void;
-  onExportConfig?: () => void;
   onToggleEditMode: () => void;
   onMoveRoom?: (activeRoom: string, overRoom: string) => void;
   onAddCard?: () => void;
@@ -45,19 +39,11 @@ interface RoomNavItemProps {
   onRoomChange: (room: string) => void;
 }
 
-interface DashboardMenuSubLabelProps {
-  Icon: LucideIcon;
+interface RoomNavMenuButtonProps {
+  icon: typeof Lightbulb;
   label: string;
-}
-
-interface DashboardMenuSubmenuProps {
-  theme: ReturnType<typeof useTheme>['theme'];
-  triggerIcon: LucideIcon;
-  triggerLabel: string;
-  sectionLabel: string;
-  children: ReactNode;
-  triggerClassName: string;
-  sectionLabelClassName: string;
+  textSecondary: string;
+  className: string;
 }
 
 const ALL_VIEW_GROUPING_OPTIONS: Array<{ label: string; value: AllViewGrouping }> = [
@@ -102,7 +88,6 @@ export const RoomNav = memo(function RoomNav({
   allViewGrouping = 'custom',
   isEditMode,
   onAllViewGroupingChange,
-  onExportConfig,
   onToggleEditMode,
   onMoveRoom,
   onAddCard,
@@ -124,12 +109,13 @@ export const RoomNav = memo(function RoomNav({
   const textSecondary = surface.textSecondary;
   const inactiveBg = surface.subtleBg;
   const hoverBg = surface.hoverBg;
+  const dividerClass =
+    theme === 'light' ? 'bg-gray-300/90' : theme === 'contrast' ? 'bg-white/30' : 'bg-white/14';
   const stickyOffset = 'calc(env(safe-area-inset-top, 0px) + 8px)';
   const stickyShellClass = getStickyBarSurfaceClass(theme, isStickyActive);
   const showAllViewGrouping = activeRoom === 'All' && onAllViewGroupingChange;
-  const menuItemClass = `rounded-xl px-3 py-2 ${surface.textPrimary} ${hoverBg}`;
-  const subTriggerClass = `rounded-xl px-3 py-2 ${surface.textPrimary} ${hoverBg}`;
-  const menuLabelClass = `px-3 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-[0.14em] ${surface.textMuted}`;
+  const actionPillClassName = `flex items-center gap-2 rounded-lg p-2 px-3 transition-colors ${inactiveBg} ${hoverBg}`;
+  const dropdownItemClassName = `rounded-xl px-3 py-2 ${surface.textPrimary} ${hoverBg}`;
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -169,103 +155,94 @@ export const RoomNav = memo(function RoomNav({
           </div>
 
           <div className="flex items-center gap-1 flex-shrink-0 pl-1 md:gap-1.5 md:pl-1.5">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <InteractivePill
-                  active={isEditMode}
-                  intent="action"
-                  className={`flex h-[30px] items-center justify-center rounded-lg px-2.5 py-1.5 transition-colors md:h-[38px] md:gap-2 md:px-3 md:py-2 ${
-                    isEditMode ? 'shadow-sm' : `${inactiveBg} ${hoverBg}`
-                  }`}
-                >
-                  {isEditMode ? (
-                    <Check className="h-4 w-4 text-white" />
-                  ) : (
-                    <Edit3 className={`h-4 w-4 ${textSecondary}`} />
-                  )}
-                  <span
-                    className={`hidden text-xs font-medium md:inline ${isEditMode ? 'text-white' : textSecondary}`}
-                  >
-                    Dashboard
-                  </span>
-                  <ChevronDown
-                    className={`h-3.5 w-3.5 ${isEditMode ? 'text-white' : textSecondary}`}
+            {isEditMode && showAllViewGrouping ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <RoomNavMenuButton
+                    icon={LayoutGrid}
+                    label="View"
+                    textSecondary={textSecondary}
+                    className={actionPillClassName}
                   />
-                </InteractivePill>
-              </DropdownMenuTrigger>
+                </DropdownMenuTrigger>
+                <ThemeDropdownContent theme={theme} align="end">
+                  <DropdownMenuLabel className={`px-3 py-2 text-xs font-medium ${textSecondary}`}>
+                    Group By
+                  </DropdownMenuLabel>
+                  {ALL_VIEW_GROUPING_OPTIONS.map((option) => (
+                    <DropdownMenuItem
+                      key={option.value}
+                      className={dropdownItemClassName}
+                      onClick={() => onAllViewGroupingChange(option.value)}
+                    >
+                      <span className="flex min-w-0 flex-1 items-center gap-2">
+                        <span>{option.label}</span>
+                      </span>
+                      {allViewGrouping === option.value ? <Check className="h-4 w-4" /> : null}
+                    </DropdownMenuItem>
+                  ))}
+                </ThemeDropdownContent>
+              </DropdownMenu>
+            ) : null}
 
-              <ThemeDropdownContent theme={theme} align="end">
-                {(onAddEntity || onAddCard) && (
-                  <DashboardMenuSubmenu
-                    theme={theme}
-                    triggerIcon={Lightbulb}
-                    triggerLabel="Add"
-                    sectionLabel="Add"
-                    triggerClassName={subTriggerClass}
-                    sectionLabelClassName={menuLabelClass}
-                  >
-                    {onAddEntity ? (
-                      <DropdownMenuItem className={menuItemClass} onClick={onAddEntity}>
-                        <Lightbulb className="h-4 w-4" />
-                        {addEntityLabel}
-                      </DropdownMenuItem>
-                    ) : null}
-                    {onAddCard ? (
-                      <DropdownMenuItem className={menuItemClass} onClick={onAddCard}>
-                        <LayoutGrid className="h-4 w-4" />
-                        Add Card
-                      </DropdownMenuItem>
-                    ) : null}
-                  </DashboardMenuSubmenu>
-                )}
-
-                {showAllViewGrouping ? (
-                  <DashboardMenuSubmenu
-                    theme={theme}
-                    triggerIcon={LayoutGrid}
-                    triggerLabel="View"
-                    sectionLabel="Grouping"
-                    triggerClassName={subTriggerClass}
-                    sectionLabelClassName={menuLabelClass}
-                  >
-                    {ALL_VIEW_GROUPING_OPTIONS.map((option) => (
-                      <DropdownMenuItem
-                        key={option.value}
-                        className={menuItemClass}
-                        onClick={() => onAllViewGroupingChange(option.value)}
-                      >
-                        <span className="flex min-w-0 flex-1 items-center gap-2">
-                          <span>{option.label}</span>
-                        </span>
-                        {allViewGrouping === option.value ? <Check className="h-4 w-4" /> : null}
-                      </DropdownMenuItem>
-                    ))}
-                  </DashboardMenuSubmenu>
-                ) : null}
-
-                {onAddEntity || onAddCard || showAllViewGrouping ? <DropdownMenuSeparator /> : null}
-
-                <DashboardMenuSubmenu
-                  theme={theme}
-                  triggerIcon={Edit3}
-                  triggerLabel="Edit"
-                  sectionLabel="Edit"
-                  triggerClassName={subTriggerClass}
-                  sectionLabelClassName={menuLabelClass}
-                >
-                  <DropdownMenuItem className={menuItemClass} onClick={onToggleEditMode}>
-                    <Edit3 className="h-4 w-4" />
-                    {isEditMode ? 'Done Editing' : 'Edit Dashboard'}
-                  </DropdownMenuItem>
-                  {onExportConfig ? (
-                    <DropdownMenuItem className={menuItemClass} onClick={onExportConfig}>
-                      <LayoutGrid className="h-4 w-4" />
-                      Export Config
+            {isEditMode && (onAddEntity || onAddCard) ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <RoomNavMenuButton
+                    icon={Lightbulb}
+                    label="Add"
+                    textSecondary={textSecondary}
+                    className={actionPillClassName}
+                  />
+                </DropdownMenuTrigger>
+                <ThemeDropdownContent theme={theme} align="end">
+                  {onAddEntity ? (
+                    <DropdownMenuItem className={dropdownItemClassName} onClick={onAddEntity}>
+                      <Lightbulb className="h-4 w-4" />
+                      {addEntityLabel}
                     </DropdownMenuItem>
                   ) : null}
-                </DashboardMenuSubmenu>
-              </ThemeDropdownContent>
-            </DropdownMenu>
+                  {onAddCard ? (
+                    <DropdownMenuItem className={dropdownItemClassName} onClick={onAddCard}>
+                      <LayoutGrid className="h-4 w-4" />
+                      Add Card
+                    </DropdownMenuItem>
+                  ) : null}
+                </ThemeDropdownContent>
+              </DropdownMenu>
+            ) : null}
+
+            {isEditMode ? (
+              <div
+                aria-hidden="true"
+                className={`mx-1 h-6 w-px shrink-0 rounded-full ${dividerClass}`}
+              />
+            ) : null}
+
+            <InteractivePill
+              onClick={onToggleEditMode}
+              active={isEditMode}
+              intent="action"
+              className={`flex items-center gap-2 rounded-lg p-2 px-3 transition-colors ${
+                isEditMode ? 'shadow-sm' : `${inactiveBg} ${hoverBg}`
+              }`}
+            >
+              {isEditMode ? (
+                <>
+                  <Check className="h-4 w-4 text-white" />
+                  <span className="hidden text-xs font-medium text-white md:inline">
+                    Done Editing
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Edit3 className={`h-4 w-4 ${textSecondary}`} />
+                  <span className={`hidden text-xs font-medium md:inline ${textSecondary}`}>
+                    Customize
+                  </span>
+                </>
+              )}
+            </InteractivePill>
           </div>
         </div>
       </div>
@@ -273,39 +250,19 @@ export const RoomNav = memo(function RoomNav({
   );
 });
 
-const DashboardMenuSubmenu = memo(function DashboardMenuSubmenu({
-  theme,
-  triggerIcon,
-  triggerLabel,
-  sectionLabel,
-  children,
-  triggerClassName,
-  sectionLabelClassName,
-}: DashboardMenuSubmenuProps) {
-  return (
-    <DropdownMenuSub>
-      <DropdownMenuSubTrigger className={triggerClassName}>
-        <DashboardMenuSubLabel Icon={triggerIcon} label={triggerLabel} />
-      </DropdownMenuSubTrigger>
-      <ThemeDropdownSubContent theme={theme} className="min-w-[220px]">
-        <div className={sectionLabelClassName}>{sectionLabel}</div>
-        {children}
-      </ThemeDropdownSubContent>
-    </DropdownMenuSub>
-  );
-});
-
-const DashboardMenuSubLabel = memo(function DashboardMenuSubLabel({
-  Icon,
-  label,
-}: DashboardMenuSubLabelProps) {
-  return (
-    <span className="flex min-w-0 flex-1 items-center gap-2">
-      <Icon className="h-4 w-4 shrink-0" />
-      <span className="truncate">{label}</span>
-    </span>
-  );
-});
+const RoomNavMenuButton = memo(
+  forwardRef<HTMLButtonElement, RoomNavMenuButtonProps & ButtonHTMLAttributes<HTMLButtonElement>>(
+    function RoomNavMenuButton({ icon: Icon, label, textSecondary, className, ...props }, ref) {
+      return (
+        <InteractivePill ref={ref} intent="action" className={className} {...props}>
+          <Icon className={`h-4 w-4 ${textSecondary}`} />
+          <span className={`hidden text-xs font-medium md:inline ${textSecondary}`}>{label}</span>
+          <ChevronDown className={`h-3.5 w-3.5 ${textSecondary}`} />
+        </InteractivePill>
+      );
+    }
+  )
+);
 
 const RoomNavItem = memo(function RoomNavItem({
   room,

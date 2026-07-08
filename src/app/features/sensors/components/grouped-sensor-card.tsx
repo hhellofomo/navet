@@ -1,16 +1,23 @@
 import { Gauge } from 'lucide-react';
 import { memo } from 'react';
-import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import {
+  type CardSize,
+  CardSizeSelector,
+  isCompactCardSize,
+} from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { useTheme } from '@/app/hooks';
-import { SensorGroupSettingsDialog } from './sensor-group-settings-dialog';
-import { GridSensorDisplay } from './sensors/grid-sensor-display';
-import { darkColorMap, lightColorMap } from './sensors/sensor-colors';
-import type { SensorReading } from './sensors/sensor-types';
-import { iconMap } from './sensors/sensor-types';
-import { SmallSensorDisplay } from './sensors/small-sensor-display';
-import { useSensorGroup } from './sensors/use-sensor-group';
+import { SensorGroupSettingsDialog } from './sensor-group-settings';
+import {
+  darkColorMap,
+  GridSensorDisplay,
+  iconMap,
+  lightColorMap,
+  type SensorReading,
+  SmallSensorDisplay,
+  useSensorGroup,
+} from './sensors';
 
 interface GroupedSensorCardProps {
   id: string;
@@ -43,7 +50,7 @@ export const GroupedSensorCard = memo(function GroupedSensorCard({
   const { theme } = useTheme();
 
   // Size-specific styling with intelligent layout adaptation
-  const isSmall = size === 'extra-small' || size === 'small';
+  const isSmall = isCompactCardSize(size);
   const isMedium = size === 'medium';
   const padding = isSmall ? 'p-4' : 'p-5';
 

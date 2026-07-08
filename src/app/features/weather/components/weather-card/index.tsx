@@ -1,6 +1,11 @@
 import { Sunrise, Sunset } from 'lucide-react';
 import { memo } from 'react';
-import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import {
+  type CardSize,
+  CardSizeSelector,
+  isCompactCardSize,
+} from '@/app/components/shared/card-size-selector';
+import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { CaptionValue } from '@/app/components/ui/caption-value';
 import { CardWrapper } from '@/app/components/ui/card-wrapper';
@@ -62,7 +67,8 @@ export const WeatherCard = memo(function WeatherCard({
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
-  const isSmall = size === 'extra-small' || size === 'small';
+  const shell = getAccentCardShellTokens(theme, 'blue');
+  const isSmall = isCompactCardSize(size);
   const isLarge = size === 'large';
 
   // Get current date and time
@@ -76,31 +82,22 @@ export const WeatherCard = memo(function WeatherCard({
   const dateTime = `${dayName}, ${time}`;
 
   // Theme-aware colors
-  const cardBg =
-    theme === 'light'
-      ? 'bg-gradient-to-br from-white to-slate-50/80 border-gray-200/80'
-      : isGlass
-        ? 'bg-gradient-to-br from-white/14 via-blue-200/10 to-white/[0.03] border-white/18'
-        : 'bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-slate-700/30';
   const textPrimary = surface.textPrimary;
-  const textSecondary = theme === 'light' ? 'text-gray-500' : surface.textSecondary;
+  const textSecondary = surface.textSubtle;
   const iconBg =
     theme === 'light'
       ? 'bg-blue-100'
       : isGlass
         ? 'bg-blue-300/24 border border-blue-100/20'
         : 'bg-blue-500/24 border border-blue-300/18';
-  const glowOverlay =
-    theme === 'light'
-      ? 'from-blue-50/30 via-transparent to-cyan-50/30'
-      : isGlass
-        ? 'from-white/10 via-blue-300/10 to-cyan-200/08'
-        : 'from-blue-500/5 via-transparent to-cyan-500/5';
   const dashedBorder =
     theme === 'light' ? 'border-gray-300' : isGlass ? 'border-white/18' : 'border-slate-600';
 
   return (
-    <CardWrapper className={`${cardBg} p-5`}>
+    <CardWrapper
+      className={`${shell.containerClassName} p-5`}
+      lightOverlayClassName={shell.overlayClassName || undefined}
+    >
       {isEditMode && (
         <CardSizeSelector
           currentSize={size}
@@ -109,7 +106,7 @@ export const WeatherCard = memo(function WeatherCard({
       )}
 
       {/* Subtle gradient overlay */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${glowOverlay}`} />
+      <div className={`absolute inset-0 ${shell.glowClassName}`} />
 
       <div className="relative z-[2] h-full flex flex-col">
         {/* Header: Location + Icon */}

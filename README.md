@@ -80,7 +80,7 @@ Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built
 - **Shared UI Foundation** - Cross-feature pieces such as card sizing, empty states, interaction previews, and theme color helpers live under shared component modules
 - **Shared Visual Primitives** - Cross-theme icon pills and interactive nav/action pills are centralized behind reusable shared primitives instead of feature-level inline theme branches
 - **Shared Card State Styling** - Off/inactive card treatment for light, HVAC, switch, and media cards now resolves through one shared card-state surface token helper
-- **Artwork-Led Media Layouts** - Small, medium, and large media cards now use full-bleed artwork-driven layouts with a shared transport-control language
+- **Artwork-Led Media Layouts** - Small, medium, and medium-vertical media cards use artwork-driven layouts with a shared transport-control language
 - **Single Climate Card Path** - The legacy `ClimateCard` implementation has been removed; climate entities now use `HVACCard` only
 - **Consistent Persistence** - Storage keys plus dashboard/light preference persistence are standardized behind shared helpers and feature stores
 

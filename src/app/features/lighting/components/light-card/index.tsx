@@ -1,5 +1,9 @@
 import { memo } from 'react';
-import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import {
+  type CardSize,
+  CardSizeSelector,
+  isCompactCardSize,
+} from '@/app/components/shared/card-size-selector';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import { LightCardLarge } from './light-card-large';
@@ -44,7 +48,7 @@ export const LightCard = memo(function LightCard({
   });
   const stateSurface = getCardStateSurfaceTokens(theme, controller.isOn);
 
-  const isSmall = size === 'extra-small' || size === 'small';
+  const isSmall = isCompactCardSize(size);
 
   return (
     <>

@@ -1,6 +1,10 @@
 import { CalendarDays } from 'lucide-react';
 import { memo } from 'react';
-import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import {
+  type CardSize,
+  CardSizeSelector,
+  isCompactCardSize,
+} from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { useTheme } from '@/app/hooks';
@@ -36,7 +40,7 @@ export const CalendarCard = memo(function CalendarCard({
     moreEventsColor,
   } = useCalendarTheme(theme);
 
-  const isSmall = size === 'extra-small' || size === 'small';
+  const isSmall = isCompactCardSize(size);
   const isMedium = size === 'medium';
 
   return (

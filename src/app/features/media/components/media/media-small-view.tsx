@@ -4,10 +4,13 @@ import { RoundControlButton } from '@/app/components/shared/round-control-button
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import { getMediaControlStyles } from './media-control-styles';
+import { MediaFallbackArtwork } from './media-fallback-artwork';
 import { formatMediaTime } from './media-time';
 import { MediaVisualizerButton } from './media-visualizer-button';
+import { useMediaArtworkColors, withAlpha } from './use-media-artwork-colors';
 
 interface MediaSmallViewProps {
+  entityId: string;
   artwork?: string | null;
   title: string;
   artist: string;
@@ -15,6 +18,7 @@ interface MediaSmallViewProps {
   isPlaying: boolean;
   volume: number;
   elapsedSeconds: number;
+  durationSeconds: number;
   theme: ThemeType;
   onPrevious: () => void;
   onTogglePlay: () => void;
@@ -24,6 +28,7 @@ interface MediaSmallViewProps {
 }
 
 export function MediaSmallView({
+  entityId,
   artwork,
   title,
   artist,
@@ -31,6 +36,7 @@ export function MediaSmallView({
   isPlaying,
   volume,
   elapsedSeconds,
+  durationSeconds,
   theme,
   onPrevious,
   onTogglePlay,
@@ -39,31 +45,71 @@ export function MediaSmallView({
   onOpenDialog,
 }: MediaSmallViewProps) {
   const displayVolume = Math.max(0, Math.min(100, volume));
-  const overlay =
-    theme === 'light'
-      ? 'bg-[radial-gradient(circle_at_78%_34%,rgba(255,255,255,0.16),transparent_18%),linear-gradient(180deg,rgba(0,0,0,0.28),rgba(0,0,0,0.12)_34%,rgba(0,0,0,0.52))]'
-      : theme === 'glass'
-        ? 'bg-[radial-gradient(circle_at_78%_34%,rgba(255,255,255,0.14),transparent_18%),linear-gradient(180deg,rgba(2,6,23,0.2),rgba(2,6,23,0.08)_34%,rgba(2,6,23,0.48))]'
-        : 'bg-[radial-gradient(circle_at_78%_34%,rgba(255,255,255,0.08),transparent_18%),linear-gradient(180deg,rgba(0,0,0,0.24),rgba(0,0,0,0.12)_34%,rgba(0,0,0,0.56))]';
   const stateSurface = getCardStateSurfaceTokens(theme, isActive);
   const iconTone = stateSurface.primaryTextClassName;
   const subtitleTone = stateSurface.secondaryTextClassName;
-  const displayElapsed = formatMediaTime(elapsedSeconds);
+  const displayRemaining = formatMediaTime(Math.max(0, durationSeconds - elapsedSeconds));
   const controls = getMediaControlStyles(theme);
+  const palette = useMediaArtworkColors(artwork, theme, entityId, `${title}::${artist}`);
   const controlSizes = getCardActionControlSizes('small');
   const primaryControlSizes = getCardActionControlSizes('medium');
+  const backgroundBaseStyle = {
+    background: `radial-gradient(circle at 18% 14%, ${withAlpha(
+      palette.highlight,
+      0.12
+    )} 0%, transparent 34%), linear-gradient(165deg, ${withAlpha(
+      palette.dominant,
+      0.94
+    )} 0%, ${withAlpha(palette.dominant, 0.88)} 42%, ${withAlpha(palette.gradientEnd, 0.94)} 100%)`,
+  };
+  const colorTintStyle = {
+    background: `linear-gradient(160deg, ${withAlpha(palette.dominant, 0.52)} 0%, ${withAlpha(
+      palette.dominant,
+      0.58
+    )} 48%, ${withAlpha(palette.darkMuted, 0.62)} 100%)`,
+  };
+  const readabilityGradientStyle = {
+    background: `radial-gradient(circle at 50% 46%, ${withAlpha(
+      palette.highlight,
+      0.08
+    )} 0%, transparent 34%), linear-gradient(180deg, rgba(0,0,0,0.36) 0%, rgba(0,0,0,0.16) 42%, rgba(0,0,0,0.28) 68%, rgba(0,0,0,0.46) 100%)`,
+  };
+  const artworkAtmosphereStyle = {
+    background: `radial-gradient(circle at 50% 50%, ${withAlpha(
+      palette.dominant,
+      0.12
+    )} 0%, transparent 72%)`,
+  };
 
   return (
     <div className="relative -m-4 flex h-[calc(100%+2rem)] flex-col overflow-hidden rounded-[inherit]">
+      <div className="pointer-events-none absolute inset-0" style={backgroundBaseStyle} />
       {artwork ? (
-        <img
-          src={artwork}
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover"
+        <>
+          <img
+            src={artwork}
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 h-full w-full scale-[1.04] object-cover opacity-18 saturate-[0.92] contrast-[0.88]"
+          />
+          <img
+            src={artwork}
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 h-full w-full scale-[1.12] object-cover opacity-10 blur-[26px] saturate-[1.02]"
+          />
+        </>
+      ) : (
+        <MediaFallbackArtwork
+          palette={palette}
+          compact
+          className="absolute inset-0 opacity-72"
+          style={{ transform: 'scale(1.02)' }}
         />
-      ) : null}
-      <div className={`absolute inset-0 ${overlay}`} />
+      )}
+      <div className="pointer-events-none absolute inset-0" style={artworkAtmosphereStyle} />
+      <div className="pointer-events-none absolute inset-0" style={colorTintStyle} />
+      <div className="pointer-events-none absolute inset-0" style={readabilityGradientStyle} />
 
       <div className="relative flex h-full flex-col p-4">
         <div className="flex items-center gap-2.5">
@@ -75,7 +121,9 @@ export function MediaSmallView({
             }}
             className={iconTone}
           />
-          {isPlaying && <span className={`text-[11px] ${subtitleTone}`}>{displayElapsed}</span>}
+          {isPlaying && durationSeconds > 0 && (
+            <span className={`text-[11px] ${subtitleTone}`}>{displayRemaining}</span>
+          )}
         </div>
 
         <div className="mt-auto flex items-center justify-between gap-4">

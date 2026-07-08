@@ -1,0 +1,186 @@
+import { Pause, Play, SkipBack, SkipForward } from 'lucide-react';
+import { getCardActionControlSizes } from '@/app/components/shared/card-action-control-sizes';
+import { RoundControlButton } from '@/app/components/shared/round-control-button';
+import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
+import type { ThemeType } from '@/app/hooks/use-theme';
+import { MediaArtworkSurface } from './media-artwork-surface';
+import { getMediaControlStyles } from './media-control-styles';
+import { formatMediaTime } from './media-time';
+import { MediaVisualizerButton } from './media-visualizer-button';
+import { useMediaArtworkColors, withAlpha } from './use-media-artwork-colors';
+
+interface MediaMediumVerticalViewProps {
+  entityId: string;
+  artwork?: string | null;
+  title: string;
+  artist: string;
+  isActive: boolean;
+  isPlaying: boolean;
+  volume: number;
+  isMuted: boolean;
+  elapsedSeconds: number;
+  durationSeconds: number;
+  theme: ThemeType;
+  onOpenDialog?: () => void;
+  onPrevious: () => void;
+  onTogglePlay: () => void;
+  onNext: () => void;
+  onVolumeChange: (value: number) => void;
+}
+
+export function MediaMediumVerticalView({
+  entityId,
+  artwork,
+  title,
+  artist,
+  isActive,
+  isPlaying,
+  volume,
+  isMuted,
+  elapsedSeconds,
+  durationSeconds,
+  theme,
+  onOpenDialog,
+  onPrevious,
+  onTogglePlay,
+  onNext,
+  onVolumeChange,
+}: MediaMediumVerticalViewProps) {
+  const displayVolume = Math.max(0, Math.min(100, isMuted ? 0 : volume));
+  const stateSurface = getCardStateSurfaceTokens(theme, isActive);
+  const palette = useMediaArtworkColors(artwork, theme, entityId, `${title}::${artist}`);
+  const iconTone = stateSurface.primaryTextClassName;
+  const subtitleTone = stateSurface.secondaryTextClassName;
+  const displayRemaining = formatMediaTime(Math.max(0, durationSeconds - elapsedSeconds));
+  const controls = getMediaControlStyles(theme);
+  const controlSizes = getCardActionControlSizes('small');
+  const primaryControlSizes = getCardActionControlSizes('medium');
+  const playButtonStyle = {
+    background: `linear-gradient(180deg, ${withAlpha(palette.highlight, 0.34)} 0%, ${withAlpha(palette.vibrant, 0.62)} 100%)`,
+    borderColor: withAlpha(palette.highlight, 0.22),
+    boxShadow: `0 18px 42px -18px ${withAlpha(palette.vibrant, 0.7)}, inset 0 1px 0 ${withAlpha(palette.highlight, 0.22)}`,
+  };
+  const playGlowStyle = {
+    background: `radial-gradient(circle, ${withAlpha(palette.vibrant, 0.5)} 0%, ${withAlpha(
+      palette.highlight,
+      0.2
+    )} 38%, transparent 74%)`,
+  };
+  return (
+    <div className="relative -m-6 flex h-[calc(100%+3rem)] flex-col overflow-hidden rounded-[inherit]">
+      <MediaArtworkSurface
+        artwork={artwork}
+        palette={palette}
+        layout="stacked"
+        artRegionClassName="h-[52%]"
+        imagePaddingClassName=""
+        imageClassName="object-cover object-top"
+      />
+
+      <div className="relative z-[1] flex h-full flex-col">
+        <div className="h-[52%]" />
+
+        <div className="flex min-h-0 flex-1 flex-col px-6 pb-6 pt-5">
+          <div className="flex items-center gap-3">
+            <MediaVisualizerButton
+              isPlaying={isPlaying}
+              onClick={(event) => {
+                event.stopPropagation();
+                onOpenDialog?.();
+              }}
+              className={iconTone}
+            />
+            {isPlaying && durationSeconds > 0 && (
+              <span className={`text-xs ${subtitleTone}`}>{displayRemaining}</span>
+            )}
+          </div>
+
+          <div className="mt-auto flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <div className={`truncate text-sm font-medium ${iconTone}`}>{title}</div>
+              <div className={`mt-0.5 truncate text-[13px] ${subtitleTone}`}>{artist}</div>
+            </div>
+
+            <div className="relative">
+              <div
+                className="pointer-events-none absolute inset-[-26%] rounded-full blur-3xl"
+                style={playGlowStyle}
+              />
+              <RoundControlButton
+                theme={theme}
+                size="large"
+                variant="emphasis"
+                aria-label={isPlaying ? 'Pause playback' : 'Resume playback'}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onTogglePlay();
+                }}
+                className="h-12 w-12 border backdrop-blur-xl hover:scale-[1.03] active:scale-95"
+                iconClassName="!text-white"
+                style={playButtonStyle}
+              >
+                {isPlaying ? (
+                  <Pause className={primaryControlSizes.icon} fill="currentColor" />
+                ) : (
+                  <Play className={primaryControlSizes.icon} fill="currentColor" />
+                )}
+              </RoundControlButton>
+            </div>
+          </div>
+
+          <div className="mt-6 flex items-center gap-2">
+            <RoundControlButton
+              theme={theme}
+              size="small"
+              variant="neutral"
+              aria-label="Previous track"
+              onClick={(event) => {
+                event.stopPropagation();
+                onPrevious();
+              }}
+              className="transition-colors"
+            >
+              <SkipBack className={controlSizes.icon} />
+            </RoundControlButton>
+
+            <div className="relative flex-1">
+              <div
+                className={`absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 ${controls.trackBase}`}
+              />
+              <div
+                className={`absolute left-0 top-1/2 h-px -translate-y-1/2 ${controls.trackFill}`}
+                style={{ width: `${displayVolume}%` }}
+              />
+              <div
+                className={`absolute top-1/2 h-4 w-px -translate-y-1/2 rounded-full ${controls.trackThumb}`}
+                style={{ left: `calc(${displayVolume}% - 0.5px)` }}
+              />
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={displayVolume}
+                onChange={(event) => onVolumeChange(parseInt(event.target.value, 10))}
+                className="absolute inset-0 h-6 w-full -translate-y-1/2 cursor-pointer opacity-0"
+              />
+            </div>
+
+            <RoundControlButton
+              theme={theme}
+              size="small"
+              variant="neutral"
+              aria-label="Next track"
+              onClick={(event) => {
+                event.stopPropagation();
+                onNext();
+              }}
+              className="transition-colors"
+            >
+              <SkipForward className={controlSizes.icon} />
+            </RoundControlButton>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

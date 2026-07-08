@@ -1,4 +1,5 @@
 import { memo, type ReactNode } from 'react';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 
 interface CaptionValueProps {
@@ -22,9 +23,10 @@ export const CaptionValue = memo(function CaptionValue({
   valueClassName = '',
 }: CaptionValueProps) {
   const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const justifyClass = align === 'right' ? 'justify-end' : 'justify-start';
-  const defaultCaptionColor = theme === 'light' ? 'text-gray-500' : 'text-gray-300';
-  const defaultValueColor = theme === 'light' ? 'text-gray-900' : 'text-white';
+  const defaultCaptionColor = surface.textSubtle;
+  const defaultValueColor = surface.textPrimary;
 
   return (
     <div className={`flex items-center gap-3 ${justifyClass}`}>

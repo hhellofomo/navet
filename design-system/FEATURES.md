@@ -166,7 +166,7 @@ Navet now uses a live Home Assistant-backed media card flow instead of a mock-on
 
 #### Current Behavior
 - **Home Assistant media player wiring** - media cards map real `media_player` entities into playback state, volume, mute, metadata, artwork, and elapsed-time UI
-- **Artwork-led layouts** - small, medium, and large media cards use full-bleed artwork surfaces rather than a separate album-art tile pattern
+- **Artwork-led layouts** - small, medium, and medium-vertical media cards use artwork-led surfaces rather than a separate album-art tile pattern
 - **Shared transport controls** - previous, play/pause, next, volume, and details actions use the shared round control button primitive
 - **Theme-aware inactive treatment** - media off state now follows the same shared card-state surface token system used by other cards
 - **Top-left playback indicator** - the visualizer animates while media is playing, and elapsed time appears beside it only during active playback

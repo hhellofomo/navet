@@ -10,6 +10,7 @@ export interface ThemeSurfaceTokens {
   divider: string;
   textPrimary: string;
   textSecondary: string;
+  textSubtle: string;
   textMuted: string;
   iconBg: string;
   subtleBg: string;
@@ -34,6 +35,7 @@ export function getThemeSurfaceTokens(theme: ThemeType): ThemeSurfaceTokens {
       divider: 'divide-gray-200/80',
       textPrimary: 'text-gray-900',
       textSecondary: 'text-gray-600',
+      textSubtle: 'text-gray-500',
       textMuted: 'text-gray-500',
       iconBg: 'bg-gray-100',
       subtleBg: 'bg-gray-100',
@@ -58,6 +60,7 @@ export function getThemeSurfaceTokens(theme: ThemeType): ThemeSurfaceTokens {
       divider: 'divide-white/10',
       textPrimary: 'text-white',
       textSecondary: 'text-gray-300',
+      textSubtle: 'text-gray-300',
       textMuted: 'text-gray-300',
       iconBg: 'bg-white/10',
       subtleBg: 'bg-black',
@@ -82,6 +85,7 @@ export function getThemeSurfaceTokens(theme: ThemeType): ThemeSurfaceTokens {
       divider: 'divide-white/10',
       textPrimary: 'text-white',
       textSecondary: 'text-gray-300',
+      textSubtle: 'text-gray-300',
       textMuted: 'text-white/60',
       iconBg: 'bg-white/10',
       subtleBg: 'bg-white/8',
@@ -105,6 +109,7 @@ export function getThemeSurfaceTokens(theme: ThemeType): ThemeSurfaceTokens {
     divider: 'divide-white/10',
     textPrimary: 'text-white',
     textSecondary: 'text-gray-300',
+    textSubtle: 'text-gray-300',
     textMuted: 'text-gray-500',
     iconBg: 'bg-white/6',
     subtleBg: 'bg-white/5',

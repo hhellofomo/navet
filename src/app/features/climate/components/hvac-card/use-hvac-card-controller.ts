@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { useTheme } from '@/app/hooks';
 import type { HVACCardProps } from './hvac-card.types';
@@ -28,7 +29,7 @@ export function useHVACCardController({
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { colors, theme } = useTheme();
 
-  const isSmall = size === 'extra-small' || size === 'small';
+  const isSmall = isCompactCardSize(size);
   const isMedium = size === 'medium';
 
   const cardColors = !isOn

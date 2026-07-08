@@ -1,6 +1,10 @@
 import { Bot } from 'lucide-react';
 import { memo } from 'react';
-import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import {
+  type CardSize,
+  CardSizeSelector,
+  isCompactCardSize,
+} from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
@@ -52,7 +56,7 @@ export const VacuumCard = memo(function VacuumCard({
   const isGlass = theme === 'glass';
   const accentColorValue = getThemeColorValue(primaryColor);
 
-  const isSmall = size === 'extra-small' || size === 'small';
+  const isSmall = isCompactCardSize(size);
   const isMedium = size === 'medium';
   const padding = isSmall ? 'p-4' : 'p-5';
 

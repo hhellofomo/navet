@@ -13,9 +13,9 @@ import { EmptyState } from '@/app/components/shared/empty-state';
 import { LoadingSpinner } from '@/app/components/shared/loading-spinner';
 import { RenderProfiler } from '@/app/components/shared/render-profiler';
 import { AllViewGrid } from '../all-view-grid';
-import { DashboardLayout } from '../dashboard-layout';
 import { DeviceGrid } from '../device-grid';
 import type { DashboardController } from '../hooks/use-dashboard-controller';
+import { DashboardLayout } from '../shell';
 
 const SettingsSection = lazy(async () => {
   const module = await import('@/app/features/settings');
@@ -46,7 +46,6 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     isEditMode,
     lightDeviceMap,
     lightRooms,
-    onExportDashboardConfig,
     onMoveRoom,
     onSetAllViewGrouping,
     onOpenAddCardDialog,
@@ -158,7 +157,6 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
           allViewGrouping={allViewGrouping}
           isEditMode={isEditMode}
           onAllViewGroupingChange={onSetAllViewGrouping}
-          onExportConfig={onExportDashboardConfig}
           onToggleEditMode={onToggleEditMode}
           onMoveRoom={onMoveRoom}
           onAddCard={onOpenAddCardDialog}

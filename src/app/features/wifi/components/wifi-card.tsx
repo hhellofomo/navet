@@ -1,6 +1,11 @@
 import { Wifi } from 'lucide-react';
 import { memo } from 'react';
-import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import {
+  type CardSize,
+  CardSizeSelector,
+  isCompactCardSize,
+} from '@/app/components/shared/card-size-selector';
+import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 
@@ -27,23 +32,16 @@ export const WifiCard = memo(function WifiCard({
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
+  const shell = getAccentCardShellTokens(theme, 'green');
 
   // Size-specific styling with intelligent layout adaptation
-  const isSmall = size === 'extra-small' || size === 'small';
+  const isSmall = isCompactCardSize(size);
   const isMedium = size === 'medium';
   const padding = isSmall ? 'p-4' : 'p-5';
 
   // Theme-aware colors
-  const cardGradient =
-    theme === 'light'
-      ? 'from-white to-green-50/80'
-      : isGlass
-        ? 'from-white/16 via-green-200/10 to-white/[0.03]'
-        : 'from-green-900/90 to-green-950/95';
-  const cardBorder =
-    theme === 'light' ? 'border-gray-200/80' : isGlass ? surface.border : 'border-green-700/30';
   const textPrimary = surface.textPrimary;
-  const textSecondary = theme === 'light' ? 'text-gray-500' : surface.textSecondary;
+  const textSecondary = surface.textSubtle;
   const iconBg =
     theme === 'light'
       ? 'bg-green-100'
@@ -52,16 +50,9 @@ export const WifiCard = memo(function WifiCard({
         : 'bg-green-500/24 border border-green-300/18';
   const iconColor =
     theme === 'light' ? 'text-green-700' : isGlass ? 'text-green-100' : 'text-green-300';
-  const glowGradient =
-    theme === 'light'
-      ? 'from-green-50/40'
-      : isGlass
-        ? 'from-white/10 via-green-300/10'
-        : 'from-green-500/5';
-
   return (
     <div
-      className={`relative h-full bg-gradient-to-br ${cardGradient} backdrop-blur-xl rounded-3xl ${padding} border ${cardBorder} overflow-hidden ${theme === 'light' ? 'shadow-lg' : ''}`}
+      className={`relative h-full backdrop-blur-xl rounded-3xl ${padding} border overflow-hidden ${shell.containerClassName}`}
     >
       {isEditMode && (
         <CardSizeSelector
@@ -70,14 +61,9 @@ export const WifiCard = memo(function WifiCard({
         />
       )}
 
-      <div className={`absolute inset-0 bg-gradient-to-br ${glowGradient} to-transparent`}></div>
+      <div className={`absolute inset-0 ${shell.glowClassName}`}></div>
 
-      {/* Light theme frosted overlay */}
-      {(theme === 'light' || isGlass) && (
-        <div
-          className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`}
-        />
-      )}
+      {shell.overlayClassName && <div className={`absolute inset-0 ${shell.overlayClassName}`} />}
 
       <div className="relative h-full flex flex-col">
         <div className={`flex items-start justify-between ${isSmall ? 'mb-1' : 'mb-2'}`}>

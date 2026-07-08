@@ -1,7 +1,7 @@
 import { Minus, Plus } from 'lucide-react';
 import { memo } from 'react';
 import { getCardActionControlSizes } from '@/app/components/shared/card-action-control-sizes';
-import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { useTheme } from '@/app/hooks';
 
@@ -19,7 +19,7 @@ export const HVACTempControls = memo(function HVACTempControls({
   size = 'medium',
 }: HVACTempControlsProps) {
   const { theme } = useTheme();
-  const isCompact = size === 'extra-small' || size === 'small';
+  const isCompact = isCompactCardSize(size);
   const primitiveSize = isCompact ? 'small' : size === 'large' ? 'large' : 'medium';
   const controlSizes = getCardActionControlSizes(primitiveSize);
   const hoverScale = isCompact ? 'hover:scale-105' : '';

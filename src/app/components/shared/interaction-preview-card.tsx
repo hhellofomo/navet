@@ -1,6 +1,7 @@
 import { Hand, Lightbulb, MoreHorizontal, Settings2, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { getDeviceEditorSurfaceTokens } from '@/app/components/shared/device-editor';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import type { EntityInteractionMode } from '@/app/stores';
 import { getInteractionPreview } from './entity-card-interaction-controller';
@@ -21,6 +22,7 @@ export function InteractionPreviewCard({
   const [isOn, setIsOn] = useState(true);
   const [brightness, setBrightness] = useState(60);
   const surface = getThemeSurfaceTokens(isLightTheme ? 'light' : 'glass');
+  const editorSurface = getDeviceEditorSurfaceTokens(isOn);
   const preview = getInteractionPreview(mode);
   const showsTrailingButton = mode === 'toggle-first';
   const surfaceClass = isLightTheme
@@ -36,13 +38,6 @@ export function InteractionPreviewCard({
     : isLightTheme
       ? 'text-gray-500'
       : 'text-gray-400';
-  const mutedClass = isOn
-    ? isLightTheme
-      ? 'text-gray-500'
-      : 'text-gray-300'
-    : isLightTheme
-      ? 'text-gray-400'
-      : 'text-gray-500';
   const quietPillClass = isOn
     ? isLightTheme
       ? 'bg-gray-100 text-gray-600'
@@ -66,6 +61,7 @@ export function InteractionPreviewCard({
         ? `0 0 0 2px ${accentColor}22, 0 12px 30px ${accentColor}45`
         : 'none',
   };
+  const sliderTrackClassName = isLightTheme ? 'bg-gray-200' : 'bg-white/10';
 
   const showControlsOpenedToast = () => {
     toast.success('Controls opened', {
@@ -129,12 +125,10 @@ export function InteractionPreviewCard({
 
         <div className="mt-6">
           <div className="mb-2 flex items-center justify-between">
-            <span className={`text-xs ${mutedClass}`}>Brightness</span>
+            <span className={`text-xs ${editorSurface.suffixClassName}`}>Brightness</span>
             <span className={`text-sm font-bold ${textClass}`}>{brightness}%</span>
           </div>
-          <div
-            className={`relative h-2 rounded-full ${isLightTheme ? 'bg-gray-200' : 'bg-white/10'}`}
-          >
+          <div className={`relative h-2 rounded-full ${sliderTrackClassName}`}>
             <div
               className="absolute inset-y-0 left-0 rounded-full"
               style={{

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { type CardSize, isExtraSmallCardSize } from '@/app/components/shared/card-size-selector';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 
@@ -23,7 +23,7 @@ export function EntityCardHeader({
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const textColor = surface.textPrimary;
-  const isExtraSmall = size === 'extra-small';
+  const isExtraSmall = isExtraSmallCardSize(size);
   const isStandardCompact = size === 'small' || size === 'medium';
   const titleSize = isExtraSmall || isStandardCompact ? 'text-xs' : 'text-sm';
   const marginBottom = isExtraSmall ? 'mb-1' : isStandardCompact ? 'mb-2' : 'mb-2';

@@ -27,7 +27,7 @@ export function VacuumStatusDisplay({
 }: VacuumStatusDisplayProps) {
   const surface = getThemeSurfaceTokens(theme);
   const textPrimary = surface.textPrimary;
-  const textSecondary = theme === 'light' ? 'text-gray-500' : surface.textSecondary;
+  const textSecondary = surface.textSubtle;
   const statusRow = (
     <div className="flex items-end justify-between">
       <div className={`font-medium leading-none ${getVacuumStatusColorClass(currentStatus)}`}>

@@ -1,8 +1,13 @@
 import { Gauge, TrendingDown, TrendingUp } from 'lucide-react';
 import { memo } from 'react';
-import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import {
+  type CardSize,
+  CardSizeSelector,
+  isCompactCardSize,
+} from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 
@@ -31,37 +36,23 @@ export const SensorCard = memo(function SensorCard({
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
+  const shell = getAccentCardShellTokens(theme, 'teal');
 
   // Size-specific styling
-  const isSmall = size === 'extra-small' || size === 'small';
+  const isSmall = isCompactCardSize(size);
   const padding = isSmall ? 'p-4' : 'p-5';
 
   const IconComponent =
     icon === 'trend-up' ? TrendingUp : icon === 'trend-down' ? TrendingDown : Gauge;
 
   // Theme-aware colors
-  const cardGradient =
-    theme === 'light'
-      ? 'from-white to-teal-50/80'
-      : isGlass
-        ? 'from-white/16 via-teal-200/10 to-white/[0.03]'
-        : 'from-teal-900/90 to-teal-950/95';
-  const cardBorder =
-    theme === 'light' ? 'border-gray-200/80' : isGlass ? surface.border : 'border-teal-700/30';
   const textPrimary = surface.textPrimary;
-  const textSecondary = theme === 'light' ? 'text-gray-500' : surface.textSecondary;
+  const textSecondary = surface.textSubtle;
   const accentColor =
     theme === 'light' ? 'text-teal-700' : isGlass ? 'text-teal-200' : 'text-teal-400';
-  const glowGradient =
-    theme === 'light'
-      ? 'from-teal-50/40'
-      : isGlass
-        ? 'from-white/10 via-teal-300/10'
-        : 'from-teal-500/5';
-
   return (
     <div
-      className={`relative h-full bg-gradient-to-br ${cardGradient} backdrop-blur-xl rounded-3xl ${padding} border ${cardBorder} overflow-hidden ${theme === 'light' ? 'shadow-lg' : ''}`}
+      className={`relative h-full backdrop-blur-xl rounded-3xl ${padding} border overflow-hidden ${shell.containerClassName}`}
     >
       {isEditMode && (
         <CardSizeSelector
@@ -70,14 +61,9 @@ export const SensorCard = memo(function SensorCard({
         />
       )}
 
-      <div className={`absolute inset-0 bg-gradient-to-br ${glowGradient} to-transparent`}></div>
+      <div className={`absolute inset-0 ${shell.glowClassName}`}></div>
 
-      {/* Light theme frosted overlay */}
-      {(theme === 'light' || isGlass) && (
-        <div
-          className={`absolute inset-0 ${theme === 'light' ? 'bg-white/60' : 'bg-white/[0.03]'}`}
-        />
-      )}
+      {shell.overlayClassName && <div className={`absolute inset-0 ${shell.overlayClassName}`} />}
 
       <div className="relative h-full flex flex-col">
         <EntityCardHeader

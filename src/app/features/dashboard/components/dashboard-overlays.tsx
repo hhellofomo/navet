@@ -3,7 +3,7 @@ import type { DashboardController } from '../hooks/use-dashboard-controller';
 import { AddEntityDialog } from './add-entity-dialog';
 
 const AddCardDialog = lazy(async () => {
-  const module = await import('./AddCardDialogContainer');
+  const module = await import('./add-card-dialog');
   return { default: module.AddCardDialogContainer };
 });
 

@@ -1,9 +1,7 @@
 ## Commit Rules
 
-- All commit messages must follow Conventional Commits.
 - Format: `type(scope): summary`
 - Valid types include: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `build`, `ci`, `perf`, and `style`.
-- Before creating a commit, verify the message matches Conventional Commits.
 - Do not use generic or free-form commit messages.
 - If a commit has already been created with a non-conventional message, amend it before finishing the task.
 
@@ -12,47 +10,24 @@
 ### Architecture and Ownership
 
 - Prefer feature-owned modules over global catch-all folders.
-- Dashboard-owned logic belongs under `src/app/features/dashboard/`.
-- Lighting-owned logic belongs under `src/app/features/lighting/`.
-- Climate-only utilities belong under `src/app/features/climate/`.
 - Shared cross-feature UI building blocks belong under `src/app/components/shared/`.
 - Do not add new feature-specific hooks, stores, or utilities to generic global folders unless they are truly shared across multiple features.
 
 ### Feature Public APIs
 
 - Prefer importing from a feature root `index.ts` when crossing feature boundaries.
-- Current feature public entry points exist for:
-  - `src/app/features/calendar`
-  - `src/app/features/climate`
-  - `src/app/features/dashboard`
-  - `src/app/features/lighting`
-  - `src/app/features/media`
-  - `src/app/features/notifications`
-  - `src/app/features/person`
-  - `src/app/features/power`
-  - `src/app/features/rss`
-  - `src/app/features/security`
-  - `src/app/features/sensors`
-  - `src/app/features/settings`
-  - `src/app/features/vacuum`
-  - `src/app/features/weather`
-  - `src/app/features/wifi`
 - If a cross-feature import reaches into `components/`, `hooks/`, `stores/`, or `utils/`, first check whether it should be exported from the feature root instead.
 
 ### Import Conventions
 
 - Use `@/app/...` imports for shared app modules and cross-feature imports.
 - Keep short relative imports for files inside the same small feature/module subtree.
-- Avoid deep relative imports to shared app modules such as hooks, contexts, stores, and shared components when the alias is clearer.
+- Avoid deep relative imports to shared app modules when the alias is clearer.
 
 ### Component and File Structure
 
 - Keep provider/bootstrap concerns near `src/app/App.tsx`; move feature orchestration into feature modules.
-- Prefer splitting large feature files into:
-  - entry component
-  - controller hook
-  - presentational view components
-  - local types/data/constants files when useful
+- Prefer splitting large feature files into entry components, controller hooks, presentational views, and local types/data/constants when useful.
 - For card-style features with internal structure, prefer folder modules with `index.tsx` entries, for example:
   - `light-card/`
   - `hvac-card/`
@@ -70,7 +45,7 @@
 ### Theming Rules
 
 - Do not let sections, cards, dialogs, or feature views invent their own light/dark/contrast/glass surface logic when shared theme tokens can express it.
-- Prefer `src/app/components/shared/theme/theme-surface-tokens.ts` for shared surface decisions such as panel backgrounds, borders, muted text, overlays, hover states, dialog backdrops, and input surfaces.
+- Prefer `src/app/components/shared/theme/theme-surface-tokens.ts` for shared surface decisions.
 - When updating a section or card, first check whether the styling should consume shared surface tokens instead of adding new `theme === 'light' ? ... : ...` branches inline.
 - Only keep local theme branches when the styling is truly feature-specific, for example domain accents or status colors that are not generic surfaces.
 - If a recurring theme pattern appears in more than one place, move it into a shared token/helper instead of copying the branch logic again.
@@ -89,12 +64,11 @@
 
 - Follow `docs/branding/BRANDING.md` when using Navet brand assets.
 - Use the existing logo files from `public/` as-is; do not restyle the logo itself.
-- Do not place the logo inside decorative pills, badges, or framed containers that change its presentation.
 - Do not add shadows, outlines, glows, recolors, or gradients directly to the logo.
-- If a scene needs more visual drama, add lighting or atmosphere around the logo, not on the logo.
 - Prefer neutral backgrounds and adequate clear space around the mark.
 
 ### Verification
 
-- After structural refactors or import cleanup, run `npm run typecheck`.
+- After structural refactors, import cleanup, module moves, or shared-type changes, run `pnpm typecheck`.
+- For small visual or copy-only tweaks, do not default to running `pnpm typecheck` after every change unless the edit touches shared logic, types, or wiring.
 - Prefer preserving behavior during refactors; structural cleanup should not introduce feature changes unless explicitly requested.

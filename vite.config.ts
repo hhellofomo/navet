@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
@@ -20,7 +20,12 @@ function getPackageName(id: string) {
   return segments[0] ?? null
 }
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const hassUrl = env.NAVET_HASS_URL?.trim().replace(/\/$/, '')
+  const hassToken = env.NAVET_HASS_TOKEN?.trim()
+
+  return {
   envPrefix: ['VITE_', 'NAVET_'],
   plugins: [
     // The React and Tailwind plugins are both required for Make, even if
@@ -155,5 +160,31 @@ export default defineConfig({
     host: 'navet.homeassistant.local',
     port: 5200,
     strictPort: true,
+    proxy: hassUrl
+      ? {
+          '/api': {
+            target: hassUrl,
+            changeOrigin: true,
+            secure: false,
+            headers: hassToken
+              ? {
+                  Authorization: `Bearer ${hassToken}`,
+                }
+              : undefined,
+          },
+          '/__navet_ha_proxy__': {
+            target: hassUrl,
+            changeOrigin: true,
+            secure: false,
+            headers: hassToken
+              ? {
+                  Authorization: `Bearer ${hassToken}`,
+                }
+              : undefined,
+            rewrite: (path) => path.replace(/^\/__navet_ha_proxy__/, ''),
+          },
+        }
+      : undefined,
   },
+}
 })

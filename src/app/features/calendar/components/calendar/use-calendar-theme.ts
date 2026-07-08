@@ -17,7 +17,7 @@ interface CalendarThemeColors {
 export function useCalendarTheme(theme: ThemeType): CalendarThemeColors {
   const surface = getThemeSurfaceTokens(theme);
   const textPrimary = surface.textPrimary;
-  const textSecondary = theme === 'light' ? 'text-gray-500' : surface.textSecondary;
+  const textSecondary = surface.textSubtle;
   const overlayBg =
     theme === 'light' ? 'bg-white/60 backdrop-blur-sm' : 'bg-black/20 backdrop-blur-sm';
   const iconBg =

@@ -5,5 +5,5 @@ export type {
   SensorColorScheme,
   SensorIconType,
   SensorReading,
-} from './components/sensors/sensor-types';
-export { iconMap } from './components/sensors/sensor-types';
+} from './components/sensors';
+export { iconMap } from './components/sensors';

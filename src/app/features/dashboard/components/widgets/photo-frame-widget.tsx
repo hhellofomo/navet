@@ -1,9 +1,10 @@
 import { ChevronLeft, ChevronRight, Image as ImageIcon } from 'lucide-react';
 import { useState } from 'react';
 import { ImageWithFallback } from '@/app/components/figma/ImageWithFallback';
-import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { type CardSize, isCompactCardSize } from '@/app/components/shared/card-size-selector';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { useTheme } from '@/app/hooks';
+import { getDashboardWidgetSurfaceTokens } from './widget-surface-tokens';
 
 const mockPhotos = [
   'https://images.unsplash.com/photo-1767858702764-39693c994ee1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYW1pbHklMjB2YWNhdGlvbiUyMGJlYWNofGVufDF8fHx8MTc3MjY4ODE4OXww&ixlib=rb-4.1.0&q=80&w=1080',
@@ -19,12 +20,9 @@ interface PhotoFrameWidgetProps {
 
 export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
   const { theme, primaryColor } = useTheme();
+  const surface = getDashboardWidgetSurfaceTokens(theme);
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const bgColor =
-    theme === 'light' ? 'bg-white/70' : theme === 'contrast' ? 'bg-black/50' : 'bg-white/10';
-  const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const border = theme === 'light' ? 'border-gray-200/50' : 'border-white/10';
+  const isCompact = isCompactCardSize(size);
 
   const nextPhoto = () => {
     setCurrentIndex((prev) => (prev + 1) % mockPhotos.length);
@@ -35,9 +33,7 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
   };
 
   return (
-    <div
-      className={`${bgColor} backdrop-blur-xl rounded-2xl p-4 border ${border} h-full flex flex-col`}
-    >
+    <div className={`${surface.panelClassName} h-full flex flex-col`}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <div
@@ -50,8 +46,8 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
           <ImageIcon className="w-5 h-5" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className={`text-sm font-semibold ${textPrimary}`}>Photo Frame</h3>
-          <p className="text-[10px] text-gray-300 truncate mt-0.5">Widget</p>
+          <h3 className={`text-sm font-semibold ${surface.textPrimary}`}>Photo Frame</h3>
+          <p className={`mt-0.5 truncate text-[10px] ${surface.textMuted}`}>Widget</p>
         </div>
       </div>
 
@@ -64,7 +60,7 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
         />
 
         {/* Navigation Buttons */}
-        {size !== 'extra-small' && size !== 'small' && (
+        {!isCompact && (
           <>
             <button
               type="button"
@@ -85,7 +81,7 @@ export function PhotoFrameWidget({ size = 'large' }: PhotoFrameWidgetProps) {
       </div>
 
       {/* Thumbnail Dots */}
-      {size !== 'extra-small' && size !== 'small' && (
+      {!isCompact && (
         <div className="flex justify-center gap-2">
           {mockPhotos.map((_, index) => (
             <button

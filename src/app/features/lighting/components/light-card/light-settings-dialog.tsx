@@ -1,12 +1,14 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { memo } from 'react';
-import { BrightnessPresetEditor } from '@/app/components/shared/brightness-preset-editor';
-import { BrightnessPresets } from '@/app/components/shared/brightness-presets';
-import { ColorSelectorSection } from '@/app/components/shared/color-selector-section';
-import { ColorTemperatureSection } from '@/app/components/shared/color-temperature-section';
-import { CustomScrollbar } from '@/app/components/shared/custom-scrollbar';
-import { DialogHeader } from '@/app/components/shared/dialog-header';
-import { IconPicker } from '@/app/components/shared/icon-picker';
+import {
+  BrightnessPresetEditor,
+  BrightnessPresets,
+  ColorSelectorSection,
+  ColorTemperatureSection,
+  CustomScrollbar,
+  DialogHeader,
+  IconPicker,
+} from '@/app/components/shared/device-editor';
 import { PRESET_COLORS } from '@/app/constants/light-constants';
 import { useTheme } from '@/app/hooks';
 import type { BrightnessPresetKey } from '../../stores/light-preset-store';
