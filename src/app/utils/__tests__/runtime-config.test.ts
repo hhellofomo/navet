@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { getRuntimeConfig } from '@/app/config/runtime-config';
 
 describe('runtime-config', () => {
-  it('does not expose browser runtime tokens', () => {
+  it('normalizes browser runtime connection defaults', () => {
     window.__NAVET_CONFIG__ = {
       hassUrl: 'https://ha.example.com/',
+      hassToken: '  token  ',
     };
 
-    expect(getRuntimeConfig()).toEqual({ hassUrl: 'https://ha.example.com' });
-    expect('token' in getRuntimeConfig()).toBe(false);
+    expect(getRuntimeConfig()).toEqual({ hassUrl: 'https://ha.example.com', hassToken: 'token' });
   });
 });

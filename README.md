@@ -137,8 +137,9 @@ docker compose pull
 docker compose up -d
 ```
 
-`NAVET_HASS_TOKEN` is server-only for Docker and add-on deployments. Do not expose it in a public
-static build, Vite client variable, checked-in file, or browser-readable runtime config.
+`NAVET_HASS_TOKEN` is injected into Docker and add-on runtime config so those deployments can start
+without the login form. Do not expose it in a public static build, Vite client variable, or
+checked-in file, and use a least-privilege Home Assistant token for shared dashboard devices.
 
 Before publishing or sharing any hosted build, review the
 [public launch security checklist](docs/PUBLIC_LAUNCH_SECURITY.md).

@@ -5,6 +5,7 @@ NAVET_HASS_URL="${NAVET_HASS_URL:-}"
 NAVET_HASS_TOKEN="${NAVET_HASS_TOKEN:-}"
 NAVET_PROXY_AUTH_DIRECTIVE=""
 NAVET_HASS_URL_JS="$(printf '%s' "${NAVET_HASS_URL}" | sed 's/\\/\\\\/g; s/"/\\"/g')"
+NAVET_HASS_TOKEN_JS="$(printf '%s' "${NAVET_HASS_TOKEN}" | sed 's/\\/\\\\/g; s/"/\\"/g')"
 
 case "${NAVET_HASS_URL}" in
   ""|http://*|https://*) ;;
@@ -23,7 +24,7 @@ if [ -n "${NAVET_HASS_TOKEN}" ]; then
   NAVET_PROXY_AUTH_DIRECTIVE="    proxy_set_header Authorization \"Bearer ${NAVET_HASS_TOKEN}\";"
 fi
 
-export NAVET_HASS_URL NAVET_HASS_URL_JS NAVET_PROXY_AUTH_DIRECTIVE
+export NAVET_HASS_URL NAVET_HASS_URL_JS NAVET_HASS_TOKEN_JS NAVET_PROXY_AUTH_DIRECTIVE
 
 if [ -n "${NAVET_HASS_URL}" ]; then
   envsubst '${NAVET_HASS_URL} ${NAVET_PROXY_AUTH_DIRECTIVE}' \
@@ -33,6 +34,6 @@ else
   cp /etc/navet-nginx/default.no-proxy.conf /etc/nginx/conf.d/default.conf
 fi
 
-envsubst '${NAVET_HASS_URL_JS}' \
+envsubst '${NAVET_HASS_URL_JS} ${NAVET_HASS_TOKEN_JS}' \
   < /usr/share/nginx/html/config.js.template \
   > /usr/share/nginx/html/config.js
