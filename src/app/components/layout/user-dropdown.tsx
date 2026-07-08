@@ -5,7 +5,7 @@ import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/components/ui/avatar';
 import { useAuth } from '@/app/contexts/auth-context';
-import { useHomeAssistant, useTheme } from '@/app/hooks';
+import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 
 interface UserDropdownProps {
   avatarUrl?: string | null;
@@ -15,6 +15,7 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { theme, primaryColor } = useTheme();
+  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const { user } = useHomeAssistant();
   const { logout } = useAuth();
@@ -34,7 +35,7 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
   }, [isOpen]);
 
   const handleLogout = () => {
-    if (confirm('Are you sure you want to logout?')) {
+    if (confirm(t('settings.feedback.logoutConfirm'))) {
       setIsOpen(false);
       logout();
     }
@@ -48,7 +49,7 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
   const itemBg = surface.subtleBg;
   const dropdownSurfaceClass = getThemeDropdownSurfaceClasses(theme);
 
-  const fullName = user?.name?.trim() || 'User';
+  const fullName = user?.name?.trim() || t('userDropdown.defaultUser');
   const initials = useMemo(() => {
     const parts = fullName.split(/\s+/).filter(Boolean);
     return parts
@@ -56,7 +57,11 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
       .map((part) => part[0]?.toUpperCase() ?? '')
       .join('');
   }, [fullName]);
-  const roleLabel = user?.is_owner ? 'Owner' : user?.is_admin ? 'Administrator' : 'User';
+  const roleLabel = user?.is_owner
+    ? t('userDropdown.role.owner')
+    : user?.is_admin
+      ? t('userDropdown.role.administrator')
+      : t('userDropdown.role.user');
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -65,7 +70,7 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 group cursor-pointer"
-        aria-label="Open user menu"
+        aria-label={t('userDropdown.openMenu')}
         aria-expanded={isOpen}
       >
         <Avatar
@@ -74,7 +79,7 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
         >
           {avatarUrl ? <AvatarImage src={avatarUrl} alt={fullName} /> : null}
           <AvatarFallback className="bg-transparent text-white text-sm font-semibold">
-            {initials || 'U'}
+            {initials || t('userDropdown.defaultInitial')}
           </AvatarFallback>
         </Avatar>
       </button>
@@ -93,12 +98,12 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
               >
                 {avatarUrl ? <AvatarImage src={avatarUrl} alt={fullName} /> : null}
                 <AvatarFallback className="bg-transparent text-white font-semibold">
-                  {initials || 'U'}
+                  {initials || t('userDropdown.defaultInitial')}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <p className={`text-sm font-semibold ${textPrimary}`}>{fullName}</p>
-                <p className={`text-xs ${textMuted}`}>Connected to Home Assistant</p>
+                <p className={`text-xs ${textMuted}`}>{t('userDropdown.connected')}</p>
               </div>
             </div>
 
@@ -106,7 +111,7 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
             <div className={`flex items-center gap-2 px-3 py-2 ${itemBg} rounded-lg`}>
               <Shield className={`w-4 h-4 ${textSecondary}`} />
               <div>
-                <p className={`text-xs ${textMuted}`}>Role</p>
+                <p className={`text-xs ${textMuted}`}>{t('userDropdown.roleLabel')}</p>
                 <p className={`text-sm font-medium ${textPrimary}`}>{roleLabel}</p>
               </div>
             </div>
@@ -120,7 +125,7 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-red-500/10 transition-all`}
             >
               <LogOut className="w-4 h-4" />
-              <span className="text-sm font-medium">Logout</span>
+              <span className="text-sm font-medium">{t('common.logout')}</span>
             </button>
           </div>
         </div>

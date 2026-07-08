@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ThemeAppearancePicker } from '@/app/components/shared/theme/theme-appearance-picker';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { PRIMARY_COLOR_OPTIONS, THEME_OPTIONS } from '@/app/constants/theme-options';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import type { PrimaryColor, ThemeType } from '@/app/hooks/use-theme';
 import type { DashboardOnboardingDialogProps, WizardRoute, WizardStep } from './types';
 
@@ -15,6 +15,7 @@ export function DashboardOnboardingDialog({
   phase = 'idle',
   onClosingAnimationComplete,
 }: DashboardOnboardingDialogProps) {
+  const { t } = useI18n();
   const { theme, primaryColor, setPrimaryColor, setTheme } = useTheme();
   const [isImporting, setIsImporting] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState<WizardRoute>(null);
@@ -117,7 +118,9 @@ export function DashboardOnboardingDialog({
 
   const isClosing = phase === 'closing';
   const routeLabel =
-    selectedRoute === 'all' ? 'Start with all entities' : 'Start with a blank dashboard';
+    selectedRoute === 'all'
+      ? t('dashboard.onboarding.route.all.title')
+      : t('dashboard.onboarding.route.blank.title');
 
   const handleContinueToTheme = (route: Exclude<WizardRoute, null>) => {
     setSelectedRoute(route);
@@ -169,17 +172,17 @@ export function DashboardOnboardingDialog({
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className={`text-[11px] font-semibold uppercase tracking-[0.24em] ${mutedColor}`}>
-              Welcome
+              {t('dashboard.onboarding.welcome')}
             </p>
             <h2 className={`mt-3 text-3xl font-semibold tracking-tight ${textColor}`}>
               {step === 'route'
-                ? 'How should Navet start your dashboard?'
-                : 'Set the initial look before your first reveal.'}
+                ? t('dashboard.onboarding.heading.route')
+                : t('dashboard.onboarding.heading.theme')}
             </h2>
             <p className={`mt-3 max-w-2xl text-sm leading-relaxed ${mutedColor}`}>
               {step === 'route'
-                ? 'Pick a starting route once. Import jumps straight into restore, while fresh starts let you choose the initial theme first.'
-                : 'Choose the base theme and accent color Navet should apply before the dashboard appears for the first time.'}
+                ? t('dashboard.onboarding.body.route')
+                : t('dashboard.onboarding.body.theme')}
             </p>
           </div>
           <div className="flex items-center gap-2 pt-1">
@@ -224,9 +227,11 @@ export function DashboardOnboardingDialog({
               >
                 <Sparkles className="h-5 w-5" style={{ color: accentColor }} />
               </div>
-              <h3 className={`mt-5 text-lg font-semibold ${textColor}`}>Start with all entities</h3>
+              <h3 className={`mt-5 text-lg font-semibold ${textColor}`}>
+                {t('dashboard.onboarding.route.all.title')}
+              </h3>
               <p className={`mt-2 text-sm leading-relaxed ${mutedColor}`}>
-                Show everything Home Assistant exposes, then hide what you do not want.
+                {t('dashboard.onboarding.route.all.body')}
               </p>
             </button>
 
@@ -243,11 +248,10 @@ export function DashboardOnboardingDialog({
                 <Layers3 className="h-5 w-5" style={{ color: accentColor }} />
               </div>
               <h3 className={`mt-5 text-lg font-semibold ${textColor}`}>
-                Start with a blank dashboard
+                {t('dashboard.onboarding.route.blank.title')}
               </h3>
               <p className={`mt-2 text-sm leading-relaxed ${mutedColor}`}>
-                Start with an empty dashboard, then add back only the entities you want from Add
-                Entity.
+                {t('dashboard.onboarding.route.blank.body')}
               </p>
             </button>
 
@@ -267,15 +271,15 @@ export function DashboardOnboardingDialog({
               </div>
               <h3 className={`mt-5 text-lg font-semibold ${textColor}`}>
                 {isClosing
-                  ? 'Preparing your reveal...'
+                  ? t('dashboard.onboarding.route.import.preparing')
                   : isImporting
-                    ? 'Importing config...'
-                    : 'Import a config file'}
+                    ? t('dashboard.onboarding.route.import.importing')
+                    : t('dashboard.onboarding.route.import.title')}
               </h3>
               <p className={`mt-2 text-sm leading-relaxed ${mutedColor}`}>
                 {isClosing
-                  ? 'Sealing the onboarding experience and transitioning into your restored dashboard.'
-                  : 'Restore a previously exported Navet YAML dashboard config instead of starting from scratch.'}
+                  ? t('dashboard.onboarding.route.import.closingBody')
+                  : t('dashboard.onboarding.route.import.body')}
               </p>
             </button>
           </div>
@@ -298,7 +302,9 @@ export function DashboardOnboardingDialog({
                   </div>
                   <div>
                     <p className={`text-sm font-semibold ${textColor}`}>{routeLabel}</p>
-                    <p className={`text-xs ${mutedColor}`}>Step 2 of 2: initial theme setup</p>
+                    <p className={`text-xs ${mutedColor}`}>
+                      {t('dashboard.onboarding.theme.stepLabel')}
+                    </p>
                   </div>
                 </div>
               }
@@ -315,7 +321,7 @@ export function DashboardOnboardingDialog({
               className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium ${borderColor} ${textColor}`}
             >
               <ArrowLeft className="h-4 w-4" />
-              Back
+              {t('dashboard.onboarding.back')}
             </button>
             <button
               type="button"
@@ -327,7 +333,7 @@ export function DashboardOnboardingDialog({
                 boxShadow: `0 18px 40px ${accentColor}40`,
               }}
             >
-              Continue to my dashboard
+              {t('dashboard.onboarding.continue')}
             </button>
           </div>
         ) : null}

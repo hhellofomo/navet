@@ -5,7 +5,7 @@ import { type CardSize, isExtraSmallCardSize } from '@/app/components/shared/car
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { DEFAULT_LIGHT_ICON, LIGHT_ICON_MAP } from '@/app/constants/icon-map';
 import { TEMP_OPTIONS } from '@/app/constants/light-constants';
-import { useHomeAssistant, useTheme } from '@/app/hooks';
+import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
 import { getGradientColors } from '@/app/utils/color-utils';
 import { useBrightnessPresets } from '../../hooks/use-brightness-presets';
@@ -94,6 +94,7 @@ export function useLightCardController({
   const [selectedIcon, setSelectedIcon] = useState(DEFAULT_LIGHT_ICON);
   const { connection, entities } = useHomeAssistant();
   const { theme } = useTheme();
+  const { t } = useI18n();
   const brightnessPresets = useBrightnessPresets(id);
   const rememberLightState = useLightMemoryStore((state) => state.rememberState);
   const setBrightnessPresetValue = useLightPresetStore((state) => state.setBrightnessPresetValue);
@@ -305,11 +306,13 @@ export function useLightCardController({
       try {
         await homeAssistantService.updateLight(id, options);
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : 'Failed to update light');
+        toast.error(
+          error instanceof Error ? error.message : t('lighting.feedback.updateLightFailed')
+        );
         throw error;
       }
     },
-    [id, isHomeAssistantLight]
+    [id, isHomeAssistantLight, t]
   );
 
   const schedulePendingStateReset = useCallback((nextIsOn: boolean, delayMs = 1500) => {
@@ -511,7 +514,7 @@ export function useLightCardController({
   }, []);
 
   const cardInteraction = useEntityCardInteractionController({
-    ariaLabel: `${name} light`,
+    ariaLabel: `${name} ${t('lighting.type.light').toLowerCase()}`,
     ariaPressed: isOn,
     isEditMode,
     onToggle: () => toggleLightState(!isOn),

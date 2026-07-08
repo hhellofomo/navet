@@ -24,12 +24,15 @@
 
 Navet (Swedish for "the hub") is a modern, responsive smart home dashboard built with React and Tailwind CSS v4. Features a stunning frosted glass design inspired by iOS widgets, with comprehensive smart home control capabilities and an intuitive editing system.
 
+Current release channel: `0.1.0-beta.1`. See [docs/VERSIONING.md](docs/VERSIONING.md) for the beta versioning policy.
+
 ## ✨ Features
 
 ### 🎨 Design
 - **iOS-Inspired Interface** - Frosted glass cards with blur effects and smooth animations
 - **4 Theme Modes** - Liquid Glass, Dark, Light, and High Contrast
 - **8 Primary Colors** - Customizable accent colors
+- **Multi-Language UI** - English, Swedish, German, French, and Spanish interface support with locale-aware date, time, and number formatting
 - **Responsive Grid** - 2 columns (mobile) → 4 (tablet) → 6 (desktop)
 - **Adaptive Cards** - Extra-Small, Small, Medium, and Large card sizes
 
@@ -178,6 +181,8 @@ pnpm build
 - Access **Settings** from the user menu
 - Choose from **4 modes**: Liquid Glass, Dark, Light, Contrast
 - Select from **8 colors**: Blue, Purple, Green, Orange, Pink, Red, Teal, Yellow
+- Choose the app **Language** in **Settings -> Appearance** to switch locale-aware interface formatting
+- Theme mode names, descriptions, and shared **Live Preview** labels follow the selected app language
 - In **Settings -> Appearance**, choose whether active light cards use **Ambient bleed** or stay **Contained** inside the card
 - Shared theme-sensitive pieces such as entity icon pills and nav/action pills now resolve through reusable shared primitives rather than per-feature inline styling
 - Inactive/off card shells and text treatment now also resolve through a shared card-state primitive instead of per-card opacity tweaks
@@ -232,7 +237,7 @@ pnpm build
 - Open the **Add** dropdown in edit mode to add custom widgets
 - Choose from **3 widget types**:
   - **📰 RSS Feed** - Live articles from direct RSS URLs or Home Assistant Feedreader sources
-  - **🖼️ Photo Frame** - Beautiful photo carousel with navigation
+  - **🖼️ Photo Frame** - Decorative ambient frame with built-in rotating artwork panels
   - **📝 Quick Note** - Editable sticky notes for reminders
 - Calendar is now provided by live Home Assistant `calendar.*` entity cards instead of a custom widget
 - Available in **3 sizes**: Small, Medium, Large
@@ -334,7 +339,7 @@ Found a bug or have an idea? [Open an issue](https://github.com/awesomestvi/nave
 - [ ] Widget settings (customize content)
 - [ ] Automations management
 - [ ] History and analytics
-- [ ] Multi-language support
+- [x] Multi-language interface support
 - [ ] Voice control integration
 - [ ] Scene management
 - [x] Home Assistant calendar entity integration

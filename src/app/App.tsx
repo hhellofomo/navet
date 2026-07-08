@@ -9,6 +9,7 @@ import { LoadingProvider } from './contexts/loading-context';
 import { LoginPage } from './features/auth/login-page';
 import { DashboardPage } from './features/dashboard';
 import { useHomeAssistant } from './hooks';
+import { I18nProvider } from './i18n';
 import { useSettingsStore } from './stores';
 
 function AppContent() {
@@ -65,13 +66,15 @@ function AppContent() {
 export default function App() {
   return (
     <ConfigProvider>
-      <LoadingProvider>
-        <ErrorProvider>
-          <AuthProvider>
-            <AppContent />
-          </AuthProvider>
-        </ErrorProvider>
-      </LoadingProvider>
+      <I18nProvider>
+        <LoadingProvider>
+          <ErrorProvider>
+            <AuthProvider>
+              <AppContent />
+            </AuthProvider>
+          </ErrorProvider>
+        </LoadingProvider>
+      </I18nProvider>
     </ConfigProvider>
   );
 }

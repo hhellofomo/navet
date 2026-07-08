@@ -1,23 +1,28 @@
+import type { TranslationKey } from '../i18n';
 import type { DeviceCollection } from '../types/device.types';
 
-export const DEVICE_TYPE_LABELS: Record<keyof DeviceCollection, string> = {
-  lights: 'Light',
-  hvac: 'HVAC',
-  climate: 'Climate',
-  power: 'Power',
-  media: 'Media',
-  weather: 'Weather',
-  wifi: 'Wi-Fi',
-  switches: 'Switch',
-  covers: 'Cover',
-  locks: 'Lock',
-  persons: 'Person',
-  sensors: 'Sensor',
-  vacuums: 'Vacuum',
-  calendars: 'Calendar',
-  'grouped-sensors': 'Sensor Group',
+export const DEVICE_TYPE_LABEL_KEYS: Record<keyof DeviceCollection, TranslationKey> = {
+  lights: 'deviceType.light',
+  hvac: 'deviceType.hvac',
+  climate: 'deviceType.climate',
+  power: 'deviceType.power',
+  media: 'deviceType.media',
+  weather: 'deviceType.weather',
+  wifi: 'deviceType.wifi',
+  switches: 'deviceType.switch',
+  covers: 'deviceType.cover',
+  locks: 'deviceType.lock',
+  persons: 'deviceType.person',
+  sensors: 'deviceType.sensor',
+  vacuums: 'deviceType.vacuum',
+  calendars: 'deviceType.calendar',
+  'grouped-sensors': 'deviceType.sensorGroup',
 };
 
-export function getDeviceTypeLabel(type: string): string {
-  return DEVICE_TYPE_LABELS[type as keyof DeviceCollection] ?? type;
+export function getDeviceTypeLabel(
+  type: string,
+  translate?: (key: TranslationKey) => string
+): string {
+  const key = DEVICE_TYPE_LABEL_KEYS[type as keyof DeviceCollection];
+  return key && translate ? translate(key) : type;
 }

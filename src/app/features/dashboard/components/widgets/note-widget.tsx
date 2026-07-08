@@ -2,7 +2,7 @@ import { Check, Edit2, StickyNote } from 'lucide-react';
 import { useState } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { getDashboardWidgetSurfaceTokens } from './widget-surface-tokens';
 
 interface NoteWidgetProps {
@@ -13,8 +13,10 @@ interface NoteWidgetProps {
 
 export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetProps, 'size'>) {
   const { theme, primaryColor } = useTheme();
+  const { t } = useI18n();
   const surface = getDashboardWidgetSurfaceTokens(theme);
-  const [note, setNote] = useState(initialNote || 'Click to add a note...');
+  const emptyNote = t('widgets.note.emptyState');
+  const [note, setNote] = useState(initialNote || emptyNote);
   const [isEditing, setIsEditing] = useState(false);
   const [tempNote, setTempNote] = useState(note);
 
@@ -50,8 +52,12 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
           <StickyNote className="w-5 h-5" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className={`text-sm font-semibold ${surface.textPrimary}`}>Quick Note</h3>
-          <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5`}>Widget</p>
+          <h3 className={`text-sm font-semibold ${surface.textPrimary}`}>
+            {t('widgets.note.title')}
+          </h3>
+          <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5`}>
+            {t('widgets.common.widget')}
+          </p>
         </div>
         {!isEditing && (
           <button
@@ -77,7 +83,7 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
                 backgroundColor: surface.subtleFill,
                 border: `2px solid ${getThemeColorValue(primaryColor)}`,
               }}
-              placeholder="Write your note here..."
+              placeholder={t('widgets.note.placeholder')}
             />
             <div className="flex gap-2 mt-3">
               <button
@@ -86,7 +92,7 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
                 className={`flex-1 rounded-lg py-2 text-xs font-medium transition-colors ${surface.textSecondary}`}
                 style={{ backgroundColor: surface.subtleFill }}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="button"
@@ -96,7 +102,7 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
               >
                 <div className="flex items-center justify-center gap-1">
                   <Check className="w-3 h-3" />
-                  <span>Save</span>
+                  <span>{t('widgets.note.save')}</span>
                 </div>
               </button>
             </div>
@@ -106,7 +112,7 @@ export function NoteWidget({ initialNote = '', onNoteChange }: Omit<NoteWidgetPr
             type="button"
             onClick={handleStartEdit}
             className={`flex-1 p-3 rounded-xl text-sm cursor-pointer transition-colors text-left ${
-              note === 'Click to add a note...' ? surface.textSecondary : surface.textPrimary
+              note === emptyNote ? surface.textSecondary : surface.textPrimary
             }`}
             style={{ backgroundColor: surface.subtleFill }}
           >

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { getCardActionControlSizes } from '@/app/components/shared/card-action-control-sizes';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
+import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import { getMediaControlStyles } from './media-control-styles';
 import { MediaFallbackArtwork } from './media-fallback-artwork';
@@ -47,6 +48,7 @@ export function MediaSmallView({
   onVolumeChange,
   onOpenDialog,
 }: MediaSmallViewProps) {
+  const { t } = useI18n();
   const [showDeferredBackdrop, setShowDeferredBackdrop] = useState(false);
 
   useEffect(() => {
@@ -179,7 +181,7 @@ export function MediaSmallView({
             theme={theme}
             size="medium"
             variant="emphasis"
-            aria-label={isPlaying ? 'Pause playback' : 'Resume playback'}
+            aria-label={isPlaying ? t('media.pausePlayback') : t('media.resumePlayback')}
             onClick={(event) => {
               event.stopPropagation();
               onTogglePlay();
@@ -199,7 +201,7 @@ export function MediaSmallView({
             theme={theme}
             size="small"
             variant="neutral"
-            aria-label="Previous track"
+            aria-label={t('media.previousTrack')}
             onClick={(event) => {
               event.stopPropagation();
               onPrevious();
@@ -235,7 +237,7 @@ export function MediaSmallView({
             theme={theme}
             size="small"
             variant="neutral"
-            aria-label="Next track"
+            aria-label={t('media.nextTrack')}
             onClick={(event) => {
               event.stopPropagation();
               onNext();

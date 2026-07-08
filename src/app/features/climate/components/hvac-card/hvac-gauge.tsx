@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import {
   getHVACBackgroundGlowColor,
   getHVACGaugeColor,
@@ -22,6 +22,7 @@ export const HVACGauge = memo(function HVACGauge({
   currentTemp,
   isOn,
 }: HVACGaugeProps) {
+  const { t } = useI18n();
   const gaugeColors = getHVACGaugeColor(mode);
   const glowColor = getHVACGlowColor(mode);
   const textShadow = getHVACTextShadow(mode);
@@ -39,17 +40,13 @@ export const HVACGauge = memo(function HVACGauge({
   const tickColor = theme === 'light' ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.2)';
   const arcBgStroke = theme === 'light' ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.05)';
   const arcInnerStroke = theme === 'light' ? 'rgba(0, 0, 0, 0.04)' : 'rgba(0, 0, 0, 0.3)';
+  const gaugeLabel = t('climate.gaugeLabel', { mode, temp: targetTemp });
 
   return (
     <div className="relative w-56 h-36">
       {/* SVG Half Circular Gauge */}
-      <svg
-        className="w-full h-full"
-        viewBox="0 0 220 140"
-        role="img"
-        aria-label={`${mode} temperature gauge showing ${targetTemp} degrees`}
-      >
-        <title>{`${mode} temperature gauge showing ${targetTemp} degrees`}</title>
+      <svg className="w-full h-full" viewBox="0 0 220 140" role="img" aria-label={gaugeLabel}>
+        <title>{gaugeLabel}</title>
         {/* Outer glow effect */}
         <defs>
           <linearGradient id={`gauge-gradient-${id}`} x1="0%" y1="0%" x2="100%" y2="0%">
@@ -146,7 +143,9 @@ export const HVACGauge = memo(function HVACGauge({
             {targetTemp}°
           </div>
         </div>
-        <div className={`text-xs ${currentTempColor} mt-2`}>Current {currentTemp}°C</div>
+        <div className={`text-xs ${currentTempColor} mt-2`}>
+          {t('climate.currentTemperature', { temp: currentTemp })}
+        </div>
       </div>
     </div>
   );

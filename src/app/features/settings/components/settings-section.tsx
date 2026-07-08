@@ -1,4 +1,5 @@
 import { Info, LayoutGrid, Palette, Server } from 'lucide-react';
+import { useI18n } from '@/app/hooks';
 import { useSettingsSectionController } from '../hooks/use-settings-section-controller';
 import { SettingsAppearanceSection } from './settings-appearance-section';
 import { SettingsDashboardSection } from './settings-dashboard-section';
@@ -6,20 +7,20 @@ import { SettingsProjectSection } from './settings-project-section';
 import { SettingsHero } from './settings-section-shell';
 import { SettingsSystemSection } from './settings-system-section';
 
-const NAV_ITEMS = [
-  { id: 'appearance', label: 'Appearance', icon: Palette },
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
-  { id: 'system', label: 'System', icon: Server },
-  { id: 'project', label: 'Project', icon: Info },
-] as const;
-
 export function SettingsSection() {
+  const { t } = useI18n();
   const controller = useSettingsSectionController();
+  const navItems = [
+    { id: 'appearance', label: t('settings.nav.appearance'), icon: Palette },
+    { id: 'dashboard', label: t('settings.nav.dashboard'), icon: LayoutGrid },
+    { id: 'system', label: t('settings.nav.system'), icon: Server },
+    { id: 'project', label: t('settings.nav.project'), icon: Info },
+  ] as const;
 
   return (
     <div className="h-full overflow-y-auto px-4 py-4 md:px-6 md:py-6">
       <div className="mx-auto max-w-6xl space-y-8">
-        <SettingsHero navItems={[...NAV_ITEMS]} styles={controller.styles} />
+        <SettingsHero navItems={[...navItems]} styles={controller.styles} />
         <SettingsAppearanceSection controller={controller} />
         <SettingsDashboardSection controller={controller} />
         <SettingsSystemSection controller={controller} />

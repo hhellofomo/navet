@@ -9,7 +9,7 @@ import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-c
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { CaptionValue } from '@/app/components/ui/caption-value';
 import { CardWrapper } from '@/app/components/ui/card-wrapper';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { type WeatherCondition, WeatherIcon } from './weather-icon';
 
 // Re-export types
@@ -65,6 +65,7 @@ export const WeatherCard = memo(function WeatherCard({
   isEditMode,
 }: WeatherCardProps) {
   const { theme } = useTheme();
+  const { formatDate, formatTime, t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
   const shell = getAccentCardShellTokens(theme, 'blue');
@@ -74,12 +75,8 @@ export const WeatherCard = memo(function WeatherCard({
 
   // Get current date and time
   const now = new Date();
-  const dayName = now.toLocaleDateString('en-US', { weekday: 'long' });
-  const time = now.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
+  const dayName = formatDate(now, { weekday: 'long' });
+  const time = formatTime(now, { hour: 'numeric', minute: '2-digit' }, true);
   const dateTime = `${dayName}, ${time}`;
 
   // Theme-aware colors
@@ -118,7 +115,9 @@ export const WeatherCard = memo(function WeatherCard({
             >
               {location}
             </h3>
-            <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5`}>Weather</p>
+            <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5`}>
+              {t('weather.subtitle')}
+            </p>
             {!isSmall && <p className={`text-xs ${textSecondary}`}>{dateTime}</p>}
           </div>
           <div
@@ -154,9 +153,21 @@ export const WeatherCard = memo(function WeatherCard({
 
               {/* Weather Details - Right Aligned */}
               <div className="space-y-0.5 flex-shrink-0">
-                <CaptionValue caption="Precipitation" value={`${precipitation}%`} align="right" />
-                <CaptionValue caption="Humidity" value={`${humidity}%`} align="right" />
-                <CaptionValue caption="Wind" value={`${windSpeed} km/h`} align="right" />
+                <CaptionValue
+                  caption={t('weather.precipitation')}
+                  value={`${precipitation}%`}
+                  align="right"
+                />
+                <CaptionValue
+                  caption={t('weather.humidity')}
+                  value={`${humidity}%`}
+                  align="right"
+                />
+                <CaptionValue
+                  caption={t('weather.wind')}
+                  value={`${windSpeed} km/h`}
+                  align="right"
+                />
               </div>
             </div>
 

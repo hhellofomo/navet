@@ -1,11 +1,13 @@
 import { Bell, CalendarDays, Clock3, Search, X } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
+import { AppReleaseBadge } from '@/app/components/shared/app-release-badge';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useAuth } from '@/app/contexts/auth-context';
 import { NotificationPanel } from '@/app/features/notifications';
 import { useNotifications } from '@/app/features/notifications/components/notifications/use-notifications';
-import { useDevices, useHomeAssistant, useSearch, useTheme } from '@/app/hooks';
+import { useDevices, useHomeAssistant, useI18n, useSearch, useTheme } from '@/app/hooks';
+import { getWeekNumber } from '@/app/utils/format';
 import { UserDropdown } from './user-dropdown';
 
 export const Header = memo(function Header() {
@@ -20,6 +22,7 @@ export const Header = memo(function Header() {
     useSearch();
   const devices = useDevices();
   const { unreadCount } = useNotifications();
+  const { formatDate, formatTime, t } = useI18n();
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -116,11 +119,11 @@ export const Header = memo(function Header() {
   const firstName = useMemo(() => {
     const fullName = user?.name?.trim();
     if (!fullName) {
-      return 'there';
+      return t('header.guestName');
     }
 
     return fullName.split(/\s+/)[0];
-  }, [user?.name]);
+  }, [t, user?.name]);
 
   const avatarUrl = useMemo(() => {
     const entityPicture = Object.values(entities ?? {}).find((entity) => {
@@ -148,32 +151,26 @@ export const Header = memo(function Header() {
   }, [authConfig, entities, user?.name]);
 
   const formattedDate = useMemo(
-    () =>
-      new Intl.DateTimeFormat(undefined, {
-        weekday: 'short',
-        month: 'long',
-        day: 'numeric',
-      }).format(currentDateTime),
-    [currentDateTime]
+    () => formatDate(currentDateTime, { weekday: 'short', month: 'long', day: 'numeric' }),
+    [currentDateTime, formatDate]
   );
 
   const formattedTime = useMemo(
-    () =>
-      new Intl.DateTimeFormat(undefined, {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      }).format(currentDateTime),
-    [currentDateTime]
+    () => formatTime(currentDateTime, { hour: '2-digit', minute: '2-digit' }, false),
+    [currentDateTime, formatTime]
   );
+  const weekNumber = useMemo(() => getWeekNumber(currentDateTime), [currentDateTime]);
 
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div className="flex items-center gap-4 md:gap-6 flex-1">
         <div>
-          <h1 className={`text-2xl md:text-4xl font-bold ${textPrimary} mb-1`}>
-            Hello, {firstName}!
-          </h1>
+          <div className="mb-1 flex flex-wrap items-center gap-2">
+            <h1 className={`text-2xl md:text-4xl font-bold ${textPrimary}`}>
+              {t('header.greeting', { name: firstName })}
+            </h1>
+            <AppReleaseBadge className="translate-y-[1px]" />
+          </div>
           <div className={`${textSecondary} flex flex-wrap items-center gap-3 text-xs md:text-sm`}>
             <div className="flex items-center gap-1.5">
               <Clock3 className="h-3.5 w-3.5" />
@@ -185,7 +182,7 @@ export const Header = memo(function Header() {
             </div>
             <div className="flex items-center gap-1.5">
               <CalendarDays className="h-3.5 w-3.5" />
-              <span>Week 11</span>
+              <span>{t('header.weekLabel', { week: weekNumber })}</span>
             </div>
           </div>
         </div>
@@ -196,7 +193,7 @@ export const Header = memo(function Header() {
           <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textSecondary}`} />
           <input
             type="text"
-            placeholder="Search devices"
+            placeholder={t('header.searchPlaceholder')}
             value={searchQuery}
             onChange={handleSearchChange}
             onFocus={() => setIsSearchFocused(true)}

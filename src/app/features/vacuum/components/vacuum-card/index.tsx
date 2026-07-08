@@ -9,7 +9,7 @@ import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { useVacuumControl } from '../vacuum/use-vacuum-control';
 import { VacuumControlsLarge } from '../vacuum/vacuum-controls-large';
 import { VacuumControlsMedium } from '../vacuum/vacuum-controls-medium';
@@ -52,6 +52,7 @@ export const VacuumCard = memo(function VacuumCard({
     handleReturnHome,
   } = useVacuumControl({ initialStatus: status });
   const { theme, colors } = useTheme();
+  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const isActive = currentStatus === 'cleaning' || currentStatus === 'returning';
   const stateSurface = getCardStateSurfaceTokens(theme, isActive);
@@ -87,7 +88,7 @@ export const VacuumCard = memo(function VacuumCard({
         <div className="relative h-full flex flex-col">
           <EntityCardHeader
             title={name}
-            subtitle="Vacuum"
+            subtitle={t('vacuum.subtitle')}
             size={size}
             leading={
               <EntityCardHeaderIcon

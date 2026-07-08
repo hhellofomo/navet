@@ -1,3 +1,4 @@
+import { useI18n } from '@/app/hooks';
 import { CalendarEventItem } from './calendar-event-item';
 import { getCalendarDateParts } from './calendar-formatters';
 import type { CalendarEvent, CalendarEventGroup } from './types';
@@ -19,7 +20,8 @@ interface CalendarAgendaListProps {
 }
 
 export function CalendarDateRail({ date, textPrimary, textSecondary }: CalendarDateRailProps) {
-  const { weekdayShort, dayNumber, monthShort } = getCalendarDateParts(date);
+  const { locale } = useI18n();
+  const { weekdayShort, dayNumber, monthShort } = getCalendarDateParts(date, locale);
 
   return (
     <div className="flex w-[42px] flex-shrink-0 flex-col items-center pt-1 text-center">

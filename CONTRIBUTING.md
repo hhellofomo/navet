@@ -182,6 +182,8 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `test:` - Adding or updating tests
 - `chore:` - Maintenance tasks
 
+Version bumps follow the beta semver policy in [docs/VERSIONING.md](docs/VERSIONING.md). While Navet is in beta, prefer `0.x.y` and `0.x.y-beta.n` over `1.0.0`.
+
 Examples:
 ```
 feat(calendar): add source selection to card settings
@@ -267,7 +269,7 @@ If applicable, add screenshots.
 **Environment:**
 - OS: [e.g., macOS, Windows, Linux]
 - Browser: [e.g., Chrome, Firefox, Safari]
-- Version: [e.g., 1.0.0]
+- Version: [e.g., 0.1.0-beta.1]
 
 **Additional Context**
 Any other context about the problem.

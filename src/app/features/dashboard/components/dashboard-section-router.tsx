@@ -12,6 +12,7 @@ import {
 import { EmptyState } from '@/app/components/shared/empty-state';
 import { LoadingSpinner } from '@/app/components/shared/loading-spinner';
 import { RenderProfiler } from '@/app/components/shared/render-profiler';
+import { useI18n } from '@/app/hooks';
 import { AllViewGrid } from '../all-view-grid';
 import { DeviceGrid } from '../device-grid';
 import type { DashboardController } from '../hooks/use-dashboard-controller';
@@ -28,6 +29,7 @@ interface DashboardSectionRouterProps {
 }
 
 export function DashboardSectionRouter({ controller }: DashboardSectionRouterProps) {
+  const { t } = useI18n();
   const {
     activeRoom,
     activeSection,
@@ -106,14 +108,14 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
           ) : (
             <EmptyState
               icon={Lightbulb}
-              title="No Lights"
+              title={t('dashboard.shell.noLightsTitle')}
               description={
                 hiddenEntityIds.length > 0
-                  ? 'All light entities have been removed from the dashboard.'
-                  : 'No Home Assistant light entities are currently available.'
+                  ? t('dashboard.shell.noLightsHidden')
+                  : t('dashboard.shell.noLightsEmpty')
               }
               actionIcon={Lightbulb}
-              actionLabel={hiddenEntityIds.length > 0 ? 'Add Entity' : undefined}
+              actionLabel={hiddenEntityIds.length > 0 ? t('dashboard.addEntity.title') : undefined}
               onAction={hiddenEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
             />
           )}
@@ -141,7 +143,7 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
   if (activeSection === 'settings') {
     return (
       <DashboardLayout>
-        <Suspense fallback={<LoadingSpinner message="Loading settings..." />}>
+        <Suspense fallback={<LoadingSpinner message={t('dashboard.shell.loadingSettings')} />}>
           <RenderProfiler id="SettingsSection">
             <SettingsSection />
           </RenderProfiler>
@@ -170,7 +172,7 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
             onMoveRoom={onMoveRoom}
             onAddCard={onOpenAddCardDialog}
             onAddEntity={addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
-            addEntityLabel="Add Entity"
+            addEntityLabel={t('dashboard.addEntity.title')}
           />
 
           {activeRoom === 'All' ? (
@@ -212,10 +214,10 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
           {deviceMap.size === 0 && customCards.length === 0 && activeRoom === 'All' && (
             <EmptyState
               icon={Lightbulb}
-              title="No Visible Entities"
-              description="Your dashboard is empty. Add entities from your hidden list or add custom cards to start building it."
+              title={t('dashboard.shell.noVisibleEntitiesTitle')}
+              description={t('dashboard.shell.noVisibleEntitiesDescription')}
               actionIcon={Lightbulb}
-              actionLabel={addableEntityIds.length > 0 ? 'Add Entity' : undefined}
+              actionLabel={addableEntityIds.length > 0 ? t('dashboard.addEntity.title') : undefined}
               onAction={addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
             />
           )}

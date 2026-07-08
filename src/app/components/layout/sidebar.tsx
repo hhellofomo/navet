@@ -2,11 +2,12 @@ import { Clipboard, FlaskConical, Home, Lightbulb, Lock, Settings, Tv, Video } f
 import { memo, useEffect, useRef, useState } from 'react';
 import { InteractivePill } from '@/app/components/shared/interactive-pill';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { type Section, useNavigation, useTheme } from '@/app/hooks';
+import { type Section, useI18n, useNavigation, useTheme } from '@/app/hooks';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 
 export const Sidebar = memo(function Sidebar() {
   const { theme } = useTheme();
+  const { t } = useI18n();
   const { activeSection, setActiveSection } = useNavigation();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
@@ -40,49 +41,49 @@ export const Sidebar = memo(function Sidebar() {
   const menuItems = [
     {
       icon: Home,
-      label: 'Home',
+      label: t('sidebar.home'),
       section: 'home' as Section,
       onClick: () => setActiveSection('home'),
     },
     {
       icon: Video,
-      label: 'Security',
+      label: t('sidebar.security'),
       section: 'security' as Section,
       onClick: () => setActiveSection('security'),
     },
     {
       icon: Clipboard,
-      label: 'Tasks',
+      label: t('sidebar.tasks'),
       section: 'tasks' as Section,
       onClick: () => setActiveSection('tasks'),
     },
     {
       icon: Lock,
-      label: 'Locks',
+      label: t('sidebar.locks'),
       section: 'locks' as Section,
       onClick: () => setActiveSection('locks'),
     },
     {
       icon: Lightbulb,
-      label: 'Lights',
+      label: t('sidebar.lights'),
       section: 'lights' as Section,
       onClick: () => setActiveSection('lights'),
     },
     {
       icon: Tv,
-      label: 'Media',
+      label: t('sidebar.media'),
       section: 'media' as Section,
       onClick: () => setActiveSection('media'),
     },
     {
       icon: FlaskConical,
-      label: 'Mock',
+      label: t('sidebar.mock'),
       section: 'mock' as Section,
       onClick: () => setActiveSection('mock'),
     },
     {
       icon: Settings,
-      label: 'Settings',
+      label: t('sidebar.settings'),
       section: 'settings' as Section,
       onClick: () => setActiveSection('settings'),
     },
@@ -96,7 +97,11 @@ export const Sidebar = memo(function Sidebar() {
       >
         <div className="flex w-full justify-center pt-8">
           <div className="flex h-10 w-10 items-center justify-center">
-            <ImageWithFallback src="/logo.svg" alt="Brand Logo" className="h-10 w-10" />
+            <ImageWithFallback
+              src="/logo.svg"
+              alt={t('sidebar.brandLogoAlt')}
+              className="h-10 w-10"
+            />
           </div>
         </div>
 

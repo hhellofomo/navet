@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { getDeviceEditorSurfaceTokens } from './device-editor-surface-tokens';
 
 interface ColorSelectorSectionProps {
@@ -21,6 +21,7 @@ export const ColorSelectorSection = memo(function ColorSelectorSection({
   onCustomColorChange,
 }: ColorSelectorSectionProps) {
   const { primaryColor } = useTheme();
+  const { t } = useI18n();
   const activeColor = getThemeColorValue(primaryColor);
   const editorSurface = getDeviceEditorSurfaceTokens(isOn);
   return (
@@ -28,7 +29,7 @@ export const ColorSelectorSection = memo(function ColorSelectorSection({
       <span
         className={`mb-4 block text-sm font-medium transition-colors duration-500 ${editorSurface.sectionLabelClassName}`}
       >
-        Light Color
+        {t('lighting.lightColor')}
       </span>
 
       {/* Preset Colors + Custom Color Button */}
@@ -54,7 +55,7 @@ export const ColorSelectorSection = memo(function ColorSelectorSection({
           className={`w-full aspect-square rounded-full transition-all duration-300 flex items-center justify-center cursor-pointer relative overflow-hidden ${
             isOn ? 'hover:scale-110' : editorSurface.disabledCircleClassName
           }`}
-          title="Custom color picker"
+          title={t('lighting.customColorPicker')}
           style={{
             background: `linear-gradient(135deg, ${customColor} 0%, ${customColor}cc 45%, rgba(255, 255, 255, 0.9) 100%)`,
             boxShadow: selectedColor === customColor ? `0 0 0 4px ${activeColor}` : undefined,

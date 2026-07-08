@@ -7,7 +7,7 @@ import {
 } from '@/app/components/shared/card-size-selector';
 import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 
 interface WifiCardProps {
   networkName: string;
@@ -30,6 +30,7 @@ export const WifiCard = memo(function WifiCard({
 }: WifiCardProps) {
   const cardId = 'wifi-1';
   const { theme } = useTheme();
+  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
   const shell = getAccentCardShellTokens(theme, 'green');
@@ -71,9 +72,11 @@ export const WifiCard = memo(function WifiCard({
             <h3
               className={`font-semibold ${textPrimary} truncate ${isSmall ? 'text-xs' : 'text-sm'}`}
             >
-              Wi-Fi
+              {t('wifi.title')}
             </h3>
-            <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5`}>Network</p>
+            <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5`}>
+              {t('wifi.subtitle')}
+            </p>
             {!isSmall && <p className={`text-xs ${textSecondary} truncate`}>{networkName}</p>}
           </div>
           <div

@@ -9,7 +9,7 @@ import {
 } from '@/app/components/shared/device-editor';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { PRESET_COLORS } from '@/app/constants/light-constants';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { CustomColorTrigger } from './custom-color-trigger';
 import { LightCardHeader } from './light-card-header';
 import type { HeaderIconButtonProps, LightBrightnessPreset } from './light-card-types';
@@ -49,6 +49,7 @@ export const LightCardLarge = memo(function LightCardLarge({
   showSettingsButton,
 }: Omit<LightCardLargeProps, 'room'>) {
   const { theme } = useTheme();
+  const { t } = useI18n();
   const stateSurface = getCardStateSurfaceTokens(theme, isOn);
   const secondaryTextColor = stateSurface.secondaryTextClassName;
   const textColor = stateSurface.primaryTextClassName;
@@ -69,7 +70,7 @@ export const LightCardLarge = memo(function LightCardLarge({
         {/* Brightness section */}
         <div className="mb-2">
           <div className="flex items-baseline justify-between mb-2">
-            <div className={`text-xs ${secondaryTextColor}`}>Brightness</div>
+            <div className={`text-xs ${secondaryTextColor}`}>{t('lighting.brightness')}</div>
             <div className={`text-2xl font-bold ${textColor}`}>{brightness}%</div>
           </div>
           <BrightnessSlider
@@ -94,7 +95,7 @@ export const LightCardLarge = memo(function LightCardLarge({
 
         {supportsColorControl && (
           <div className="space-y-2">
-            <div className={`text-xs ${secondaryTextColor}`}>Colors</div>
+            <div className={`text-xs ${secondaryTextColor}`}>{t('lighting.colors')}</div>
             <div className="flex items-center gap-2">
               <div className="flex gap-2 flex-1">
                 <ColorPicker

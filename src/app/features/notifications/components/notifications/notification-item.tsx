@@ -1,6 +1,6 @@
 import { InteractivePill } from '@/app/components/shared/interactive-pill';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
-import type { PrimaryColor, ThemeType } from '@/app/hooks';
+import { type PrimaryColor, type ThemeType, useI18n } from '@/app/hooks';
 import { getNotificationSurfaceTokens } from './notification-surface-tokens';
 import { getNotificationColor, getNotificationIcon } from './notification-utils';
 import type { Notification } from './use-notifications';
@@ -22,15 +22,19 @@ export function NotificationItem({
   primaryColor,
   formatTimestamp,
 }: NotificationItemProps) {
+  const { t } = useI18n();
   const surface = getNotificationSurfaceTokens(theme);
   const NotificationIcon = getNotificationIcon(notification.type);
   const primaryActionLabel =
     notification.source === 'update'
       ? notification.requiresRestart
-        ? 'Restart'
-        : 'Update'
-      : 'Mark as read';
-  const secondaryActionLabel = notification.source === 'update' ? 'Hide' : 'Delete';
+        ? t('notifications.action.restart')
+        : t('notifications.action.update')
+      : t('notifications.action.markAsRead');
+  const secondaryActionLabel =
+    notification.source === 'update'
+      ? t('notifications.action.hide')
+      : t('notifications.action.delete');
   const accentColor = getNotificationColor(notification.type, primaryColor);
   const unreadIndicatorColor = getThemeColorValue(primaryColor);
   const iconColor =

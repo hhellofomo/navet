@@ -20,6 +20,7 @@ import { memo } from 'react';
 import { Checkbox } from '@/app/components/ui/checkbox';
 import { Label } from '@/app/components/ui/label';
 import type { BrightnessPresetKey } from '@/app/features/lighting';
+import { useI18n } from '@/app/hooks';
 import { getDeviceEditorSurfaceTokens } from './device-editor-surface-tokens';
 
 interface BrightnessPresetEditorItem {
@@ -47,6 +48,7 @@ export const BrightnessPresetEditor = memo(function BrightnessPresetEditor({
   onOnlyApplyToThisLightChange,
 }: BrightnessPresetEditorProps) {
   const editorSurface = getDeviceEditorSurfaceTokens(isOn);
+  const { t } = useI18n();
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -85,7 +87,7 @@ export const BrightnessPresetEditor = memo(function BrightnessPresetEditor({
         <span
           className={`text-sm font-medium transition-colors duration-500 ${editorSurface.sectionLabelClassName}`}
         >
-          Edit Brightness Presets
+          {t('lighting.editBrightnessPresets')}
         </span>
       </div>
 
@@ -97,7 +99,7 @@ export const BrightnessPresetEditor = memo(function BrightnessPresetEditor({
             id="brightness-preset-scope"
             checked={onlyApplyToThisLight}
             onCheckedChange={(checked) => onOnlyApplyToThisLightChange(checked === true)}
-            aria-label="Only apply brightness preset changes to this light"
+            aria-label={t('lighting.onlyApplyToThisLight')}
             className="mt-0.5"
           />
           <div className="min-w-0 flex-1">
@@ -105,10 +107,10 @@ export const BrightnessPresetEditor = memo(function BrightnessPresetEditor({
               htmlFor="brightness-preset-scope"
               className={`text-sm ${editorSurface.settingLabelClassName}`}
             >
-              Only apply to this light
+              {t('lighting.onlyApplyToThisLight')}
             </Label>
             <p className={`mt-1 text-xs ${editorSurface.settingDescriptionClassName}`}>
-              Leave this off to update brightness preset values and ordering for all lights.
+              {t('lighting.applyToAllLightsDescription')}
             </p>
           </div>
         </div>
@@ -144,6 +146,7 @@ const BrightnessPresetEditorRow = memo(function BrightnessPresetEditorRow({
   onPresetValueChange,
 }: BrightnessPresetEditorRowProps) {
   const editorSurface = getDeviceEditorSurfaceTokens(isOn);
+  const { t } = useI18n();
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: preset.key,
   });
@@ -160,7 +163,7 @@ const BrightnessPresetEditorRow = memo(function BrightnessPresetEditorRow({
     >
       <button
         type="button"
-        aria-label={`Reorder ${preset.label} preset`}
+        aria-label={t('lighting.reorderPreset', { preset: preset.label })}
         className={`flex h-9 w-5 touch-none items-center justify-center rounded-md transition-colors ${editorSurface.dragHandleClassName}`}
         {...attributes}
         {...listeners}
@@ -180,7 +183,7 @@ const BrightnessPresetEditorRow = memo(function BrightnessPresetEditorRow({
         </div>
       </div>
       <label className="sr-only" htmlFor={`brightness-preset-${preset.key}`}>
-        {preset.label} brightness preset
+        {t('lighting.brightnessPresetField', { preset: preset.label })}
       </label>
       <input
         id={`brightness-preset-${preset.key}`}

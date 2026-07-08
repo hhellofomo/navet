@@ -1,7 +1,7 @@
 import { memo, useState } from 'react';
 import { toast } from 'sonner';
 import { isCompactCardSize } from '@/app/components/shared/card-size-selector';
-import { useHomeAssistant, useTheme } from '@/app/hooks';
+import { useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 import { RSSFeedSettingsDialog } from './settings-dialog';
 import type { RSSFeedCardProps } from './types';
 import { useRSSFeedItems } from './use-rss-feed-items';
@@ -16,6 +16,7 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
 }: RSSFeedCardProps) {
   const { entities } = useHomeAssistant();
   const { theme, colors, primaryColor } = useTheme();
+  const { t } = useI18n();
   const isSmall = isCompactCardSize(size);
   const isMedium = size === 'medium';
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -58,18 +59,24 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
 
     if (removedCount > 0 && deselectedCount > 0) {
       toast.success(
-        `Deleted ${removedCount} feed${removedCount === 1 ? '' : 's'} and cleared ${deselectedCount} Home Assistant source${deselectedCount === 1 ? '' : 's'}`
+        t('rss.feedback.deletedAndCleared', { feeds: removedCount, sources: deselectedCount })
       );
       return;
     }
 
     if (removedCount > 0) {
-      toast.success(`Deleted ${removedCount} feed${removedCount === 1 ? '' : 's'}`);
+      toast.success(
+        removedCount === 1
+          ? t('rss.feedback.deletedFeed.one', { count: removedCount })
+          : t('rss.feedback.deletedFeed.other', { count: removedCount })
+      );
       return;
     }
 
     toast.success(
-      `Cleared ${deselectedCount} Home Assistant source${deselectedCount === 1 ? '' : 's'}`
+      deselectedCount === 1
+        ? t('rss.feedback.clearedSource.one', { count: deselectedCount })
+        : t('rss.feedback.clearedSource.other', { count: deselectedCount })
     );
   };
 
@@ -97,7 +104,7 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
       <RSSFeedSettingsDialog
         isOpen={isSettingsOpen}
         onOpenChange={setIsSettingsOpen}
-        title="this RSS card"
+        title={t('rss.title')}
         theme={theme}
         providers={providers}
         selectedProviderIds={selectedProviderIds}
@@ -106,24 +113,24 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
           try {
             new URL(feedUrl);
           } catch {
-            toast.error('Enter a valid feed URL');
+            toast.error(t('rss.feedback.invalidUrl'));
             return false;
           }
 
           const nextProvider = addProvider(name, feedUrl);
           if (!nextProvider) {
-            toast.error('Add a name and feed URL');
+            toast.error(t('rss.feedback.addNameAndUrl'));
             return false;
           }
 
-          toast.success(`Added ${nextProvider.name}`);
+          toast.success(t('rss.feedback.addedProvider', { name: nextProvider.name }));
           return true;
         }}
         onRemoveProvider={(providerId) => {
           const provider = providers.find((candidate) => candidate.id === providerId);
           removeProvider(providerId);
           if (provider) {
-            toast.success(`Removed ${provider.name}`);
+            toast.success(t('rss.feedback.removedProvider', { name: provider.name }));
           }
         }}
         onDeleteSelectedProviders={handleDeleteSelectedProviders}

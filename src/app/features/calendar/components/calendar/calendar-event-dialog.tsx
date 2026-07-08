@@ -2,7 +2,9 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Calendar, CalendarDays, ExternalLink, FileText, MapPin } from 'lucide-react';
 import { DialogHeader } from '@/app/components/shared/device-editor';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
+import { formatCalendarEventTimeLabel } from './calendar-formatters';
 import type { CalendarEvent } from './types';
 
 interface CalendarEventDialogProps {
@@ -18,6 +20,7 @@ export function CalendarEventDialog({
   onOpenChange,
   theme,
 }: CalendarEventDialogProps) {
+  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const isOn = theme !== 'light';
 
@@ -34,22 +37,24 @@ export function CalendarEventDialog({
         >
           <DialogHeader
             title={event.title}
-            description={`${event.startTime} - ${event.endTime}`}
+            description={formatCalendarEventTimeLabel(event, t('calendar.allDay'))}
             isOn={isOn}
           />
 
           <div className="space-y-4">
             <div className={`rounded-2xl border p-4 ${surface.border} ${surface.subtleBg}`}>
-              <div className={`mb-3 text-xs font-medium ${surface.textSecondary}`}>Details</div>
+              <div className={`mb-3 text-xs font-medium ${surface.textSecondary}`}>
+                {t('calendar.event.details')}
+              </div>
               <div className="space-y-3 text-sm">
                 <div className={`flex items-center gap-2 ${surface.textPrimary}`}>
                   <CalendarDays className="h-4 w-4" />
-                  <span>{event.sourceName ?? 'Calendar'}</span>
+                  <span>{event.sourceName ?? t('calendar.defaultSourceName')}</span>
                 </div>
 
                 <div className={`flex items-center gap-2 ${surface.textPrimary}`}>
                   <Calendar className="h-4 w-4" />
-                  <span>Event</span>
+                  <span>{t('calendar.event.type')}</span>
                 </div>
 
                 {event.location && (
@@ -86,7 +91,7 @@ export function CalendarEventDialog({
                   className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium ${surface.textPrimary} ${surface.subtleBg} ${surface.hoverBg}`}
                 >
                   <ExternalLink className="h-4 w-4" />
-                  Open Map
+                  {t('calendar.event.openMap')}
                 </button>
               )}
 
@@ -95,7 +100,7 @@ export function CalendarEventDialog({
                   type="button"
                   className={`rounded-xl px-4 py-2 text-sm font-medium ${surface.textPrimary} ${surface.subtleBg} ${surface.hoverBg}`}
                 >
-                  Done
+                  {t('common.done')}
                 </button>
               </Dialog.Close>
             </div>

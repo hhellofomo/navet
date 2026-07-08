@@ -2,6 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Home, Play } from 'lucide-react';
 import { DialogHeader } from '@/app/components/shared/device-editor';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
+import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import { getVacuumSettingsDialogSurface } from './vacuum-settings-dialog-surface';
 
@@ -28,7 +29,9 @@ export function VacuumSettingsDialog({
   theme,
   accentColorValue,
 }: VacuumSettingsDialogProps) {
+  const { t } = useI18n();
   const dialogSurface = getVacuumSettingsDialogSurface(theme);
+  const fanSpeeds = [t('vacuum.speed.quiet'), t('vacuum.speed.standard'), t('vacuum.speed.max')];
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={onClose}>
@@ -39,10 +42,12 @@ export function VacuumSettingsDialog({
         >
           <div className="p-6 pb-0">
             <DialogHeader
-              title={`${name} Settings`}
+              title={t('vacuum.settings.title', { name })}
               description={`${name} - ${room}`}
               isOn={theme !== 'light'}
-              trailing={<EntityRoomSelector entityId={entityId} label="Room" compact />}
+              trailing={
+                <EntityRoomSelector entityId={entityId} label={t('vacuum.settings.room')} compact />
+              }
             />
           </div>
 
@@ -50,10 +55,15 @@ export function VacuumSettingsDialog({
             {/* Cleaning Modes */}
             <div>
               <h3 className={`mb-3 text-sm font-semibold ${dialogSurface.headingClassName}`}>
-                Cleaning Mode
+                {t('vacuum.settings.cleaningMode')}
               </h3>
               <div className="grid grid-cols-2 gap-2">
-                {['Auto', 'Spot', 'Edge', 'Room'].map((mode) => (
+                {[
+                  t('vacuum.mode.auto'),
+                  t('vacuum.mode.spot'),
+                  t('vacuum.mode.edge'),
+                  t('vacuum.mode.room'),
+                ].map((mode) => (
                   <button
                     type="button"
                     key={mode}
@@ -68,10 +78,10 @@ export function VacuumSettingsDialog({
             {/* Fan Speed */}
             <div>
               <h3 className={`mb-3 text-sm font-semibold ${dialogSurface.headingClassName}`}>
-                Fan Speed
+                {t('vacuum.settings.fanSpeed')}
               </h3>
               <div className="grid grid-cols-3 gap-2">
-                {['Quiet', 'Standard', 'Max'].map((speed) => (
+                {fanSpeeds.map((speed) => (
                   <button
                     type="button"
                     key={speed}
@@ -86,7 +96,7 @@ export function VacuumSettingsDialog({
             {/* Actions */}
             <div>
               <h3 className={`mb-3 text-sm font-semibold ${dialogSurface.headingClassName}`}>
-                Actions
+                {t('vacuum.settings.actions')}
               </h3>
               <div className="space-y-2">
                 <button
@@ -96,7 +106,7 @@ export function VacuumSettingsDialog({
                   style={{ backgroundColor: accentColorValue }}
                 >
                   <Play className="w-4 h-4" />
-                  Start Cleaning
+                  {t('vacuum.action.startCleaning')}
                 </button>
                 <button
                   type="button"
@@ -104,7 +114,7 @@ export function VacuumSettingsDialog({
                   className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 font-medium transition-colors ${dialogSurface.secondaryButtonClassName}`}
                 >
                   <Home className="w-4 h-4" />
-                  Return to Dock
+                  {t('vacuum.action.returnToDock')}
                 </button>
               </div>
             </div>

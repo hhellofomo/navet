@@ -4,6 +4,7 @@ import {
   useCallback,
   useMemo,
 } from 'react';
+import { useI18n } from '@/app/hooks';
 import { type EntityInteractionMode, useSettingsStore } from '@/app/stores';
 
 type CardAction = 'toggle' | 'controls' | 'settings';
@@ -15,12 +16,6 @@ interface UseEntityCardInteractionControllerOptions {
   onToggle?: () => void;
   onOpenControls?: () => void;
   onOpenSettings?: () => void;
-}
-
-interface InteractionPreviewConfig {
-  cardTap: string;
-  iconTap: string;
-  settingsTap: string;
 }
 
 const NESTED_INTERACTIVE_SELECTOR = [
@@ -35,25 +30,8 @@ const NESTED_INTERACTIVE_SELECTOR = [
   '[role="button"]',
 ].join(', ');
 
-const interactionPreviewMap: Record<EntityInteractionMode, InteractionPreviewConfig> = {
-  'control-first': {
-    cardTap: 'Open controls',
-    iconTap: 'Toggle device',
-    settingsTap: 'Open settings',
-  },
-  'toggle-first': {
-    cardTap: 'Toggle device',
-    iconTap: 'Toggle device',
-    settingsTap: 'Open settings',
-  },
-};
-
 export const normalizeInteractionMode = (mode: string | null | undefined): EntityInteractionMode =>
   mode === 'control-first' ? 'control-first' : 'toggle-first';
-
-export const getInteractionPreview = (
-  mode: EntityInteractionMode = 'toggle-first'
-): InteractionPreviewConfig => interactionPreviewMap[mode];
 
 export function useEntityCardInteractionController({
   ariaLabel,
@@ -64,6 +42,7 @@ export function useEntityCardInteractionController({
   onOpenSettings,
 }: UseEntityCardInteractionControllerOptions) {
   const interactionMode = useSettingsStore((state) => state.entityInteractionMode);
+  const { t } = useI18n();
 
   const runAction = useCallback(
     (action: CardAction) => {
@@ -173,7 +152,13 @@ export function useEntityCardInteractionController({
   return {
     interactionMode,
     cardProps,
-    iconButtonProps: getButtonProps('toggle', `Toggle ${ariaLabel}`),
-    settingsButtonProps: getButtonProps('settings', `Open settings for ${ariaLabel}`),
+    iconButtonProps: getButtonProps(
+      'toggle',
+      t('entityCardInteraction.toggle', { name: ariaLabel })
+    ),
+    settingsButtonProps: getButtonProps(
+      'settings',
+      t('entityCardInteraction.openSettings', { name: ariaLabel })
+    ),
   };
 }

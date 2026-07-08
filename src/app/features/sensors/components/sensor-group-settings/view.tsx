@@ -4,6 +4,7 @@ import { Gauge, Plus, Search, Trash2, X } from 'lucide-react';
 import type { Dispatch, ReactNode, RefObject, SetStateAction } from 'react';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import type { SensorIconType, SensorReading } from '../sensors';
 import type { AvailableSensor, SensorGroupColorConfig } from './types';
@@ -55,8 +56,21 @@ export function SensorGroupSettingsView({
   isSensorSelected,
   CustomScrollbar,
 }: SensorGroupSettingsViewProps) {
+  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
+  const getCategoryLabel = (category: AvailableSensor['category']) => {
+    switch (category) {
+      case 'energy':
+        return t('sensors.category.energy');
+      case 'climate':
+        return t('sensors.category.climate');
+      case 'environmental':
+        return t('sensors.category.environmental');
+      default:
+        return t('sensors.category.other');
+    }
+  };
 
   return (
     <Dialog.Content
@@ -75,15 +89,20 @@ export function SensorGroupSettingsView({
             <div className="flex items-start justify-between mb-6">
               <div>
                 <Dialog.Title className={`text-xl font-semibold ${surface.textPrimary}`}>
-                  {groupName} Settings
+                  {t('sensors.groupSettings.title', { name: groupName })}
                 </Dialog.Title>
                 <Dialog.Description className={`text-sm mt-1 ${surface.textSecondary}`}>
-                  Manage sensors for this group
+                  {t('sensors.groupSettings.description')}
                 </Dialog.Description>
               </div>
 
               <div className="ml-4 flex items-start gap-2">
-                <EntityRoomSelector entityId={entityId} label="Room" compact className="w-32" />
+                <EntityRoomSelector
+                  entityId={entityId}
+                  label={t('sensors.groupSettings.room')}
+                  compact
+                  className="w-32"
+                />
 
                 <Dialog.Close asChild>
                   <button
@@ -101,13 +120,16 @@ export function SensorGroupSettingsView({
               {/* Selected Sensors Section */}
               <div>
                 <h3 className={`text-sm font-semibold mb-3 ${surface.textPrimary}`}>
-                  Selected Sensors ({selectedSensors.length}/{maxSensors})
+                  {t('sensors.groupSettings.selected', {
+                    count: selectedSensors.length,
+                    max: maxSensors,
+                  })}
                 </h3>
 
                 {selectedSensors.length === 0 ? (
                   <div className={`rounded-2xl p-4 text-center ${surface.subtleBg}`}>
                     <p className={`text-xs ${surface.textSecondary}`}>
-                      Search and add sensors below
+                      {t('sensors.groupSettings.emptySelected')}
                     </p>
                   </div>
                 ) : (
@@ -138,7 +160,7 @@ export function SensorGroupSettingsView({
                             type="button"
                             onClick={() => handleRemoveSensor(index)}
                             className="w-7 h-7 rounded-full bg-red-500/20 hover:bg-red-500/30 flex items-center justify-center transition-colors flex-shrink-0"
-                            aria-label="Remove sensor"
+                            aria-label={t('sensors.groupSettings.removeSensor')}
                           >
                             <Trash2 className="w-3.5 h-3.5 text-red-400" />
                           </button>
@@ -151,7 +173,9 @@ export function SensorGroupSettingsView({
 
               {/* Search and Autocomplete Section */}
               <div className="relative">
-                <h3 className={`text-sm font-semibold mb-3 ${surface.textPrimary}`}>Add Sensors</h3>
+                <h3 className={`text-sm font-semibold mb-3 ${surface.textPrimary}`}>
+                  {t('sensors.groupSettings.addSensors')}
+                </h3>
 
                 {/* Search Input */}
                 <div className="relative">
@@ -206,7 +230,7 @@ export function SensorGroupSettingsView({
                         inputRef.current?.blur();
                       }
                     }}
-                    placeholder="Search sensors..."
+                    placeholder={t('sensors.groupSettings.searchPlaceholder')}
                     className={`w-full ${surface.inputBg} border ${surface.border} rounded-2xl pl-11 pr-4 py-3 text-sm ${surface.textPrimary} ${surface.placeholder} focus:outline-none focus:ring-2 focus:ring-white/20 transition-all`}
                     disabled={selectedSensors.length >= maxSensors}
                     autoComplete="off"
@@ -282,12 +306,13 @@ export function SensorGroupSettingsView({
                                     {highlightMatch(sensor.label)}
                                   </p>
                                   <p className={`text-xs ${surface.textSecondary}`}>
-                                    {sensor.value} {sensor.unit} · {sensor.category}
+                                    {sensor.value} {sensor.unit} {'·'}{' '}
+                                    {getCategoryLabel(sensor.category)}
                                   </p>
                                 </div>
                                 {isSelected ? (
                                   <span className={`text-xs flex-shrink-0 ${surface.textMuted}`}>
-                                    Added
+                                    {t('sensors.groupSettings.added')}
                                   </span>
                                 ) : !isDisabled ? (
                                   <Plus className={`w-4 h-4 flex-shrink-0 ${surface.textMuted}`} />
@@ -299,7 +324,7 @@ export function SensorGroupSettingsView({
                       ) : (
                         <div className="p-6 text-center">
                           <p className={`text-xs ${surface.textSecondary}`}>
-                            No sensors match "{searchQuery}"
+                            {t('sensors.groupSettings.noMatch', { query: searchQuery })}
                           </p>
                         </div>
                       )}
@@ -319,14 +344,14 @@ export function SensorGroupSettingsView({
           onClick={handleCancel}
           className={`flex-1 py-3 px-4 rounded-2xl ${surface.subtleBg} ${surface.hoverBg} ${surface.textPrimary} font-medium transition-colors`}
         >
-          Cancel
+          {t('common.cancel')}
         </button>
         <button
           type="button"
           onClick={handleSave}
           className={`flex-1 py-3 px-4 rounded-2xl ${colors.iconBg} ${colors.hover} text-white font-medium transition-colors`}
         >
-          Save Changes
+          {t('sensors.groupSettings.save')}
         </button>
       </div>
     </Dialog.Content>

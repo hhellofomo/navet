@@ -3,6 +3,7 @@ import { Check, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { DialogHeader } from '@/app/components/shared/device-editor';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import type { RSSProvider } from './types';
 
@@ -32,6 +33,7 @@ export function RSSFeedSettingsDialog({
   onDeleteSelectedProviders,
 }: RSSFeedSettingsDialogProps) {
   const surface = getThemeSurfaceTokens(theme);
+  const { t } = useI18n();
   const [providerName, setProviderName] = useState('');
   const [providerUrl, setProviderUrl] = useState('');
 
@@ -60,15 +62,15 @@ export function RSSFeedSettingsDialog({
           className={`fixed top-1/2 left-1/2 z-50 w-[90vw] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-3xl border p-6 shadow-2xl backdrop-blur-xl ${surface.panel} ${surface.border}`}
         >
           <DialogHeader
-            title="RSS Providers"
-            description={`Choose which providers ${title} should show`}
+            title={t('rss.settings.title')}
+            description={t('rss.settings.description', { title })}
             isOn={theme !== 'light'}
           />
 
           <div className="mb-4 space-y-2">
             <div className="flex items-center justify-between gap-3">
               <div className={`text-xs font-medium ${surface.textSecondary}`}>
-                Selected Providers
+                {t('rss.settings.selectedProviders')}
               </div>
               {selectedProviderIds.length > 0 && (
                 <button
@@ -77,7 +79,7 @@ export function RSSFeedSettingsDialog({
                   className={`inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-medium ${surface.textPrimary} ${surface.subtleBg} ${surface.hoverBg}`}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
-                  Delete Selected
+                  {t('rss.settings.deleteSelected')}
                 </button>
               )}
             </div>
@@ -116,7 +118,7 @@ export function RSSFeedSettingsDialog({
                           onRemoveProvider(provider.id);
                         }}
                         className={`rounded-xl p-2 ${surface.textSecondary} ${surface.hoverBg}`}
-                        aria-label={`Remove ${provider.name}`}
+                        aria-label={t('rss.settings.removeProvider', { name: provider.name })}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -137,17 +139,19 @@ export function RSSFeedSettingsDialog({
           </div>
 
           <div className="space-y-3">
-            <div className={`text-xs font-medium ${surface.textSecondary}`}>Add Direct Feed</div>
+            <div className={`text-xs font-medium ${surface.textSecondary}`}>
+              {t('rss.settings.addDirectFeed')}
+            </div>
             <input
               value={providerName}
               onChange={(event) => setProviderName(event.target.value)}
-              placeholder="Provider name"
+              placeholder={t('rss.settings.providerName')}
               className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none ${surface.inputBg} ${surface.border} ${surface.textPrimary} ${surface.placeholder}`}
             />
             <input
               value={providerUrl}
               onChange={(event) => setProviderUrl(event.target.value)}
-              placeholder="https://example.com/feed.xml"
+              placeholder={t('rss.settings.providerUrl')}
               className={`w-full rounded-2xl border px-4 py-3 text-sm outline-none ${surface.inputBg} ${surface.border} ${surface.textPrimary} ${surface.placeholder}`}
             />
             <button
@@ -156,7 +160,7 @@ export function RSSFeedSettingsDialog({
               className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium ${surface.textPrimary} ${surface.subtleBg} ${surface.hoverBg}`}
             >
               <Plus className="h-4 w-4" />
-              Add Feed URL
+              {t('rss.settings.addFeedUrl')}
             </button>
           </div>
 
@@ -166,7 +170,7 @@ export function RSSFeedSettingsDialog({
                 type="button"
                 className={`rounded-xl px-4 py-2 text-sm font-medium ${surface.textPrimary} ${surface.subtleBg} ${surface.hoverBg}`}
               >
-                Done
+                {t('common.done')}
               </button>
             </Dialog.Close>
           </div>

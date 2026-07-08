@@ -3,6 +3,7 @@ import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import { useDashboardEntitiesStore } from '@/app/features/dashboard';
 import { useCustomCardsStore } from '@/app/features/dashboard/stores/custom-cards-store';
 import { useLightPresetStore } from '@/app/features/lighting';
+import { resolveAppLanguage } from '@/app/i18n/config';
 import { isSection } from '@/app/navigation/sections';
 import { useNavigationStore } from '@/app/stores/navigation-store';
 import { defaultSettings, useSettingsStore } from '@/app/stores/settings-store';
@@ -60,6 +61,8 @@ const buildExportedSettings = (
     username:
       settingsState.username !== defaultSettings.username ? settingsState.username : undefined,
     email: settingsState.email || undefined,
+    language:
+      settingsState.language !== defaultSettings.language ? settingsState.language : undefined,
     showNotifications:
       settingsState.showNotifications !== defaultSettings.showNotifications
         ? settingsState.showNotifications
@@ -185,6 +188,9 @@ export const importDashboardConfig = (value: unknown) => {
   useSettingsStore.setState({
     username: (settings.username as string | undefined) ?? defaultSettings.username,
     email: (settings.email as string | undefined) ?? defaultSettings.email,
+    language: resolveAppLanguage(
+      typeof settings.language === 'string' ? settings.language : defaultSettings.language
+    ),
     showNotifications:
       typeof settings.showNotifications === 'boolean'
         ? settings.showNotifications

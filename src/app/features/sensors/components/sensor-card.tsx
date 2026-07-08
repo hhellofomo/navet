@@ -9,7 +9,7 @@ import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { getAccentCardShellTokens } from '@/app/components/shared/theme/accent-card-shell-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 
 interface SensorCardProps {
   name: string;
@@ -34,6 +34,7 @@ export const SensorCard = memo(function SensorCard({
 }: SensorCardProps) {
   const cardId = `sensor-${name.toLowerCase().replace(/ /g, '-')}`;
   const { theme } = useTheme();
+  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
   const shell = getAccentCardShellTokens(theme, 'teal');
@@ -68,7 +69,7 @@ export const SensorCard = memo(function SensorCard({
       <div className="relative h-full flex flex-col">
         <EntityCardHeader
           title={name}
-          subtitle="Sensor"
+          subtitle={t('sensors.single')}
           size={size}
           leading={
             <EntityCardHeaderIcon IconComponent={IconComponent} isActive={true} size={size} />

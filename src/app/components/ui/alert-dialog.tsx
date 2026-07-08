@@ -3,6 +3,7 @@
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 import * as React from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
+import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useTheme } from '@/app/hooks';
 import { cn } from './utils';
 
@@ -25,12 +26,15 @@ const AlertDialogOverlay = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Overlay>
 >(function AlertDialogOverlay({ className, ...props }, ref) {
+  const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   return (
     <AlertDialogPrimitive.Overlay
       ref={ref}
       data-slot="alert-dialog-overlay"
       className={cn(
-        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/55 backdrop-blur-sm',
+        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50',
+        surface.dialogBackdrop,
         className
       )}
       {...props}
@@ -44,12 +48,16 @@ const AlertDialogContent = React.forwardRef<
 >(function AlertDialogContent({ className, ...props }, ref) {
   const { theme, primaryColor } = useTheme();
   const accentColor = getThemeColorValue(primaryColor);
-  const surfaceClass =
-    theme === 'light' ? 'border-gray-200/80 text-gray-900' : 'border-white/10 text-white';
+  const surface = getThemeSurfaceTokens(theme);
+  const surfaceClass = `${surface.borderStrong} ${surface.textPrimary}`;
   const background =
     theme === 'light'
       ? `linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.92) 72%, ${accentColor}10 100%)`
-      : `linear-gradient(180deg, rgba(18,18,20,0.96) 0%, rgba(12,12,14,0.94) 72%, ${accentColor}14 100%)`;
+      : theme === 'contrast'
+        ? `linear-gradient(180deg, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.98) 72%, ${accentColor}18 100%)`
+        : theme === 'glass'
+          ? `linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.08) 72%, ${accentColor}1A 100%)`
+          : `linear-gradient(180deg, rgba(18,18,20,0.96) 0%, rgba(12,12,14,0.94) 72%, ${accentColor}14 100%)`;
 
   return (
     <AlertDialogPortal>
@@ -108,15 +116,12 @@ const AlertDialogDescription = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Description>
 >(function AlertDialogDescription({ className, ...props }, ref) {
   const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   return (
     <AlertDialogPrimitive.Description
       ref={ref}
       data-slot="alert-dialog-description"
-      className={cn(
-        'text-sm leading-relaxed',
-        theme === 'light' ? 'text-gray-600' : 'text-gray-300',
-        className
-      )}
+      className={cn('text-sm leading-relaxed', surface.textSecondary, className)}
       {...props}
     />
   );
@@ -146,16 +151,22 @@ const AlertDialogCancel = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Cancel>
 >(function AlertDialogCancel({ className, ...props }, ref) {
   const { theme } = useTheme();
+  const surface = getThemeSurfaceTokens(theme);
   const cancelClass =
     theme === 'light'
       ? 'border-gray-200/80 bg-gray-100 text-gray-900 hover:bg-gray-200'
-      : 'border-white/10 bg-white/5 text-white hover:bg-white/10';
+      : theme === 'contrast'
+        ? 'border-white/16 bg-black text-white hover:bg-white/10'
+        : theme === 'glass'
+          ? 'border-white/18 bg-white/[0.08] text-white hover:bg-white/[0.14]'
+          : 'border-white/10 bg-white/5 text-white hover:bg-white/10';
 
   return (
     <AlertDialogPrimitive.Cancel
       ref={ref}
       className={cn(
-        'inline-flex h-10 items-center justify-center gap-2 rounded-full border px-5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
+        'inline-flex h-10 items-center justify-center gap-2 rounded-full border px-5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+        surface.ringOffset,
         cancelClass,
         className
       )}

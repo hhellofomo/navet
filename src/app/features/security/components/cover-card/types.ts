@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import type { ButtonHTMLAttributes } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import type { TranslationKey } from '@/app/i18n';
 
 export type CoverState = 'open' | 'closed' | 'opening' | 'closing';
 
@@ -26,7 +27,7 @@ export interface CoverCardProps {
 }
 
 export interface DeviceClassConfig {
-  label: string;
+  labelKey: TranslationKey;
   icon: LucideIcon;
 }
 

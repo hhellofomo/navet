@@ -40,22 +40,22 @@ function StickyNote(props: SVGProps<SVGSVGElement>) {
 export const cardTemplates: CardTemplate[] = [
   {
     id: 'rss',
-    name: 'RSS Feed',
-    description: 'Follow articles from your selected feed providers',
+    nameKey: 'dashboard.addCard.templates.rss.name',
+    descriptionKey: 'dashboard.addCard.templates.rss.description',
     icon: <Newspaper className="w-5 h-5" />,
     defaultSize: 'large',
   },
   {
     id: 'photo',
-    name: 'Photo Frame',
-    description: 'Display your favorite photos',
+    nameKey: 'dashboard.addCard.templates.photo.name',
+    descriptionKey: 'dashboard.addCard.templates.photo.description',
     icon: <Image className="w-5 h-5" />,
     defaultSize: 'large',
   },
   {
     id: 'note',
-    name: 'Quick Note',
-    description: 'Sticky note for reminders',
+    nameKey: 'dashboard.addCard.templates.note.name',
+    descriptionKey: 'dashboard.addCard.templates.note.description',
     icon: <StickyNote className="w-5 h-5" />,
     defaultSize: 'small',
   },

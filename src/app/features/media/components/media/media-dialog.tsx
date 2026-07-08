@@ -3,7 +3,7 @@ import { Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-rea
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { MediaFallbackArtwork } from './media-fallback-artwork';
 import { formatMediaTime } from './media-time';
 import { useMediaArtworkColors } from './use-media-artwork-colors';
@@ -21,7 +21,9 @@ interface MediaDialogProps {
   isMuted: boolean;
   elapsedSeconds: number;
   durationSeconds: number;
+  onPrevious: () => void;
   onTogglePlay: () => void;
+  onNext: () => void;
   onToggleMute: () => void;
   onVolumeChange: (value: number) => void;
 }
@@ -39,11 +41,14 @@ export function MediaDialog({
   isMuted,
   elapsedSeconds,
   durationSeconds,
+  onPrevious,
   onTogglePlay,
+  onNext,
   onToggleMute,
   onVolumeChange,
 }: MediaDialogProps) {
   const { theme } = useTheme();
+  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const isGlass = theme === 'glass';
   const palette = useMediaArtworkColors(artwork, theme, 'media-dialog', `${title}::${artist}`);
@@ -78,7 +83,12 @@ export function MediaDialog({
                   {artist}
                 </Dialog.Description>
               </div>
-              <EntityRoomSelector entityId={entityId} label="Room" compact className="w-32" />
+              <EntityRoomSelector
+                entityId={entityId}
+                label={t('media.room')}
+                compact
+                className="w-32"
+              />
             </div>
           </div>
 
@@ -88,7 +98,7 @@ export function MediaDialog({
               {artwork ? (
                 <img
                   src={artwork}
-                  alt={`${title} by ${artist}`}
+                  alt={t('media.artworkAlt', { title, artist })}
                   onError={() => onArtworkError?.(artwork)}
                   className="h-48 w-48 rounded-3xl object-cover shadow-2xl"
                 />
@@ -106,6 +116,8 @@ export function MediaDialog({
                 theme={theme}
                 size="large"
                 variant="neutral"
+                aria-label={t('media.previousTrack')}
+                onClick={onPrevious}
                 className="h-12 w-12 transition-colors"
               >
                 <SkipBack className="h-6 w-6" />
@@ -115,6 +127,7 @@ export function MediaDialog({
                 size="large"
                 variant="emphasis"
                 onClick={onTogglePlay}
+                aria-label={isPlaying ? t('media.pausePlayback') : t('media.resumePlayback')}
                 className="h-16 w-16 transition-colors"
               >
                 {isPlaying ? (
@@ -127,6 +140,8 @@ export function MediaDialog({
                 theme={theme}
                 size="large"
                 variant="neutral"
+                aria-label={t('media.nextTrack')}
+                onClick={onNext}
                 className="h-12 w-12 transition-colors"
               >
                 <SkipForward className="h-6 w-6" />
@@ -142,7 +157,9 @@ export function MediaDialog({
                 </div>
               )}
               <div className="flex items-center justify-between mb-3">
-                <span className={`text-sm font-medium ${surface.textSecondary}`}>Volume</span>
+                <span className={`text-sm font-medium ${surface.textSecondary}`}>
+                  {t('media.volume')}
+                </span>
                 <span className={`text-sm font-semibold ${surface.textPrimary}`}>
                   {isMuted ? 0 : volume}%
                 </span>
@@ -153,6 +170,7 @@ export function MediaDialog({
                   size="medium"
                   variant="neutral"
                   onClick={onToggleMute}
+                  aria-label={isMuted ? t('media.unmuteVolume') : t('media.muteVolume')}
                   className="h-10 w-10 transition-colors"
                 >
                   {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
@@ -177,19 +195,14 @@ export function MediaDialog({
             {/* Quick Volume Presets */}
             <div>
               <span className={`text-sm font-medium ${surface.textSecondary} mb-3 block`}>
-                Quick Volume
+                {t('media.quickVolume')}
               </span>
               <div className="grid grid-cols-4 gap-2">
                 {[25, 50, 75, 100].map((vol) => (
                   <button
                     type="button"
                     key={vol}
-                    onClick={() => {
-                      onVolumeChange(vol);
-                      if (isMuted) {
-                        // Toggle mute off when setting volume
-                      }
-                    }}
+                    onClick={() => onVolumeChange(vol)}
                     className={`py-3 rounded-xl text-sm font-medium transition-all border-2 ${presetButton(
                       volume === vol && !isMuted
                     )}`}
@@ -206,7 +219,7 @@ export function MediaDialog({
                 type="button"
                 className="w-full py-3 bg-pink-500 hover:bg-pink-600 rounded-xl text-white font-medium transition-colors"
               >
-                Done
+                {t('common.done')}
               </button>
             </Dialog.Close>
           </div>

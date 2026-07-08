@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { type AppLanguage, getNavigatorLanguage } from '@/app/i18n/config';
 
 export type EntityInteractionMode = 'control-first' | 'toggle-first';
 
 export interface UserSettings {
   username: string;
   email: string;
+  language: AppLanguage;
   showNotifications: boolean;
   showWeatherInHeader: boolean;
   use24HourTime: boolean;
@@ -25,6 +27,7 @@ interface SettingsState extends UserSettings {
 export const defaultSettings: UserSettings = {
   username: 'User',
   email: '',
+  language: getNavigatorLanguage(),
   showNotifications: true,
   showWeatherInHeader: true,
   use24HourTime: false,

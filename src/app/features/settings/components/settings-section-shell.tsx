@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { useI18n } from '@/app/hooks';
 import type {
   SectionNavItem,
   SettingsSectionStyles,
@@ -72,6 +73,8 @@ export function SettingsItem({ title, description, styles, children }: SettingsI
 }
 
 export function SettingsHero({ navItems, styles }: SettingsHeroProps) {
+  const { t } = useI18n();
+
   return (
     <section
       className={`relative overflow-hidden rounded-[36px] border px-6 py-8 md:px-8 md:py-10 ${styles.borderColor} ${styles.cardBg}`}
@@ -96,16 +99,15 @@ export function SettingsHero({ navItems, styles }: SettingsHeroProps) {
         <p
           className={`text-[11px] font-semibold uppercase tracking-[0.24em] ${styles.subtleColor}`}
         >
-          Settings
+          {t('settings.hero.eyebrow')}
         </p>
         <h1
           className={`mt-4 max-w-3xl text-3xl font-semibold tracking-tight md:text-5xl ${styles.textColor}`}
         >
-          A calmer place to tune Navet.
+          {t('settings.hero.title')}
         </h1>
         <p className={`mt-4 max-w-2xl text-sm leading-7 md:text-base ${styles.subtleColor}`}>
-          Large type, fewer boxes, and one clear action path per setting. The page stays scalable,
-          but it should now read more like a product settings experience than a dense control panel.
+          {t('settings.hero.description')}
         </p>
 
         <div className="mt-8 flex flex-wrap gap-2">

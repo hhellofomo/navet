@@ -80,7 +80,7 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
                     className={`${stateSurface.secondaryTextClassName} min-w-0 flex items-center gap-1 pr-2`}
                   >
                     {controller.renderMetricIcon(metric, 'h-3 w-3 flex-shrink-0')}
-                    <span className="truncate">{metric.label}</span>
+                    <span className="truncate">{controller.getMetricLabel(metric)}</span>
                   </span>
                   <span
                     className={`${stateSurface.primaryTextClassName} flex-shrink-0 whitespace-nowrap font-medium`}
@@ -118,7 +118,7 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
                       : 'bg-white/5'
                 }`}
               >
-                <EntityRoomSelector entityId={props.id} label="Room" />
+                <EntityRoomSelector entityId={props.id} label={controller.roomLabel} />
               </div>
 
               {controller.hasMetrics && (
@@ -132,11 +132,10 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
                   }`}
                 >
                   <p className={`text-xs uppercase tracking-[0.16em] ${controller.labelColor}`}>
-                    Card Metric
+                    {controller.metricSectionTitle}
                   </p>
                   <p className={`mt-1 text-xs ${controller.labelColor}`}>
-                    Select up to {controller.metricLimit}{' '}
-                    {controller.metricLimit === 1 ? 'metric' : 'metrics'} for this card.
+                    {controller.metricSectionDescription}
                   </p>
                   <div className="mt-3 space-y-2">
                     {controller.availableMetrics.map((metric) => {
@@ -160,7 +159,7 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
                             className={`min-w-0 flex items-center gap-2 ${controller.labelColor}`}
                           >
                             {controller.renderMetricIcon(metric, 'h-4 w-4 flex-shrink-0')}
-                            <span className="truncate">{metric.label}</span>
+                            <span className="truncate">{controller.getMetricLabel(metric)}</span>
                           </span>
                           <div className="flex flex-shrink-0 items-center gap-3">
                             <span className={`font-medium ${controller.textColor}`}>

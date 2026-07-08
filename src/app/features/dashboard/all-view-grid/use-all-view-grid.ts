@@ -1,7 +1,7 @@
 import { useCallback, useDeferredValue, useMemo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
-import { useSearch } from '@/app/hooks';
+import { useI18n, useSearch } from '@/app/hooks';
 import type { DeviceWithType } from '@/app/types/device.types';
 import { getDeviceRoomLabel, UNKNOWN_ROOM_LABEL } from '@/app/utils/device-location';
 import type { CustomCard } from '../stores/custom-cards-store';
@@ -24,6 +24,7 @@ export function useAllViewGrid({
   rooms,
   updateCardSize,
 }: UseAllViewGridParams) {
+  const { t } = useI18n();
   const { isSearchActive, filteredDeviceIds } = useSearch();
   const deferredFilteredDeviceIds = useDeferredValue(filteredDeviceIds);
 
@@ -110,7 +111,7 @@ export function useAllViewGrid({
         ? [
             {
               key: 'all-items',
-              title: 'All Items',
+              title: t('dashboard.sections.allItems'),
               orderedIds: allOrderedIds,
               totalItems: allOrderedIds.length,
               showHeader: false,
@@ -125,9 +126,10 @@ export function useAllViewGrid({
       allOrderedIds.forEach((id) => {
         const customCard = customCardMap.get(id);
         if (customCard) {
-          const existing = grouped.get('Widgets') ?? [];
+          const widgetsTitle = t('dashboard.sections.widgets');
+          const existing = grouped.get(widgetsTitle) ?? [];
           existing.push(id);
-          grouped.set('Widgets', existing);
+          grouped.set(widgetsTitle, existing);
           return;
         }
 
@@ -136,7 +138,7 @@ export function useAllViewGrid({
           return;
         }
 
-        const title = getDeviceTypeLabel(device.type);
+        const title = getDeviceTypeLabel(device.type, t);
         const existing = grouped.get(title) ?? [];
         existing.push(id);
         grouped.set(title, existing);
@@ -168,12 +170,12 @@ export function useAllViewGrid({
 
     return orderedEntries.map((entry) => ({
       key: `room:${entry.room}`,
-      title: entry.room === 'All' ? 'Widgets' : entry.room,
+      title: entry.room === 'All' ? t('dashboard.sections.widgets') : entry.room,
       orderedIds: entry.orderedIds,
       totalItems: entry.totalItems,
       mutedTitle: entry.room === UNKNOWN_ROOM_LABEL,
     }));
-  }, [allOrderedIds, customCardMap, deviceMap, grouping, orderedRoomEntries]);
+  }, [allOrderedIds, customCardMap, deviceMap, grouping, orderedRoomEntries, t]);
 
   return {
     customCardMap,

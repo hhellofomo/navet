@@ -1,4 +1,10 @@
-import { format } from 'date-fns';
+import { getLocaleForLanguage, resolveAppLanguage } from '@/app/i18n/config';
+import { useSettingsStore } from '@/app/stores';
+
+const getCurrentLocale = () => {
+  const language = resolveAppLanguage(useSettingsStore.getState().language);
+  return getLocaleForLanguage(language);
+};
 
 /**
  * Formats a temperature value with the appropriate unit symbol
@@ -15,28 +21,50 @@ export function formatTemperature(
  * Formats a time with optional 24-hour format
  */
 export function formatTime(date: Date, use24Hour: boolean = false): string {
-  return format(date, use24Hour ? 'HH:mm' : 'h:mm a');
+  return new Intl.DateTimeFormat(getCurrentLocale(), {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: !use24Hour,
+  }).format(date);
 }
 
 /**
  * Formats a date in a human-readable format
  */
 export function formatDate(date: Date): string {
-  return format(date, 'MMMM d, yyyy');
+  return new Intl.DateTimeFormat(getCurrentLocale(), {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(date);
 }
 
 /**
  * Formats a date with time in 24-hour format (hours and minutes only)
  */
 export function formatDateWithTime(date: Date): string {
-  return format(date, 'MMMM d, yyyy HH:mm');
+  return new Intl.DateTimeFormat(getCurrentLocale(), {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(date);
 }
 
 /**
  * Formats a date and time together
  */
 export function formatDateTime(date: Date, use24Hour: boolean = false): string {
-  return format(date, use24Hour ? 'MMM d, yyyy HH:mm' : 'MMM d, yyyy h:mm a');
+  return new Intl.DateTimeFormat(getCurrentLocale(), {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: !use24Hour,
+  }).format(date);
 }
 
 /**
@@ -45,11 +73,12 @@ export function formatDateTime(date: Date, use24Hour: boolean = false): string {
 export function formatRelativeTime(date: Date): string {
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const formatter = new Intl.RelativeTimeFormat(getCurrentLocale(), { numeric: 'auto' });
 
-  if (diffInSeconds < 60) return 'just now';
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+  if (diffInSeconds < 60) return formatter.format(0, 'second');
+  if (diffInSeconds < 3600) return formatter.format(-Math.floor(diffInSeconds / 60), 'minute');
+  if (diffInSeconds < 86400) return formatter.format(-Math.floor(diffInSeconds / 3600), 'hour');
+  if (diffInSeconds < 604800) return formatter.format(-Math.floor(diffInSeconds / 86400), 'day');
 
   return formatDate(date);
 }
@@ -65,7 +94,7 @@ export function formatPercentage(value: number): string {
  * Formats a number with comma separators
  */
 export function formatNumber(value: number): string {
-  return new Intl.NumberFormat('en-US').format(value);
+  return new Intl.NumberFormat(getCurrentLocale()).format(value);
 }
 
 /**

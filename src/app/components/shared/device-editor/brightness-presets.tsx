@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { memo } from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { getDeviceEditorSurfaceTokens } from './device-editor-surface-tokens';
 
 interface BrightnessPreset {
@@ -25,6 +25,7 @@ export const BrightnessPresets = memo(function BrightnessPresets({
   onBrightnessChange,
 }: BrightnessPresetsProps) {
   const { primaryColor } = useTheme();
+  const { t } = useI18n();
   const activeColor = getThemeColorValue(primaryColor);
   const editorSurface = getDeviceEditorSurfaceTokens(isOn);
 
@@ -33,7 +34,7 @@ export const BrightnessPresets = memo(function BrightnessPresets({
       <span
         className={`mb-4 block text-sm font-medium transition-colors duration-500 ${editorSurface.sectionLabelClassName}`}
       >
-        Brightness Presets
+        {t('lighting.brightnessPresets')}
       </span>
 
       {/* Preset Brightness Levels */}

@@ -1,3 +1,4 @@
+import { useI18n } from '@/app/hooks';
 import { CalendarEventItem } from './calendar-event-item';
 import { formatCalendarGroupLabel } from './calendar-formatters';
 import type { CalendarEvent, CalendarEventGroup } from './types';
@@ -19,6 +20,7 @@ export function CalendarSmallView({
   hoverBg,
   onEventClick,
 }: CalendarSmallViewProps) {
+  const { locale } = useI18n();
   if (dayGroups.length === 0) {
     return null;
   }
@@ -29,7 +31,7 @@ export function CalendarSmallView({
         {dayGroups.map((group) => (
           <div key={group.key}>
             <div className={`mb-1 px-1 text-[10px] font-medium ${textSecondary}`}>
-              {formatCalendarGroupLabel(group.date)}
+              {formatCalendarGroupLabel(group.date, locale)}
             </div>
             <div className="space-y-1">
               {group.events.map((event) => (

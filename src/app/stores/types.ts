@@ -1,4 +1,5 @@
 import type { CardSize } from '../components/shared/card-size-selector';
+import type { AppLanguage } from '../i18n';
 import type { Section } from '../navigation/sections';
 import type { EntityInteractionMode } from './settings-store';
 import type { PrimaryColor, ThemeMode } from './theme-store';
@@ -38,6 +39,7 @@ export interface SearchState {
 interface UserSettings {
   username: string;
   email: string;
+  language: AppLanguage;
   showNotifications: boolean;
   showWeatherInHeader: boolean;
   use24HourTime: boolean;

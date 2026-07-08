@@ -6,7 +6,7 @@ import {
 } from '@/app/components/shared/card-size-selector';
 import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { MediaMediumVerticalView } from '../media/media-medium-vertical-view';
 import { MediaMediumView } from '../media/media-medium-view';
 import { MediaSmallView } from '../media/media-small-view';
@@ -16,30 +16,6 @@ const MediaDialog = lazy(async () => {
   const module = await import('../media/media-dialog');
   return { default: module.MediaDialog };
 });
-
-const mediaCardSizeOptions = [
-  {
-    value: 'small' as const,
-    label: 'Small',
-    description: '1 × 1',
-    dimensions: 'Square tile',
-    preview: 'w-7 h-7',
-  },
-  {
-    value: 'medium' as const,
-    label: 'Medium',
-    description: '2 × 1',
-    dimensions: 'Wide tile',
-    preview: 'w-14 h-7',
-  },
-  {
-    value: 'large' as const,
-    label: 'Medium',
-    description: '1 × 2',
-    dimensions: 'Vertical tile',
-    preview: 'w-7 h-14',
-  },
-];
 
 interface MediaCardProps {
   id: string;
@@ -77,7 +53,31 @@ export const MediaCard = memo(function MediaCard({
   isEditMode,
 }: MediaCardProps) {
   const { theme, colors } = useTheme();
+  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
+  const mediaCardSizeOptions = [
+    {
+      value: 'small' as const,
+      label: t('media.size.small'),
+      description: '1 × 1',
+      dimensions: t('media.size.squareTile'),
+      preview: 'w-7 h-7',
+    },
+    {
+      value: 'medium' as const,
+      label: t('media.size.medium'),
+      description: '2 × 1',
+      dimensions: t('media.size.wideTile'),
+      preview: 'w-14 h-7',
+    },
+    {
+      value: 'large' as const,
+      label: t('media.size.large'),
+      description: '1 × 2',
+      dimensions: t('media.size.verticalTile'),
+      preview: 'w-7 h-14',
+    },
+  ];
   const mediaSize = getCompactCardSize(size);
   const {
     albumArt: resolvedAlbumArt,
@@ -235,7 +235,9 @@ export const MediaCard = memo(function MediaCard({
             isMuted={isMuted}
             elapsedSeconds={elapsedSeconds}
             durationSeconds={durationSeconds}
+            onPrevious={handlePrevious}
             onTogglePlay={togglePlay}
+            onNext={handleNext}
             onToggleMute={toggleMute}
             onVolumeChange={handleVolumeChange}
           />

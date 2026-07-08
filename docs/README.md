@@ -8,6 +8,7 @@ Complete documentation for the Navet smart home dashboard.
 2. **[Contributing](../CONTRIBUTING.md)** - How to contribute
 3. **[Branding](branding/BRANDING.md)** - Brand identity and usage
 4. **[Logo Showcase](LOGO_SHOWCASE.md)** - Visual brand assets
+5. **[Versioning](VERSIONING.md)** - Beta release and version bump policy
 
 ## 📚 Documentation Structure
 
@@ -22,6 +23,7 @@ Complete documentation for the Navet smart home dashboard.
 - **[Main README](../README.md#room-navigation)** - Dashboard room navigation, All-view grouping modes, and dashboard dropdown behavior
 - **[Main README](../README.md#search)** - Dashboard search behavior, including Home Assistant entity-id and domain queries
 - **[Main README](../README.md#themes)** - Theme modes, shared appearance primitives, and the light card ambience setting
+- **[Main README](../README.md#themes)** - Appearance settings also cover app language, translated theme picker copy, shared localized live previews, and locale-aware formatting
 - **[Design System](../design-system/README.md#core-design-principles)** - Shared primitives, including icon pills, nav/action pills, and card off-state surface tokens
 - **[Docker and Home Assistant Add-on](DOCKER_HOME_ASSISTANT_ADDON.md)** - Packaging and deployment guide
   - Standalone Docker image
@@ -53,6 +55,9 @@ Complete documentation for the Navet smart home dashboard.
   - Drag-and-drop migration
   - Optimization history
 
+### Release Process
+- **[Versioning](VERSIONING.md)** - Beta release numbering and bump rules
+
 ## 🎯 Common Tasks
 
 ### I want to...
@@ -62,6 +67,9 @@ Complete documentation for the Navet smart home dashboard.
 
 **Contribute to the project:**
 → See [Contributing Guide](../CONTRIBUTING.md)
+
+**Bump a release version:**
+→ See [Versioning](VERSIONING.md)
 
 **Understand the design system:**
 → See [Design System](../design-system/README.md)
@@ -116,6 +124,7 @@ This documentation is organized into:
 docs/
 ├── README.md (this file)      ← Documentation index
 ├── DOCKER_HOME_ASSISTANT_ADDON.md ← Deployment packaging guide
+├── VERSIONING.md               ← Beta release/version policy
 ├── WIDGETS.md                 ← User-facing feature docs
 ├── TERMS_OF_USE.md            ← Legal information
 ├── ATTRIBUTIONS.md            ← Credits

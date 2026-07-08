@@ -1,7 +1,7 @@
 import { memo, useState } from 'react';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import { DEVICE_CLASS_CONFIG } from './constants';
 import type { CoverCardProps, CoverState, DeviceClass } from './types';
 import { CoverCardView } from './view';
@@ -22,6 +22,7 @@ export const CoverCardContainer = memo(function CoverCardContainer({
     initialPosition === 100 ? 'open' : initialPosition === 0 ? 'closed' : 'open'
   );
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const { t } = useI18n();
   const { colors, theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
 
@@ -61,13 +62,13 @@ export const CoverCardContainer = memo(function CoverCardContainer({
   const getStateDisplay = () => {
     switch (coverState) {
       case 'open':
-        return { text: 'Open', color: surface.textSecondary };
+        return { text: t('cover.state.open'), color: surface.textSecondary };
       case 'closed':
-        return { text: 'Closed', color: surface.textSecondary };
+        return { text: t('cover.state.closed'), color: surface.textSecondary };
       case 'opening':
-        return { text: 'Opening...', color: surface.textSecondary };
+        return { text: t('cover.state.opening'), color: surface.textSecondary };
       case 'closing':
-        return { text: 'Closing...', color: surface.textSecondary };
+        return { text: t('cover.state.closing'), color: surface.textSecondary };
     }
   };
 
@@ -75,7 +76,7 @@ export const CoverCardContainer = memo(function CoverCardContainer({
   const cardColors = position > 50 ? colors.cover.open : colors.cover.closed;
   const cardId = `cover-${name.toLowerCase().replace(/ /g, '-')}`;
   const cardInteraction = useEntityCardInteractionController({
-    ariaLabel: `${name} cover`,
+    ariaLabel: t('cover.ariaLabel', { name }),
     ariaPressed: position > 0,
     isEditMode,
     onToggle: () => {

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { useAuth } from '@/app/contexts/auth-context';
 import { useConfig } from '@/app/contexts/config-context';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 
 export function LoginPage() {
   const [url, setUrl] = useState('');
@@ -15,6 +15,7 @@ export function LoginPage() {
   const { login } = useAuth();
   const { testConnection } = useConfig();
   const { theme } = useTheme();
+  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,12 +24,12 @@ export function LoginPage() {
 
     // Validation
     if (!url.trim()) {
-      setError('Please enter your smart home URL');
+      setError(t('login.errors.urlRequired'));
       return;
     }
 
     if (!token.trim()) {
-      setError('Please enter your access token');
+      setError(t('login.errors.tokenRequired'));
       return;
     }
 
@@ -36,7 +37,7 @@ export function LoginPage() {
     try {
       new URL(url);
     } catch {
-      setError('Please enter a valid URL (e.g., http://homeassistant.local:8123)');
+      setError(t('login.errors.urlInvalid'));
       return;
     }
 
@@ -50,7 +51,7 @@ export function LoginPage() {
         // If connection is valid, proceed with login
         const success = await login(url, token);
         if (!success) {
-          setError('Failed to save configuration');
+          setError(t('login.errors.saveFailed'));
         }
       } else {
         // Connection failed - this is normal in development due to CORS
@@ -59,11 +60,11 @@ export function LoginPage() {
         if (success) {
           // Login successful despite connection test failure
         } else {
-          setError('Failed to save configuration');
+          setError(t('login.errors.saveFailed'));
         }
       }
     } catch (_err) {
-      setError('An unexpected error occurred');
+      setError(t('login.errors.unexpected'));
     } finally {
       setIsLoading(false);
     }
@@ -129,8 +130,8 @@ export function LoginPage() {
           >
             <Home className="w-10 h-10 text-orange-500" />
           </div>
-          <h1 className={`text-3xl font-bold ${textPrimary} mb-2`}>Navet</h1>
-          <p className={`text-sm ${textSecondary}`}>Connect to your smart home</p>
+          <h1 className={`text-3xl font-bold ${textPrimary} mb-2`}>{t('login.title')}</h1>
+          <p className={`text-sm ${textSecondary}`}>{t('login.subtitle')}</p>
         </div>
 
         {/* Login Form */}
@@ -139,7 +140,7 @@ export function LoginPage() {
             {/* URL Input */}
             <div>
               <label htmlFor="url" className={`block text-sm font-medium ${textPrimary} mb-2`}>
-                Smart Home URL
+                {t('login.urlLabel')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -150,18 +151,18 @@ export function LoginPage() {
                   type="text"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  placeholder="http://homeassistant.local:8123"
+                  placeholder={t('login.urlPlaceholder')}
                   className={`w-full pl-12 pr-4 py-3 ${inputBg} border ${border} rounded-xl ${textPrimary} placeholder-${textMuted} transition-all ${inputFocus} outline-none`}
                   disabled={isLoading}
                 />
               </div>
-              <p className={`mt-2 text-xs ${textMuted}`}>Your smart home server address</p>
+              <p className={`mt-2 text-xs ${textMuted}`}>{t('login.urlHelp')}</p>
             </div>
 
             {/* Token Input */}
             <div>
               <label htmlFor="token" className={`block text-sm font-medium ${textPrimary} mb-2`}>
-                Long-Lived Access Token
+                {t('login.tokenLabel')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -172,7 +173,7 @@ export function LoginPage() {
                   type={showToken ? 'text' : 'password'}
                   value={token}
                   onChange={(e) => setToken(e.target.value)}
-                  placeholder="Enter your access token"
+                  placeholder={t('login.tokenPlaceholder')}
                   className={`w-full pl-12 pr-12 py-3 ${inputBg} border ${border} rounded-xl ${textPrimary} placeholder-${textMuted} transition-all ${inputFocus} outline-none`}
                   disabled={isLoading}
                 />
@@ -181,13 +182,12 @@ export function LoginPage() {
                   onClick={() => setShowToken(!showToken)}
                   className={`absolute inset-y-0 right-0 pr-4 flex items-center ${textMuted} hover:${textSecondary} transition-colors`}
                   disabled={isLoading}
+                  aria-label={showToken ? t('login.hideToken') : t('login.showToken')}
                 >
                   {showToken ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
-              <p className={`mt-2 text-xs ${textMuted}`}>
-                Create one in Profile → Security → Long-Lived Access Tokens
-              </p>
+              <p className={`mt-2 text-xs ${textMuted}`}>{t('login.tokenHelp')}</p>
             </div>
 
             {/* Error Message */}
@@ -207,29 +207,23 @@ export function LoginPage() {
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
                   <Loader2 className="animate-spin h-5 w-5" />
-                  {error ? 'Retrying...' : 'Connecting...'}
+                  {error ? t('login.retrying') : t('login.connecting')}
                 </span>
               ) : (
-                'Connect'
+                t('login.connect')
               )}
             </button>
           </form>
 
           {/* Help Text */}
           <div className={`mt-6 pt-6 border-t ${border}`}>
-            <p className={`text-xs ${textMuted} text-center leading-relaxed`}>
-              Need help? Visit your smart home instance at{' '}
-              <span className={`${textSecondary} font-medium`}>/profile/security</span> to create a
-              long-lived access token.
-            </p>
+            <p className={`text-xs ${textMuted} text-center leading-relaxed`}>{t('login.help')}</p>
           </div>
         </div>
 
         {/* Footer */}
         <div className="mt-6 text-center">
-          <p className={`text-xs ${textMuted}`}>
-            Your credentials are stored locally and never shared
-          </p>
+          <p className={`text-xs ${textMuted}`}>{t('login.footer')}</p>
         </div>
       </div>
     </div>

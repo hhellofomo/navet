@@ -1,5 +1,5 @@
 import { Bell, Check, Trash2, X } from 'lucide-react';
-import type { PrimaryColor, ThemeType } from '@/app/hooks';
+import { type PrimaryColor, type ThemeType, useI18n } from '@/app/hooks';
 import { getNotificationSurfaceTokens } from './notification-surface-tokens';
 
 interface NotificationHeaderProps {
@@ -23,6 +23,7 @@ export function NotificationHeader({
   primaryColor,
   getColorValue,
 }: NotificationHeaderProps) {
+  const { t } = useI18n();
   const surface = getNotificationSurfaceTokens(theme);
 
   return (
@@ -31,7 +32,9 @@ export function NotificationHeader({
       <div className={`flex items-center justify-between border-b p-4 ${surface.borderClassName}`}>
         <div className="flex items-center gap-2">
           <Bell className={`h-4 w-4 ${surface.textSecondary}`} />
-          <h3 className={`text-sm font-semibold ${surface.textPrimary}`}>Notifications</h3>
+          <h3 className={`text-sm font-semibold ${surface.textPrimary}`}>
+            {t('notifications.title')}
+          </h3>
           {unreadCount > 0 && (
             <span
               className="text-xs font-medium px-2 py-0.5 rounded-full text-white"
@@ -60,7 +63,9 @@ export function NotificationHeader({
               className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 transition-all ${surface.hoverClassName}`}
             >
               <Check className={`h-3.5 w-3.5 ${surface.textSecondary}`} />
-              <span className={`text-xs font-medium ${surface.textPrimary}`}>Mark all read</span>
+              <span className={`text-xs font-medium ${surface.textPrimary}`}>
+                {t('notifications.header.markAllRead')}
+              </span>
             </button>
           )}
           <button
@@ -69,7 +74,9 @@ export function NotificationHeader({
             className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 transition-all ${surface.hoverClassName}`}
           >
             <Trash2 className={`h-3.5 w-3.5 ${surface.textSecondary}`} />
-            <span className={`text-xs font-medium ${surface.textPrimary}`}>Clear all</span>
+            <span className={`text-xs font-medium ${surface.textPrimary}`}>
+              {t('notifications.header.clearAll')}
+            </span>
           </button>
         </div>
       )}

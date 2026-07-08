@@ -2,7 +2,7 @@ import { Loader2 } from 'lucide-react';
 import { memo } from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 
 interface LoadingSpinnerProps {
   message?: string;
@@ -10,11 +10,13 @@ interface LoadingSpinnerProps {
 }
 
 export const LoadingSpinner = memo(function LoadingSpinner({
-  message = 'Loading...',
+  message,
   fullScreen = false,
 }: LoadingSpinnerProps) {
   const { theme, primaryColor } = useTheme();
+  const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
+  const resolvedMessage = message ?? t('common.loading');
 
   const containerClasses = fullScreen
     ? `fixed inset-0 z-50 flex items-center justify-center ${surface.appBg}`
@@ -27,7 +29,7 @@ export const LoadingSpinner = memo(function LoadingSpinner({
           className="w-8 h-8 animate-spin"
           style={{ color: getThemeColorValue(primaryColor) }}
         />
-        <p className={`text-sm ${surface.textSecondary}`}>{message}</p>
+        <p className={`text-sm ${surface.textSecondary}`}>{resolvedMessage}</p>
       </div>
     </div>
   );

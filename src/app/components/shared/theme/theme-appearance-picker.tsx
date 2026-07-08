@@ -1,6 +1,7 @@
 import { Check } from 'lucide-react';
 import { SettingsLivePreviewFrame } from '@/app/components/shared/settings-live-preview-frame';
 import type { PrimaryColorOption, ThemeOption } from '@/app/constants/theme-options';
+import { useI18n } from '@/app/hooks';
 import type { PrimaryColor, ThemeType } from '@/app/hooks/use-theme';
 import { getThemeAppearancePickerTokens } from './theme-appearance-picker-tokens';
 import { getThemeColorValue } from './theme-colors';
@@ -24,6 +25,7 @@ export function ThemeAppearancePicker({
   onThemeChange,
   lead,
 }: ThemeAppearancePickerProps) {
+  const { t } = useI18n();
   const accentColor = getThemeColorValue(selectedAccent);
   const previewTheme = selectedTheme;
   const pickerTokens = getThemeAppearancePickerTokens(previewTheme, accentColor);
@@ -34,10 +36,14 @@ export function ThemeAppearancePicker({
         {lead ? <div className="mb-6">{lead}</div> : null}
 
         <div>
-          <p className={`text-sm font-semibold ${pickerTokens.textClassName}`}>Theme mode</p>
+          <p className={`text-sm font-semibold ${pickerTokens.textClassName}`}>
+            {t('themePicker.themeMode')}
+          </p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             {themeOptions.map((option) => {
               const isActive = selectedTheme === option.value;
+              const optionLabel = t(option.labelKey);
+              const optionDescription = t(option.descriptionKey);
 
               return (
                 <button
@@ -53,10 +59,10 @@ export function ThemeAppearancePicker({
                     className={`text-sm font-semibold ${pickerTokens.textClassName}`}
                     style={isActive ? { color: accentColor } : undefined}
                   >
-                    {option.label}
+                    {optionLabel}
                   </p>
                   <p className={`mt-1 text-xs leading-relaxed ${pickerTokens.mutedClassName}`}>
-                    {option.description}
+                    {optionDescription}
                   </p>
                 </button>
               );
@@ -65,7 +71,9 @@ export function ThemeAppearancePicker({
         </div>
 
         <div className="mt-6">
-          <p className={`text-sm font-semibold ${pickerTokens.textClassName}`}>Accent color</p>
+          <p className={`text-sm font-semibold ${pickerTokens.textClassName}`}>
+            {t('themePicker.accentColor')}
+          </p>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             {colorOptions.map((option) => {
               const isActive = selectedAccent === option.value;
@@ -103,7 +111,12 @@ export function ThemeAppearancePicker({
         accentColor={accentColor}
         theme={selectedTheme}
         title="Navet"
-        subtitle={`${themeOptions.find((option) => option.value === selectedTheme)?.label} mode`}
+        subtitle={t('themePicker.previewSubtitle', {
+          mode: t(
+            themeOptions.find((option) => option.value === selectedTheme)?.labelKey ??
+              'themeOption.light.label'
+          ),
+        })}
         background={pickerTokens.previewBackground}
         topBar={
           <div

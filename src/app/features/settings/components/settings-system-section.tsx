@@ -1,4 +1,5 @@
 import { ExternalLink, Server, Settings2 } from 'lucide-react';
+import { useI18n } from '@/app/hooks';
 import type { SettingsSectionController } from '../hooks/use-settings-section-controller';
 import { SettingsItem, SettingsSectionShell } from './settings-section-shell';
 
@@ -7,27 +8,28 @@ interface SettingsSystemSectionProps {
 }
 
 export function SettingsSystemSection({ controller }: SettingsSystemSectionProps) {
+  const { t } = useI18n();
   const { config, disableAnimations, handleResetConnection, styles, updateSettings } = controller;
 
   return (
     <SettingsSectionShell
       id="system"
       icon={Server}
-      title="System"
-      description="Performance controls and connection details for the current Home Assistant target."
+      title={t('settings.system.sectionTitle')}
+      description={t('settings.system.sectionDescription')}
       styles={styles}
     >
       <SettingsItem
-        title="Disable animations"
-        description="Useful for slower devices like Raspberry Pis. Turns off transitions and animated effects across the app."
+        title={t('settings.system.animations.title')}
+        description={t('settings.system.animations.description')}
         styles={styles}
       >
         <div
           className={`inline-flex rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
         >
           {[
-            { value: false, label: 'Off' },
-            { value: true, label: 'On' },
+            { value: false, label: t('common.off') },
+            { value: true, label: t('common.on') },
           ].map((option) => {
             const isActive = disableAnimations === option.value;
             return (
@@ -58,16 +60,16 @@ export function SettingsSystemSection({ controller }: SettingsSystemSectionProps
       </SettingsItem>
 
       <SettingsItem
-        title="Connection"
-        description="Review the current server target, open Home Assistant, or reset the saved connection."
+        title={t('settings.system.connection.title')}
+        description={t('settings.system.connection.description')}
         styles={styles}
       >
         <div className={`rounded-[24px] border px-5 py-4 ${styles.borderColor} ${styles.softBg}`}>
           <p className={`text-[11px] uppercase tracking-[0.18em] ${styles.subtleColor}`}>
-            Connected to
+            {t('settings.system.connection.connectedTo')}
           </p>
           <p className={`mt-2 break-all font-mono text-sm ${styles.textColor}`}>
-            {config?.url || 'Not connected'}
+            {config?.url || t('settings.system.connection.notConnected')}
           </p>
         </div>
 
@@ -80,7 +82,7 @@ export function SettingsSystemSection({ controller }: SettingsSystemSectionProps
               className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
             >
               <ExternalLink className="h-4 w-4" />
-              <span>Open Homeassistant</span>
+              <span>{t('settings.system.connection.openHomeAssistant')}</span>
             </a>
 
             <button
@@ -89,7 +91,7 @@ export function SettingsSystemSection({ controller }: SettingsSystemSectionProps
               className={`inline-flex items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-colors ${styles.borderColor} ${styles.softBg} ${styles.hoverBg} ${styles.textColor}`}
             >
               <Settings2 className="h-4 w-4" />
-              <span>Reset connection</span>
+              <span>{t('settings.system.connection.reset')}</span>
             </button>
           </div>
         ) : null}

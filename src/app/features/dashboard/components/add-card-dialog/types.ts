@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import type { TranslationKey } from '@/app/i18n';
 
 export interface AddCardDialogContainerProps {
   open: boolean;
@@ -12,8 +13,8 @@ export type CardType = 'rss' | 'photo' | 'note';
 
 export interface CardTemplate {
   id: CardType;
-  name: string;
-  description: string;
+  nameKey: TranslationKey;
+  descriptionKey: TranslationKey;
   icon: ReactNode;
   defaultSize: CardSize;
 }

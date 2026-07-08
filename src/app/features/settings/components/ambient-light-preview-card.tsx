@@ -1,6 +1,7 @@
 import { Lightbulb } from 'lucide-react';
 import { SettingsLivePreviewFrame } from '@/app/components/shared/settings-live-preview-frame';
 import { getThemeAppearancePickerTokens } from '@/app/components/shared/theme/theme-appearance-picker-tokens';
+import { useI18n } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 
 interface AmbientLightPreviewCardProps {
@@ -14,6 +15,7 @@ export function AmbientLightPreviewCard({
   ambientLightBleed,
   theme,
 }: AmbientLightPreviewCardProps) {
+  const { t } = useI18n();
   const isLightTheme = theme === 'light';
   const isContrastTheme = theme === 'contrast';
   const previewTokens = getThemeAppearancePickerTokens(theme, accentColor);
@@ -44,8 +46,12 @@ export function AmbientLightPreviewCard({
     <SettingsLivePreviewFrame
       accentColor={accentColor}
       theme={theme}
-      title="Light card"
-      subtitle={ambientLightBleed ? 'Ambient bleed enabled' : 'Contained inside card'}
+      title={t('settings.preview.lightCardTitle')}
+      subtitle={
+        ambientLightBleed
+          ? t('settings.preview.ambientBleedEnabled')
+          : t('settings.preview.containedInsideCard')
+      }
       topBar={
         <div
           className="h-3 w-16 rounded-full"

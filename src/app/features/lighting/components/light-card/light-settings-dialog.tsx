@@ -11,7 +11,7 @@ import {
 } from '@/app/components/shared/device-editor';
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { PRESET_COLORS } from '@/app/constants/light-constants';
-import { useTheme } from '@/app/hooks';
+import { useI18n, useTheme } from '@/app/hooks';
 import type { BrightnessPresetKey } from '../../stores/light-preset-store';
 import type { LightBrightnessPreset } from './light-card-types';
 
@@ -75,6 +75,7 @@ export const LightSettingsDialog = memo(function LightSettingsDialog({
   onIconChange,
 }: LightSettingsDialogProps) {
   const { primaryColor } = useTheme();
+  const { t } = useI18n();
   const colorMap = {
     orange: { from: 'from-orange-900/95', to: 'to-orange-950/95', border: 'border-orange-500/20' },
     blue: { from: 'from-blue-900/95', to: 'to-blue-950/95', border: 'border-blue-500/20' },
@@ -101,10 +102,16 @@ export const LightSettingsDialog = memo(function LightSettingsDialog({
           <CustomScrollbar isOn={isOn}>
             <div className="p-8">
               <DialogHeader
-                title="Light Settings"
+                title={t('lighting.settings.title')}
                 description={`${name} - ${room}`}
                 isOn={isOn}
-                trailing={<EntityRoomSelector entityId={entityId} label="Room" compact />}
+                trailing={
+                  <EntityRoomSelector
+                    entityId={entityId}
+                    label={t('lighting.settings.room')}
+                    compact
+                  />
+                }
               />
 
               <div className="space-y-8">
