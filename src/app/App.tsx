@@ -18,6 +18,7 @@ import { LoadingProvider } from './contexts/loading-context';
 import { ErrorProvider } from './contexts/error-context';
 import { NavigationProvider, useNavigation } from './contexts/navigation-context';
 import { SearchProvider } from './contexts/search-context';
+import { HomeAssistantProvider, useHomeAssistantContext } from './contexts/home-assistant-context';
 import { SecuritySection, TasksSection, LocksSection, LightsSection, MediaSection, SettingsSection } from './components/sections';
 import { 
   useCardState, 
@@ -27,6 +28,7 @@ import {
   useDeviceMap 
 } from './hooks';
 import { useDevices, useRooms } from './hooks/use-devices';
+import { useHADevices } from './hooks/use-ha-devices';
 import { useCustomCards } from './hooks/use-custom-cards';
 
 /**
@@ -35,28 +37,22 @@ import { useCustomCards } from './hooks/use-custom-cards';
  */
 function Dashboard() {
   const { activeSection } = useNavigation();
+  const { connected, connecting, error } = useHomeAssistantContext();
   const [devicesLoaded, setDevicesLoaded] = useState(false);
   const [showAddCardDialog, setShowAddCardDialog] = useState(false);
   
-  // Simulate initial device loading
-  useEffect(() => {
-    const loadDevices = async () => {
-      try {
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 800));
-        setDevicesLoaded(true);
-      } catch (err) {
-        console.error('Failed to load devices:', err);
-        setDevicesLoaded(true); // Still show dashboard even if load fails
-      }
-    };
-
-    loadDevices();
-  }, []);
-
-  // Fetch devices (mock data for now, would be React Query in production)
-  const devices = useDevices();
+  // Fetch devices from Home Assistant or fallback to mock data
+  const haDevices = useHADevices();
+  const mockDevices = useDevices();
+  const devices = connected ? haDevices : mockDevices;
   const rooms = useRooms(devices);
+  
+  // Set devices loaded when connected or when mock devices are ready
+  useEffect(() => {
+    if (connected || !connecting) {
+      setDevicesLoaded(true);
+    }
+  }, [connected, connecting]);
   
   // Custom hooks for state management
   const { activeRoom, changeRoom } = useRoomNavigation('All'); // Default to All view
@@ -130,7 +126,13 @@ function Dashboard() {
 
   // Show loading state during initial load
   if (!devicesLoaded) {
-    return <LoadingSpinner message="Loading devices..." fullScreen />;
+    const message = connecting ? "Connecting to Home Assistant..." : "Loading devices...";
+    return <LoadingSpinner message={message} fullScreen />;
+  }
+  
+  // Show connection error if Home Assistant connection failed
+  if (error) {
+    console.error('Home Assistant connection error:', error);
   }
 
   // Render different sections based on activeSection
@@ -236,7 +238,20 @@ function Dashboard() {
  */
 function AppContent() {
   const { isAuthenticated } = useAuth();
-  const { isConfigured } = useConfig();
+  const { isConfigured, config } = useConfig();
+  const { connected, connecting, connect } = useHomeAssistantContext();
+  
+  // Attempt to connect to Home Assistant when configured but not connected
+  useEffect(() => {
+    if (isConfigured && config && !connected && !connecting) {
+      connect({
+        hassUrl: config.url,
+        token: config.token
+      }).catch(err => {
+        console.error('Failed to connect to Home Assistant:', err);
+      });
+    }
+  }, [isConfigured, config, connected, connecting, connect]);
   
   return (
     <>
@@ -265,7 +280,9 @@ export default function App() {
             <AuthProvider>
               <SearchProvider>
                 <NavigationProvider>
-                  <AppContent />
+                  <HomeAssistantProvider>
+                    <AppContent />
+                  </HomeAssistantProvider>
                 </NavigationProvider>
               </SearchProvider>
             </AuthProvider>
