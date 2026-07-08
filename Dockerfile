@@ -1,4 +1,4 @@
-FROM node:22-alpine AS build
+FROM --platform=$BUILDPLATFORM node:22-alpine AS build
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
@@ -7,7 +7,7 @@ RUN corepack enable && pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm build
 
-FROM nginx:1.27-alpine
+FROM --platform=$TARGETPLATFORM nginx:1.27-alpine
 
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 COPY docker/config.js.template /usr/share/nginx/html/config.js.template
