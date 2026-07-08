@@ -153,6 +153,9 @@ export const RoomNav = memo(function RoomNav({
     } as CSSProperties;
   }, [theme]);
   const showAllViewGrouping = activeRoom === 'All' && onAllViewGroupingChange;
+  const hasEditMenus = Boolean(
+    (isEditMode && showAllViewGrouping) || (isEditMode && (onAddEntity || onAddCard))
+  );
   const actionPillClassName = `flex items-center gap-1.5 rounded-[22px] px-2.5 py-1.5 text-xs md:gap-2 md:px-3 md:py-2 md:text-sm transition-colors ${inactiveBg} ${hoverBg}`;
   const dropdownItemClassName = `rounded-xl px-3 py-2 ${surface.textPrimary} ${hoverBg}`;
   const allViewGroupingOptions: Array<{ label: string; value: AllViewGrouping }> = [
@@ -248,7 +251,7 @@ export const RoomNav = memo(function RoomNav({
                 </DropdownMenu>
               ) : null}
 
-              {isEditMode ? (
+              {hasEditMenus ? (
                 <div
                   aria-hidden="true"
                   className={`mx-1 h-6 w-px shrink-0 rounded-full ${dividerClass}`}

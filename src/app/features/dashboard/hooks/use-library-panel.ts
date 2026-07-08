@@ -8,7 +8,7 @@ export interface UseLibraryPanelReturn {
   isLibraryVisible: boolean;
   isLibraryCollapsed: boolean;
   libraryPosition: { x: number; y: number };
-  handleStartLibraryDrag: (event: ReactPointerEvent<HTMLButtonElement>) => void;
+  handleStartLibraryDrag: (event: ReactPointerEvent<HTMLElement>) => void;
   toggleLibraryVisibility: () => void;
   expandLibrary: () => void;
   collapseLibraryToDock: () => void;
@@ -36,7 +36,7 @@ export function useLibraryPanel(): UseLibraryPanelReturn {
     return () => window.removeEventListener('resize', placePanel);
   }, [isLibraryCollapsed]);
 
-  const handleStartLibraryDrag = (event: ReactPointerEvent<HTMLButtonElement>) => {
+  const handleStartLibraryDrag = (event: ReactPointerEvent<HTMLElement>) => {
     if (isLibraryCollapsed) return;
 
     const panel = libraryPanelRef.current;

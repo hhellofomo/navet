@@ -338,7 +338,7 @@ The card library is a draggable floating panel (`useLibraryPanel`) that overlays
 
 ### Section Partitioning
 
-Sections in `sectioned` mode are laid out in rows. The `partitionSectionRows` algorithm (in `use-home-dashboard-editor.ts`) enforces two hard constraints:
+Sections in `sectioned` mode are laid out in rows. The `partitionSectionRows` algorithm (exported from `use-home-dashboard-layout.ts`) enforces two hard constraints:
 
 - Maximum **4 sections per row**
 - Maximum combined span of **8 columns** per row
@@ -349,9 +349,10 @@ Each section carries a `HomeDashboardSectionSpan` value that controls how many g
 
 | Hook | Location | Responsibility |
 |---|---|---|
-| `useHomeDashboardEditor` | `hooks/use-home-dashboard-editor.ts` | Card map construction, library card list, section rows, flow card list, drag state, drag-end handler, library search/filtering, summary stats |
+| `useHomeDashboardEditor` | `hooks/use-home-dashboard-editor.ts` | Card map construction, library card list, section rows, flow card list, library search/filtering, summary stats |
+| `useDashboardDragState` | `hooks/use-dashboard-drag-state.ts` | dnd-kit sensors, active drag card/size, `handleDragOver`, `handleDragEnd`, drop-meta resolution |
 | `useLibraryPanel` | `hooks/use-library-panel.ts` | Floating panel position, drag-to-reposition, visibility/collapse toggles, resize-responsive repositioning |
-| `useHomeDashboardLayout` | `hooks/use-home-dashboard-layout.ts` | Persisted layout state — card IDs, section assignments, layout mode, hero visibility |
+| `useHomeDashboardLayout` | `hooks/use-home-dashboard-layout.ts` | Persisted layout state — card IDs, section assignments, layout mode, hero visibility; exports `partitionSectionRows` |
 
 ### Summary Stats
 
@@ -489,6 +490,30 @@ Beautiful placeholder screens for sections without data.
 - Locks: "No Smart Locks"
 - Lights: "No Lights"
 - Media: "No Media Players"
+
+### Inline Empty State Component
+
+**Location**: `/src/app/components/shared/inline-empty-state.tsx`
+
+Compact inline empty state for use inside panels and dialogs where the full-page centered treatment is too heavy.
+
+#### Props
+| Prop | Type | Required | Description |
+|---|---|---|---|
+| `title` | `string` | Yes | Primary heading |
+| `description` | `string` | Yes | Supporting text |
+| `surface` | `ReturnType<typeof getThemeSurfaceTokens>` | Yes | Theme surface tokens |
+| `accentColor` | `string` | No | Accent color for gradient tint (default `#9fb0ff`) |
+| `icon` | `LucideIcon` | No | Icon (default `Wand2`) |
+| `actionLabel` | `string` | No | Label for optional action button |
+| `onAction` | `() => void` | No | Callback for optional action button |
+| `actionIcon` | `LucideIcon` | No | Icon for optional action button |
+| `className` | `string` | No | Extra class names |
+| `children` | `ReactNode` | No | Additional content below the action |
+
+#### Used by
+- `NotificationEmptyState` — empty notifications panel
+- `AddEntityDialog` — no matching entities in search
 
 ---
 

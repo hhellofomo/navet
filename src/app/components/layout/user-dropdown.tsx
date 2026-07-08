@@ -1,4 +1,4 @@
-import { LogOut, Shield } from 'lucide-react';
+import { Activity, LogOut } from 'lucide-react';
 import { memo, useMemo, useState } from 'react';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
@@ -18,6 +18,7 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
   const { t } = useI18n();
   const surface = getThemeSurfaceTokens(theme);
   const user = useHomeAssistant(homeAssistantSelectors.user);
+  const connected = useHomeAssistant(homeAssistantSelectors.connected);
   const { logout } = useAuth();
 
   const handleLogout = () => {
@@ -29,14 +30,14 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
 
   // Theme colors
   const textPrimary = surface.textPrimary;
-  const textSecondary = surface.textSecondary;
   const textMuted = surface.textMuted;
   const divider = surface.border;
   const itemBg = surface.subtleBg;
+  const accentColor = getThemeColorValue(primaryColor);
   const dropdownPanelClassName = `rounded-2xl border shadow-2xl ${surface.panel} ${surface.border} ${
     theme === 'glass' ? 'backdrop-blur-xl' : ''
   }`;
-  const roleBadgeClassName = `flex items-center gap-2 rounded-lg px-3 py-2 ${itemBg}`;
+  const statusCardClassName = `flex items-center gap-3 rounded-xl border px-3 py-3 ${surface.border} ${itemBg}`;
   const logoutButtonClassName =
     'inline-flex w-full items-center gap-2 rounded-full bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/15';
 
@@ -65,8 +66,14 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
         aria-expanded={isOpen}
       >
         <Avatar
-          className="w-10 h-10 transition-transform group-hover:scale-105"
-          style={{ backgroundColor: getThemeColorValue(primaryColor) }}
+          className="h-10 w-10 transition-transform group-hover:scale-105"
+          style={{
+            backgroundColor: accentColor,
+            boxShadow: connected
+              ? `0 0 0 2px ${accentColor}55, 0 0 0 5px ${accentColor}18`
+              : undefined,
+            opacity: connected ? 1 : 0.82,
+          }}
         >
           {avatarUrl ? <AvatarImage src={avatarUrl} alt={fullName} /> : null}
           <AvatarFallback className="bg-transparent text-white text-sm font-semibold">
@@ -84,26 +91,51 @@ export const UserDropdown = memo(function UserDropdown({ avatarUrl }: UserDropdo
           <div className={`p-4 border-b ${divider}`}>
             <div className="flex items-center gap-3 mb-3">
               <Avatar
-                className="w-12 h-12"
-                style={{ backgroundColor: getThemeColorValue(primaryColor) }}
+                className="h-12 w-12"
+                style={{
+                  backgroundColor: accentColor,
+                  boxShadow: connected
+                    ? `0 0 0 2px ${accentColor}66, 0 0 0 6px ${accentColor}1f`
+                    : `0 0 0 1px rgba(255,255,255,0.08)`,
+                  opacity: connected ? 1 : 0.84,
+                }}
               >
                 {avatarUrl ? <AvatarImage src={avatarUrl} alt={fullName} /> : null}
                 <AvatarFallback className="bg-transparent text-white font-semibold">
                   {initials || t('userDropdown.defaultInitial')}
                 </AvatarFallback>
               </Avatar>
-              <div>
+              <div className="min-w-0">
                 <p className={`text-sm font-semibold ${textPrimary}`}>{fullName}</p>
-                <p className={`text-xs ${textMuted}`}>{t('userDropdown.connected')}</p>
+                <p className={`mt-0.5 text-xs ${textMuted}`}>{roleLabel}</p>
               </div>
             </div>
 
-            {/* Role Badge */}
-            <div className={roleBadgeClassName}>
-              <Shield className={`w-4 h-4 ${textSecondary}`} />
-              <div>
-                <p className={`text-xs ${textMuted}`}>{t('userDropdown.roleLabel')}</p>
-                <p className={`text-sm font-medium ${textPrimary}`}>{roleLabel}</p>
+            <div className={statusCardClassName}>
+              <div
+                className="flex h-9 w-9 items-center justify-center rounded-xl"
+                style={{
+                  backgroundColor: connected ? `${accentColor}1f` : 'rgba(255,255,255,0.05)',
+                }}
+              >
+                <Activity
+                  className="h-4 w-4"
+                  style={{ color: connected ? accentColor : undefined }}
+                />
+              </div>
+              <div className="min-w-0">
+                <p className={`text-xs ${textMuted}`}>
+                  {t('settings.system.connection.connectedTo')}
+                </p>
+                <div className="mt-0.5 flex items-center gap-2">
+                  <span
+                    className="h-2 w-2 rounded-full"
+                    style={{ backgroundColor: connected ? '#22c55e' : '#6b7280' }}
+                  />
+                  <p className={`truncate text-sm font-medium ${textPrimary}`}>
+                    {connected ? 'Home Assistant' : t('settings.system.connection.notConnected')}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

@@ -14,6 +14,7 @@ import {
   Rows3,
   Search,
   Wand2,
+  X,
 } from 'lucide-react';
 import { type CSSProperties, memo, type ReactNode } from 'react';
 import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-size-selector';
@@ -120,10 +121,13 @@ export const HomeDashboardOverview = memo(function HomeDashboardOverview({
     allCards,
     flowCards,
     sectionRows,
+    activeSectionId,
+    setActiveSectionId,
     activeDragCard,
     setActiveDragCard,
     activeDragSize,
     sensors,
+    handleDragOver,
     handleDragEnd,
     libraryCards,
     libraryQuery,
@@ -175,6 +179,7 @@ export const HomeDashboardOverview = memo(function HomeDashboardOverview({
         const dragMeta = event.active.data.current as DragMeta | undefined;
         setActiveDragCard(dragMeta?.cardId ?? null);
       }}
+      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
       <div className="space-y-6 md:space-y-8">
@@ -293,9 +298,9 @@ export const HomeDashboardOverview = memo(function HomeDashboardOverview({
                         <Columns2 className="h-4 w-4" />
                         <span className={surface.textPrimary}>Add column</span>
                       </button>
+                      <div className="hidden h-8 self-center w-px rounded-full bg-white/24 md:block" />
                     </>
                   ) : null}
-                  <div className="hidden h-8 self-center w-px rounded-full bg-white/24 md:block" />
                   <ModeChip
                     active={homeLayout.mode === 'flow'}
                     icon={<LayoutPanelTop className="h-4 w-4" />}
@@ -329,6 +334,8 @@ export const HomeDashboardOverview = memo(function HomeDashboardOverview({
                           key={row.map((section) => section.id).join(':')}
                           row={row}
                           sectionGridCols={sectionGridCols}
+                          activeSectionId={activeSectionId}
+                          accentColor={accentColor}
                           allCards={allCards}
                           cardSizes={cardSizes}
                           updateCardSize={updateCardSize}
@@ -336,6 +343,11 @@ export const HomeDashboardOverview = memo(function HomeDashboardOverview({
                           onUpdateCard={onUpdateCard}
                           onRemoveFromLayout={removeHomeCard}
                           showHero={homeLayout.showHero}
+                          onSelectSection={setActiveSectionId}
+                          onOpenLibraryForSection={(sectionId) => {
+                            setActiveSectionId(sectionId);
+                            expandLibrary();
+                          }}
                           onRenameSection={renameHomeSection}
                           onRemoveSection={removeHomeSection}
                           surface={surface}
@@ -389,11 +401,23 @@ export const HomeDashboardOverview = memo(function HomeDashboardOverview({
       {isLibraryVisible && !isLibraryCollapsed ? (
         <aside
           ref={libraryPanelRef}
-          className={`fixed z-40 w-[360px] rounded-[28px] border p-5 md:p-6 ${surface.border} ${surface.panel} ${surface.cardShadow}`}
+          className={`fixed z-40 w-[360px] cursor-grab rounded-[28px] border p-5 active:cursor-grabbing md:p-6 ${surface.border} ${surface.panel} ${surface.cardShadow}`}
           style={{
             width: `${FLOATING_LIBRARY_WIDTH}px`,
             left: `${libraryPosition.x}px`,
             top: `${libraryPosition.y}px`,
+          }}
+          onPointerDown={(event) => {
+            const target = event.target as HTMLElement;
+            if (
+              target.closest(
+                'button, input, textarea, select, a, [role="button"], [data-library-interactive="true"]'
+              )
+            ) {
+              return;
+            }
+
+            handleStartLibraryDrag(event);
           }}
         >
           <div className="flex items-start justify-between gap-3">
@@ -408,24 +432,25 @@ export const HomeDashboardOverview = memo(function HomeDashboardOverview({
             <div className="ml-auto flex items-center gap-2">
               <button
                 type="button"
-                onPointerDown={handleStartLibraryDrag}
-                className={`rounded-full border p-2 ${surface.border} ${surface.hoverBg}`}
-                aria-label="Drag card library"
-              >
-                <GripVertical className={`h-4 w-4 ${surface.textPrimary}`} />
-              </button>
-              <button
-                type="button"
                 onClick={collapseLibraryToDock}
                 className={`rounded-full border p-2 ${surface.border} ${surface.hoverBg}`}
                 aria-label="Put away card library"
               >
                 <ChevronRight className={`h-4 w-4 ${surface.textPrimary}`} />
               </button>
+              <button
+                type="button"
+                onClick={toggleLibraryVisibility}
+                className={`rounded-full border p-2 ${surface.border} ${surface.hoverBg}`}
+                aria-label="Close card library"
+              >
+                <X className={`h-4 w-4 ${surface.textPrimary}`} />
+              </button>
             </div>
           </div>
 
           <div
+            data-library-interactive="true"
             className={`mt-4 flex items-center gap-2 rounded-[18px] border px-3 py-3 ${surface.border} ${surface.panelMuted}`}
           >
             <Search className={`h-4 w-4 shrink-0 ${surface.textMuted}`} />
@@ -481,6 +506,8 @@ function SectionCanvas({
   sectionId,
   title,
   renderedSpan,
+  isActive,
+  accentColor,
   cardIds,
   allCards,
   cardSizes,
@@ -489,6 +516,8 @@ function SectionCanvas({
   onUpdateCard,
   onRemoveFromLayout,
   showHero,
+  onSelectSection,
+  onOpenLibraryForSection,
   onRenameSection,
   onRemoveSection,
   surface,
@@ -496,6 +525,8 @@ function SectionCanvas({
   sectionId: string;
   title: string;
   renderedSpan: number;
+  isActive: boolean;
+  accentColor: string;
   cardIds: string[];
   allCards: Map<string, DeviceWithType | CustomCard>;
   cardSizes: Record<string, CardSize>;
@@ -504,25 +535,46 @@ function SectionCanvas({
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
   onRemoveFromLayout: (cardId: string) => void;
   showHero: boolean;
+  onSelectSection: (sectionId: string) => void;
+  onOpenLibraryForSection: (sectionId: string) => void;
   onRenameSection: (sectionId: string, title: string) => void;
   onRemoveSection: (sectionId: string) => void;
   surface: ReturnType<typeof getThemeSurfaceTokens>;
 }) {
   return (
-    <div
-      className={`rounded-[24px] border p-4 ${surface.border} ${surface.panelMuted}`}
-      style={{ gridColumn: `span ${renderedSpan} / span ${renderedSpan}` }}
+    <section
+      className={`relative rounded-[24px] border p-4 transition-[border-color,box-shadow,background-color] ${
+        isActive
+          ? `${surface.borderStrong} ${surface.panel}`
+          : `${surface.border} ${surface.panelMuted}`
+      }`}
+      style={{
+        gridColumn: `span ${renderedSpan} / span ${renderedSpan}`,
+        boxShadow: isActive
+          ? `0 0 0 2px ${accentColor}55, 0 22px 52px -34px ${accentColor}aa`
+          : undefined,
+      }}
     >
-      <div className="mb-4 flex items-center gap-3">
+      <button
+        type="button"
+        aria-label={`Select ${title || 'section'}`}
+        className="absolute inset-0 rounded-[24px]"
+        onClick={() => onSelectSection(sectionId)}
+      />
+      <div className="relative z-10 mb-4 flex items-center gap-3">
         <input
           type="text"
           value={title}
           onChange={(event) => onRenameSection(sectionId, event.target.value)}
+          onFocus={() => onSelectSection(sectionId)}
           className={`min-w-0 flex-1 bg-transparent text-lg font-semibold outline-none ${surface.textPrimary}`}
         />
         <button
           type="button"
-          onClick={() => onRemoveSection(sectionId)}
+          onClick={(event) => {
+            event.stopPropagation();
+            onRemoveSection(sectionId);
+          }}
           className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${surface.border} ${surface.textSecondary} ${surface.hoverBg}`}
         >
           Remove
@@ -533,36 +585,42 @@ function SectionCanvas({
         items={cardIds.map((cardId) => `home-card-${cardId}`)}
         strategy={rectSortingStrategy}
       >
-        <HomeContainerDropZone sectionId={sectionId} cardIds={cardIds}>
-          {cardIds.length > 0 ? (
-            <CardGrid
-              cardIds={cardIds}
-              sectionId={sectionId}
-              allCards={allCards}
-              cardSizes={cardSizes}
-              updateCardSize={updateCardSize}
-              isEditMode={isEditMode}
-              onUpdateCard={onUpdateCard}
-              onRemoveFromLayout={onRemoveFromLayout}
-              showHero={showHero}
-            />
-          ) : (
-            <EmptyCanvas
-              label="Drop cards here"
-              description="Drag device cards or widgets into this section."
-              surface={surface}
-              compact
-            />
-          )}
-        </HomeContainerDropZone>
+        <div className="relative z-10">
+          <HomeContainerDropZone sectionId={sectionId} cardIds={cardIds}>
+            {cardIds.length > 0 ? (
+              <CardGrid
+                cardIds={cardIds}
+                sectionId={sectionId}
+                gridCols={renderedSpan}
+                allCards={allCards}
+                cardSizes={cardSizes}
+                updateCardSize={updateCardSize}
+                isEditMode={isEditMode}
+                onUpdateCard={onUpdateCard}
+                onRemoveFromLayout={onRemoveFromLayout}
+                showHero={showHero}
+              />
+            ) : (
+              <EmptyCanvas
+                label="Drop cards here"
+                description="Drag device cards or widgets into this section."
+                surface={surface}
+                compact
+                onClick={() => onOpenLibraryForSection(sectionId)}
+              />
+            )}
+          </HomeContainerDropZone>
+        </div>
       </SortableContext>
-    </div>
+    </section>
   );
 }
 
 function SectionRowCanvas({
   row,
   sectionGridCols,
+  activeSectionId,
+  accentColor,
   allCards,
   cardSizes,
   updateCardSize,
@@ -570,6 +628,8 @@ function SectionRowCanvas({
   onUpdateCard,
   onRemoveFromLayout,
   showHero,
+  onSelectSection,
+  onOpenLibraryForSection,
   onRenameSection,
   onRemoveSection,
   surface,
@@ -581,6 +641,8 @@ function SectionRowCanvas({
     cardIds: string[];
   }>;
   sectionGridCols: number;
+  activeSectionId: string | null;
+  accentColor: string;
   allCards: Map<string, DeviceWithType | CustomCard>;
   cardSizes: Record<string, CardSize>;
   updateCardSize: (id: string, size: CardSize) => void;
@@ -588,6 +650,8 @@ function SectionRowCanvas({
   onUpdateCard?: (cardId: string, data: Record<string, unknown>) => void;
   onRemoveFromLayout: (cardId: string) => void;
   showHero: boolean;
+  onSelectSection: (sectionId: string) => void;
+  onOpenLibraryForSection: (sectionId: string) => void;
   onRenameSection: (sectionId: string, title: string) => void;
   onRemoveSection: (sectionId: string) => void;
   surface: ReturnType<typeof getThemeSurfaceTokens>;
@@ -609,6 +673,8 @@ function SectionRowCanvas({
             sectionId={section.id}
             title={section.title}
             renderedSpan={getRenderedSectionSpan(section.span, sectionGridCols)}
+            isActive={activeSectionId === section.id}
+            accentColor={accentColor}
             cardIds={section.cardIds}
             allCards={allCards}
             cardSizes={cardSizes}
@@ -617,6 +683,8 @@ function SectionRowCanvas({
             onUpdateCard={onUpdateCard}
             onRemoveFromLayout={onRemoveFromLayout}
             showHero={showHero}
+            onSelectSection={onSelectSection}
+            onOpenLibraryForSection={onOpenLibraryForSection}
             onRenameSection={onRenameSection}
             onRemoveSection={onRemoveSection}
             surface={surface}
@@ -680,6 +748,7 @@ function FlowCanvas({
 function CardGrid({
   cardIds,
   sectionId,
+  gridCols,
   allCards,
   cardSizes,
   updateCardSize,
@@ -691,6 +760,7 @@ function CardGrid({
 }: {
   cardIds: string[];
   sectionId?: string;
+  gridCols?: number;
   allCards: Map<string, DeviceWithType | CustomCard>;
   cardSizes: Record<string, CardSize>;
   updateCardSize: (id: string, size: CardSize) => void;
@@ -700,8 +770,19 @@ function CardGrid({
   showHero: boolean;
   sortable?: boolean;
 }) {
+  const breakpointCols = useBreakpointCols();
+  const renderedGridCols = Math.max(1, Math.min(gridCols ?? breakpointCols, breakpointCols));
+
   return (
-    <div className="grid w-full grid-flow-row-dense grid-cols-2 auto-rows-[87px] gap-2 md:grid-cols-4 md:gap-3 xl:grid-cols-6 lg:gap-4 2xl:grid-cols-8">
+    <div
+      className="grid w-full grid-flow-row-dense auto-rows-[87px] gap-2 md:gap-3 lg:gap-4"
+      style={
+        {
+          '--home-card-cols': renderedGridCols,
+          gridTemplateColumns: 'repeat(var(--home-card-cols), minmax(0, 1fr))',
+        } as CSSProperties
+      }
+    >
       {cardIds.map((cardId) => {
         const entry = allCards.get(cardId);
         if (!entry) {
@@ -854,15 +935,14 @@ function HomePresentation({
                 }}
               >
                 <div className="mb-3 flex items-center gap-3">
-                  <h2
-                    className={`text-sm font-semibold uppercase tracking-[0.14em] ${surface.textMuted}`}
-                  >
+                  <h2 className={`text-lg font-semibold md:text-xl ${surface.textPrimary}`}>
                     {section.title}
                   </h2>
                   <div className={`h-px flex-1 ${surface.borderStrong}`} />
                 </div>
                 <CardGrid
                   cardIds={section.cardIds}
+                  gridCols={getRenderedSectionSpan(section.span, sectionGridCols)}
                   allCards={allCards}
                   cardSizes={cardSizes}
                   updateCardSize={updateCardSize}
@@ -937,22 +1017,15 @@ function SortableHomeCard({
   return (
     <div
       ref={setNodeRef}
+      {...attributes}
+      {...listeners}
       style={{
-        transform: CSS.Transform.toString(transform),
+        transform: CSS.Translate.toString(transform),
         transition,
       }}
-      className={`${className} relative h-full ${isDragging ? 'opacity-40' : ''}`}
+      className={`${className} relative h-full cursor-grab active:cursor-grabbing ${isDragging ? 'opacity-40' : ''}`}
       data-card-id={cardId}
     >
-      <button
-        type="button"
-        aria-label="Drag card"
-        className="absolute bottom-2 left-1/2 z-50 -translate-x-1/2 cursor-grab touch-none rounded-full p-1 opacity-40 hover:opacity-80 active:cursor-grabbing"
-        {...attributes}
-        {...listeners}
-      >
-        <GripVertical className="h-4 w-4 text-white" />
-      </button>
       {children}
     </div>
   );
@@ -999,6 +1072,7 @@ function LibraryCardRow({
   return (
     <div
       ref={setNodeRef}
+      data-library-interactive="true"
       className={`flex w-full items-center gap-3 rounded-[22px] border p-3 text-left transition-colors ${surface.border} ${surface.panelMuted} ${surface.hoverBg} ${isDragging ? 'opacity-50' : ''}`}
       {...attributes}
       {...listeners}
@@ -1067,19 +1141,55 @@ function EmptyCanvas({
   description,
   surface,
   compact = false,
+  onClick,
 }: {
   label: string;
   description: string;
   surface: ReturnType<typeof getThemeSurfaceTokens>;
   compact?: boolean;
+  onClick?: () => void;
 }) {
+  const content = (
+    <div
+      className={`relative overflow-hidden rounded-[20px] border-2 border-dashed text-center ${
+        compact ? 'min-h-[180px] px-5 py-6' : 'min-h-[220px] px-5 py-8'
+      } ${surface.panelMuted}`}
+      style={{
+        borderColor: 'rgba(255,255,255,0.16)',
+        background:
+          'radial-gradient(circle at top left, rgba(159,176,255,0.1), transparent 34%), radial-gradient(circle at bottom right, rgba(159,176,255,0.06), transparent 28%)',
+      }}
+    >
+      <div className="relative mx-auto flex max-w-lg flex-col items-center justify-center">
+        <div
+          className={`text-[11px] font-semibold uppercase tracking-[0.16em] ${surface.textMuted}`}
+        >
+          Empty section
+        </div>
+        <h3 className={`mt-2 text-base font-semibold tracking-tight ${surface.textPrimary}`}>
+          {label}
+        </h3>
+        <p className={`mt-2 max-w-md text-sm leading-6 ${surface.textSecondary}`}>{description}</p>
+        <div
+          className={`mt-4 text-[11px] font-medium uppercase tracking-[0.16em] ${surface.textMuted}`}
+        >
+          Drag cards here or click to open the library
+        </div>
+      </div>
+    </div>
+  );
+
+  if (!onClick) {
+    return content;
+  }
+
   return (
-    <DashboardEmptyState
-      title={label}
-      description={description}
-      surface={surface}
-      accentColor="#9fb0ff"
-      compact={compact}
-    />
+    <button
+      type="button"
+      onClick={onClick}
+      className="block w-full text-left transition-transform hover:scale-[1.01]"
+    >
+      {content}
+    </button>
   );
 }

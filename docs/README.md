@@ -117,6 +117,9 @@ Complete documentation for the Navet smart home dashboard.
 **Understand the energy dashboard, widgets, and chart primitives:**
 → See [Features -> Energy Dashboard](../design-system/FEATURES.md#energy-dashboard)
 
+**Understand the shared inline empty state used in panels and dialogs:**
+→ See [Features -> Inline Empty State](../design-system/FEATURES.md#inline-empty-state-component)
+
 **Understand calendar card behavior and source selection:**
 → See [Main README -> Calendar Cards](../README.md#calendar-cards)
 
@@ -174,5 +177,5 @@ docs/
 
 ---
 
-**Last Updated:** March 19, 2026
+**Last Updated:** March 21, 2026
 **Documentation Status:** ✅ Complete and organized

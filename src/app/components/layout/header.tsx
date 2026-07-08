@@ -6,9 +6,25 @@ import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surfa
 import { useAuth } from '@/app/contexts/auth-context';
 import { NotificationPanel, useNotifications } from '@/app/features/notifications';
 import { useDevices, useHomeAssistant, useI18n, useSearch, useTheme } from '@/app/hooks';
+import type { TranslationKey } from '@/app/i18n';
 import { homeAssistantSelectors } from '@/app/stores/selectors';
 import { getWeekNumber } from '@/app/utils/format';
 import { UserDropdown } from './user-dropdown';
+
+function getGreetingKey(hour: number): TranslationKey {
+  const casual: TranslationKey[] = [
+    'header.greeting.hi',
+    'header.greeting.hey',
+    'header.greeting.welcome',
+  ];
+  if (Math.random() < 0.25) {
+    return casual[Math.floor(Math.random() * casual.length)];
+  }
+  if (hour >= 5 && hour < 12) return 'header.greeting.morning';
+  if (hour >= 12 && hour < 17) return 'header.greeting.afternoon';
+  if (hour >= 17 && hour < 21) return 'header.greeting.evening';
+  return 'header.greeting.night';
+}
 
 export const Header = memo(function Header() {
   const { theme, primaryColor } = useTheme();
@@ -20,7 +36,10 @@ export const Header = memo(function Header() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [currentDateTime, setCurrentDateTime] = useState(() => new Date());
+  const [greetingKey] = useState(() => getGreetingKey(new Date().getHours()));
   const mobileSearchInputRef = useRef<HTMLInputElement | null>(null);
+  const mobileNotificationButtonRef = useRef<HTMLButtonElement | null>(null);
+  const desktopNotificationButtonRef = useRef<HTMLButtonElement | null>(null);
   const { searchQuery, setSearchQuery, setFilteredDeviceIds, clearSearch, isSearchActive } =
     useSearch();
   const devices = useDevices();
@@ -185,7 +204,7 @@ export const Header = memo(function Header() {
                 <h1
                   className={`min-w-0 text-[1.55rem] leading-none md:text-4xl font-bold ${textPrimary}`}
                 >
-                  {t('header.greeting', { name: firstName })}
+                  {t(greetingKey, { name: firstName })}
                 </h1>
                 <AppReleaseBadge className="shrink-0 translate-y-[1px] scale-90 md:scale-100" />
               </div>
@@ -237,6 +256,7 @@ export const Header = memo(function Header() {
 
               <div className="relative">
                 <button
+                  ref={mobileNotificationButtonRef}
                   type="button"
                   onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                   className={`relative p-2 rounded-[22px] ${hoverBg} transition-colors`}
@@ -253,6 +273,7 @@ export const Header = memo(function Header() {
                 <NotificationPanel
                   isOpen={isNotificationOpen}
                   onClose={() => setIsNotificationOpen(false)}
+                  triggerRefs={[mobileNotificationButtonRef, desktopNotificationButtonRef]}
                 />
               </div>
 
@@ -293,6 +314,7 @@ export const Header = memo(function Header() {
 
           <div className="relative">
             <button
+              ref={desktopNotificationButtonRef}
               type="button"
               onClick={() => setIsNotificationOpen(!isNotificationOpen)}
               className={`relative p-2 rounded-[22px] ${hoverBg} transition-colors`}
@@ -309,6 +331,7 @@ export const Header = memo(function Header() {
             <NotificationPanel
               isOpen={isNotificationOpen}
               onClose={() => setIsNotificationOpen(false)}
+              triggerRefs={[mobileNotificationButtonRef, desktopNotificationButtonRef]}
             />
           </div>
 

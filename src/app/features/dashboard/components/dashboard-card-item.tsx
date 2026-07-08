@@ -1,6 +1,6 @@
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { EyeOff, GripVertical, X } from 'lucide-react';
+import { EyeOff, X } from 'lucide-react';
 import { memo } from 'react';
 import { CardEditActionButton } from '@/app/components/shared/card-edit-action-button';
 import { type CardSize, getCardSpanClass } from '@/app/components/shared/card-size-selector';
@@ -117,21 +117,14 @@ export const DashboardCardItem = memo(function DashboardCardItem({
   return (
     <div
       ref={setNodeRef}
+      {...(draggable ? attributes : {})}
+      {...(draggable ? listeners : {})}
       className={`relative h-full ${device?.type === 'lights' && ambientLightBleed ? '[contain:layout_style]' : '[contain:layout_style_paint]'} ${spanClass} ${isDragging ? 'opacity-40' : ''}`}
       style={transform ? { transform: CSS.Translate.toString(transform) } : undefined}
+      data-card-nodrag={draggable ? undefined : 'true'}
       data-draggable-card="true"
+      data-card-drag-surface={draggable ? 'true' : undefined}
     >
-      {draggable && (
-        <button
-          type="button"
-          aria-label="Drag to rezone"
-          className="absolute bottom-2 left-1/2 z-50 -translate-x-1/2 cursor-grab touch-none rounded-full p-1 opacity-40 hover:opacity-80 active:cursor-grabbing"
-          {...listeners}
-          {...attributes}
-        >
-          <GripVertical className="h-4 w-4 text-white" />
-        </button>
-      )}
       {cardContent}
     </div>
   );

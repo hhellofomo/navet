@@ -1,0 +1,161 @@
+import {
+  type DragEndEvent,
+  type DragOverEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { useMemo, useRef, useState } from 'react';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
+import type { DeviceWithType } from '@/app/types/device.types';
+import type { CustomCard } from '../stores/custom-cards-store';
+import type { DragMeta, DropMeta } from './use-home-dashboard-editor';
+
+const NO_DRAG_SELECTOR = [
+  'button',
+  'input',
+  'textarea',
+  'select',
+  'a',
+  '[role="slider"]',
+  '[role="switch"]',
+  '[data-card-interactive]',
+  '[data-dashboard-edit-action]',
+  '[data-card-nodrag="true"]:not([data-draggable-card="true"])',
+].join(', ');
+
+class DashboardPointerSensor extends PointerSensor {
+  static activators = [
+    {
+      eventName: 'onPointerDown' as const,
+      handler: ({ nativeEvent }: { nativeEvent: PointerEvent }) => {
+        const target = nativeEvent.target;
+        if (!(target instanceof HTMLElement)) {
+          return false;
+        }
+
+        if (target.closest(NO_DRAG_SELECTOR)) {
+          return false;
+        }
+
+        return nativeEvent.isPrimary && nativeEvent.button === 0;
+      },
+    },
+  ];
+}
+
+function resolveDropMeta(
+  rawMeta: DropMeta | undefined,
+  rawId: string | number | undefined
+): DropMeta | undefined {
+  if (rawMeta) {
+    return rawMeta;
+  }
+
+  if (typeof rawId !== 'string') {
+    return undefined;
+  }
+
+  if (rawId.startsWith('home-card-')) {
+    return { type: 'card', cardId: rawId.slice('home-card-'.length) };
+  }
+
+  if (rawId === 'home-container-flow') {
+    return { type: 'container' };
+  }
+
+  if (rawId.startsWith('home-container-')) {
+    return { type: 'container', sectionId: rawId.slice('home-container-'.length) };
+  }
+
+  return undefined;
+}
+
+interface UseDashboardDragStateParams {
+  allCards: Map<string, DeviceWithType | CustomCard>;
+  cardSizes: Record<string, CardSize>;
+  addHomeCard: (cardId: string, sectionId?: string) => void;
+  moveHomeCard: (activeId: string, overId: string | null, sectionId?: string) => void;
+}
+
+export function useDashboardDragState({
+  allCards,
+  cardSizes,
+  addHomeCard,
+  moveHomeCard,
+}: UseDashboardDragStateParams) {
+  const [activeDragCard, setActiveDragCard] = useState<string | null>(null);
+  const lastResolvedOverRef = useRef<DropMeta | null>(null);
+
+  const sensors = useSensors(
+    useSensor(DashboardPointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const activeDragSize = useMemo<CardSize | null>(() => {
+    if (!activeDragCard) return null;
+    const entry = allCards.get(activeDragCard);
+    const resolvedSize = cardSizes[activeDragCard];
+    if (resolvedSize) return resolvedSize;
+    if (entry && 'size' in entry) return entry.size as CardSize;
+    return 'small';
+  }, [activeDragCard, allCards, cardSizes]);
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const activeMeta = event.active.data.current as DragMeta | undefined;
+    const overMeta = resolveDropMeta(
+      event.over?.data.current as DropMeta | undefined,
+      event.over?.id
+    );
+
+    if (!activeMeta || !overMeta) {
+      return;
+    }
+
+    if (
+      overMeta.type === 'card' &&
+      activeMeta.source === 'home' &&
+      overMeta.cardId === activeMeta.cardId
+    ) {
+      return;
+    }
+
+    lastResolvedOverRef.current = overMeta;
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const activeMeta = event.active.data.current as DragMeta | undefined;
+    const overMeta =
+      resolveDropMeta(event.over?.data.current as DropMeta | undefined, event.over?.id) ??
+      lastResolvedOverRef.current;
+
+    setActiveDragCard(null);
+    lastResolvedOverRef.current = null;
+
+    if (!activeMeta || !overMeta) return;
+
+    const targetSectionId = overMeta.sectionId;
+    const overCardId = overMeta.type === 'card' ? overMeta.cardId : null;
+
+    if (activeMeta.source === 'library') {
+      addHomeCard(activeMeta.cardId, targetSectionId);
+      moveHomeCard(activeMeta.cardId, overCardId, targetSectionId);
+      return;
+    }
+
+    if (activeMeta.cardId === overCardId) return;
+
+    moveHomeCard(activeMeta.cardId, overCardId, targetSectionId);
+  };
+
+  return {
+    activeDragCard,
+    setActiveDragCard,
+    activeDragSize,
+    sensors,
+    handleDragOver,
+    handleDragEnd,
+  };
+}
