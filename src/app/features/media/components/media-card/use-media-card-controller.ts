@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useAuth } from '@/app/contexts/auth-context';
-import { fetchMediaThumbnailDataUrl } from '@/app/features/media/utils/media-thumbnail';
-import { useHomeAssistant, useI18n } from '@/app/hooks';
+import { useI18n } from '@/app/hooks';
 import { homeAssistantService } from '@/app/services/home-assistant.service';
-import { homeAssistantSelectors } from '@/app/stores/selectors';
 import {
   resolveHomeAssistantAbsoluteUrl,
   resolveHomeAssistantProxyUrl,
@@ -41,18 +39,16 @@ export function useMediaCardController({
   initialPositionUpdatedAt,
 }: UseMediaCardControllerParams) {
   const { config: authConfig } = useAuth();
-  const connected = useHomeAssistant(homeAssistantSelectors.connected);
-  const connection = useHomeAssistant(homeAssistantSelectors.connection);
   const { t } = useI18n();
   const [state, setState] = useState(initialState);
   const [volume, setVolume] = useState(initialVolume);
   const [isMuted, setIsMuted] = useState(initialMuted);
+  const [previousVolume, setPreviousVolume] = useState(initialVolume > 0 ? initialVolume : 50);
   const [isOpen, setIsOpen] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(initialElapsedSeconds ?? 0);
   const [durationSeconds, setDurationSeconds] = useState(initialDurationSeconds ?? 0);
   const [failedArtworkUrl, setFailedArtworkUrl] = useState<string | null>(null);
   const [resolvedAlbumArt, setResolvedAlbumArt] = useState<string | null>(null);
-  const [thumbnailAlbumArt, setThumbnailAlbumArt] = useState<string | null>(null);
   const artworkRequestKey = [entityId, artworkKey].filter(Boolean).join('::');
   const fallbackArtwork = entityPicture
     ? import.meta.env.DEV
@@ -66,11 +62,14 @@ export function useMediaCardController({
 
   useEffect(() => {
     setVolume(initialVolume);
+    if (initialVolume > 0) {
+      setPreviousVolume(initialVolume);
+    }
   }, [initialVolume]);
 
   useEffect(() => {
-    setIsMuted(initialMuted);
-  }, [initialMuted]);
+    setIsMuted(initialMuted || initialVolume === 0);
+  }, [initialMuted, initialVolume]);
 
   useEffect(() => {
     setElapsedSeconds(initialElapsedSeconds ?? 0);
@@ -82,50 +81,15 @@ export function useMediaCardController({
 
   useEffect(() => {
     if (!artworkRequestKey) {
-      setThumbnailAlbumArt(null);
       setResolvedAlbumArt(
         isFailedArtworkCandidate(fallbackArtwork, failedArtworkUrl) ? null : fallbackArtwork
       );
       return;
     }
-
-    let cancelled = false;
-
-    void (async () => {
-      if (!connected || !connection) {
-        if (!cancelled) {
-          setResolvedAlbumArt(
-            isFailedArtworkCandidate(fallbackArtwork, failedArtworkUrl) ? null : fallbackArtwork
-          );
-        }
-        return;
-      }
-
-      const thumbnailDataUrl = await fetchMediaThumbnailDataUrl(entityId, connection).catch(
-        () => null
-      );
-      if (thumbnailDataUrl && !isFailedArtworkCandidate(thumbnailDataUrl, failedArtworkUrl)) {
-        if (cancelled) {
-          return;
-        }
-
-        setThumbnailAlbumArt(thumbnailDataUrl);
-        setResolvedAlbumArt(thumbnailDataUrl);
-        return;
-      }
-
-      if (!cancelled) {
-        setThumbnailAlbumArt(null);
-        setResolvedAlbumArt(
-          isFailedArtworkCandidate(fallbackArtwork, failedArtworkUrl) ? null : fallbackArtwork
-        );
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [artworkRequestKey, connected, connection, entityId, failedArtworkUrl, fallbackArtwork]);
+    setResolvedAlbumArt(
+      isFailedArtworkCandidate(fallbackArtwork, failedArtworkUrl) ? null : fallbackArtwork
+    );
+  }, [artworkRequestKey, failedArtworkUrl, fallbackArtwork]);
 
   useEffect(() => {
     if (!artworkRequestKey) {
@@ -133,7 +97,6 @@ export function useMediaCardController({
     }
 
     setFailedArtworkUrl(null);
-    setThumbnailAlbumArt(null);
   }, [artworkRequestKey]);
 
   const isPlaying = state === 'playing';
@@ -193,22 +156,43 @@ export function useMediaCardController({
   const toggleMute = useCallback(() => {
     const nextMuted = !isMuted;
     setIsMuted(nextMuted);
+    if (nextMuted) {
+      const nextPreviousVolume = volume > 0 ? volume : previousVolume;
+      setPreviousVolume(nextPreviousVolume);
+      setVolume(0);
+      void runAction(
+        () => homeAssistantService.setMediaPlayerVolume(entityId, 0),
+        t('media.feedback.updateVolumeFailed')
+      );
+      return;
+    }
+
+    const restoredVolume = previousVolume > 0 ? previousVolume : 50;
+    setVolume(restoredVolume);
     void runAction(
-      () => homeAssistantService.setMediaPlayerMute(entityId, nextMuted),
+      () => homeAssistantService.setMediaPlayerVolume(entityId, restoredVolume),
       t('media.feedback.updateVolumeFailed')
     );
-  }, [entityId, isMuted, runAction, t]);
+  }, [entityId, isMuted, previousVolume, runAction, t, volume]);
 
   const handleVolumeChange = useCallback(
     (nextVolume: number) => {
       setVolume(nextVolume);
+      if (nextVolume > 0) {
+        setPreviousVolume(nextVolume);
+      }
+
       if (nextVolume > 0 && isMuted) {
         setIsMuted(false);
-        void runAction(async () => {
-          await homeAssistantService.setMediaPlayerMute(entityId, false);
-          await homeAssistantService.setMediaPlayerVolume(entityId, nextVolume);
-        }, t('media.feedback.updateVolumeFailed'));
+        void runAction(
+          () => homeAssistantService.setMediaPlayerVolume(entityId, nextVolume),
+          t('media.feedback.updateVolumeFailed')
+        );
         return;
+      }
+
+      if (nextVolume === 0) {
+        setIsMuted(true);
       }
 
       void runAction(
@@ -252,7 +236,6 @@ export function useMediaCardController({
 
   return {
     albumArt: resolvedAlbumArt,
-    thumbnailAlbumArt,
     closeDialog,
     durationSeconds,
     elapsedSeconds,

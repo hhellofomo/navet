@@ -15,7 +15,6 @@ import { useMediaArtworkColors, withAlpha } from './use-media-artwork-colors';
 interface MediaSmallViewProps {
   entityId: string;
   artwork?: string | null;
-  paletteArtwork?: string | null;
   onArtworkError?: (imageUrl?: string | null) => void;
   title: string;
   artist: string;
@@ -35,7 +34,6 @@ interface MediaSmallViewProps {
 export function MediaSmallView({
   entityId,
   artwork,
-  paletteArtwork,
   onArtworkError,
   title,
   artist,
@@ -76,13 +74,7 @@ export function MediaSmallView({
   const subtitleTone = stateSurface.secondaryTextClassName;
   const displayRemaining = formatMediaTime(Math.max(0, durationSeconds - elapsedSeconds));
   const controls = getMediaControlStyles(theme);
-  const palette = useMediaArtworkColors(
-    artwork,
-    theme,
-    entityId,
-    `${title}::${artist}`,
-    paletteArtwork
-  );
+  const palette = useMediaArtworkColors(artwork, theme, `${entityId}::${title}::${artist}`);
   const controlSizes = getCardActionControlSizes('small');
   const primaryControlSizes = getCardActionControlSizes('medium');
   const subduedFallback = !artwork && !isActive;

@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/app/contexts/auth-context';
-import { fetchMediaThumbnailDataUrl } from '@/app/features/media/utils/media-thumbnail';
-import { useHomeAssistant } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
-import { homeAssistantSelectors } from '@/app/stores/selectors';
 import {
   isMediaPlayerProxyUrl,
   resolveHomeAssistantProxyUrl,
@@ -322,24 +319,9 @@ async function fetchArtworkObjectUrl(imageUrl: string, token?: string) {
   return URL.createObjectURL(blob);
 }
 
-async function resolveArtworkPalette(
-  imageUrl: string,
-  hassUrl?: string,
-  token?: string,
-  entityId?: string
-) {
+async function resolveArtworkPalette(imageUrl: string, hassUrl?: string, token?: string) {
   if (imageUrl.startsWith('data:') || imageUrl.startsWith('blob:')) {
     return samplePaletteFromImageUrl(imageUrl).catch(() => null);
-  }
-
-  if (entityId) {
-    const thumbnailDataUrl = await fetchMediaThumbnailDataUrl(entityId).catch(() => null);
-    if (thumbnailDataUrl) {
-      const thumbnailPalette = await samplePaletteFromImageUrl(thumbnailDataUrl).catch(() => null);
-      if (thumbnailPalette) {
-        return thumbnailPalette;
-      }
-    }
   }
 
   if (!import.meta.env.DEV && isMediaPlayerProxyUrl(imageUrl)) {
@@ -380,21 +362,14 @@ async function resolveArtworkPalette(
 export function useMediaArtworkColors(
   artwork: string | null | undefined,
   theme: ThemeType,
-  entityId?: string,
-  artworkKey?: string,
-  paletteArtwork?: string | null
+  artworkKey?: string
 ) {
   const { config: authConfig } = useAuth();
-  const connected = useHomeAssistant(homeAssistantSelectors.connected);
-  const paletteSource = paletteArtwork ?? artwork;
   const [colors, setColors] = useState<MediaArtworkPalette>(FALLBACK_COLORS[theme]);
-  const connectionStateKey = connected ? 'connected' : 'disconnected';
-  const requestKey = [entityId, paletteSource, artworkKey, connectionStateKey]
-    .filter(Boolean)
-    .join('::');
+  const requestKey = [artwork, artworkKey].filter(Boolean).join('::');
 
   useEffect(() => {
-    if (!paletteSource) {
+    if (!artwork) {
       setColors(FALLBACK_COLORS[theme]);
       return;
     }
@@ -411,11 +386,9 @@ export function useMediaArtworkColors(
     const existingRequest = pendingPaletteRequests.get(requestKey);
     const paletteRequest =
       existingRequest ??
-      resolveArtworkPalette(paletteSource, authConfig?.url, authConfig?.token, entityId).finally(
-        () => {
-          pendingPaletteRequests.delete(requestKey);
-        }
-      );
+      resolveArtworkPalette(artwork, authConfig?.url, authConfig?.token).finally(() => {
+        pendingPaletteRequests.delete(requestKey);
+      });
 
     if (!existingRequest) {
       pendingPaletteRequests.set(requestKey, paletteRequest);
@@ -433,7 +406,7 @@ export function useMediaArtworkColors(
     return () => {
       cancelled = true;
     };
-  }, [authConfig?.token, authConfig?.url, entityId, paletteSource, requestKey, theme]);
+  }, [artwork, authConfig?.token, authConfig?.url, requestKey, theme]);
 
   return colors;
 }
