@@ -106,7 +106,7 @@ export const PresentationCardGrid = memo(function PresentationCardGrid({
         className={`w-full${isAutoScaled ? ' absolute left-0 top-0 origin-top-left' : ''}`}
         style={innerContainerStyle}
       >
-        <div className="grid w-full gap-3.5 md:gap-3 lg:gap-4" style={gridStyle}>
+        <div className="grid w-full gap-3 lg:gap-4" style={gridStyle}>
           {visibleCardIds.map((cardId) => {
             const entry = allCards.get(cardId);
             if (!entry) {

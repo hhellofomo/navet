@@ -46,7 +46,7 @@ export function DashboardHeroSection({
         <div>
           {eyebrow ? eyebrow : null}
           <h1
-            className={`mt-1.5 max-w-3xl text-[1.5rem] leading-[1.12] font-semibold tracking-tight md:mt-4 md:text-4xl md:leading-tight ${surface.textPrimary}`}
+            className={`mt-1.5 max-w-3xl text-[1.375rem] leading-[1.1] font-semibold tracking-tight md:mt-4 md:text-4xl md:leading-tight ${surface.textPrimary}`}
           >
             {title}
           </h1>

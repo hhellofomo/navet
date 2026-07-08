@@ -1,5 +1,6 @@
 export { CardActionRow } from './card-action-row';
 export {
+  CardDialogBody,
   CardDialogChoicePill,
   CardDialogDoneFooter,
   CardDialogFooter,

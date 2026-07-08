@@ -48,7 +48,7 @@ export const EntityGrid = memo(function EntityGrid({
         {headerAction}
       </div>
       <div
-        className="grid w-full grid-flow-row-dense gap-2 md:gap-3 lg:gap-4"
+        className="grid w-full grid-flow-row-dense gap-3 lg:gap-4"
         style={
           {
             ...getCardGridAutoRowsStyle(breakpointCols),

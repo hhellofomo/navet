@@ -1,6 +1,7 @@
 import { Palette, Plus, Sliders, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import {
+  CardDialogBody,
   CardDialogChoicePill,
   CardDialogDoneFooter,
   CardDialogHeader,
@@ -119,7 +120,7 @@ export function PhotoFrameSettingsDialog({
       contentOverlayClassName={dialogShell.contentOverlayClassName}
     >
       <CustomScrollbar isOn={theme !== 'light'}>
-        <div className="p-6">
+        <CardDialogBody>
           <CardDialogHeader
             title={t('widgets.photoFrame.settings.title')}
             showRoomSelector={false}
@@ -144,7 +145,7 @@ export function PhotoFrameSettingsDialog({
                 icon={Sliders}
                 onClick={() => setActiveTab('controls')}
               >
-                Controls
+                {t('common.controls')}
               </CardDialogTabTrigger>
               {onTintColorChange ? (
                 <CardDialogTabTrigger
@@ -152,7 +153,7 @@ export function PhotoFrameSettingsDialog({
                   icon={Palette}
                   onClick={() => setActiveTab('card')}
                 >
-                  Customize
+                  {t('common.customize')}
                 </CardDialogTabTrigger>
               ) : null}
             </CardDialogTabList>
@@ -288,7 +289,7 @@ export function PhotoFrameSettingsDialog({
           </Tabs>
 
           <CardDialogDoneFooter label={t('common.done')} />
-        </div>
+        </CardDialogBody>
       </CustomScrollbar>
     </DialogShell>
   );

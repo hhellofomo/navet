@@ -63,7 +63,7 @@ export const HVACSettingsDialog = memo(function HVACSettingsDialog({
     accentColor,
   });
   const styles = getHVACSettingsDialogStyles(visualMode, isOn);
-  const contentInsetClassName = 'px-6';
+  const contentInsetClassName = 'px-6 max-sm:px-3.5';
   const [activeTab, setActiveTab] = useState('hvac');
 
   return (
@@ -75,7 +75,7 @@ export const HVACSettingsDialog = memo(function HVACSettingsDialog({
       contentClassName={`fixed top-1/2 left-1/2 z-50 h-auto max-h-[85vh] w-[90vw] max-w-[30rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-3xl border shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in duration-200 ${styles.contentClassName}`}
     >
       <CustomScrollbar isOn={isOn}>
-        <div className="pt-6 pb-6">
+        <div className="pt-6 pb-6 max-sm:pt-2 max-sm:pb-3">
           <div className={contentInsetClassName}>
             <CardDialogHeader title={name} description={entityType} entityId={entityId} />
           </div>
@@ -128,6 +128,9 @@ export const HVACSettingsDialog = memo(function HVACSettingsDialog({
                         onTempCommit={onTargetTempCommit}
                         isOn={isOn}
                         size="medium"
+                        minTemp={minTemp}
+                        maxTemp={maxTemp}
+                        step={step}
                       />
                       <HVACModeControls
                         mode={visualMode}

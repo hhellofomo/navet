@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { ALL_ROOMS_ID } from '@/app/constants/rooms';
 import { isSection, pathToSection, type Section, sectionToPath } from '../navigation/sections';
 
 let navigationStoreCleanup: (() => void) | null = null;
@@ -54,7 +55,7 @@ const initialSection = (): Section =>
 export const useNavigationStore = create<NavigationState>()(
   persist(
     (set) => ({
-      currentRoom: 'All',
+      currentRoom: ALL_ROOMS_ID,
       activeSection: initialSection(),
       recentSections: [],
       lastNonHomeSection: null,
@@ -91,7 +92,9 @@ export const useNavigationStore = create<NavigationState>()(
         return {
           ...current,
           currentRoom:
-            typeof p.currentRoom === 'string' && p.currentRoom.length > 0 ? p.currentRoom : 'All',
+            typeof p.currentRoom === 'string' && p.currentRoom.length > 0
+              ? p.currentRoom
+              : ALL_ROOMS_ID,
           recentSections: sanitizeRecentSections(p.recentSections),
           lastNonHomeSection:
             p.lastNonHomeSection &&

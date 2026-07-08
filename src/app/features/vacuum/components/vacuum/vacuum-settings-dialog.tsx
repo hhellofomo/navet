@@ -1,6 +1,7 @@
 import { Palette, Sliders } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import {
+  CardDialogBody,
   CardDialogHeader,
   CardDialogTabList,
   CardDialogTabTrigger,
@@ -219,7 +220,7 @@ export const VacuumSettingsDialog = memo(function VacuumSettingsDialog({
       contentOverlayClassName={surfaceOverlayClassName ?? tintSurface.overlayClassName ?? undefined}
     >
       <CustomScrollbar isOn={isActive}>
-        <div>
+        <CardDialogBody>
           <CardDialogHeader title={name} description={entityType} entityId={entityId} />
 
           <Tabs value={activeTab} defaultValue="controls" onValueChange={setActiveTab}>
@@ -302,7 +303,7 @@ export const VacuumSettingsDialog = memo(function VacuumSettingsDialog({
           </Tabs>
 
           <DialogDoneFooter label={t('common.done')} />
-        </div>
+        </CardDialogBody>
       </CustomScrollbar>
     </ModalSurface>
   );

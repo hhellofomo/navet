@@ -16,13 +16,13 @@ import {
   DropdownMenuTrigger,
 } from '@/app/components/ui/dropdown-menu';
 import { cn } from '@/app/components/ui/utils';
-import { HOME_WIDGET_ROOM } from '@/app/features/dashboard/stores/custom-cards-store';
 import { useAreaRooms, useI18n, useTheme } from '@/app/hooks';
 import { useAuth } from '@/app/stores/auth-store';
 import { authSelectors } from '@/app/stores/selectors';
 import { PhotoFrameSettingsDialog } from './photo-frame-settings-dialog';
 import { type PhotoFrameSourceMode, resolvePhotoFrameSourceMode } from './photo-frame-types';
 import { usePhotoFrameSources } from './use-photo-frame-sources';
+import { useDashboardWidgetRoomOptions } from './use-widget-room-options';
 import { getDashboardWidgetSurfaceTokens } from './widget-surface-tokens';
 
 const mockPhotos = [
@@ -92,12 +92,7 @@ export function PhotoFrameWidget({
   const surface = getDashboardWidgetSurfaceTokens(theme, tintColor);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const roomValue = room === 'All' || !room ? HOME_WIDGET_ROOM : room;
-  const roomLabel = roomValue === HOME_WIDGET_ROOM ? t('dashboard.roomNav.all') : roomValue;
-  const roomOptions = [
-    { label: t('dashboard.roomNav.all'), value: HOME_WIDGET_ROOM },
-    ...rooms.map((entry) => ({ label: entry, value: entry })),
-  ];
+  const { roomValue, roomLabel, roomOptions } = useDashboardWidgetRoomOptions(room, rooms);
   const isCompact = isCompactCardSize(size);
   const resolvedSourceMode = resolvePhotoFrameSourceMode(sourceMode, mediaSourceId);
   const { activePhotoUrls, hasCustomPhotos } = usePhotoFrameSources({

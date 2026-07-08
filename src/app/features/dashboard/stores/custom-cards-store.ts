@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { ALL_ROOMS_ID, isAllRooms } from '@/app/constants/rooms';
+
+export { ENERGY_WIDGET_ROOM, HOME_WIDGET_ROOM } from '@/app/constants/rooms';
+
 import type { ZoneName } from '../zones/zone-types';
 
 export type CardType = 'rss' | 'photo' | 'note' | 'battery' | 'energy-now' | 'button' | 'map';
-export const HOME_WIDGET_ROOM = '__home__';
-export const ENERGY_WIDGET_ROOM = '__energy__';
 
 export interface CustomCard {
   id: string;
@@ -86,10 +88,10 @@ export const useCustomCardsStore = create<CustomCardsState>()(
       },
       getCardsForRoom: (room) => {
         const { cards } = get();
-        if (room === 'All') {
+        if (isAllRooms(room)) {
           return cards;
         }
-        return cards.filter((card) => card.room === room || card.room === 'All');
+        return cards.filter((card) => card.room === room || card.room === ALL_ROOMS_ID);
       },
     }),
     {

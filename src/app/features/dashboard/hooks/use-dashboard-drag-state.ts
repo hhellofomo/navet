@@ -14,7 +14,7 @@ import type { DeviceWithType } from '@/app/types/device.types';
 import type { CustomCard } from '../stores/custom-cards-store';
 import type { DragMeta, DropMeta } from './use-home-dashboard-editor';
 
-const NO_DRAG_SELECTOR = [
+const INTERACTIVE_NO_DRAG_SELECTOR = [
   'button',
   'input',
   'textarea',
@@ -24,10 +24,12 @@ const NO_DRAG_SELECTOR = [
   '[role="switch"]',
   '[data-card-interactive]',
   '[data-dashboard-edit-action]',
-  '[data-card-nodrag="true"]:not([data-draggable-card="true"])',
 ].join(', ');
 
-function canStartDashboardDrag(target: EventTarget | null) {
+const CARD_NO_DRAG_SELECTOR = '[data-card-nodrag="true"]';
+const CARD_DRAG_SURFACE_SELECTOR = '[data-card-drag-surface="true"]';
+
+export function canStartDashboardDrag(target: EventTarget | null) {
   if (!(target instanceof Element)) {
     return false;
   }
@@ -36,7 +38,12 @@ function canStartDashboardDrag(target: EventTarget | null) {
     return true;
   }
 
-  if (target.closest(NO_DRAG_SELECTOR)) {
+  if (target.closest(INTERACTIVE_NO_DRAG_SELECTOR)) {
+    return false;
+  }
+
+  const noDragSurface = target.closest(CARD_NO_DRAG_SELECTOR);
+  if (noDragSurface && !noDragSurface.closest(CARD_DRAG_SURFACE_SELECTOR)) {
     return false;
   }
 

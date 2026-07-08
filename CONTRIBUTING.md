@@ -20,8 +20,8 @@ This project adheres to a code of conduct. By participating, you are expected to
 
 ### Prerequisites
 
-- Node.js 18 or higher
-- npm or pnpm
+- Node.js `^20.19.0` or `>=22.12.0`
+- pnpm 10
 - Git
 - Basic knowledge of React, TypeScript, and Tailwind CSS
 
@@ -105,17 +105,18 @@ Pull requests and pushes to `main` run **GitHub Actions** (`.github/workflows/ci
 
 1. `pnpm check` — Biome lint and format
 2. `pnpm check:stories` — Storybook title and ownership rules
-3. `pnpm typecheck` — TypeScript (`tsc --noEmit`)
-4. `pnpm test` — Vitest unit tests
-5. `pnpm build` — production Vite build
+3. `pnpm check:ui-kit` — shared UI boundary rules
+4. `pnpm typecheck` — TypeScript (`tsc --noEmit`)
+5. `pnpm test` — Vitest unit tests
+6. `pnpm build` — production Vite build
 
-Before opening a PR, run the same sequence locally (or at minimum `pnpm check`, `pnpm typecheck`, and `pnpm test`) so CI stays green.
+Before opening a PR, run the same sequence locally (or at minimum `pnpm check`, `pnpm check:ui-kit`, `pnpm typecheck`, and `pnpm test`) so CI stays green.
 
 [Dependabot](.github/dependabot.yml) opens weekly PRs for npm dependency updates; review them for breaking changes before merge.
 
 ### Package layout note
 
-`react` and `react-dom` are listed as **optional** `peerDependencies` so Storybook and other tooling can resolve the workspace without forcing duplicate peer installs in every scenario. The app still expects React 18 at runtime; keep `peerDependencies` versions aligned with what Vite and Storybook use.
+`react` and `react-dom` are listed as **optional** `peerDependencies` so Storybook and other tooling can resolve the workspace without forcing duplicate peer installs in every scenario. The app expects React 19 at runtime; keep `peerDependencies` versions aligned with what Vite and Storybook use.
 
 ## 📝 Coding Standards
 
@@ -148,7 +149,8 @@ Before opening a PR, run the same sequence locally (or at minimum `pnpm check`, 
   ├── components/shared/     # App-specific shared UI + compatibility shims
   ├── components/layout/   # App shell layout pieces
   ├── features/            # Feature-owned modules, hooks, and stores
-  ├── contexts/            # App-shell React contexts
+  ├── i18n/                # I18n provider and translation messages
+  ├── pwa/                 # PWA update state and install/update support
   ├── hooks/               # Truly shared hooks
   ├── stores/              # Shared app stores/selectors
   ├── navigation/          # Section definitions and shared nav metadata

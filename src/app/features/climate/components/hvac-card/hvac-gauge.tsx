@@ -101,7 +101,7 @@ export const HVACGauge = memo(function HVACGauge({
 
     const updateTemperature = (nextValue: number) => {
       const steppedTemperature = Math.round((nextValue - minTemp) / stepSize) * stepSize + minTemp;
-      return Number(clamp(steppedTemperature, minTemp, maxTemp).toFixed(1));
+      return Number(clamp(steppedTemperature, minTemp, maxTemp).toFixed(3));
     };
 
     const handleTemperatureChange = (nextValue: number) => {

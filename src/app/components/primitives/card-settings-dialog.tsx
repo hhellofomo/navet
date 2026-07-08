@@ -1,6 +1,7 @@
 import { type LucideIcon, Palette, Sliders } from 'lucide-react';
 import type { ReactNode } from 'react';
 import {
+  CardDialogBody,
   CardDialogHeader,
   CardDialogSection,
   CardDialogTabList,
@@ -96,8 +97,8 @@ export function CardSettingsDialog({
       contentGlowStyle={dialogShell.contentGlowStyle}
       contentOverlayClassName={dialogShell.contentOverlayClassName}
     >
-      <CustomScrollbar isOn={theme !== 'light'}>
-        <div className="p-6">
+      <CustomScrollbar isOn={theme !== 'light'} className="max-sm:min-h-0 max-sm:flex-1">
+        <CardDialogBody>
           <CardDialogHeader title={title} description={entityType} entityId={entityId} />
 
           <Tabs value={tabs[0]?.key} defaultValue={tabs[0]?.key}>
@@ -126,7 +127,7 @@ export function CardSettingsDialog({
           ) : (
             <DialogDoneFooter label="common.done" />
           )}
-        </div>
+        </CardDialogBody>
       </CustomScrollbar>
     </DialogShell>
   );

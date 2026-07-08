@@ -136,10 +136,10 @@ export function SectionRowRenderer({
   const isEditModeRender = renderMode === 'edit';
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4 md:gap-5">
       {visibleRowLayouts.map(({ rowLayouts, rowStacks }, rowIndex) => {
         return (
-          <div key={rowIndex} className={isEditModeRender ? 'space-y-4' : 'space-y-6'}>
+          <div key={rowIndex} className={isEditModeRender ? 'space-y-4' : 'space-y-5 md:space-y-6'}>
             <div className={`grid items-start ${SECTION_GRID_GAP_CLASS}`} style={rowGridStyle}>
               {rowStacks.map((stack, columnIndex) => {
                 const leadSection = stack[0];

@@ -1,4 +1,4 @@
-import { ChevronDown, Home } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { memo } from 'react';
 import { Select } from '@/app/components/primitives/select';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
@@ -40,7 +40,6 @@ export const CompactRoomSelector = memo(function CompactRoomSelector({
         </Select>
       ) : null}
       <div className={`inline-flex min-w-0 items-center gap-2 text-sm ${surface.textPrimary}`}>
-        <Home className={`h-4 w-4 ${surface.textSecondary}`} />
         <span className="max-w-[12rem] truncate font-medium">{label}</span>
         <ChevronDown className={`h-4 w-4 ${surface.textSecondary}`} />
       </div>

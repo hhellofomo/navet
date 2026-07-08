@@ -1,10 +1,11 @@
 import { useCallback, useDeferredValue, useMemo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
+import { ALL_ROOMS_ID, HOME_WIDGET_ROOM, isAllRooms } from '@/app/constants/rooms';
 import { useI18n, useSearch } from '@/app/hooks';
 import type { DeviceWithType } from '@/app/types/device.types';
 import { getDeviceRoomLabel, UNKNOWN_ROOM_LABEL } from '@/app/utils/device-location';
-import { type CustomCard, HOME_WIDGET_ROOM } from '../stores/custom-cards-store';
+import type { CustomCard } from '../stores/custom-cards-store';
 import type { AllViewGrouping, AllViewSectionData } from './types';
 
 interface UseAllViewGridParams {
@@ -191,15 +192,15 @@ export function useAllViewGrid({
     if (grouping === 'room') {
       // Sort in-place to avoid creating new array
       visibleEntries.sort((left, right) => {
-        if (left.room === 'All') return -1;
-        if (right.room === 'All') return 1;
+        if (isAllRooms(left.room)) return -1;
+        if (isAllRooms(right.room)) return 1;
         return left.room.localeCompare(right.room);
       });
     }
 
     return visibleEntries.map((entry) => ({
       key: `room:${entry.room}`,
-      title: entry.room === 'All' ? t('dashboard.sections.widgets') : entry.room,
+      title: entry.room === ALL_ROOMS_ID ? t('dashboard.sections.widgets') : entry.room,
       orderedIds: entry.orderedIds,
       totalItems: entry.totalItems,
       mutedTitle: entry.room === UNKNOWN_ROOM_LABEL,

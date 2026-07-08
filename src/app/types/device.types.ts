@@ -146,6 +146,9 @@ export interface VacuumDevice extends BaseDevice {
   battery: number;
   cleanedArea?: string;
   cleaningTime?: string;
+  nextCleaning?: string;
+  waterLevel?: number | string;
+  binLevel?: number | string;
 }
 
 // Calendar device

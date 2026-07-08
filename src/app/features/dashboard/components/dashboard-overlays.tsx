@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { getDeviceTypeIcon } from '@/app/constants/device-type-icons';
 import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
+import { isAllRooms } from '@/app/constants/rooms';
 import { useI18n } from '@/app/hooks';
 import { getDeviceRoomLabel } from '@/app/utils/device-location';
 import type { DashboardController } from '../hooks/use-dashboard-controller';
@@ -41,7 +42,7 @@ export function DashboardOverlays({ controller }: DashboardOverlaysProps) {
   } = controller;
 
   const normalCards = useMemo<DashboardLibraryCard[]>(() => {
-    const isHomeCanvasTarget = activeSection === 'home' && activeRoom === 'All' && isEditMode;
+    const isHomeCanvasTarget = activeSection === 'home' && isAllRooms(activeRoom) && isEditMode;
     const placedCardIds = new Set(isHomeCanvasTarget ? homeLayout.cardIds : orderedCardIds);
 
     return [...availableDeviceMap.values()]
@@ -77,7 +78,7 @@ export function DashboardOverlays({ controller }: DashboardOverlaysProps) {
   ]);
 
   const handleAddNormalCard =
-    activeSection === 'home' && activeRoom === 'All' && isEditMode
+    activeSection === 'home' && isAllRooms(activeRoom) && isEditMode
       ? handleAddLibraryCard
       : handleAddEntity;
 

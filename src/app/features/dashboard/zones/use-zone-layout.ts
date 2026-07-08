@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
+import { HOME_WIDGET_ROOM, isAllRooms } from '@/app/constants/rooms';
 import type { DeviceWithType } from '@/app/types/device.types';
-import { type CustomCard, HOME_WIDGET_ROOM } from '../stores/custom-cards-store';
+import type { CustomCard } from '../stores/custom-cards-store';
 import { resolveCardZone } from './resolve-card-zone';
 import { ZONE_ORDERED, type ZoneName } from './zone-types';
 
@@ -38,7 +39,7 @@ export function useZoneLayout(
 
     // Custom widget cards — only those assigned to the home screen
     for (const card of customCards) {
-      if (card.room !== 'All' && card.room !== HOME_WIDGET_ROOM) continue;
+      if (!isAllRooms(card.room) && card.room !== HOME_WIDGET_ROOM) continue;
       push(resolveCardZone(card.type, card.zone ?? cardZones[card.id]), card.id);
     }
 

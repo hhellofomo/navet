@@ -1,6 +1,6 @@
 # Navet
 
-Navet is a smart home dashboard PWA built with React 19, TypeScript 6, Zustand 5, Tailwind CSS 4.2,
+Navet is a smart home dashboard PWA built with React 19, TypeScript 6, Zustand 5, Tailwind CSS 4.3,
 and Vite 8. It connects directly to Home Assistant over WebSocket and is designed to stay usable on
 both desktop-class hardware and lower-power wall panels.
 
@@ -97,7 +97,7 @@ The same store also persists special room sentinels for shared widget bands:
 | App | React 19 |
 | Language | TypeScript 6 |
 | State | Zustand 5 |
-| Styling | Tailwind CSS 4.2 |
+| Styling | Tailwind CSS 4.3 |
 | UI primitives | Radix UI |
 | Build | Vite 8 |
 | Smart-home integration | `home-assistant-js-websocket` |
@@ -169,6 +169,7 @@ See [docs/technical/REACT_ZUSTAND.md](docs/technical/REACT_ZUSTAND.md) for the s
 | [`src/app/features/dashboard/components/home-dashboard-overview.tsx`](src/app/features/dashboard/components/home-dashboard-overview.tsx) | Home overview presentation/edit canvas |
 | [`src/app/features/dashboard/utils/card-renderer.tsx`](src/app/features/dashboard/utils/card-renderer.tsx) | Entity-card registry for the dashboard |
 | [`src/app/features/dashboard/stores/custom-cards-store.ts`](src/app/features/dashboard/stores/custom-cards-store.ts) | Custom-widget persistence and migration |
+| [`src/app/features/dashboard/stores/home-dashboard-layout-store.ts`](src/app/features/dashboard/stores/home-dashboard-layout-store.ts) | Home overview layout, zone, and ordering persistence |
 | [`src/app/features/dashboard/zones/`](src/app/features/dashboard/zones/) | Zone defaults, zone resolution, and home overview grouping |
 | [`src/app/components/layout/device-section-layout.tsx`](src/app/components/layout/device-section-layout.tsx) | Shared shell for domain-specific entity sections |
 | [`src/app/components/shared/theme/`](src/app/components/shared/theme/) | Theme, surface, readable-text, and card-state helpers |
@@ -182,7 +183,7 @@ See [docs/technical/REACT_ZUSTAND.md](docs/technical/REACT_ZUSTAND.md) for the s
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js `^20.19.0` or `>=22.12.0`
 - `pnpm`
 - a running Home Assistant instance
 - a Home Assistant long-lived access token
@@ -288,6 +289,7 @@ Shared test support currently lives in:
 Active co-located `__tests__/` directories currently include:
 
 - [`src/app/components/layout/__tests__/`](src/app/components/layout/__tests__)
+- [`src/app/components/shared/theme/__tests__/`](src/app/components/shared/theme/__tests__)
 - [`src/app/components/system/tokens/__tests__/`](src/app/components/system/tokens/__tests__)
 - [`src/app/features/calendar/components/calendar/__tests__/`](src/app/features/calendar/components/calendar/__tests__)
 - [`src/app/features/dashboard/components/__tests__/`](src/app/features/dashboard/components/__tests__)
@@ -297,9 +299,11 @@ Active co-located `__tests__/` directories currently include:
 - [`src/app/features/energy/utils/__tests__/`](src/app/features/energy/utils/__tests__)
 - [`src/app/features/lighting/components/light-card/__tests__/`](src/app/features/lighting/components/light-card/__tests__)
 - [`src/app/features/media/components/media-card/__tests__/`](src/app/features/media/components/media-card/__tests__)
+- [`src/app/features/media/components/media/__tests__/`](src/app/features/media/components/media/__tests__)
 - [`src/app/features/rss/components/rss-feed-card/__tests__/`](src/app/features/rss/components/rss-feed-card/__tests__)
 - [`src/app/features/tasks/components/__tests__/`](src/app/features/tasks/components/__tests__)
 - [`src/app/features/tasks/utils/__tests__/`](src/app/features/tasks/utils/__tests__)
+- [`src/app/features/vacuum/components/vacuum/__tests__/`](src/app/features/vacuum/components/vacuum/__tests__)
 - [`src/app/hooks/__tests__/`](src/app/hooks/__tests__)
 - [`src/app/stores/__tests__/`](src/app/stores/__tests__)
 - [`src/app/utils/__tests__/`](src/app/utils/__tests__)

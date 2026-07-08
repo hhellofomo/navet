@@ -240,7 +240,7 @@ export const CardGrid = memo(function CardGrid({
         style={innerContainerStyle}
       >
         <div
-          className={`grid w-full gap-3.5 md:gap-3 lg:gap-4 ${
+          className={`grid w-full gap-3 lg:gap-4 ${
             hasInlineAddCardSlot ? 'grid-flow-row' : 'grid-flow-row-dense'
           }`}
           style={gridStyle}

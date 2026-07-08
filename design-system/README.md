@@ -8,7 +8,6 @@ UI layer backed by:
 
 - authoring in `src/app/components/primitives/` and `src/app/components/patterns/`
 - curated exports and token stories in `src/app/components/system/`
-- canonical discovery stories in `src/app/ui-kit/`
 - canonical shared imports for docs, stories, and stable shared consumers in `src/app/ui-kit/`
 - shared theme/surface decisions in `src/app/components/shared/theme/`
 - Storybook as the main visual review and docs surface
@@ -96,7 +95,7 @@ Use `system/` to expose or document stable shared UI. Do not author new componen
 
 ### `src/app/ui-kit/`
 
-Canonical shared import surface for Navet developers and Storybook examples.
+Canonical shared import and discovery surface for Navet developers and Storybook examples.
 
 Use `ui-kit/` when:
 
@@ -105,6 +104,21 @@ Use `ui-kit/` when:
 - you are documenting the intended public shared UI surface
 
 When docs or stories need a shared import example, prefer `@/app/ui-kit/*` over `components/system/*`.
+
+The same layer also owns the curated Storybook-facing discovery stories for stable primitives,
+patterns, and tokens.
+
+Current entrypoints include:
+
+- `primitives.ts`
+- `patterns.ts`
+- `tokens.ts`
+- `start-here.stories.tsx`
+- `inventory.stories.tsx`
+- `recipes.stories.tsx`
+
+Use this layer for discovery and workshop organization, not as a replacement for the underlying
+authoring directories.
 
 ### `src/app/components/layout/`
 
@@ -121,22 +135,6 @@ Current layout ownership includes:
 
 Use `layout/` when the component owns app structure or cross-feature section composition rather than
 portable primitive behavior.
-
-### `src/app/ui-kit/`
-
-This is the curated Storybook-facing discovery layer for stable primitives, patterns, and tokens.
-
-Current entrypoints include:
-
-- `primitives.ts`
-- `patterns.ts`
-- `tokens.ts`
-- `start-here.stories.tsx`
-- `inventory.stories.tsx`
-- `recipes.stories.tsx`
-
-Use this layer for discovery and workshop organization, not as a replacement for the underlying
-authoring directories.
 
 ## Foundations and Tokens
 
@@ -272,6 +270,7 @@ Shared test support lives in:
 - [`src/test/store-reset.ts`](/Users/vishal/Development/Github/Navet/Navet/src/test/store-reset.ts)
 - [`src/test/browser-mocks.ts`](/Users/vishal/Development/Github/Navet/Navet/src/test/browser-mocks.ts)
 - [`src/test/factories/home-assistant-service-stub.ts`](/Users/vishal/Development/Github/Navet/Navet/src/test/factories/home-assistant-service-stub.ts)
+- [`src/test/mocks/virtual-pwa-register.ts`](/Users/vishal/Development/Github/Navet/Navet/src/test/mocks/virtual-pwa-register.ts)
 
 Use unit tests for:
 

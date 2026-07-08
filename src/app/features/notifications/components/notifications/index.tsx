@@ -146,7 +146,7 @@ export function NotificationPanel({ isOpen, onClose, triggerRefs = [] }: Notific
             if (!open) onClose();
           }}
           title={t('notifications.title')}
-          description={t('notifications.section.notifications')}
+          description={t('notifications.section.notifications') || t('notifications.title')}
           accentColor={getColorValue(primaryColor)}
           overlayClassName={`animate-in fade-in bg-black/45 backdrop-blur-[2px] md:hidden ${surface.dialogBackdrop}`}
           contentClassName={surface.sheetClassName}

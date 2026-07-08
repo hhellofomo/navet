@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { HOME_WIDGET_ROOM, isAllRooms } from '@/app/constants/rooms';
 import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import type { Device, DeviceCollection } from '@/app/types/device.types';
 import { getDeviceRoomLabel } from '@/app/utils/device-location';
 import { storage } from '@/app/utils/storage';
-import { type CustomCard, HOME_WIDGET_ROOM } from './use-custom-cards';
+import type { CustomCard } from './use-custom-cards';
 
 export const useCardOrdering = (
   devices: DeviceCollection,
@@ -54,7 +55,7 @@ export const useCardOrdering = (
         }
       });
       safeCustomCards.forEach((card) => {
-        if (card.room === room || card.room === 'All') {
+        if (card.room === room || isAllRooms(card.room)) {
           roomCards.push(card.id);
         }
       });

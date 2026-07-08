@@ -14,6 +14,7 @@ import { RoundControlButton } from '@/app/components/primitives/round-control-bu
 import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { useI18n } from '@/app/hooks';
 import { getEntityTypeLabel } from '@/app/utils/entity-type-label';
+import { getMediaDisplayVolume } from './media-card-style-utils';
 import type { MediaDialogGroupingPlayer, MediaDialogProps } from './media-dialog.types';
 import { MediaFallbackArtwork } from './media-fallback-artwork';
 import type { MediaDialogController } from './use-media-dialog-controller';
@@ -230,6 +231,7 @@ export function MediaDialogVolumeControl({
   volume,
 }: MediaDialogVolumeControlProps) {
   const { t } = useI18n();
+  const displayVolume = getMediaDisplayVolume(volume, isMuted);
 
   return (
     <div>
@@ -248,7 +250,7 @@ export function MediaDialogVolumeControl({
           {t('media.volume')}
         </span>
         <span className={`text-sm font-semibold ${controller.surface.textPrimary}`}>
-          {isMuted ? 0 : volume}%
+          {displayVolume}%
         </span>
       </div>
       <div className="flex items-center gap-3">
@@ -266,13 +268,13 @@ export function MediaDialogVolumeControl({
         <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-white/20">
           <div
             className="absolute left-0 top-0 h-full bg-white transition-all duration-150"
-            style={{ width: isMuted ? '0%' : `${volume}%` }}
+            style={{ width: `${displayVolume}%` }}
           />
           <input
             type="range"
             min="0"
             max="100"
-            value={isMuted ? 0 : volume}
+            value={displayVolume}
             onMouseDown={onVolumeInteractionStart}
             onTouchStart={onVolumeInteractionStart}
             onKeyDown={onVolumeInteractionStart}

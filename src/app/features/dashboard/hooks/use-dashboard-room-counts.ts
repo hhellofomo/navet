@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import { isAllRooms } from '@/app/constants/rooms';
 import type { DeviceCollection } from '@/app/types/device.types';
 
 export function useDashboardRoomCounts(allDevices: DeviceCollection, devices: DeviceCollection) {
@@ -9,7 +10,7 @@ export function useDashboardRoomCounts(allDevices: DeviceCollection, devices: De
     deviceGroups.forEach((group) => {
       group.forEach((device) => {
         const room = device.room;
-        if (!room || room === 'All') {
+        if (!room || isAllRooms(room)) {
           return;
         }
 

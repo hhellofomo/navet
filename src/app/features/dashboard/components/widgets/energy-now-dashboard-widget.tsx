@@ -1,13 +1,15 @@
 import { memo, useMemo, useState } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
-import { HOME_WIDGET_ROOM } from '@/app/features/dashboard/stores/custom-cards-store';
-import { useEnergyUsageSensorOptions } from '@/app/features/energy';
-import { useEnergyDashboard } from '@/app/features/energy/hooks/use-energy-dashboard';
-import { useEnergyLoadHistory } from '@/app/features/energy/hooks/use-energy-load-history';
+import {
+  useEnergyDashboard,
+  useEnergyLoadHistory,
+  useEnergyUsageSensorOptions,
+} from '@/app/features/energy';
 import { useAreaRooms, useI18n, useTheme } from '@/app/hooks';
 import { EnergyNowCardView } from './energy-now-card-view';
 import { EnergyNowSettingsDialog, type EnergySourceOption } from './energy-now-settings-dialog';
 import { EnergyNowStatusWidget } from './energy-now-status-widget';
+import { useDashboardWidgetRoomOptions } from './use-widget-room-options';
 
 interface EnergyNowDashboardWidgetProps {
   size?: CardSize;
@@ -49,12 +51,7 @@ export const EnergyNowDashboardWidget = memo(function EnergyNowDashboardWidget({
   } = useEnergyDashboard();
   const selectedSourceId = getSelectedSourceId(data?.selectedSourceId);
   const tintColor = typeof data?.tintColor === 'string' ? data.tintColor : undefined;
-  const roomValue = room === 'All' || !room ? HOME_WIDGET_ROOM : room;
-  const roomLabel = roomValue === HOME_WIDGET_ROOM ? t('dashboard.roomNav.all') : roomValue;
-  const roomOptions = [
-    { label: t('dashboard.roomNav.all'), value: HOME_WIDGET_ROOM },
-    ...rooms.map((entry) => ({ label: entry, value: entry })),
-  ];
+  const { roomValue, roomLabel, roomOptions } = useDashboardWidgetRoomOptions(room, rooms);
 
   const sourceOptions = useMemo(() => {
     const options: EnergySourceOption[] = [

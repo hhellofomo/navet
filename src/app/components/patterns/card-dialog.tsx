@@ -28,6 +28,11 @@ interface CardDialogSectionProps {
   labelClassName?: string;
 }
 
+interface CardDialogBodyProps {
+  children: ReactNode;
+  className?: string;
+}
+
 interface CardDialogTabTriggerProps {
   active: boolean;
   children: ReactNode;
@@ -71,7 +76,8 @@ export const CardDialogHeader = memo(function CardDialogHeader({
           ) : null)}
         <Dialog.Title
           className={cn(
-            'text-xl font-semibold text-white',
+            navetTypographyTokens.titleMd,
+            'text-white',
             eyebrow || (showRoomSelector && entityId) ? 'mt-1' : undefined
           )}
         >
@@ -79,7 +85,7 @@ export const CardDialogHeader = memo(function CardDialogHeader({
         </Dialog.Title>
         {description ? (
           <Dialog.Description
-            className={cn('mt-1 truncate', navetTypographyTokens.body, 'text-white/82')}
+            className={cn('mt-1 truncate', navetTypographyTokens.compactHelper, 'text-white/82')}
           >
             {description}
           </Dialog.Description>
@@ -102,6 +108,14 @@ export const CardDialogHeader = memo(function CardDialogHeader({
     </div>
   );
 });
+
+export function CardDialogBody({ children, className }: CardDialogBodyProps) {
+  return (
+    <div className={cn('w-full min-w-0 p-6 max-sm:px-3.5 max-sm:pt-2 max-sm:pb-3', className)}>
+      {children}
+    </div>
+  );
+}
 
 export const CardDialogSection = memo(function CardDialogSection({
   children,

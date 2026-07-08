@@ -1,6 +1,7 @@
 import { Battery, Palette, Sliders } from 'lucide-react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import {
+  CardDialogBody,
   CardDialogHeader,
   CardDialogSection,
   CardDialogTabList,
@@ -26,7 +27,6 @@ import {
 } from '@/app/components/shared/theme/custom-card-tint-surface';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import { HOME_WIDGET_ROOM } from '@/app/features/dashboard/stores/custom-cards-store';
 import { useAreaRooms, useHomeAssistant, useI18n, useTheme } from '@/app/hooks';
 import type { HaBatterySensorRow } from '@/app/hooks/ha-battery-sensor-rows';
 import {
@@ -34,6 +34,7 @@ import {
   selectBatterySensorRowsFromHa,
 } from '@/app/hooks/ha-battery-sensor-rows';
 import { BatteryList, getLevelColor } from './battery-list';
+import { useDashboardWidgetRoomOptions } from './use-widget-room-options';
 import { getDashboardWidgetSurfaceTokens } from './widget-surface-tokens';
 
 export interface BatteryOverviewWidgetData {
@@ -135,7 +136,7 @@ export function BatterySettingsDialog({
       contentOverlayClassName={dialogShell.contentOverlayClassName}
     >
       <div className="max-h-[85vh] w-full min-w-0 overflow-y-auto">
-        <div className="w-full min-w-0 p-6">
+        <CardDialogBody>
           <CardDialogHeader
             title={t('widgets.battery.settings.title')}
             showRoomSelector={false}
@@ -160,7 +161,7 @@ export function BatterySettingsDialog({
                 icon={Sliders}
                 onClick={() => setActiveTab('controls')}
               >
-                Controls
+                {t('common.controls')}
               </CardDialogTabTrigger>
               {onTintColorChange ? (
                 <CardDialogTabTrigger
@@ -168,7 +169,7 @@ export function BatterySettingsDialog({
                   icon={Palette}
                   onClick={() => setActiveTab('card')}
                 >
-                  Customize
+                  {t('common.customize')}
                 </CardDialogTabTrigger>
               ) : null}
             </CardDialogTabList>
@@ -256,7 +257,7 @@ export function BatterySettingsDialog({
           </Tabs>
 
           <DialogDoneFooter label={t('common.done')} />
-        </div>
+        </CardDialogBody>
       </div>
     </DialogShell>
   );
@@ -285,12 +286,7 @@ export const BatteryOverviewWidget = memo(function BatteryOverviewWidget({
       : batteries.filter((battery) => selectedIdSet.has(battery.id));
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const chromeSize = size === 'large' ? 'medium' : size;
-  const roomValue = room === 'All' || !room ? HOME_WIDGET_ROOM : room;
-  const roomLabel = roomValue === HOME_WIDGET_ROOM ? t('dashboard.roomNav.all') : roomValue;
-  const roomOptions = [
-    { label: t('dashboard.roomNav.all'), value: HOME_WIDGET_ROOM },
-    ...rooms.map((entry) => ({ label: entry, value: entry })),
-  ];
+  const { roomValue, roomLabel, roomOptions } = useDashboardWidgetRoomOptions(room, rooms);
 
   const isCompact = isCompactCardSize(size);
   const accentHex = getThemeColorValue(primaryColor);
@@ -357,7 +353,7 @@ export const BatteryOverviewWidget = memo(function BatteryOverviewWidget({
           ) : null}
           <EntityCardHeader
             title={t('widgets.battery.title')}
-            subtitle="Custom"
+            subtitle={t('common.custom')}
             layout="eyebrow-first"
             size={chromeSize}
             titleClassName={surface.textPrimary}

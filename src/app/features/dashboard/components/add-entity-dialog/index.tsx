@@ -6,6 +6,7 @@ import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { getDeviceTypeIcon } from '@/app/constants/device-type-icons';
 import { getDeviceTypeLabel } from '@/app/constants/device-type-labels';
+import { isAllRooms } from '@/app/constants/rooms';
 import { useI18n, useTheme } from '@/app/hooks';
 import type { DeviceWithType } from '@/app/types/device.types';
 import { getDeviceRoomLabel } from '@/app/utils/device-location';
@@ -126,7 +127,7 @@ export function AddEntityDialog({
       }
 
       const room = getDeviceRoomLabel(device);
-      if (currentRoom !== 'All' && room !== currentRoom) {
+      if (!isAllRooms(currentRoom) && room !== currentRoom) {
         continue;
       }
 
@@ -207,7 +208,7 @@ export function AddEntityDialog({
             <h2 className={`text-xl font-semibold ${textColor}`}>{title}</h2>
             <p className={`text-sm ${mutedColor} mt-1`}>
               {description ??
-                (currentRoom === 'All'
+                (isAllRooms(currentRoom)
                   ? t('dashboard.addEntity.defaultDescriptionAll')
                   : t('dashboard.addEntity.defaultDescriptionRoom', { room: currentRoom }))}
             </p>

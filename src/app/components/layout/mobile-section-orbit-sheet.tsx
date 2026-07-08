@@ -3,7 +3,9 @@ import { memo, useMemo } from 'react';
 import { Button, SheetSurface } from '@/app/components/primitives';
 import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { navetTypographyTokens } from '@/app/components/system/tokens';
 import { cn } from '@/app/components/ui/utils';
+import { getDashboardRoomLabel } from '@/app/constants/rooms';
 import { type Section, useI18n, useTheme } from '@/app/hooks';
 import { MobileRoomDropdown, type MobileRoomNavigation } from './mobile-room-dropdown';
 import {
@@ -59,18 +61,16 @@ export const MobileSectionOrbitSheet = memo(function MobileSectionOrbitSheet({
       contentClassName={`${surface.panel} ${surface.border}`}
       bodyClassName="px-4"
     >
-      <div className="space-y-4 pb-1">
-        <div className="flex items-start justify-between gap-3 py-1">
+      <div className="space-y-3 pb-1">
+        <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p
-              className={`text-[0.7rem] font-semibold uppercase tracking-[0.18em] ${surface.textMuted}`}
-            >
+            <p className={`${navetTypographyTokens.eyebrow} ${surface.textMuted}`}>
               {t('sidebar.orbit')}
             </p>
-            <p className={`mt-1 text-base font-semibold ${surface.textPrimary}`}>
+            <p className={`mt-1 ${navetTypographyTokens.titleMd} ${surface.textPrimary}`}>
               {t('sidebar.orbitTitle')}
             </p>
-            <p className={`mt-1 text-xs ${surface.textSecondary}`}>
+            <p className={`mt-0.5 ${navetTypographyTokens.compactHelper} ${surface.textSecondary}`}>
               {t('sidebar.orbitDescription')}
             </p>
           </div>
@@ -86,12 +86,10 @@ export const MobileSectionOrbitSheet = memo(function MobileSectionOrbitSheet({
 
         {featuredRecentSections.length > 0 ? (
           <section className="space-y-2">
-            <p
-              className={`text-[0.7rem] font-semibold uppercase tracking-[0.18em] ${surface.textMuted}`}
-            >
+            <p className={`${navetTypographyTokens.eyebrow} ${surface.textMuted}`}>
               {t('sidebar.recentSections')}
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {featuredRecentSections.map((item) => (
                 <Button
                   key={item.section}
@@ -112,12 +110,10 @@ export const MobileSectionOrbitSheet = memo(function MobileSectionOrbitSheet({
         ) : null}
 
         <section className="space-y-2">
-          <p
-            className={`text-[0.7rem] font-semibold uppercase tracking-[0.18em] ${surface.textMuted}`}
-          >
+          <p className={`${navetTypographyTokens.eyebrow} ${surface.textMuted}`}>
             {t('sidebar.allSections')}
           </p>
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-2 gap-2">
             {orbitItems.map((item) => {
               const isActive = activeSection === item.section;
 
@@ -127,7 +123,7 @@ export const MobileSectionOrbitSheet = memo(function MobileSectionOrbitSheet({
                   type="button"
                   onClick={() => handleSelectSection(item.section)}
                   className={cn(
-                    'flex min-h-24 flex-col items-start justify-between rounded-[24px] border px-4 py-3.5 text-left transition-colors',
+                    'flex min-h-14 items-center gap-2.5 rounded-[18px] border px-3 py-2.5 text-left transition-colors',
                     isActive
                       ? 'border-transparent text-white shadow-[0_18px_36px_-24px_rgba(0,0,0,0.45)]'
                       : `${surface.border} ${surface.hoverBg} ${surface.textPrimary}`
@@ -136,24 +132,19 @@ export const MobileSectionOrbitSheet = memo(function MobileSectionOrbitSheet({
                 >
                   <span
                     className={cn(
-                      'flex h-11 w-11 items-center justify-center rounded-[18px]',
+                      'flex h-8 w-8 shrink-0 items-center justify-center rounded-[14px]',
                       isActive ? 'bg-white/16' : surface.subtleBg
                     )}
                   >
                     <item.icon
-                      className={cn('h-5 w-5', isActive ? 'text-white' : surface.textSecondary)}
+                      className={cn(
+                        'h-[18px] w-[18px]',
+                        isActive ? 'text-white' : surface.textSecondary
+                      )}
                     />
                   </span>
-                  <span className="min-w-0">
-                    <span className="block text-sm font-semibold">{item.label}</span>
-                    <span
-                      className={cn(
-                        'mt-1 block text-xs',
-                        isActive ? 'text-white/74' : surface.textSecondary
-                      )}
-                    >
-                      {item.section === 'home' ? t('sidebar.backToHome') : t('sidebar.orbit')}
-                    </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold">{item.label}</span>
                   </span>
                 </button>
               );
@@ -163,19 +154,18 @@ export const MobileSectionOrbitSheet = memo(function MobileSectionOrbitSheet({
 
         {activeSection === 'home' && currentRoomNavigation ? (
           <section className="space-y-2 pt-1">
-            <p
-              className={`text-[0.7rem] font-semibold uppercase tracking-[0.18em] ${surface.textMuted}`}
-            >
+            <p className={`${navetTypographyTokens.eyebrow} ${surface.textMuted}`}>
               {t('sidebar.currentRoom')}
             </p>
             <div
-              className={`flex items-center justify-between gap-3 rounded-[22px] border px-4 py-3 ${surface.border} ${surface.hoverBg}`}
+              className={`flex items-center justify-between gap-3 rounded-[20px] border px-3.5 py-2.5 ${surface.border} ${surface.hoverBg}`}
             >
               <div className="min-w-0">
                 <p className={`text-sm font-semibold ${surface.textPrimary}`}>
-                  {currentRoomNavigation.activeRoom === 'All'
-                    ? t('dashboard.roomNav.all')
-                    : currentRoomNavigation.activeRoom}
+                  {getDashboardRoomLabel(
+                    currentRoomNavigation.activeRoom,
+                    t('dashboard.roomNav.all')
+                  )}
                 </p>
                 <p className={`mt-0.5 text-xs ${surface.textSecondary}`}>
                   {t('dashboard.roomNav.openRooms')}

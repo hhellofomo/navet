@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { ENERGY_WIDGET_ROOM, HOME_WIDGET_ROOM, isAllRooms } from '@/app/constants/rooms';
 import type { TranslateFn } from '@/app/hooks';
 import type { CardType } from '../components/add-card-dialog';
 import type { CustomCard } from '../stores/custom-cards-store';
-import { ENERGY_WIDGET_ROOM, HOME_WIDGET_ROOM } from './use-custom-cards';
 
 interface UseDashboardCardActionsParams {
   activeRoom: string;
@@ -42,7 +42,7 @@ export function useDashboardCardActions({
 }: UseDashboardCardActionsParams) {
   const handleAddCard = useCallback(
     (type: CardType, size: CardSize) => {
-      const isHomeCanvasTarget = activeSection === 'home' && activeRoom === 'All' && isEditMode;
+      const isHomeCanvasTarget = activeSection === 'home' && isAllRooms(activeRoom) && isEditMode;
       const isEnergyDashboardTarget = activeSection === 'energy';
       const targetRoom = isHomeCanvasTarget
         ? HOME_WIDGET_ROOM
@@ -96,7 +96,7 @@ export function useDashboardCardActions({
 
   const handleAddLibraryCard = useCallback(
     (cardId: string) => {
-      const isHomeCanvasTarget = activeSection === 'home' && activeRoom === 'All' && isEditMode;
+      const isHomeCanvasTarget = activeSection === 'home' && isAllRooms(activeRoom) && isEditMode;
       if (!isHomeCanvasTarget) {
         return;
       }

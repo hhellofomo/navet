@@ -26,6 +26,12 @@ type CoverColorSet = {
   glow: string;
 };
 
+const COVER_OPEN_TONE_THRESHOLD = 50;
+
+function isCoverOpenTone(position: number) {
+  return position > COVER_OPEN_TONE_THRESHOLD;
+}
+
 interface CoverCardViewProps {
   entityId: string;
   name: string;
@@ -94,7 +100,7 @@ export function CoverCardView({
     <BaseCard
       size={size}
       {...cardProps}
-      frameClassName={`bg-linear-to-br ${closedColors.gradient} ${cardShell.rootFrameClassName} ${clampedPosition > 50 ? openColors.border : closedColors.border} ${securitySurface.containerShadowClassName}`}
+      frameClassName={`bg-linear-to-br ${closedColors.gradient} ${cardShell.rootFrameClassName} ${isCoverOpenTone(clampedPosition) ? openColors.border : closedColors.border} ${securitySurface.containerShadowClassName}`}
       disableDefaultSheen
       overlay={
         <>
@@ -254,6 +260,63 @@ interface SharedCoverLayoutProps {
   onSetPosition?: (newPosition: number) => void;
 }
 
+function CoverCardHeader({
+  name,
+  size,
+  DeviceIcon,
+  iconButtonProps,
+  deviceLabel,
+  position,
+}: Pick<
+  SharedCoverLayoutProps,
+  'name' | 'size' | 'DeviceIcon' | 'iconButtonProps' | 'deviceLabel' | 'position'
+>) {
+  const tone = isCoverOpenTone(position) ? 'primary' : 'neutral';
+
+  return (
+    <EntityCardHeader
+      title={name}
+      subtitle={deviceLabel}
+      layout="eyebrow-first"
+      size={size}
+      tone={tone}
+      leading={
+        <EntityCardHeaderIcon
+          IconComponent={DeviceIcon}
+          isActive={isCoverOpenTone(position)}
+          size={size}
+          tone={tone}
+          ariaLabel={iconButtonProps['aria-label']}
+          onClick={iconButtonProps.onClick}
+          onPointerDown={iconButtonProps.onPointerDown}
+        />
+      }
+    />
+  );
+}
+
+function CoverPositionMetric({
+  position,
+  stateDisplay,
+  openColors,
+  theme,
+  size,
+}: Pick<SharedCoverLayoutProps, 'position' | 'stateDisplay' | 'openColors' | 'theme'> & {
+  size: 'sm' | 'xl';
+}) {
+  return (
+    <CardMetric
+      value={`${position}%`}
+      label={stateDisplay.text}
+      size={size}
+      isActive={position > 0}
+      accentClassName={openColors.accent}
+      theme={theme}
+      labelClassName={stateDisplay.color}
+    />
+  );
+}
+
 // Small — no window visualization; the card background split IS the indicator.
 function CompactCoverLayout({
   name,
@@ -273,36 +336,24 @@ function CompactCoverLayout({
 }: SharedCoverLayoutProps) {
   return (
     <div className="flex h-full flex-col">
-      <EntityCardHeader
-        title={name}
-        subtitle={deviceLabel}
-        layout="eyebrow-first"
+      <CoverCardHeader
+        name={name}
         size={size}
-        tone={position > 50 ? 'primary' : 'neutral'}
-        leading={
-          <EntityCardHeaderIcon
-            IconComponent={DeviceIcon}
-            isActive={position > 50}
-            size={size}
-            tone={position > 50 ? 'primary' : 'neutral'}
-            ariaLabel={iconButtonProps['aria-label']}
-            onClick={iconButtonProps.onClick}
-            onPointerDown={iconButtonProps.onPointerDown}
-          />
-        }
+        DeviceIcon={DeviceIcon}
+        iconButtonProps={iconButtonProps}
+        deviceLabel={deviceLabel}
+        position={position}
       />
 
       <CardMetricActionLayout
         size="small"
         metric={
-          <CardMetric
-            value={`${position}%`}
-            label={stateDisplay.text}
-            size="sm"
-            isActive={position > 0}
-            accentClassName={openColors.accent}
+          <CoverPositionMetric
+            position={position}
+            stateDisplay={stateDisplay}
+            openColors={openColors}
             theme={theme}
-            labelClassName={stateDisplay.color}
+            size="sm"
           />
         }
         actions={
@@ -340,36 +391,24 @@ function MediumCoverLayout({
 }: SharedCoverLayoutProps) {
   return (
     <div className="flex h-full flex-col">
-      <EntityCardHeader
-        title={name}
-        subtitle={deviceLabel}
-        layout="eyebrow-first"
+      <CoverCardHeader
+        name={name}
         size={size}
-        tone={position > 50 ? 'primary' : 'neutral'}
-        leading={
-          <EntityCardHeaderIcon
-            IconComponent={DeviceIcon}
-            isActive={position > 50}
-            size={size}
-            tone={position > 50 ? 'primary' : 'neutral'}
-            ariaLabel={iconButtonProps['aria-label']}
-            onClick={iconButtonProps.onClick}
-            onPointerDown={iconButtonProps.onPointerDown}
-          />
-        }
+        DeviceIcon={DeviceIcon}
+        iconButtonProps={iconButtonProps}
+        deviceLabel={deviceLabel}
+        position={position}
       />
 
       <CardMetricActionLayout
         size="medium"
         metric={
-          <CardMetric
-            value={`${position}%`}
-            label={stateDisplay.text}
-            size="sm"
-            isActive={position > 0}
-            accentClassName={openColors.accent}
+          <CoverPositionMetric
+            position={position}
+            stateDisplay={stateDisplay}
+            openColors={openColors}
             theme={theme}
-            labelClassName={stateDisplay.color}
+            size="sm"
           />
         }
         actions={
@@ -410,23 +449,13 @@ function LargeCoverLayout({
 
   return (
     <div className="flex h-full flex-col">
-      <EntityCardHeader
-        title={name}
-        subtitle={deviceLabel}
-        layout="eyebrow-first"
+      <CoverCardHeader
+        name={name}
         size={size}
-        tone={position > 50 ? 'primary' : 'neutral'}
-        leading={
-          <EntityCardHeaderIcon
-            IconComponent={DeviceIcon}
-            isActive={position > 50}
-            size={size}
-            tone={position > 50 ? 'primary' : 'neutral'}
-            ariaLabel={iconButtonProps['aria-label']}
-            onClick={iconButtonProps.onClick}
-            onPointerDown={iconButtonProps.onPointerDown}
-          />
-        }
+        DeviceIcon={DeviceIcon}
+        iconButtonProps={iconButtonProps}
+        deviceLabel={deviceLabel}
+        position={position}
       />
 
       <div className="mt-5 grid flex-1 grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] gap-5">
@@ -438,14 +467,12 @@ function LargeCoverLayout({
         />
 
         <div className="flex min-w-0 flex-col rounded-[28px] border border-white/10 bg-black/10 p-4 backdrop-blur-sm">
-          <CardMetric
-            value={`${position}%`}
-            label={stateDisplay.text}
-            size="xl"
-            isActive={position > 0}
-            accentClassName={openColors.accent}
+          <CoverPositionMetric
+            position={position}
+            stateDisplay={stateDisplay}
+            openColors={openColors}
             theme={theme}
-            labelClassName={stateDisplay.color}
+            size="xl"
           />
 
           {onSetPosition && (

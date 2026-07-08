@@ -54,7 +54,7 @@ describe('Sidebar mobile navigation', () => {
     );
     const dock = getMobileDock(container);
 
-    expect(within(dock).getByRole('button', { name: 'Home' })).toBeInTheDocument();
+    expect(within(dock).getByRole('button', { name: 'Living room' })).toBeInTheDocument();
     expect(within(dock).getByRole('button', { name: 'Settings' })).toBeInTheDocument();
     expect(within(dock).getByRole('button', { name: 'Orbit' })).toBeInTheDocument();
     expect(within(dock).getByRole('button', { name: 'Search' })).toBeInTheDocument();

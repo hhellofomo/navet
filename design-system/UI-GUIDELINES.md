@@ -292,4 +292,4 @@ Avoid:
 - compact cards that duplicate controls across rows
 - feature-specific dialog shells that bypass shared settings patterns without a strong reason
 
-Last updated: April 28, 2026
+Last updated: May 14, 2026

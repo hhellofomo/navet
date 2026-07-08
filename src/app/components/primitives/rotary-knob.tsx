@@ -114,7 +114,7 @@ function getPointerAngle(element: HTMLDivElement | null, clientX: number, client
 
 function snapToStep(value: number, min: number, max: number, step: number) {
   const snappedValue = Math.round((value - min) / step) * step + min;
-  return Number(clamp(snappedValue, min, max).toFixed(1));
+  return Number(clamp(snappedValue, min, max).toFixed(3));
 }
 
 export const RotaryKnob = memo(function RotaryKnob({

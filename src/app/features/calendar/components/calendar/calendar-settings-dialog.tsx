@@ -1,6 +1,7 @@
 import { Palette, Sliders } from 'lucide-react';
 import { useState } from 'react';
 import {
+  CardDialogBody,
   CardDialogChoicePill,
   CardDialogHeader,
   CardDialogSection,
@@ -98,7 +99,7 @@ export function CalendarSettingsDialog({
       contentOverlayClassName={dialogShell.contentOverlayClassName}
     >
       <CustomScrollbar isOn={isOn}>
-        <div className="p-6">
+        <CardDialogBody>
           <CardDialogHeader title={title} description={entityType} entityId={entityId} />
 
           <Tabs value={activeTab} defaultValue="controls" onValueChange={setActiveTab}>
@@ -188,7 +189,7 @@ export function CalendarSettingsDialog({
           </Tabs>
 
           <DialogDoneFooter label={t('common.done')} />
-        </div>
+        </CardDialogBody>
       </CustomScrollbar>
     </DialogShell>
   );

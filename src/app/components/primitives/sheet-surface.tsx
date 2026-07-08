@@ -127,6 +127,7 @@ export function SheetSurface({
       return;
     }
 
+    event.preventDefault();
     dragPointerIdRef.current = event.pointerId;
     dragStartYRef.current = event.clientY;
     dragOffsetRef.current = 0;
@@ -135,7 +136,8 @@ export function SheetSurface({
     setDragOffset(0);
   };
 
-  const handleClick = () => {
+  const handleClick = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    event.currentTarget.blur();
     if (suppressHandleClickRef.current) {
       suppressHandleClickRef.current = false;
       return;
@@ -164,6 +166,7 @@ export function SheetSurface({
       contentClassName={cn(getUiKitSheetContentClassName(theme), contentClassName)}
       contentGlowClassName={contentGlowClassName ?? getUiKitGlassSheetGlowClassName(theme)}
       contentStyle={resolvedContentStyle}
+      mobileCoverSheet={false}
     >
       <Dialog.Title className="sr-only">{title}</Dialog.Title>
       <Dialog.Description id={descriptionId} className="sr-only">

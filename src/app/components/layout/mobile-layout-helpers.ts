@@ -1,3 +1,4 @@
+import { isAllRooms } from '@/app/constants/rooms';
 import type { MobileHeaderEditActions } from './mobile-header-actions';
 
 export interface NamedArea {
@@ -32,9 +33,9 @@ export function getMobileHeaderActionAvailability(
 }
 
 export function getManageableRoomOrder(rooms: string[], areas: NamedArea[]) {
-  const areaNames = areas.map((area) => area.name).filter((name) => name && name !== 'All');
+  const areaNames = areas.map((area) => area.name).filter((name) => name && !isAllRooms(name));
   const orderedKnownRooms = rooms.filter((room) => areaNames.includes(room));
   const unorderedAreaRooms = areaNames.filter((room) => !orderedKnownRooms.includes(room));
-  const navetOnlyRooms = rooms.filter((room) => room !== 'All' && !areaNames.includes(room));
+  const navetOnlyRooms = rooms.filter((room) => !isAllRooms(room) && !areaNames.includes(room));
   return [...new Set([...orderedKnownRooms, ...unorderedAreaRooms, ...navetOnlyRooms])];
 }
