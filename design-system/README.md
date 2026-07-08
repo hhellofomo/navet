@@ -62,7 +62,7 @@ Complete feature implementation guide:
 5. **Smooth Transitions** - 500ms for state changes, 200ms for interactions
 6. **Theme Customization** - Four theme modes (Liquid Glass, Dark, Light, High Contrast) with 8 primary color options
 7. **Section-Based Navigation** - Organized into dedicated sections (Home, Security, Tasks, Locks, Lights, Media, Mock, Settings)
-8. **Shared Primitives First** - Cross-theme icon pills and nav/action pills should resolve through shared primitives before feature-level custom styling is added
+8. **Shared Primitives First** - Cross-theme icon pills, nav/action pills, and card off-state surfaces should resolve through shared primitives before feature-level custom styling is added
 9. **One Climate Card Pattern** - Climate entities should use the HVAC card pattern; do not reintroduce a parallel legacy climate-card implementation
 
 ### Authentication System
@@ -94,6 +94,7 @@ Complete feature implementation guide:
 - **Lights**: Orange/Amber when active (or custom primary color)
 - **Climate**: Blue (cooling) / Orange (heating) / Green (auto)
 - **Media**: Pink accent
+- **Media Cards**: Full-bleed artwork layouts with shared round transport controls and theme-aware inactive treatment
 - **Locks**: Red (locked) / Green (unlocked)
 - **Borders**: `border-{color}-700/20` (20% opacity) or `border-gray-200` (light theme)
 
@@ -142,7 +143,7 @@ When creating a new card component:
 - [ ] Add edit mode size selector support
 - [ ] Use the shared header pattern: icon top-left, title, then subtitle
 - [ ] Use the shared bottom action-row pattern when the card exposes left actions plus a controls/settings opener
-- [ ] Reuse shared theme primitives such as entity icon pills or interactive pills before introducing new theme branches in feature code
+- [ ] Reuse shared theme primitives such as entity icon pills, interactive pills, round control buttons, and card-state surface tokens before introducing new theme branches in feature code
 
 ### Key Files
 ```
@@ -206,5 +207,5 @@ This design system evolves based on real-world usage and feedback. Document lear
 ---
 
 **Design System Maintained By:** Development Team
-**Last Updated:** March 8, 2026
+**Last Updated:** March 11, 2026
 **Status:** Living Document

@@ -19,6 +19,7 @@ Complete documentation for the Navet smart home dashboard.
   - Widget storage and API
 - **[Main README](../README.md#installable-pwa)** - Installable PWA shell and build verification
 - **[Main README](../README.md#-features)** - Current product features, including the unified HVAC-based climate card path
+- **[Design System](../design-system/README.md#core-design-principles)** - Shared primitives, including icon pills, nav/action pills, and card off-state surface tokens
 - **[Docker and Home Assistant Add-on](DOCKER_HOME_ASSISTANT_ADDON.md)** - Packaging and deployment guide
   - Standalone Docker image
   - Home Assistant add-on structure
@@ -89,6 +90,9 @@ Complete documentation for the Navet smart home dashboard.
 **Understand climate card behavior:**
 → See [Main README -> Features](../README.md#-features)
 
+**Understand media card behavior and Home Assistant wiring:**
+→ See [Main README -> Features](../README.md#-features)
+
 **Set up local commit checks:**
 → See [Contributing](../CONTRIBUTING.md)
 
@@ -140,5 +144,5 @@ docs/
 
 ---
 
-**Last Updated:** March 8, 2026  
+**Last Updated:** March 11, 2026  
 **Documentation Status:** ✅ Complete and organized

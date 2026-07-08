@@ -521,6 +521,12 @@ export const useHADevices = (): DeviceCollection => {
               entity.attributes.media_album_name) ||
             'Ready to play';
           const volumeLevel = parseNumberish(entity.attributes?.volume_level);
+          const mediaPosition = parseNumberish(entity.attributes?.media_position);
+          const mediaDuration = parseNumberish(entity.attributes?.media_duration);
+          const positionUpdatedAt =
+            typeof entity.attributes?.media_position_updated_at === 'string'
+              ? entity.attributes.media_position_updated_at
+              : undefined;
           const normalizedState: MediaDevice['state'] =
             entity.state === 'playing'
               ? 'playing'
@@ -544,6 +550,15 @@ export const useHADevices = (): DeviceCollection => {
                 ? Math.max(0, Math.min(100, Math.round(volumeLevel * 100)))
                 : 70,
             isMuted: entity.attributes?.is_volume_muted === true,
+            elapsedSeconds:
+              typeof mediaPosition === 'number'
+                ? Math.max(0, Math.floor(mediaPosition))
+                : undefined,
+            durationSeconds:
+              typeof mediaDuration === 'number'
+                ? Math.max(0, Math.floor(mediaDuration))
+                : undefined,
+            positionUpdatedAt,
           });
           break;
         }

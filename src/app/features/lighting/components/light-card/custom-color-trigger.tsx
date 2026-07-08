@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { getCardActionControlSizes } from '@/app/components/shared/card-action-control-sizes';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { useTheme } from '@/app/hooks';
 
@@ -16,14 +17,14 @@ export const CustomColorTrigger = memo(function CustomColorTrigger({
   size,
 }: CustomColorTriggerProps) {
   const { theme } = useTheme();
+  const controlSizes = getCardActionControlSizes(size === 'large' ? 'large' : 'small');
   const inputColor =
     typeof currentColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(currentColor)
       ? currentColor
       : '#ffa500';
-  const isCompact = size === 'extra-small' || size === 'small';
-  const triggerSize = isCompact ? 'w-7 h-7' : size === 'medium' ? 'w-8 h-8' : 'w-12 h-12';
-  const innerSize = isCompact ? 'w-3.5 h-3.5' : size === 'medium' ? 'w-4 h-4' : 'w-6 h-6';
-  const dotSize = isCompact ? 'w-1.5 h-1.5' : size === 'medium' ? 'w-2 h-2' : 'w-3 h-3';
+  const triggerSize = controlSizes.button;
+  const innerSize = controlSizes.inner;
+  const dotSize = controlSizes.dot;
   const triggerBackground = isOn
     ? `linear-gradient(135deg, ${inputColor} 0%, ${inputColor}cc 45%, rgba(255, 255, 255, 0.9) 100%)`
     : theme === 'light'

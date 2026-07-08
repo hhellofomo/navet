@@ -5,6 +5,7 @@ import { CardSettingsActionButton } from '@/app/components/shared/card-settings-
 import { CardSizeSelector } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
+import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import { CardWrapper } from '@/app/components/ui/card-wrapper';
 import { HVACSettingsDialog } from '../hvac-settings-dialog';
 import type { HVACCardProps } from './hvac-card.types';
@@ -34,12 +35,13 @@ export const HVACCard = memo(function HVACCard({
     isEditMode,
     size,
   });
+  const stateSurface = getCardStateSurfaceTokens(controller.theme, controller.isOn);
 
   return (
     <>
       <CardWrapper
         interactionProps={controller.cardInteraction.cardProps}
-        className={`bg-gradient-to-br ${controller.cardColors.gradient} border ${controller.cardColors.border} p-4 ${!controller.isOn ? 'opacity-85' : ''}`}
+        className={`bg-gradient-to-br ${controller.cardColors.gradient} border ${controller.cardColors.border} p-4 ${stateSurface.containerClassName}`}
         lightOverlayClassName={controller.lightOverlay}
         showShadow={controller.isOn}
       >
@@ -54,11 +56,17 @@ export const HVACCard = memo(function HVACCard({
           className={`absolute inset-0 bg-gradient-to-br ${controller.cardColors.glow} to-transparent transition-all duration-500`}
         />
 
+        {stateSurface.overlayClassName && (
+          <div className={`absolute inset-0 ${stateSurface.overlayClassName}`} />
+        )}
+
         <div className="relative z-[2] h-full flex flex-col">
           <EntityCardHeader
             title={name}
             subtitle="HVAC"
             size={size}
+            titleClassName={stateSurface.primaryTextClassName}
+            subtitleClassName={stateSurface.mutedTextClassName}
             leading={
               <EntityCardHeaderIcon
                 IconComponent={Wind}
@@ -75,11 +83,11 @@ export const HVACCard = memo(function HVACCard({
               <div className="flex h-full flex-col gap-2">
                 <div className="mt-auto">
                   <div
-                    className={`text-3xl font-bold ${controller.textColor} leading-none transition-colors duration-500 mb-1`}
+                    className={`text-3xl font-bold ${stateSurface.primaryTextClassName} leading-none transition-colors duration-500 mb-1`}
                   >
                     {controller.targetTemp}°C
                   </div>
-                  <div className={`text-xs ${controller.secondaryTextColor}`}>
+                  <div className={`text-xs ${stateSurface.secondaryTextClassName}`}>
                     Current temperature {controller.currentTemp}°C
                   </div>
                 </div>
@@ -101,6 +109,7 @@ export const HVACCard = memo(function HVACCard({
                         {...controller.cardInteraction.settingsButtonProps}
                         theme={controller.theme}
                         size="small"
+                        tone={controller.isOn ? 'default' : 'muted'}
                       />
                     }
                   />
@@ -110,11 +119,11 @@ export const HVACCard = memo(function HVACCard({
               <div className="flex h-full flex-col">
                 <div className="mt-auto">
                   <div
-                    className={`text-3xl font-bold ${controller.textColor} leading-none transition-colors duration-500 mb-1`}
+                    className={`text-3xl font-bold ${stateSurface.primaryTextClassName} leading-none transition-colors duration-500 mb-1`}
                   >
                     {controller.targetTemp}°C
                   </div>
-                  <div className={`text-xs ${controller.secondaryTextColor}`}>
+                  <div className={`text-xs ${stateSurface.secondaryTextClassName}`}>
                     Current temperature {controller.currentTemp}°C
                   </div>
                 </div>
@@ -144,6 +153,7 @@ export const HVACCard = memo(function HVACCard({
                         {...controller.cardInteraction.settingsButtonProps}
                         theme={controller.theme}
                         size="medium"
+                        tone={controller.isOn ? 'default' : 'muted'}
                       />
                     }
                   />
@@ -180,7 +190,7 @@ export const HVACCard = memo(function HVACCard({
                     size="large"
                     leftContent={
                       <div className="flex items-center gap-3">
-                        <div className={`text-xs ${controller.secondaryTextColor}`}>Mode</div>
+                        <div className={`text-xs ${stateSurface.secondaryTextClassName}`}>Mode</div>
                         <HVACModeControls
                           mode={controller.mode}
                           isOn={controller.isOn}
@@ -194,6 +204,7 @@ export const HVACCard = memo(function HVACCard({
                         {...controller.cardInteraction.settingsButtonProps}
                         theme={controller.theme}
                         size="large"
+                        tone={controller.isOn ? 'default' : 'muted'}
                       />
                     }
                   />

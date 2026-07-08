@@ -2,13 +2,14 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { Power, Settings2 } from 'lucide-react';
 import { memo } from 'react';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
-import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
+import { RoundControlButton } from '@/app/components/shared/round-control-button';
+import { getCardStateSurfaceTokens } from '@/app/components/shared/theme/card-state-surface-tokens';
 import type { SwitchCardProps } from './switch-card.types';
 import { useSwitchCardController } from './use-switch-card-controller';
 
 export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 'room'>) {
   const controller = useSwitchCardController(props);
-  const surface = getThemeSurfaceTokens(controller.theme);
+  const stateSurface = getCardStateSurfaceTokens(controller.theme, controller.isOn);
 
   return (
     <>
@@ -18,7 +19,7 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
           props.isEditMode
             ? 'cursor-move active:cursor-grabbing'
             : 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]'
-        } ${!controller.isOn ? 'opacity-85' : ''} ${controller.theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
+        } ${stateSurface.containerClassName} ${controller.theme === 'light' && controller.isOn ? 'shadow-lg' : ''}`}
       >
         <div
           className={`absolute inset-0 bg-gradient-to-br ${controller.cardColors.glow} to-transparent transition-all duration-500`}
@@ -32,6 +33,10 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
           />
         )}
 
+        {stateSurface.overlayClassName && (
+          <div className={`absolute inset-0 ${stateSurface.overlayClassName}`} />
+        )}
+
         <div className="relative h-full flex flex-col">
           <div className="mb-2 flex items-start gap-3">
             <EntityCardHeaderIcon
@@ -43,21 +48,26 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
             />
             <div className="min-w-0 flex-1">
               <h3
-                className={`font-semibold text-xs ${controller.textColor} transition-colors duration-500 truncate text-left`}
+                className={`font-semibold text-xs ${stateSurface.primaryTextClassName} transition-colors duration-500 truncate text-left`}
               >
                 {props.name}
               </h3>
-              <p className={`text-[10px] ${surface.textMuted} truncate mt-0.5 text-left`}>
+              <p
+                className={`text-[10px] ${stateSurface.mutedTextClassName} truncate mt-0.5 text-left`}
+              >
                 {controller.entityType}
               </p>
             </div>
             {controller.showSettingsButton && (
-              <button
+              <RoundControlButton
+                theme={controller.theme}
+                size="small"
+                variant="neutral"
                 {...controller.cardInteraction.settingsButtonProps}
-                className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full transition-colors ${controller.settingsButtonClass}`}
+                className={controller.settingsButtonClass}
               >
                 <Settings2 className="h-3.5 w-3.5" />
-              </button>
+              </RoundControlButton>
             )}
           </div>
 
@@ -67,12 +77,14 @@ export const SwitchCard = memo(function SwitchCard(props: Omit<SwitchCardProps, 
             <div className="space-y-0.5">
               {controller.selectedMetrics.map((metric) => (
                 <div key={metric.label} className="flex items-center justify-between gap-2 text-xs">
-                  <span className={`${controller.labelColor} min-w-0 flex items-center gap-1 pr-2`}>
+                  <span
+                    className={`${stateSurface.secondaryTextClassName} min-w-0 flex items-center gap-1 pr-2`}
+                  >
                     {controller.renderMetricIcon(metric, 'h-3 w-3 flex-shrink-0')}
                     <span className="truncate">{metric.label}</span>
                   </span>
                   <span
-                    className={`${controller.valueColor} flex-shrink-0 whitespace-nowrap font-medium`}
+                    className={`${stateSurface.primaryTextClassName} flex-shrink-0 whitespace-nowrap font-medium`}
                   >
                     {controller.formatMetricValue(metric)}
                   </span>

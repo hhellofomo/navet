@@ -8,9 +8,18 @@ interface EntityCardHeaderProps {
   subtitle: string;
   size: CardSize;
   leading: ReactNode;
+  titleClassName?: string;
+  subtitleClassName?: string;
 }
 
-export function EntityCardHeader({ title, subtitle, size, leading }: EntityCardHeaderProps) {
+export function EntityCardHeader({
+  title,
+  subtitle,
+  size,
+  leading,
+  titleClassName = '',
+  subtitleClassName = '',
+}: EntityCardHeaderProps) {
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
   const textColor = surface.textPrimary;
@@ -25,8 +34,12 @@ export function EntityCardHeader({ title, subtitle, size, leading }: EntityCardH
     <div className={`flex items-start ${headerGap} ${marginBottom}`}>
       {leading}
       <div className="min-w-0 flex-1">
-        <h3 className={`truncate font-semibold ${titleSize} ${textColor}`}>{title}</h3>
-        <p className={`mt-0.5 truncate text-[10px] ${surface.textMuted} ${subtitleMarginTop}`}>
+        <h3 className={`truncate font-semibold ${titleSize} ${textColor} ${titleClassName}`}>
+          {title}
+        </h3>
+        <p
+          className={`mt-0.5 truncate text-[10px] ${surface.textMuted} ${subtitleMarginTop} ${subtitleClassName}`}
+        >
           {subtitle}
         </p>
       </div>

@@ -1,6 +1,8 @@
 import { Flame, Snowflake, Wind } from 'lucide-react';
 import { memo } from 'react';
+import { getCardActionControlSizes } from '@/app/components/shared/card-action-control-sizes';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { RoundControlButton } from '@/app/components/shared/round-control-button';
 import { useTheme } from '@/app/hooks';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import { getHVACModeButtonColor } from '../../utils/hvac-styles';
@@ -19,44 +21,50 @@ export const HVACModeControls = memo(function HVACModeControls({
   size = 'medium',
 }: HVACModeControlsProps) {
   const { theme } = useTheme();
-  const buttonSize = size === 'large' ? 'w-12 h-12' : 'w-8 h-8';
-  const iconSize = size === 'large' ? 'w-5 h-5' : 'w-3.5 h-3.5';
+  const primitiveSize = size === 'large' ? 'large' : 'medium';
+  const controlSizes = getCardActionControlSizes(primitiveSize);
 
   return (
     <>
-      <button
-        type="button"
+      <RoundControlButton
+        theme={theme as ThemeType}
+        size={primitiveSize}
+        variant="neutral"
         onClick={(e) => {
           e.stopPropagation();
           onModeChange('cool');
         }}
         disabled={!isOn}
-        className={`${buttonSize} rounded-full transition-all flex items-center justify-center disabled:opacity-50 ${getHVACModeButtonColor('cool', mode, isOn, theme as ThemeType)}`}
+        className={`disabled:opacity-50 ${getHVACModeButtonColor('cool', mode, isOn, theme as ThemeType)}`}
       >
-        <Snowflake className={iconSize} />
-      </button>
-      <button
-        type="button"
+        <Snowflake className={controlSizes.icon} />
+      </RoundControlButton>
+      <RoundControlButton
+        theme={theme as ThemeType}
+        size={primitiveSize}
+        variant="neutral"
         onClick={(e) => {
           e.stopPropagation();
           onModeChange('heat');
         }}
         disabled={!isOn}
-        className={`${buttonSize} rounded-full transition-all flex items-center justify-center disabled:opacity-50 ${getHVACModeButtonColor('heat', mode, isOn, theme as ThemeType)}`}
+        className={`disabled:opacity-50 ${getHVACModeButtonColor('heat', mode, isOn, theme as ThemeType)}`}
       >
-        <Flame className={iconSize} />
-      </button>
-      <button
-        type="button"
+        <Flame className={controlSizes.icon} />
+      </RoundControlButton>
+      <RoundControlButton
+        theme={theme as ThemeType}
+        size={primitiveSize}
+        variant="neutral"
         onClick={(e) => {
           e.stopPropagation();
           onModeChange('fan');
         }}
         disabled={!isOn}
-        className={`${buttonSize} rounded-full transition-all flex items-center justify-center disabled:opacity-50 ${getHVACModeButtonColor('fan', mode, isOn, theme as ThemeType)}`}
+        className={`disabled:opacity-50 ${getHVACModeButtonColor('fan', mode, isOn, theme as ThemeType)}`}
       >
-        <Wind className={iconSize} />
-      </button>
+        <Wind className={controlSizes.icon} />
+      </RoundControlButton>
     </>
   );
 });
