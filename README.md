@@ -156,6 +156,16 @@ pnpm typecheck
 pnpm build
 ```
 
+### Production Preview
+
+Use the production preview flow when you need to verify runtime config, Home Assistant proxy behavior, or other non-dev-server behavior locally.
+
+```bash
+pnpm preview
+```
+
+This builds the app, writes `dist/config.js` from `NAVET_HASS_URL` and `NAVET_HASS_TOKEN`, and serves the production bundle on `http://localhost:4173`.
+
 ## 📖 Usage
 
 ### First Time Setup

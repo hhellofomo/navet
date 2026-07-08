@@ -67,12 +67,14 @@ export const MediaCard = memo(function MediaCard({
     isMuted,
     isOpen,
     openDialog,
+    thumbnailAlbumArt,
     toggleMute,
     togglePlay,
     volume,
   } = useMediaCardController({
     entityId: id,
     entityPicture,
+    artworkKey: [entityPicture, title, artist].filter(Boolean).join('::'),
     initialState: state,
     initialVolume,
     initialMuted,
@@ -124,6 +126,7 @@ export const MediaCard = memo(function MediaCard({
             <MediaSmallView
               entityId={id}
               artwork={resolvedAlbumArt}
+              paletteArtwork={thumbnailAlbumArt}
               onArtworkError={handleArtworkError}
               title={title}
               artist={artist}
@@ -143,6 +146,7 @@ export const MediaCard = memo(function MediaCard({
             <MediaMediumView
               entityId={id}
               artwork={resolvedAlbumArt}
+              paletteArtwork={thumbnailAlbumArt}
               onArtworkError={handleArtworkError}
               title={title}
               artist={artist}
@@ -164,6 +168,7 @@ export const MediaCard = memo(function MediaCard({
             <MediaMediumVerticalView
               entityId={id}
               artwork={resolvedAlbumArt}
+              paletteArtwork={thumbnailAlbumArt}
               onArtworkError={handleArtworkError}
               title={title}
               artist={artist}
@@ -191,6 +196,7 @@ export const MediaCard = memo(function MediaCard({
             isOpen={isOpen}
             onOpenChange={closeDialog}
             artwork={resolvedAlbumArt}
+            paletteArtwork={thumbnailAlbumArt}
             onArtworkError={handleArtworkError}
             title={title}
             artist={artist}

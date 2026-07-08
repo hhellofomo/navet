@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { isMediaPlayerProxyUrl } from '@/app/utils/home-assistant-url';
 import { MediaFallbackArtwork } from './media-fallback-artwork';
 import type { MediaArtworkPalette } from './use-media-artwork-colors';
 import { withAlpha } from './use-media-artwork-colors';
@@ -43,6 +44,10 @@ export function MediaArtworkSurface({
   }, [artwork]);
 
   const useSubduedFallback = subduedFallback && !artwork;
+  const shouldRenderDecorativeArtworkLayers =
+    artwork !== null &&
+    artwork !== undefined &&
+    (import.meta.env.DEV || !isMediaPlayerProxyUrl(artwork));
   const edgeFadeMask =
     layout === 'split'
       ? 'linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 55%, rgba(0,0,0,0.9) 68%, rgba(0,0,0,0.54) 84%, rgba(0,0,0,0.14) 95%, rgba(0,0,0,0) 100%)'
@@ -82,7 +87,7 @@ export function MediaArtworkSurface({
                     : `linear-gradient(135deg, ${palette.dominant} 0%, ${palette.gradientEnd} 100%)`,
         }}
       />
-      {artwork && showDeferredBackdrop ? (
+      {artwork && showDeferredBackdrop && shouldRenderDecorativeArtworkLayers ? (
         <img
           src={artwork}
           alt=""

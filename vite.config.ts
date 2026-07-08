@@ -77,6 +77,55 @@ function rssProxyPlugin() {
   }
 }
 
+function homeAssistantPreviewProxyPlugin(hassUrl?: string, hassToken?: string) {
+  return {
+    name: 'navet-ha-preview-proxy',
+    configurePreviewServer(server) {
+      if (!hassUrl) {
+        return
+      }
+
+      server.middlewares.use('/__navet_ha_proxy__', async (req, res) => {
+        if (!req.url) {
+          res.statusCode = 400
+          res.end('Missing proxy path')
+          return
+        }
+
+        try {
+          const targetUrl = new URL(req.url, `${hassUrl}/`)
+          const upstreamResponse = await fetch(targetUrl, {
+            headers: hassToken
+              ? {
+                  Authorization: `Bearer ${hassToken}`,
+                }
+              : undefined,
+          })
+
+          res.statusCode = upstreamResponse.status
+
+          const contentType = upstreamResponse.headers.get('content-type')
+          if (contentType) {
+            res.setHeader('Content-Type', contentType)
+          }
+
+          const cacheControl = upstreamResponse.headers.get('cache-control')
+          if (cacheControl) {
+            res.setHeader('Cache-Control', cacheControl)
+          }
+
+          const body = Buffer.from(await upstreamResponse.arrayBuffer())
+          res.end(body)
+        } catch {
+          res.statusCode = 502
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify({ error: 'Unable to load Home Assistant resource' }))
+        }
+      })
+    },
+  }
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const hassUrl = env.NAVET_HASS_URL?.trim().replace(/\/$/, '')
@@ -90,6 +139,7 @@ export default defineConfig(({ mode }) => {
     react(),
     tailwindcss(),
     rssProxyPlugin(),
+    homeAssistantPreviewProxyPlugin(hassUrl, hassToken),
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: false,

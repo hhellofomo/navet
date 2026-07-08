@@ -6,6 +6,8 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
+    "preview": "pnpm build && pnpm preview:config && vite preview --host 0.0.0.0 --port 4173",
+    "preview:config": "node scripts/write-preview-config.mjs",
     "lint": "biome lint ./src",
     "format": "biome format --write ./src",
     "check": "biome check ./src",
