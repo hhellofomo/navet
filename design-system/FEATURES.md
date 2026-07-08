@@ -273,18 +273,18 @@ Beautiful placeholder screens for sections without data.
 ### Desktop (≥ 1024px)
 - Sidebar always visible on left
 - Settings: Maximum width 896px (max-w-2xl), centered
-- Grid: fixed-width 190px tracks with wrapping
+- Grid: 6 columns at `xl`, growing to 8 columns at `2xl`
 - Navigation: Sidebar icons only
 
 ### Tablet (768px - 1023px)
 - Sidebar hidden, accessible via menu
-- Grid: fixed-width 190px tracks with wrapping
+- Grid: 4 columns
 - Navigation: Bottom bar on mobile breakpoint
 
 ### Mobile (< 768px)
 - No sidebar
 - Bottom navigation bar with 6 sections including Mock and Settings
-- Grid: fixed-width tracks wrap based on available width
+- Grid: 2 columns
 - Settings: Full width with mobile padding
 
 ---

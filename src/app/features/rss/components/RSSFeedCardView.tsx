@@ -1,4 +1,5 @@
 import { ChevronRight, Rss } from 'lucide-react';
+import type { CardSize } from '../../../components/shared/card-size-selector';
 import { CardSizeSelector } from '../../../components/shared/card-size-selector';
 import type { PrimaryColor, ThemeType } from '../../../hooks';
 
@@ -14,8 +15,8 @@ interface RSSItem {
 
 interface RSSFeedCardViewProps {
   inEditMode?: boolean;
-  size?: string;
-  onSizeChange?: (size: string) => void;
+  size?: CardSize;
+  onSizeChange?: (size: CardSize) => void;
   theme: ThemeType;
   primaryColor: PrimaryColor;
   colors: {

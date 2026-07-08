@@ -78,7 +78,6 @@ export const RSSFeedCard = memo(function RSSFeedCard({
   const { theme, colors, primaryColor } = useTheme();
   const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
-  const _isLarge = size === 'large';
   const colorMap = {
     orange: { strong: '#c2410c', base: '#f97316', soft: '#fed7aa' },
     blue: { strong: '#1d4ed8', base: '#3b82f6', soft: '#bfdbfe' },

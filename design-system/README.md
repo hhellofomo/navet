@@ -96,11 +96,23 @@ Complete feature implementation guide:
 ### Card Sizes
 - **Extra-Small (1×0.5)**: Dense status or single-control layouts, compact padding and minimal controls
   Light cards keep an unlabeled brightness slider visible here; tap behavior determines whether a compact settings action shares that row or the slider uses the full width.
-- **Small (1×1)**: Minimal info, quick toggle, `p-4`, minimum `190px × 190px`
-- **Medium (2×1)**: Primary controls + info, `p-5`, minimum `396px` wide and `190px` tall
-- **Large (2×2)**: Full controls + advanced features, `p-6`, minimum `396px × 396px`
+- **Small (1×1)**: Minimal info, quick toggle, `p-4`, one responsive grid column wide and two auto-rows tall
+- **Medium (2×1)**: Primary controls + info, `p-5`, two responsive grid columns wide and two auto-rows tall
+- **Large (2×2)**: Full controls + advanced features, `p-6`, two responsive grid columns wide and four auto-rows tall
 
-Dashboard cards use a fixed-width track grid: `repeat(auto-fit, 190px)` with `16px` gaps and `87px` auto-rows.
+Dashboard cards use an explicit responsive column grid:
+- mobile: `grid-cols-2`
+- tablet (`md`): `grid-cols-4`
+- desktop (`xl`): `grid-cols-6`
+- large desktop (`2xl`): `grid-cols-8`
+
+Gaps scale from `gap-2` to `md:gap-3` to `lg:gap-4`, while `auto-rows-[87px]` keeps the card height math stable.
+
+At `lg` and above, that resolves to the familiar desktop card dimensions:
+- single-column cards: `190px` wide
+- two-column cards: `396px` wide
+- small/medium cards: `190px` tall
+- large cards: `396px` tall
 
 ### Responsive Breakpoints
 - **Mobile**: `< 768px` - 2 column grid, hidden sidebar
@@ -149,8 +161,8 @@ Use these values in your design tools (Figma, Sketch, etc.):
 
 **Spacing Scale** (4px base): 4, 8, 12, 16, 20, 24, 32
 **Border Radius**: 8px, 16px, 24px, full circle
-**Grid Columns**: 2 (mobile), 3-4 (tablet), 4-6 (desktop)
-**Grid Gap**: 16px (mobile), 24px (desktop)
+**Grid Columns**: 2 (mobile), 4 (tablet), 6 (desktop), 8 (large desktop)
+**Grid Gap**: 8px (mobile), 12px (`md`), 16px (`lg+`)
 
 ### When to Use Each Card Size
 - **Small**: Binary states (on/off, locked/unlocked), simple status displays

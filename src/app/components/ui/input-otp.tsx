@@ -64,7 +64,7 @@ function InputOTPSlot({
 
 function InputOTPSeparator({ ...props }: React.ComponentProps<'div'>) {
   return (
-    <hr
+    <div
       data-slot="input-otp-separator"
       className="mx-1 my-2.5 border-l border-gray-300"
       {...props}

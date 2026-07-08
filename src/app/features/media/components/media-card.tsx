@@ -134,7 +134,6 @@ export const MediaCard = memo(function MediaCard({
             isPlaying={isPlaying}
             volume={volume}
             isMuted={isMuted}
-            isLight={isLight}
             onTogglePlay={togglePlay}
             onToggleMute={toggleMute}
             onVolumeChange={handleVolumeChange}

@@ -76,7 +76,6 @@ export const RSSFeedCardContainer = memo(function RSSFeedCardContainer({
   const { theme, colors, primaryColor } = useTheme();
   const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
-  const _isLarge = size === 'large';
 
   const handleArticleClick = (url: string) => {
     if (!inEditMode) {

@@ -1,15 +1,8 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import { Plus, Search, Trash2, X } from 'lucide-react';
+import { Gauge, Plus, Search, Trash2, X } from 'lucide-react';
 import { memo, useCallback, useRef, useState } from 'react';
 import { CustomScrollbar } from '@/app/components/shared/custom-scrollbar';
-import { iconMap, type SensorIconType } from './sensors/sensor-types';
-
-interface SensorReading {
-  label: string;
-  value: string;
-  unit: string;
-  icon?: SensorIconType;
-}
+import { iconMap, type SensorIconType, type SensorReading } from './sensors/sensor-types';
 
 interface AvailableSensor {
   id: string;
@@ -255,7 +248,7 @@ export const SensorGroupSettingsDialog = memo(function SensorGroupSettingsDialog
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const colors = colorMap[accentColor];
 
   // Filter sensors based on search query — searches label, category, unit, and id
@@ -281,6 +274,7 @@ export const SensorGroupSettingsDialog = memo(function SensorGroupSettingsDialog
       if (alreadySelected) return;
 
       const newSensor: SensorReading = {
+        id: sensor.id,
         label: sensor.label,
         value: sensor.value,
         unit: sensor.unit,

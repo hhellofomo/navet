@@ -168,17 +168,33 @@ Gap: 8px between tabs
 
 ### Grid Configuration
 
-#### All Breakpoints
+#### Breakpoint Progression
 ```css
-grid-template-columns: repeat(auto-fit, 190px)
+grid-template-columns: repeat(2, minmax(0, 1fr))
 grid-auto-rows: 87px
-gap: 16px
-justify-content: start
+gap: 8px
+
+@media (min-width: 768px) {
+  grid-template-columns: repeat(4, minmax(0, 1fr))
+  gap: 12px
+}
+
+@media (min-width: 1280px) {
+  grid-template-columns: repeat(6, minmax(0, 1fr))
+}
+
+@media (min-width: 1024px) {
+  gap: 16px
+}
+
+@media (min-width: 1536px) {
+  grid-template-columns: repeat(8, minmax(0, 1fr))
+}
 ```
 
 ### Grid Structure
 ```tsx
-<div className="grid w-full justify-start grid-flow-row-dense grid-cols-[repeat(auto-fit,190px)] gap-4 auto-rows-[87px]">
+<div className="grid w-full grid-flow-row-dense grid-cols-2 gap-2 auto-rows-[87px] md:grid-cols-4 md:gap-3 xl:grid-cols-6 lg:gap-4 2xl:grid-cols-8">
   {/* Cards with dynamic col-span */}
   <div className="col-span-1 row-span-1"> {/* Extra-small card */}
   <div className="col-span-1 row-span-2"> {/* Small card */}
@@ -211,46 +227,73 @@ export function getCardSpanClass(size: CardSize): string {
 }
 ```
 
-### Fixed-Track Grid
+### Current Dashboard Grid
 ```css
-/* Current dashboard grid */
-grid-template-columns: repeat(auto-fit, 190px);
+grid-template-columns: repeat(2, minmax(0, 1fr));
 grid-auto-rows: 87px;
-gap: 16px;
-justify-content: start;
+gap: 8px;
+
+@media (min-width: 768px) {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (min-width: 1024px) {
+  gap: 16px;
+}
+
+@media (min-width: 1280px) {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+@media (min-width: 1536px) {
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+}
 ```
 
 ### Card Dimensions
 
 #### Extra-Small Card
 ```css
-Min Width: 190px
-Width: 1 grid column, expands with available space
+Width: 1 responsive grid column
 Height: 87px
 Typical Use: Dense status or one inline control row
 ```
 
 #### Small Card
 ```css
-Min Width: 190px
-Width: 190px
-Height: 190px (2 rows + 1 gap)
+Width: 1 responsive grid column
+Height: calc(2 × 87px + responsive gap)
+Height at breakpoints:
+  mobile: 182px
+  md: 186px
+  lg+: 190px
 Typical Use: Standard compact controls
 ```
 
 #### Medium Card
 ```css
-Min Width: 396px (2 columns + 1 gap)
-Width: 396px minimum (2 columns + 1 gap)
-Height: 190px (2 rows + 1 gap)
+Width: 2 responsive grid columns + 1 gap
+Width at breakpoints:
+  mobile: spans 2 of the 2 available columns
+  md+: spans 2 responsive grid columns + 1 gap
+  lg+: 396px on the desktop grid
+Height: calc(2 × 87px + responsive gap)
+Height at breakpoints:
+  mobile: 182px
+  md: 186px
+  lg+: 190px
 Typical Use: Primary controls plus supporting details
 ```
 
 #### Large Card
 ```css
-Min Width: 396px (2 columns + 1 gap)
-Width: 396px minimum (2 columns + 1 gap)
-Height: 396px (4 rows + 3 gaps)
+Width: 2 responsive grid columns + 1 gap
+Height: calc(4 × 87px + 3 × responsive gap)
+Height at breakpoints:
+  mobile: 372px
+  md: 384px
+  lg+: 396px
 Typical Use: Full feature layout with secondary sections
 ```
 
@@ -391,9 +434,9 @@ const filteredLights = devices.lights.filter(light => light.room === activeRoom)
 
 ### CSS Grid Benefits
 1. **Automatic Flow**: Browser handles card placement
-2. **Responsive**: Native wrapping with stable card widths
+2. **Responsive**: Deterministic column counts across Tailwind breakpoints
 3. **Gap Property**: Clean spacing without margin calculations
-4. **Auto-fit**: Adds or removes fixed-width tracks automatically
+4. **Breakpoint-controlled**: Exact 2 / 4 / 6 / 8 column progression
 
 ### Sticky Position Benefits
 1. **No JavaScript**: Pure CSS solution

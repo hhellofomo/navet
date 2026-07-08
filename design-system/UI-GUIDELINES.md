@@ -286,14 +286,14 @@ Subtle glow effects
 
 #### Small (col-span-1 row-span-2)
 - **Grid Columns**: 1
-- **Grid Height**: 190px
+- **Grid Height**: `calc(2 × 87px + gap)` → `182px / 186px / 190px` across `mobile / md / lg+`
 - **Use Case**: Standard compact controls
 - **Content Strategy**: Header, primary value/slider, compact action row
 - **Padding**: `p-4`
 
 #### Medium (col-span-2 row-span-2)
 - **Grid Columns**: 2
-- **Grid Height**: 190px
+- **Grid Height**: `calc(2 × 87px + gap)` → `182px / 186px / 190px` across `mobile / md / lg+`
 - **Use Case**: Controls with 1-2 adjustable parameters
 - **Content Strategy**: Same header density as small, more horizontal space
 - **Padding**: `p-5`
@@ -301,7 +301,7 @@ Subtle glow effects
 #### Large (col-span-2 row-span-4)
 - **Grid Columns**: 2
 - **Grid Rows**: 4
-- **Grid Height**: 396px
+- **Grid Height**: `calc(4 × 87px + 3 × gap)` → `372px / 384px / 396px` across `mobile / md / lg+`
 - **Use Case**: Complex controls with multiple parameters
 - **Content Strategy**: Full information and secondary sections
 - **Padding**: `p-6`
@@ -395,19 +395,22 @@ Desktop: > 1024px
 
 ### Mobile Optimizations
 - Sidebar hidden, accessible via menu
-- Fixed-width dashboard tracks wrap automatically
+- Dashboard uses a 2-column grid by default
 - Touch-friendly 44px minimum hit targets
 - Reduced card padding for space efficiency
 - Simplified layouts in small cards
 
 ### Grid Adaptations
 ```css
-Dashboard grid: repeat(auto-fit, 190px)
-Gap: 16px
+Mobile: grid-cols-2 + gap-2
+Tablet (md): grid-cols-4 + gap-3
+Desktop (xl): grid-cols-6
+Large Desktop (2xl): grid-cols-8
+Desktop gap: lg:gap-4
 Auto rows: 87px
-Small cards: 190px × 190px
-Medium cards: 396px minimum width × 190px height
-Large cards: 396px × 396px
+Small cards: 2 row spans
+Medium cards: 2 column spans × 2 row spans
+Large cards: 2 column spans × 4 row spans
 ```
 
 ---

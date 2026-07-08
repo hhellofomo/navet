@@ -109,11 +109,12 @@ export const useDeviceMap = (devices: DeviceCollection) => {
       deviceArray.forEach((device) => {
         const nextDevice = { ...device, type } as DeviceWithType;
         const previousDevice = previousDeviceMap.get(device.id);
+        const stableDevice =
+          previousDevice && isEquivalentDevice(previousDevice, nextDevice)
+            ? previousDevice
+            : nextDevice;
 
-        nextDeviceMap.set(
-          device.id,
-          isEquivalentDevice(previousDevice, nextDevice) ? previousDevice : nextDevice
-        );
+        nextDeviceMap.set(device.id, stableDevice);
       });
     });
 

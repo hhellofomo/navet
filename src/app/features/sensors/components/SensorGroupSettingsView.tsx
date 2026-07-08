@@ -1,15 +1,8 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import type { LucideIcon } from 'lucide-react';
-import { Plus, Search, Trash2, X } from 'lucide-react';
-import type { RefObject } from 'react';
-import type { SensorIconType } from './sensors/sensor-types';
-
-interface SensorReading {
-  label: string;
-  value: string;
-  unit: string;
-  icon?: SensorIconType;
-}
+import { Gauge, Plus, Search, Trash2, X } from 'lucide-react';
+import type { Dispatch, ReactNode, RefObject, SetStateAction } from 'react';
+import type { SensorIconType, SensorReading } from './sensors/sensor-types';
 
 interface AvailableSensor {
   id: string;
@@ -36,8 +29,8 @@ interface SensorGroupSettingsViewProps {
   isDropdownOpen: boolean;
   setIsDropdownOpen: (open: boolean) => void;
   highlightedIndex: number;
-  setHighlightedIndex: (index: number) => void;
-  inputRef: RefObject<HTMLInputElement>;
+  setHighlightedIndex: Dispatch<SetStateAction<number>>;
+  inputRef: RefObject<HTMLInputElement | null>;
   colors: ColorConfig;
   filteredSensors: AvailableSensor[];
   iconMap: Record<SensorIconType, LucideIcon>;
@@ -46,7 +39,7 @@ interface SensorGroupSettingsViewProps {
   handleSave: () => void;
   handleCancel: () => void;
   isSensorSelected: (sensorId: string) => boolean;
-  CustomScrollbar: React.ComponentType<{ children: React.ReactNode }>;
+  CustomScrollbar: React.ComponentType<{ children: ReactNode }>;
 }
 
 export function SensorGroupSettingsView({
@@ -318,14 +311,5 @@ export function SensorGroupSettingsView({
         </button>
       </div>
     </Dialog.Content>
-  );
-}
-
-function Gauge() {
-  return (
-    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <title>Gauge</title>
-      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-    </svg>
   );
 }

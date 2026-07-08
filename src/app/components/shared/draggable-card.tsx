@@ -13,7 +13,6 @@ interface DraggableCardProps {
 
 export function DraggableCard({
   id,
-  _index,
   isEditMode,
   isSortable = isEditMode,
   children,

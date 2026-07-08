@@ -261,7 +261,7 @@ For technical documentation and developer guides, see [`/docs/README.md`](docs/R
 - Test on multiple screen sizes
 - Update documentation as needed
 - Ensure accessibility standards
-- Run `pnpm setup:hooks` once so pre-commit checks enforce Biome, TypeScript baseline drift, and docs updates for user-facing changes
+- Run `pnpm setup:hooks` once so pre-commit checks enforce Biome, a clean TypeScript check with baseline sync, and docs updates for user-facing changes
 
 ## 🐛 Bug Reports & Feature Requests
 

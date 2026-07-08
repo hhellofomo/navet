@@ -75,7 +75,7 @@ const MockEntityGrid = memo(function MockEntityGrid({ devices }: { devices: Devi
           {devices.length} {devices.length === 1 ? 'entity' : 'entities'}
         </span>
       </div>
-      <div className="grid w-full justify-start grid-flow-row-dense grid-cols-[repeat(auto-fit,190px)] gap-4 auto-rows-[87px]">
+      <div className="grid w-full grid-flow-row-dense grid-cols-2 gap-2 auto-rows-[87px] md:grid-cols-4 md:gap-3 xl:grid-cols-6 lg:gap-4 2xl:grid-cols-8">
         {devices.map((device) => {
           const size = device.size as CardSize;
 

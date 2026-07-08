@@ -1,4 +1,4 @@
-import { SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
+import { Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 
 interface MediaMediumViewProps {
   albumArt: string;

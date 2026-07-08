@@ -1,3 +1,4 @@
+import { Clock } from 'lucide-react';
 import type { CalendarEvent } from './types';
 
 interface CalendarSmallViewProps {
