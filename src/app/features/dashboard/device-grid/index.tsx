@@ -15,7 +15,6 @@ export const DeviceGrid = memo(function DeviceGrid({
   orderedCardIds,
   deviceMap,
   isEditMode,
-  isScrolling = false,
   cardSizes,
   updateCardSize,
   customCards = [],
@@ -99,7 +98,6 @@ export const DeviceGrid = memo(function DeviceGrid({
                   device={device}
                   size={size}
                   isEditMode={isEditMode}
-                  renderLightweight={isScrolling && !isEditMode}
                   handleSizeChange={handleSizeChange}
                   onRemoveEntity={onRemoveEntity}
                   allowEntityRemoval={allowEntityRemoval}
@@ -118,7 +116,6 @@ export const DeviceGrid = memo(function DeviceGrid({
                 card={card}
                 size={size}
                 isEditMode={isEditMode}
-                renderLightweight={isScrolling && !isEditMode}
                 handleSizeChange={handleSizeChange}
                 onDeleteCard={onDeleteCard}
                 onUpdateCard={onUpdateCard}

@@ -2,9 +2,8 @@ import { DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } f
 import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Check, ChevronDown, Edit3, LayoutGrid, Lightbulb } from 'lucide-react';
-import { type ButtonHTMLAttributes, forwardRef, memo, useEffect, useRef, useState } from 'react';
+import { type ButtonHTMLAttributes, forwardRef, memo, useEffect, useRef } from 'react';
 import { InteractivePill } from '@/app/components/shared/interactive-pill';
-import { getStickyBarSurfaceClass } from '@/app/components/shared/theme/sticky-bar-surface-tokens';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import { ThemeDropdownContent } from '@/app/components/shared/theme-dropdown-content';
 import {
@@ -48,31 +47,52 @@ interface RoomNavMenuButtonProps {
 }
 
 function useStickyActivation() {
+  const stickyMarkerRef = useRef<HTMLDivElement | null>(null);
   const stickyRef = useRef<HTMLDivElement | null>(null);
-  const [isStickyActive, setIsStickyActive] = useState(false);
+  const shellRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const updateStickyState = () => {
-      const node = stickyRef.current;
-      if (!node) {
-        return;
-      }
+    const markerNode = stickyMarkerRef.current;
+    const stickyNode = stickyRef.current;
+    const shellNode = shellRef.current;
+    if (!markerNode || !stickyNode || !shellNode) {
+      return;
+    }
 
-      const stickyTop = Number.parseFloat(window.getComputedStyle(node).top) || 0;
-      setIsStickyActive(node.getBoundingClientRect().top <= stickyTop + 0.5);
+    let observer: IntersectionObserver | null = null;
+
+    const attachObserver = () => {
+      observer?.disconnect();
+
+      const stickyTop = Number.parseFloat(window.getComputedStyle(stickyNode).top) || 0;
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          shellNode.classList.toggle('is-stuck', Boolean(entry) && !entry.isIntersecting);
+        },
+        {
+          root: null,
+          threshold: 0,
+          rootMargin: `-${stickyTop}px 0px 0px 0px`,
+        }
+      );
+
+      observer.observe(markerNode);
     };
 
-    updateStickyState();
-    window.addEventListener('scroll', updateStickyState, { passive: true });
-    window.addEventListener('resize', updateStickyState);
+    const handleResize = () => {
+      attachObserver();
+    };
+
+    attachObserver();
+    window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('scroll', updateStickyState);
-      window.removeEventListener('resize', updateStickyState);
+      observer?.disconnect();
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
-  return { stickyRef, isStickyActive };
+  return { stickyMarkerRef, stickyRef, shellRef };
 }
 
 export const RoomNav = memo(function RoomNav({
@@ -91,7 +111,7 @@ export const RoomNav = memo(function RoomNav({
   const { t } = useI18n();
   const { theme } = useTheme();
   const surface = getThemeSurfaceTokens(theme);
-  const { stickyRef, isStickyActive } = useStickyActivation();
+  const { stickyMarkerRef, stickyRef, shellRef } = useStickyActivation();
   const visibleRooms = ['All', ...rooms];
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -107,7 +127,6 @@ export const RoomNav = memo(function RoomNav({
   const dividerClass =
     theme === 'light' ? 'bg-gray-300/90' : theme === 'contrast' ? 'bg-white/30' : 'bg-white/14';
   const stickyOffset = 'calc(env(safe-area-inset-top, 0px) + 8px)';
-  const stickyShellClass = getStickyBarSurfaceClass(theme, isStickyActive);
   const showAllViewGrouping = activeRoom === 'All' && onAllViewGroupingChange;
   const actionPillClassName = `flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs md:gap-2 md:px-3 md:py-2 md:text-sm transition-colors ${inactiveBg} ${hoverBg}`;
   const dropdownItemClassName = `rounded-xl px-3 py-2 ${surface.textPrimary} ${hoverBg}`;
@@ -132,123 +151,132 @@ export const RoomNav = memo(function RoomNav({
   };
 
   return (
-    <div ref={stickyRef} className="sticky top-0 z-30" style={{ top: stickyOffset }}>
-      <div className={isStickyActive ? stickyShellClass : ''}>
-        <div className="flex items-center gap-1 md:gap-1.5">
-          <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
-            <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-              <SortableContext items={visibleRooms} strategy={horizontalListSortingStrategy}>
-                <div className="flex items-center gap-1 min-w-max md:gap-1.5">
-                  {visibleRooms.map((room) => (
-                    <RoomNavItem
-                      key={room}
-                      room={room}
-                      activeRoom={activeRoom}
-                      allLabel={t('dashboard.roomNav.all')}
-                      isEditMode={isEditMode}
+    <>
+      <div
+        ref={stickyMarkerRef}
+        aria-hidden="true"
+        // Zero height keeps this marker out of layout. The negative bottom margin
+        // cancels the parent flex gap so the nav does not gain extra top spacing.
+        className="h-0 -mb-6 pointer-events-none md:-mb-8"
+      />
+      <div ref={stickyRef} className="sticky top-0 z-30" style={{ top: stickyOffset }}>
+        <div ref={shellRef} className="room-nav-shell" data-theme={theme}>
+          <div className="flex items-center gap-1 md:gap-1.5">
+            <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
+              <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+                <SortableContext items={visibleRooms} strategy={horizontalListSortingStrategy}>
+                  <div className="flex items-center gap-1 min-w-max md:gap-1.5">
+                    {visibleRooms.map((room) => (
+                      <RoomNavItem
+                        key={room}
+                        room={room}
+                        activeRoom={activeRoom}
+                        allLabel={t('dashboard.roomNav.all')}
+                        isEditMode={isEditMode}
+                        textSecondary={textSecondary}
+                        hoverBg={hoverBg}
+                        onRoomChange={onRoomChange}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
+            </div>
+
+            <div className="flex items-center gap-1 flex-shrink-0 pl-1 md:gap-1.5 md:pl-1.5">
+              {isEditMode && showAllViewGrouping ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <RoomNavMenuButton
+                      icon={LayoutGrid}
+                      label={t('dashboard.roomNav.view')}
                       textSecondary={textSecondary}
-                      hoverBg={hoverBg}
-                      onRoomChange={onRoomChange}
+                      className={actionPillClassName}
                     />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
-          </div>
+                  </DropdownMenuTrigger>
+                  <ThemeDropdownContent theme={theme} align="end">
+                    <DropdownMenuLabel className={`px-3 py-2 text-xs font-medium ${textSecondary}`}>
+                      {t('dashboard.roomNav.groupBy')}
+                    </DropdownMenuLabel>
+                    {allViewGroupingOptions.map((option) => (
+                      <DropdownMenuItem
+                        key={option.value}
+                        className={dropdownItemClassName}
+                        onClick={() => onAllViewGroupingChange(option.value)}
+                      >
+                        <span className="flex min-w-0 flex-1 items-center gap-2">
+                          <span>{option.label}</span>
+                        </span>
+                        {allViewGrouping === option.value ? <Check className="h-4 w-4" /> : null}
+                      </DropdownMenuItem>
+                    ))}
+                  </ThemeDropdownContent>
+                </DropdownMenu>
+              ) : null}
 
-          <div className="flex items-center gap-1 flex-shrink-0 pl-1 md:gap-1.5 md:pl-1.5">
-            {isEditMode && showAllViewGrouping ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <RoomNavMenuButton
-                    icon={LayoutGrid}
-                    label={t('dashboard.roomNav.view')}
-                    textSecondary={textSecondary}
-                    className={actionPillClassName}
-                  />
-                </DropdownMenuTrigger>
-                <ThemeDropdownContent theme={theme} align="end">
-                  <DropdownMenuLabel className={`px-3 py-2 text-xs font-medium ${textSecondary}`}>
-                    {t('dashboard.roomNav.groupBy')}
-                  </DropdownMenuLabel>
-                  {allViewGroupingOptions.map((option) => (
-                    <DropdownMenuItem
-                      key={option.value}
-                      className={dropdownItemClassName}
-                      onClick={() => onAllViewGroupingChange(option.value)}
-                    >
-                      <span className="flex min-w-0 flex-1 items-center gap-2">
-                        <span>{option.label}</span>
-                      </span>
-                      {allViewGrouping === option.value ? <Check className="h-4 w-4" /> : null}
-                    </DropdownMenuItem>
-                  ))}
-                </ThemeDropdownContent>
-              </DropdownMenu>
-            ) : null}
+              {isEditMode && (onAddEntity || onAddCard) ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <RoomNavMenuButton
+                      icon={Lightbulb}
+                      label={t('dashboard.roomNav.add')}
+                      textSecondary={textSecondary}
+                      className={actionPillClassName}
+                    />
+                  </DropdownMenuTrigger>
+                  <ThemeDropdownContent theme={theme} align="end">
+                    {onAddEntity ? (
+                      <DropdownMenuItem className={dropdownItemClassName} onClick={onAddEntity}>
+                        <Lightbulb className="h-4 w-4" />
+                        {addEntityLabel}
+                      </DropdownMenuItem>
+                    ) : null}
+                    {onAddCard ? (
+                      <DropdownMenuItem className={dropdownItemClassName} onClick={onAddCard}>
+                        <LayoutGrid className="h-4 w-4" />
+                        {t('dashboard.roomNav.addCard')}
+                      </DropdownMenuItem>
+                    ) : null}
+                  </ThemeDropdownContent>
+                </DropdownMenu>
+              ) : null}
 
-            {isEditMode && (onAddEntity || onAddCard) ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <RoomNavMenuButton
-                    icon={Lightbulb}
-                    label={t('dashboard.roomNav.add')}
-                    textSecondary={textSecondary}
-                    className={actionPillClassName}
-                  />
-                </DropdownMenuTrigger>
-                <ThemeDropdownContent theme={theme} align="end">
-                  {onAddEntity ? (
-                    <DropdownMenuItem className={dropdownItemClassName} onClick={onAddEntity}>
-                      <Lightbulb className="h-4 w-4" />
-                      {addEntityLabel}
-                    </DropdownMenuItem>
-                  ) : null}
-                  {onAddCard ? (
-                    <DropdownMenuItem className={dropdownItemClassName} onClick={onAddCard}>
-                      <LayoutGrid className="h-4 w-4" />
-                      {t('dashboard.roomNav.addCard')}
-                    </DropdownMenuItem>
-                  ) : null}
-                </ThemeDropdownContent>
-              </DropdownMenu>
-            ) : null}
-
-            {isEditMode ? (
-              <div
-                aria-hidden="true"
-                className={`mx-1 h-6 w-px shrink-0 rounded-full ${dividerClass}`}
-              />
-            ) : null}
-
-            <InteractivePill
-              onClick={onToggleEditMode}
-              active={isEditMode}
-              intent="action"
-              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs md:gap-2 md:px-3 md:py-2 md:text-sm transition-colors ${
-                isEditMode ? 'shadow-sm' : `${inactiveBg} ${hoverBg}`
-              }`}
-            >
               {isEditMode ? (
-                <>
-                  <Check className="h-4 w-4 text-white" />
-                  <span className="hidden text-xs font-medium text-white md:inline">
-                    {t('dashboard.roomNav.doneEditing')}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <Edit3 className={`h-4 w-4 ${textSecondary}`} />
-                  <span className={`hidden text-xs font-medium md:inline ${textSecondary}`}>
-                    {t('dashboard.roomNav.customize')}
-                  </span>
-                </>
-              )}
-            </InteractivePill>
+                <div
+                  aria-hidden="true"
+                  className={`mx-1 h-6 w-px shrink-0 rounded-full ${dividerClass}`}
+                />
+              ) : null}
+
+              <InteractivePill
+                onClick={onToggleEditMode}
+                active={isEditMode}
+                intent="action"
+                className={`room-nav-action-pill flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs md:gap-2 md:px-3 md:py-2 md:text-sm transition-colors ${
+                  isEditMode ? 'shadow-sm' : `${inactiveBg} ${hoverBg}`
+                }`}
+              >
+                {isEditMode ? (
+                  <>
+                    <Check className="h-4 w-4 text-white" />
+                    <span className="hidden text-xs font-medium text-white md:inline">
+                      {t('dashboard.roomNav.doneEditing')}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Edit3 className={`h-4 w-4 ${textSecondary}`} />
+                    <span className={`hidden text-xs font-medium md:inline ${textSecondary}`}>
+                      {t('dashboard.roomNav.customize')}
+                    </span>
+                  </>
+                )}
+              </InteractivePill>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 });
 
@@ -289,8 +317,8 @@ const RoomNavItem = memo(function RoomNavItem({
         transform: CSS.Transform.toString(transform),
         transition,
       }}
-      className={`px-2.5 md:px-3 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
-        activeRoom === room ? 'text-white' : `${textSecondary} ${hoverBg}`
+      className={`room-nav-item px-2.5 md:px-3 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+        activeRoom === room ? 'room-nav-item-active text-white' : `${textSecondary} ${hoverBg}`
       } ${isEditMode && room !== 'All' ? 'cursor-move active:cursor-grabbing' : ''} ${
         isDragging ? 'opacity-50' : ''
       }`}

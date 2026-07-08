@@ -92,6 +92,7 @@ export const settingsSelectors = {
   defaultView: (state: SettingsState) => state.defaultView,
   compactMode: (state: SettingsState) => state.compactMode,
   disableAnimations: (state: SettingsState) => state.disableAnimations,
+  lowPowerMode: (state: SettingsState) => state.lowPowerMode,
   entityInteractionMode: (state: SettingsState) => state.entityInteractionMode,
   ambientLightBleed: (state: SettingsState) => state.ambientLightBleed,
 
@@ -106,6 +107,7 @@ export const settingsSelectors = {
     temperatureUnit: state.temperatureUnit,
     compactMode: state.compactMode,
     disableAnimations: state.disableAnimations,
+    lowPowerMode: state.lowPowerMode,
     entityInteractionMode: state.entityInteractionMode,
     ambientLightBleed: state.ambientLightBleed,
   }),

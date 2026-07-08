@@ -6,7 +6,6 @@ import { DraggableCard } from '@/app/components/shared/draggable-card';
 import type { DeviceWithType } from '@/app/types/device.types';
 import type { CustomCard } from '../stores/custom-cards-store';
 import { renderCard } from '../utils/card-renderer';
-import { DashboardCardSkeleton } from './dashboard-card-skeleton';
 import { DashboardResizeTrigger } from './dashboard-edit-actions';
 import { WidgetCard } from './widget-card';
 
@@ -22,7 +21,6 @@ interface DashboardCardItemProps {
   onRemoveEntity?: (entityId: string) => void;
   allowEntityRemoval?: boolean;
   usesHideAction?: boolean;
-  renderLightweight?: boolean;
 }
 
 export const DashboardCardItem = memo(function DashboardCardItem({
@@ -37,7 +35,6 @@ export const DashboardCardItem = memo(function DashboardCardItem({
   onRemoveEntity,
   allowEntityRemoval = false,
   usesHideAction = false,
-  renderLightweight = false,
 }: DashboardCardItemProps) {
   const RemoveActionIcon = usesHideAction ? EyeOff : X;
   const removeAriaLabel = 'Remove entity from dashboard';
@@ -77,20 +74,16 @@ export const DashboardCardItem = memo(function DashboardCardItem({
           allowedSizes={allowedSizes}
         />
       )}
-      {renderLightweight ? (
-        <DashboardCardSkeleton size={size} />
-      ) : device ? (
-        renderCard({ device, size, handleSizeChange, isEditMode })
-      ) : (
-        card && (
-          <WidgetCard
-            card={{ ...card, size }}
-            isEditMode={isEditMode}
-            onDelete={onDeleteCard}
-            onUpdate={onUpdateCard}
-          />
-        )
-      )}
+      {device
+        ? renderCard({ device, size, handleSizeChange, isEditMode })
+        : card && (
+            <WidgetCard
+              card={{ ...card, size }}
+              isEditMode={isEditMode}
+              onDelete={onDeleteCard}
+              onUpdate={onUpdateCard}
+            />
+          )}
     </DraggableCard>
   );
 }, areDashboardCardItemPropsEqual);
@@ -132,7 +125,6 @@ function areDashboardCardItemPropsEqual(
     previous.onUpdateCard === next.onUpdateCard &&
     previous.onRemoveEntity === next.onRemoveEntity &&
     previous.allowEntityRemoval === next.allowEntityRemoval &&
-    previous.usesHideAction === next.usesHideAction &&
-    previous.renderLightweight === next.renderLightweight
+    previous.usesHideAction === next.usesHideAction
   );
 }

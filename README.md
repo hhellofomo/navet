@@ -156,7 +156,7 @@ pnpm build
 2. **Connect System** - Ensure your Home Assistant instance is accessible
 3. **Customize Layout** - Enter Edit Mode from **Customize** or by pressing and holding on the dashboard to arrange rooms and cards
 4. **Choose Theme** - Select your preferred color scheme and theme mode
-5. **Optional for slower hardware** - Disable animations in Settings -> Performance
+5. **Optional for slower hardware** - Enable Low-power mode in Settings -> System
 
 ### Features Guide
 

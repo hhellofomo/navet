@@ -18,6 +18,7 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
     handleWallpaperUpload,
     language,
     languageOptions,
+    lowPowerMode,
     primaryColor,
     setPrimaryColor,
     setTheme,
@@ -26,6 +27,7 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
     themeOptions,
     wallpaper,
   } = controller;
+  const effectiveAmbientLightBleed = ambientLightBleed && !lowPowerMode;
 
   return (
     <SettingsSectionShell
@@ -91,43 +93,52 @@ export function SettingsAppearanceSection({ controller }: SettingsAppearanceSect
         styles={styles}
       >
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
-          <div
-            className={`inline-flex w-fit rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
-          >
-            {[
-              { value: true, label: t('settings.appearance.ambience.ambientBleed') },
-              { value: false, label: t('settings.appearance.ambience.contained') },
-            ].map((option) => {
-              const isActive = ambientLightBleed === option.value;
-              return (
-                <button
-                  type="button"
-                  key={option.label}
-                  onClick={() => controller.updateSettings({ ambientLightBleed: option.value })}
-                  style={
-                    isActive
-                      ? {
-                          backgroundColor: styles.accentColor,
-                          color: '#ffffff',
-                        }
-                      : {
-                          color: undefined,
-                        }
-                  }
-                  className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
-                    isActive ? 'shadow-sm' : styles.chipTextColor
-                  }`}
-                  aria-pressed={isActive}
-                >
-                  {option.label}
-                </button>
-              );
-            })}
+          <div className="space-y-3">
+            <div
+              className={`inline-flex w-fit rounded-full border p-1 ${styles.borderColor} ${styles.softBg}`}
+            >
+              {[
+                { value: true, label: t('settings.appearance.ambience.ambientBleed') },
+                { value: false, label: t('settings.appearance.ambience.contained') },
+              ].map((option) => {
+                const isActive = effectiveAmbientLightBleed === option.value;
+                return (
+                  <button
+                    type="button"
+                    key={option.label}
+                    onClick={() => controller.updateSettings({ ambientLightBleed: option.value })}
+                    disabled={lowPowerMode}
+                    style={
+                      isActive
+                        ? {
+                            backgroundColor: styles.accentColor,
+                            color: '#ffffff',
+                          }
+                        : {
+                            color: undefined,
+                          }
+                    }
+                    className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
+                      isActive ? 'shadow-sm' : styles.chipTextColor
+                    } ${lowPowerMode ? 'cursor-not-allowed opacity-50' : ''}`}
+                    aria-pressed={isActive}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {lowPowerMode ? (
+              <p className={`text-sm ${styles.subtleColor}`}>
+                {t('settings.appearance.ambience.disabledInLowPower')}
+              </p>
+            ) : null}
           </div>
 
           <AmbientLightPreviewCard
             accentColor={styles.accentColor}
-            ambientLightBleed={ambientLightBleed}
+            ambientLightBleed={effectiveAmbientLightBleed}
             theme={theme}
           />
         </div>

@@ -16,7 +16,6 @@ interface RoomSectionProps {
   mutedTitle?: boolean;
   showHeader?: boolean;
   isEditMode: boolean;
-  isScrolling?: boolean;
   cardSizes: Record<string, CardSize>;
   deviceMap: Map<string, DeviceWithType>;
   customCardMap: Map<string, CustomCard>;
@@ -37,7 +36,6 @@ export const RoomSection = memo(function RoomSection({
   mutedTitle = false,
   showHeader = true,
   isEditMode,
-  isScrolling = false,
   cardSizes,
   deviceMap,
   customCardMap,
@@ -197,7 +195,6 @@ export const RoomSection = memo(function RoomSection({
                       device={device}
                       size={size}
                       isEditMode={isEditMode}
-                      renderLightweight={isScrolling && !isEditMode}
                       handleSizeChange={handleSizeChange}
                       onRemoveEntity={onRemoveEntity}
                       allowEntityRemoval={allowEntityRemoval}
@@ -220,7 +217,6 @@ export const RoomSection = memo(function RoomSection({
                     card={card}
                     size={size}
                     isEditMode={isEditMode}
-                    renderLightweight={isScrolling && !isEditMode}
                     handleSizeChange={handleSizeChange}
                     onDeleteCard={onDeleteCard}
                     onUpdateCard={onUpdateCard}

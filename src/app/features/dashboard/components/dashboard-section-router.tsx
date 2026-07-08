@@ -1,6 +1,6 @@
 import { closestCenter, DndContext } from '@dnd-kit/core';
 import { Lightbulb } from 'lucide-react';
-import { lazy, Suspense } from 'react';
+import { lazy, type ReactNode, Suspense } from 'react';
 import { RoomNav } from '@/app/components/layout/room-nav';
 import {
   LocksSection,
@@ -17,7 +17,6 @@ import { AllViewGrid } from '../all-view-grid';
 import { DeviceGrid } from '../device-grid';
 import type { DashboardController } from '../hooks/use-dashboard-controller';
 import { useDashboardEditModeLongPress } from '../hooks/use-dashboard-edit-mode-long-press';
-import { useDashboardScrollIdle } from '../hooks/use-dashboard-scroll-idle';
 import { DashboardLayout } from '../shell';
 
 const SettingsSection = lazy(async () => {
@@ -66,101 +65,65 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     disabled: isEditMode,
     onLongPress: onEnterEditMode,
   });
-  const isDashboardScrolling = useDashboardScrollIdle({
-    disabled: isEditMode || showAddEntityDialog || !['dashboard', 'lights'].includes(activeSection),
-  });
+  const sectionStackProps = {
+    className: 'flex flex-col gap-4 md:gap-6',
+    ...editModeLongPressProps,
+  };
+
+  let sectionContent: ReactNode;
 
   if (activeSection === 'security') {
-    return (
-      <DashboardLayout>
-        <SecuritySection />
-      </DashboardLayout>
-    );
-  }
-
-  if (activeSection === 'tasks') {
-    return (
-      <DashboardLayout>
-        <TasksSection />
-      </DashboardLayout>
-    );
-  }
-
-  if (activeSection === 'locks') {
-    return (
-      <DashboardLayout>
-        <LocksSection />
-      </DashboardLayout>
-    );
-  }
-
-  if (activeSection === 'lights') {
-    return (
-      <DashboardLayout>
-        <div className="flex flex-col gap-6 md:gap-8" {...editModeLongPressProps}>
-          {lightDeviceMap.size > 0 ? (
-            <RenderProfiler id="LightsSection">
-              <AllViewGrid
-                deviceMap={lightDeviceMap}
-                rooms={lightRooms}
-                cardOrders={cardOrders}
-                isEditMode={isEditMode}
-                isScrolling={isDashboardScrolling}
-                cardSizes={cardSizes}
-                grouping="custom"
-                updateCardSize={updateCardSize}
-              />
-            </RenderProfiler>
-          ) : (
-            <EmptyState
-              icon={Lightbulb}
-              title={t('dashboard.shell.noLightsTitle')}
-              description={
-                hiddenEntityIds.length > 0
-                  ? t('dashboard.shell.noLightsHidden')
-                  : t('dashboard.shell.noLightsEmpty')
-              }
-              actionIcon={Lightbulb}
-              actionLabel={hiddenEntityIds.length > 0 ? t('dashboard.addEntity.title') : undefined}
-              onAction={hiddenEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
+    sectionContent = <SecuritySection />;
+  } else if (activeSection === 'tasks') {
+    sectionContent = <TasksSection />;
+  } else if (activeSection === 'locks') {
+    sectionContent = <LocksSection />;
+  } else if (activeSection === 'lights') {
+    sectionContent = (
+      <div {...sectionStackProps}>
+        {lightDeviceMap.size > 0 ? (
+          <RenderProfiler id="LightsSection">
+            <AllViewGrid
+              deviceMap={lightDeviceMap}
+              rooms={lightRooms}
+              cardOrders={cardOrders}
+              isEditMode={isEditMode}
+              cardSizes={cardSizes}
+              grouping="custom"
+              updateCardSize={updateCardSize}
             />
-          )}
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  if (activeSection === 'media') {
-    return (
-      <DashboardLayout>
-        <MediaSection />
-      </DashboardLayout>
-    );
-  }
-
-  if (activeSection === 'mock') {
-    return (
-      <DashboardLayout>
-        <MockEntitiesSection />
-      </DashboardLayout>
-    );
-  }
-
-  if (activeSection === 'settings') {
-    return (
-      <DashboardLayout>
-        <Suspense fallback={<LoadingSpinner message={t('dashboard.shell.loadingSettings')} />}>
-          <RenderProfiler id="SettingsSection">
-            <SettingsSection />
           </RenderProfiler>
-        </Suspense>
-      </DashboardLayout>
+        ) : (
+          <EmptyState
+            icon={Lightbulb}
+            title={t('dashboard.shell.noLightsTitle')}
+            description={
+              hiddenEntityIds.length > 0
+                ? t('dashboard.shell.noLightsHidden')
+                : t('dashboard.shell.noLightsEmpty')
+            }
+            actionIcon={Lightbulb}
+            actionLabel={hiddenEntityIds.length > 0 ? t('dashboard.addEntity.title') : undefined}
+            onAction={hiddenEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
+          />
+        )}
+      </div>
     );
-  }
-
-  const dashboardContent = (
-    <DashboardLayout>
-      <div className="flex flex-col gap-6 md:gap-8" {...editModeLongPressProps}>
+  } else if (activeSection === 'media') {
+    sectionContent = <MediaSection />;
+  } else if (activeSection === 'mock') {
+    sectionContent = <MockEntitiesSection />;
+  } else if (activeSection === 'settings') {
+    sectionContent = (
+      <Suspense fallback={<LoadingSpinner message={t('dashboard.shell.loadingSettings')} />}>
+        <RenderProfiler id="SettingsSection">
+          <SettingsSection />
+        </RenderProfiler>
+      </Suspense>
+    );
+  } else {
+    sectionContent = (
+      <div {...sectionStackProps}>
         <RoomNav
           rooms={roomOrder}
           activeRoom={activeRoom}
@@ -182,7 +145,6 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
               rooms={roomOrder}
               cardOrders={cardOrders}
               isEditMode={isEditMode}
-              isScrolling={isDashboardScrolling}
               cardSizes={cardSizes}
               grouping={allViewGrouping}
               updateCardSize={updateCardSize}
@@ -200,7 +162,6 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
               orderedCardIds={orderedCardIds}
               deviceMap={deviceMap}
               isEditMode={isEditMode}
-              isScrolling={isDashboardScrolling}
               cardSizes={cardSizes}
               updateCardSize={updateCardSize}
               customCards={customCards}
@@ -224,8 +185,25 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
           />
         )}
       </div>
-    </DashboardLayout>
-  );
+    );
+  }
+
+  const dashboardContent = <DashboardLayout>{sectionContent}</DashboardLayout>;
+
+  if (activeSection === 'settings') {
+    return dashboardContent;
+  }
+
+  if (
+    activeSection === 'security' ||
+    activeSection === 'tasks' ||
+    activeSection === 'locks' ||
+    activeSection === 'lights' ||
+    activeSection === 'media' ||
+    activeSection === 'mock'
+  ) {
+    return dashboardContent;
+  }
 
   if (!isEditMode || showAddEntityDialog) {
     return dashboardContent;

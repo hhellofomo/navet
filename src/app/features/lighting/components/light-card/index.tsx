@@ -34,6 +34,7 @@ export const LightCard = memo(function LightCard({
 }: LightCardProps) {
   const { theme } = useTheme();
   const ambientLightBleed = useSettingsStore((state) => state.ambientLightBleed);
+  const lowPowerMode = useSettingsStore((state) => state.lowPowerMode);
   const controller = useLightCardController({
     id,
     name,
@@ -45,14 +46,16 @@ export const LightCard = memo(function LightCard({
     isEditMode,
   });
   const stateSurface = getCardStateSurfaceTokens(theme, controller.isOn);
+  const showAmbientLightBleed = ambientLightBleed && !lowPowerMode;
 
   const isSmall = isCompactCardSize(size);
 
   return (
     <>
       <div className="relative h-full w-full overflow-visible">
-        {controller.isOn && ambientLightBleed && (
+        {controller.isOn && showAmbientLightBleed && (
           <div
+            data-ambient-light-bleed="true"
             aria-hidden="true"
             className={`pointer-events-none absolute -inset-[100%] z-0 blur-3xl transition-all duration-500 ${
               theme === 'light' ? 'opacity-40' : 'opacity-20'

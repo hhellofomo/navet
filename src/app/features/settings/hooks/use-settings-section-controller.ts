@@ -51,6 +51,7 @@ export function useSettingsSectionController() {
   const { logout, config } = useAuth();
   const { clearConfig } = useConfig();
   const disableAnimations = useSettingsStore((state) => state.disableAnimations);
+  const lowPowerMode = useSettingsStore((state) => state.lowPowerMode);
   const language = useSettingsStore((state) => state.language);
   const entityInteractionMode = useSettingsStore((state) => state.entityInteractionMode);
   const ambientLightBleed = useSettingsStore((state) => state.ambientLightBleed);
@@ -153,6 +154,7 @@ export function useSettingsSectionController() {
     importInputRef,
     language,
     languageOptions,
+    lowPowerMode,
     primaryColor,
     reopenOnboarding,
     setPrimaryColor,

@@ -56,8 +56,10 @@ const buildExportedSettings = (
     ReturnType<typeof useSettingsStore.getState>,
     'updateSettings' | 'resetSettings'
   >
-) =>
-  omitUndefinedEntries({
+) => {
+  const reducedEffectsEnabled = settingsState.disableAnimations || settingsState.lowPowerMode;
+
+  return omitUndefinedEntries({
     username:
       settingsState.username !== defaultSettings.username ? settingsState.username : undefined,
     email: settingsState.email || undefined,
@@ -88,9 +90,11 @@ const buildExportedSettings = (
         ? settingsState.compactMode
         : undefined,
     disableAnimations:
-      settingsState.disableAnimations !== defaultSettings.disableAnimations
-        ? settingsState.disableAnimations
+      reducedEffectsEnabled !== defaultSettings.disableAnimations
+        ? reducedEffectsEnabled
         : undefined,
+    lowPowerMode:
+      reducedEffectsEnabled !== defaultSettings.lowPowerMode ? reducedEffectsEnabled : undefined,
     entityInteractionMode:
       settingsState.entityInteractionMode !== defaultSettings.entityInteractionMode
         ? settingsState.entityInteractionMode
@@ -100,6 +104,7 @@ const buildExportedSettings = (
         ? settingsState.ambientLightBleed
         : undefined,
   });
+};
 
 export const exportDashboardConfig = (): DashboardConfigPayload => {
   const themeState = useThemeStore.getState();
@@ -170,6 +175,12 @@ export const importDashboardConfig = (value: unknown) => {
 
   const currentThemeState = useThemeStore.getState();
   const currentLightPresetState = useLightPresetStore.getState();
+  const reducedEffectsEnabled =
+    typeof settings.lowPowerMode === 'boolean'
+      ? settings.lowPowerMode
+      : typeof settings.disableAnimations === 'boolean'
+        ? settings.disableAnimations
+        : defaultSettings.lowPowerMode;
 
   useThemeStore.setState({
     theme:
@@ -212,10 +223,8 @@ export const importDashboardConfig = (value: unknown) => {
       typeof settings.compactMode === 'boolean'
         ? settings.compactMode
         : defaultSettings.compactMode,
-    disableAnimations:
-      typeof settings.disableAnimations === 'boolean'
-        ? settings.disableAnimations
-        : defaultSettings.disableAnimations,
+    disableAnimations: reducedEffectsEnabled,
+    lowPowerMode: reducedEffectsEnabled,
     entityInteractionMode:
       settings.entityInteractionMode === 'control-first' ||
       settings.entityInteractionMode === 'toggle-first'

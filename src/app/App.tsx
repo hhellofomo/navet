@@ -17,6 +17,8 @@ function AppContent() {
   const { config: haConfig } = useConfig();
   const { connected, connecting, connect } = useHomeAssistant();
   const disableAnimations = useSettingsStore((state) => state.disableAnimations);
+  const lowPowerMode = useSettingsStore((state) => state.lowPowerMode);
+  const reducedEffectsEnabled = disableAnimations || lowPowerMode;
   const [isOnline, setIsOnline] = useState(() =>
     typeof navigator === 'undefined' ? true : navigator.onLine
   );
@@ -33,12 +35,14 @@ function AppContent() {
   }, [isAuthenticated, authConfig, haConfig, connected, connecting, connect]);
 
   useEffect(() => {
-    document.documentElement.dataset.noAnimation = disableAnimations ? 'true' : 'false';
+    document.documentElement.dataset.noAnimation = reducedEffectsEnabled ? 'true' : 'false';
+    document.documentElement.dataset.lowPower = reducedEffectsEnabled ? 'true' : 'false';
 
     return () => {
       delete document.documentElement.dataset.noAnimation;
+      delete document.documentElement.dataset.lowPower;
     };
-  }, [disableAnimations]);
+  }, [reducedEffectsEnabled]);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
