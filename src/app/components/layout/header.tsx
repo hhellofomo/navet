@@ -40,44 +40,59 @@ export const Header = memo(function Header() {
       return;
     }
 
-    const matchingIds: string[] = [];
+    const deviceGroups = [
+      { domain: 'light', type: 'lights', items: devices.lights },
+      { domain: 'climate', type: 'hvac', items: devices.hvac },
+      { domain: 'switch', type: 'switches', items: devices.switches },
+      { domain: 'cover', type: 'covers', items: devices.covers },
+      { domain: 'lock', type: 'locks', items: devices.locks },
+      { domain: 'media_player', type: 'media', items: devices.media },
+      { domain: 'person', type: 'persons', items: devices.persons },
+      { domain: 'sensor', type: 'sensors', items: devices.sensors },
+      { domain: 'vacuum', type: 'vacuums', items: devices.vacuums },
+      { domain: 'climate', type: 'climate', items: devices.climate },
+      { domain: 'weather', type: 'weather', items: devices.weather },
+      { domain: 'sensor', type: 'power', items: devices.power },
+      { domain: 'sensor', type: 'wifi', items: devices.wifi },
+    ] as const;
 
-    const searchInDevices = <T extends { id: string }>(
-      deviceArray: T[] | undefined,
-      searchFields: (keyof T)[]
-    ) => {
-      deviceArray?.forEach((device) => {
-        const matches = searchFields.some((field) => {
-          const value = device[field];
-          return (
-            value !== undefined && value !== null && String(value).toLowerCase().includes(query)
-          );
-        });
-        if (matches) {
-          matchingIds.push(device.id);
+    const matchingIds = deviceGroups.flatMap(({ domain, type, items }) =>
+      items.flatMap((device) => {
+        const searchableValues = new Set<string>([
+          device.id.toLowerCase(),
+          domain,
+          `${domain}.`,
+          type,
+          String(device.name).toLowerCase(),
+        ]);
+
+        if ('room' in device && typeof device.room === 'string') {
+          searchableValues.add(device.room.toLowerCase());
         }
-      });
-    };
 
-    const searchActions = [
-      () => searchInDevices(devices.lights, ['name', 'room']),
-      () => searchInDevices(devices.hvac, ['name', 'room']),
-      () => searchInDevices(devices.switches, ['name', 'room']),
-      () => searchInDevices(devices.covers, ['name', 'room']),
-      () => searchInDevices(devices.locks, ['name', 'room']),
-      () => searchInDevices(devices.media, ['name', 'room']),
-      () => searchInDevices(devices.persons, ['name', 'location']),
-      () => searchInDevices(devices.sensors, ['name', 'room']),
-      () => searchInDevices(devices.vacuums, ['name', 'room']),
-      () => searchInDevices(devices.climate, ['name']),
-      () => searchInDevices(devices.weather, ['name', 'location']),
-      () => searchInDevices(devices.power, ['name']),
-      () => searchInDevices(devices.wifi, ['name', 'room']),
-    ];
+        if ('location' in device && typeof device.location === 'string') {
+          searchableValues.add(device.location.toLowerCase());
+        }
 
-    searchActions.forEach((searchAction) => {
-      searchAction();
-    });
+        if ('entityType' in device && typeof device.entityType === 'string') {
+          searchableValues.add(device.entityType.toLowerCase());
+        }
+
+        const matches = Array.from(searchableValues).some((value) => {
+          if (value === query) {
+            return true;
+          }
+
+          if (value.startsWith(query)) {
+            return true;
+          }
+
+          return value.includes(query);
+        });
+
+        return matches ? [device.id] : [];
+      })
+    );
 
     setFilteredDeviceIds(matchingIds);
   }, [searchQuery, devices, setFilteredDeviceIds]);

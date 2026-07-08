@@ -81,10 +81,14 @@ export const RoomSection = memo(function RoomSection({
   return (
     <div
       ref={containerRef}
-      style={{
-        contentVisibility: 'auto',
-        containIntrinsicSize: '800px',
-      }}
+      style={
+        isVisible
+          ? undefined
+          : {
+              contentVisibility: 'auto',
+              containIntrinsicSize: '800px',
+            }
+      }
     >
       <div className={showHeader ? 'mb-4 flex items-center gap-3' : ''}>
         {showHeader ? (

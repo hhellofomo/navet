@@ -98,7 +98,6 @@ export const DeviceGrid = memo(function DeviceGrid({
               />
             );
           } else {
-            // Render custom widget card
             const { card } = item;
             const size = cardSizes[card.id] || card.size;
 

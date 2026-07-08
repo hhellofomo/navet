@@ -20,6 +20,8 @@ Complete documentation for the Navet smart home dashboard.
 - **[Main README](../README.md#installable-pwa)** - Installable PWA shell and build verification
 - **[Main README](../README.md#-features)** - Current product features, including the unified HVAC-based climate card path, live calendar cards, Home Assistant notifications/repairs, and card-level room reassignment
 - **[Main README](../README.md#room-navigation)** - Dashboard room navigation, All-view grouping modes, and dashboard dropdown behavior
+- **[Main README](../README.md#search)** - Dashboard search behavior, including Home Assistant entity-id and domain queries
+- **[Main README](../README.md#themes)** - Theme modes, shared appearance primitives, and the light card ambience setting
 - **[Design System](../design-system/README.md#core-design-principles)** - Shared primitives, including icon pills, nav/action pills, and card off-state surface tokens
 - **[Docker and Home Assistant Add-on](DOCKER_HOME_ASSISTANT_ADDON.md)** - Packaging and deployment guide
   - Standalone Docker image
@@ -29,7 +31,7 @@ Complete documentation for the Navet smart home dashboard.
   - Current dashboard performance notes
 
 ### Legal & Terms
-- **[License](../LICENSE.md)** - AGPL-3.0 code license
+- **[License](../LICENSE.md)** - AGPL-3.0-only code license
 - **[Terms of Use](TERMS_OF_USE.md)** - License and brand usage summary
 - **[Trademark Policy](branding/TRADEMARK_POLICY.md)** - Navet name and logo usage rules
 - **[Attributions](ATTRIBUTIONS.md)** - Credits and third-party licenses
@@ -50,7 +52,6 @@ Complete documentation for the Navet smart home dashboard.
   - State management migrations
   - Drag-and-drop migration
   - Optimization history
-- **[Organization Summary](archive/CLEANUP_SUMMARY.md)** - Documentation cleanup details
 
 ## 🎯 Common Tasks
 
@@ -89,6 +90,9 @@ Complete documentation for the Navet smart home dashboard.
 **Understand card tap behavior and interaction styles:**
 → See [Main README -> Card Interaction Style](../README.md#card-interaction-style)
 
+**Understand dashboard search with entity ids and domains:**
+→ See [Main README -> Search](../README.md#search)
+
 **Understand climate card behavior:**
 → See [Main README -> Features](../README.md#-features)
 
@@ -120,7 +124,6 @@ docs/
 │   └── BRANDING_ASSETS.md     ← Asset quick reference
 ├── archive/                   ← Historical records
 │   ├── CHANGES.md             ← Complete changelog
-│   ├── CLEANUP_SUMMARY.md     ← Organization history
 │   └── status/                ← Historical status summaries
 └── technical/                 ← Developer references
 ```

@@ -92,11 +92,11 @@ Editable sticky note for quick reminders.
 
 ### Step 1: Enter Edit Mode
 
-Click **Customize** in the dashboard action row.
+Click **Customize** in the dashboard action row, or press and hold on the dashboard to enter edit mode directly.
 
-### Step 2: Open Add Card Dialog
+### Step 2: Open Add Dialog
 
-Click the **Add Card** button that appears in edit mode.
+Open the **Add** dropdown that appears in edit mode.
 
 ### Step 3: Choose Widget Type
 
@@ -154,7 +154,7 @@ RSS and photo remain custom dashboard widgets. Weather and calendar are now prov
 
 ```tsx
 import { Icon } from 'lucide-react';
-import { useTheme } from '@/app/hooks';
+import { useTheme } from '@/app/hooks/use-theme';
 
 interface MyWidgetProps {
   size?: 'small' | 'medium' | 'large';
@@ -220,7 +220,7 @@ export function MyWidget({ size = 'medium' }: MyWidgetProps) {
 
 1. **Create widget component** in `/src/app/components/widgets/`
 2. **Export** from `/src/app/components/widgets/index.ts`
-3. **Add to AddCardDialog** templates array
+3. **Add to the Add dialog** templates array
 4. **Add to WidgetCard** switch statement
 5. **Update types** in `add-card-dialog.tsx`
 
@@ -229,7 +229,7 @@ export function MyWidget({ size = 'medium' }: MyWidgetProps) {
 - Use frosted glass background (`backdrop-blur-xl`)
 - Include rounded corners (`rounded-2xl`)
 - Add theme-aware colors
-- Support all three theme modes
+- Support all four theme modes
 - Keep `extra-small` as an optional dense layout path only when the widget genuinely benefits from it
 - Respect size constraints
 - Include proper spacing (4px grid system)

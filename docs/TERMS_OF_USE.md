@@ -26,7 +26,7 @@ Brand usage is governed separately by:
 
 ## Forks and Redistributed Builds
 
-If you redistribute a modified version of Navet, you may do so under AGPL-3.0, but you must not present it as the official Navet product unless you have permission to use the Navet marks.
+If you redistribute a modified version of Navet, you may do so under AGPL-3.0-only, but you must not present it as the official Navet product unless you have permission to use the Navet marks.
 
 In practice, that means forks should avoid confusing brand presentation and typically use their own:
 

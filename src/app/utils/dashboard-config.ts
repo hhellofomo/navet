@@ -92,6 +92,10 @@ const buildExportedSettings = (
       settingsState.entityInteractionMode !== defaultSettings.entityInteractionMode
         ? settingsState.entityInteractionMode
         : undefined,
+    ambientLightBleed:
+      settingsState.ambientLightBleed !== defaultSettings.ambientLightBleed
+        ? settingsState.ambientLightBleed
+        : undefined,
   });
 
 export const exportDashboardConfig = (): DashboardConfigPayload => {
@@ -211,6 +215,10 @@ export const importDashboardConfig = (value: unknown) => {
       settings.entityInteractionMode === 'toggle-first'
         ? settings.entityInteractionMode
         : defaultSettings.entityInteractionMode,
+    ambientLightBleed:
+      typeof settings.ambientLightBleed === 'boolean'
+        ? settings.ambientLightBleed
+        : defaultSettings.ambientLightBleed,
   });
 
   useNavigationStore.setState({

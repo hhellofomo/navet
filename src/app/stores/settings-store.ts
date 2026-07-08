@@ -14,6 +14,7 @@ export interface UserSettings {
   compactMode: boolean;
   disableAnimations: boolean;
   entityInteractionMode: EntityInteractionMode;
+  ambientLightBleed: boolean;
 }
 
 interface SettingsState extends UserSettings {
@@ -32,6 +33,7 @@ export const defaultSettings: UserSettings = {
   compactMode: false,
   disableAnimations: false,
   entityInteractionMode: 'toggle-first',
+  ambientLightBleed: true,
 };
 
 export const useSettingsStore = create<SettingsState>()(

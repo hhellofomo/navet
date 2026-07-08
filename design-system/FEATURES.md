@@ -39,7 +39,7 @@ await login(url, token);
 
 ### User Management
 
-**Component**: `/src/app/components/user-dropdown.tsx`
+**Component**: `/src/app/components/layout/user-dropdown.tsx`
 
 #### Features
 - **User profile display** - Shows username and connection info
@@ -143,16 +143,9 @@ Navet now uses a single HVAC-based card path for Home Assistant climate entities
 - keeps climate theming aligned with the HVAC-specific card/controller flow
 - reduces future regressions by centralizing climate behavior in one feature module
 
-#### Implementation
-```tsx
-const { theme, setTheme, primaryColor, setPrimaryColor } = useTheme();
-
-// Change theme
-setTheme('light');
-
-// Change primary color
-setPrimaryColor('blue');
-```
+#### Implementation Notes
+- Climate entities are registered through the dashboard card registry and rendered via the HVAC feature module
+- Shared HVAC card structure is reused across dashboard sizes instead of maintaining a second climate-specific card implementation
 
 ---
 
@@ -201,7 +194,7 @@ Manages section navigation state across desktop and mobile layouts through a dir
 
 #### Desktop Sidebar
 
-**Component**: `/src/app/components/sidebar.tsx`
+**Component**: `/src/app/components/layout/sidebar.tsx`
 
 - **Position**: Fixed left, full height
 - **Width**: 64px (16 Tailwind units)
@@ -214,7 +207,7 @@ Manages section navigation state across desktop and mobile layouts through a dir
 
 - **Position**: Fixed bottom, full width
 - **Height**: Auto with safe area padding
-- **Layout**: 5 icons in horizontal row
+- **Layout**: 6 icons in horizontal row
 - **Icons**: 20px with label underneath
 - **Active state**: theme-aware shared pill treatment
 - **Inactive state**: transparent/ghost buttons; only the selected item carries the pill
@@ -244,13 +237,17 @@ Full-page settings interface with card-based organization.
 **1. Appearance**
 - **Theme Mode Selection**: 2 × 2 grid with live card previews
 - **Primary Color Picker**: 8 color circles in a row
+- **Light card ambience**: global visual toggle between ambient bleed and contained light-card rendering
+- **Theme-aware live previews**: theme/accent and ambience previews share the same preview-frame primitive
 - **Visual feedback**: Selected items show primary color indicator
 - **Layout**: Left-aligned text, right-aligned selection indicator
 
 **2. Dashboard**
 - **Interaction mode**: choose between tap toggles and tap opens controls
+- **Interaction preview**: compact live preview sits beside the interaction toggle for faster comparison
 - **Entity restore action**: add all removed entities back to the dashboard
 - **Onboarding reset**: restart the first-launch dashboard choice
+- **Search behavior**: dashboard search accepts friendly names, rooms, and Home Assistant entity-id/domain queries such as `light.` and `sensor.`
 - **Shared segmented controls**: current dashboard/system control groups are a candidate for the same primitive-based refactor pattern used by icon/nav pills
 
 **3. Connection**
@@ -357,8 +354,8 @@ Beautiful placeholder screens for sections without data.
 2. **Onboarding Dialog** → Choose start with all entities, a blank dashboard, or import a YAML config file
 3. **Dashboard** → See current entities and rooms
 4. **Explore Sections** → Navigate to different sections via sidebar/bottom nav
-5. **Customize** → Go to Settings → Change theme and color
-6. **Edit Cards** → Enter edit mode to add/remove entities, reorder cards, and resize cards
+5. **Customize Appearance** → Go to Settings → Change theme, accent color, and light-card ambience
+6. **Edit Cards** → Enter edit mode from Customize or a dashboard long-press to add/remove entities, reorder cards, and resize cards
 
 ### Settings Customization Flow
 1. Navigate to Settings section

@@ -2,12 +2,14 @@ import * as Dialog from '@radix-ui/react-dialog';
 import type { LucideIcon } from 'lucide-react';
 import { Gauge, Plus, Search, Trash2, X } from 'lucide-react';
 import type { Dispatch, ReactNode, RefObject, SetStateAction } from 'react';
+import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
 import type { ThemeType } from '@/app/hooks/use-theme';
 import type { SensorIconType, SensorReading } from '../sensors';
 import type { AvailableSensor, SensorGroupColorConfig } from './types';
 
 interface SensorGroupSettingsViewProps {
+  entityId: string;
   groupName: string;
   selectedSensors: SensorReading[];
   maxSensors: number;
@@ -31,6 +33,7 @@ interface SensorGroupSettingsViewProps {
 }
 
 export function SensorGroupSettingsView({
+  entityId,
   groupName,
   selectedSensors,
   maxSensors,
@@ -79,15 +82,19 @@ export function SensorGroupSettingsView({
                 </Dialog.Description>
               </div>
 
-              <Dialog.Close asChild>
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  className={`p-2 rounded-lg ${surface.subtleBg} ${surface.hoverBg} transition-all`}
-                >
-                  <X className={`w-5 h-5 ${surface.textSecondary}`} />
-                </button>
-              </Dialog.Close>
+              <div className="ml-4 flex items-start gap-2">
+                <EntityRoomSelector entityId={entityId} label="Room" compact className="w-32" />
+
+                <Dialog.Close asChild>
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className={`p-2 rounded-lg ${surface.subtleBg} ${surface.hoverBg} transition-all`}
+                  >
+                    <X className={`w-5 h-5 ${surface.textSecondary}`} />
+                  </button>
+                </Dialog.Close>
+              </div>
             </div>
 
             <div className="space-y-4">

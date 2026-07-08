@@ -1,16 +1,20 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Check } from 'lucide-react';
 import { DialogHeader } from '@/app/components/shared/device-editor';
+import { EntityRoomSelector } from '@/app/components/shared/entity-room-selector';
+import { getThemeColorValue } from '@/app/components/shared/theme/theme-colors';
 import { getThemeSurfaceTokens } from '@/app/components/shared/theme/theme-surface-tokens';
-import type { ThemeType } from '@/app/hooks/use-theme';
+import { type ThemeType, useTheme } from '@/app/hooks/use-theme';
 
 interface CalendarSourceOption {
   id: string;
   name: string;
   room: string;
+  color: string;
 }
 
 interface CalendarSettingsDialogProps {
+  entityId?: string;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   theme: ThemeType;
@@ -23,6 +27,7 @@ interface CalendarSettingsDialogProps {
 }
 
 export function CalendarSettingsDialog({
+  entityId,
   isOpen,
   onOpenChange,
   theme,
@@ -34,7 +39,9 @@ export function CalendarSettingsDialog({
   onViewModeChange,
 }: CalendarSettingsDialogProps) {
   const surface = getThemeSurfaceTokens(theme);
+  const { primaryColor } = useTheme();
   const isOn = theme !== 'light';
+  const accentColor = getThemeColorValue(primaryColor);
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
@@ -47,6 +54,11 @@ export function CalendarSettingsDialog({
             title="Calendar Sources"
             description={`Choose which calendars ${title} should show`}
             isOn={isOn}
+            trailing={
+              entityId ? (
+                <EntityRoomSelector entityId={entityId} label="Room" compact className="w-32" />
+              ) : undefined
+            }
           />
 
           <div className="mb-4">
@@ -62,9 +74,18 @@ export function CalendarSettingsDialog({
                     onClick={() => onViewModeChange(option)}
                     className={`rounded-2xl border px-4 py-3 text-sm font-medium transition-colors ${
                       isSelected
-                        ? 'border-white bg-white text-black'
+                        ? `${surface.textPrimary}`
                         : `${surface.border} ${surface.subtleBg} ${surface.textPrimary} ${surface.hoverBg}`
                     }`}
+                    style={
+                      isSelected
+                        ? {
+                            backgroundColor:
+                              theme === 'light' ? `${accentColor}12` : `${accentColor}1c`,
+                            borderColor: `${accentColor}66`,
+                          }
+                        : undefined
+                    }
                   >
                     {option === 'week' ? 'This Week' : 'This Month'}
                   </button>
@@ -89,22 +110,44 @@ export function CalendarSettingsDialog({
                     );
                   }}
                   className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition-colors ${surface.border} ${surface.subtleBg} ${surface.hoverBg}`}
+                  style={
+                    isSelected
+                      ? {
+                          backgroundColor:
+                            theme === 'light' ? `${accentColor}0d` : `${accentColor}16`,
+                          borderColor: `${accentColor}4d`,
+                        }
+                      : undefined
+                  }
                 >
-                  <div className="min-w-0">
-                    <div className={`truncate text-sm font-medium ${surface.textPrimary}`}>
-                      {calendar.name}
-                    </div>
-                    <div className={`mt-0.5 truncate text-xs ${surface.textSecondary}`}>
-                      {calendar.room}
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className={`h-10 w-1.5 flex-shrink-0 rounded-full ${calendar.color}`} />
+                    <div className="min-w-0">
+                      <div className={`truncate text-sm font-medium ${surface.textPrimary}`}>
+                        {calendar.name}
+                      </div>
+                      <div className={`mt-0.5 truncate text-xs ${surface.textSecondary}`}>
+                        {calendar.room}
+                      </div>
                     </div>
                   </div>
 
                   <div
-                    className={`ml-4 flex h-5 w-5 items-center justify-center rounded border transition-colors ${
+                    className={`ml-4 flex h-5 w-5 items-center justify-center rounded border transition-colors ${surface.textPrimary}`}
+                    style={
                       isSelected
-                        ? 'border-white bg-white text-black'
-                        : `${surface.border} bg-transparent`
-                    }`}
+                        ? {
+                            backgroundColor: accentColor,
+                            borderColor: accentColor,
+                          }
+                        : {
+                            borderColor:
+                              theme === 'light'
+                                ? 'rgba(15, 23, 42, 0.16)'
+                                : 'rgba(255, 255, 255, 0.18)',
+                            backgroundColor: 'transparent',
+                          }
+                    }
                   >
                     {isSelected && <Check className="h-3.5 w-3.5" />}
                   </div>

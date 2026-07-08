@@ -92,6 +92,7 @@ export const settingsSelectors = {
   compactMode: (state: SettingsState) => state.compactMode,
   disableAnimations: (state: SettingsState) => state.disableAnimations,
   entityInteractionMode: (state: SettingsState) => state.entityInteractionMode,
+  ambientLightBleed: (state: SettingsState) => state.ambientLightBleed,
 
   // Actions
   updateSettings: (state: SettingsState) => state.updateSettings,
@@ -104,6 +105,7 @@ export const settingsSelectors = {
     compactMode: state.compactMode,
     disableAnimations: state.disableAnimations,
     entityInteractionMode: state.entityInteractionMode,
+    ambientLightBleed: state.ambientLightBleed,
   }),
   notificationSettings: (state: SettingsState) => ({
     showNotifications: state.showNotifications,

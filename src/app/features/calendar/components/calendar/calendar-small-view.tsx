@@ -1,47 +1,52 @@
-import { Clock } from 'lucide-react';
-import type { CalendarEvent } from './types';
+import { CalendarEventItem } from './calendar-event-item';
+import { formatCalendarGroupLabel } from './calendar-formatters';
+import type { CalendarEvent, CalendarEventGroup } from './types';
 
 interface CalendarSmallViewProps {
-  nextEvent: CalendarEvent;
-  mockEvents: CalendarEvent[];
+  dayGroups: CalendarEventGroup[];
   textPrimary: string;
   textSecondary: string;
-  moreEventsColor: string;
+  hoverText: string;
+  hoverBg: string;
   onEventClick?: (event: CalendarEvent) => void;
 }
 
 export function CalendarSmallView({
-  nextEvent,
-  mockEvents,
+  dayGroups,
   textPrimary,
   textSecondary,
-  moreEventsColor,
+  hoverText,
+  hoverBg,
   onEventClick,
 }: CalendarSmallViewProps) {
+  if (dayGroups.length === 0) {
+    return null;
+  }
+
   return (
-    <div className="flex-1 flex flex-col justify-between items-start text-left">
-      <div className="w-full">
-        <button
-          type="button"
-          className="flex w-full items-center gap-2 rounded-xl text-left transition-colors hover:bg-white/5"
-          onClick={() => onEventClick?.(nextEvent)}
-        >
-          <div className={`w-1 h-12 ${nextEvent.color} rounded-full`} />
-          <div className="flex-1 text-left">
-            <h3 className={`text-lg font-semibold ${textPrimary} leading-tight mb-1 text-left`}>
-              {nextEvent.title}
-            </h3>
-            <div className={`flex items-center gap-1.5 text-xs ${textSecondary}`}>
-              <Clock className="w-3 h-3" />
-              <span>{nextEvent.timeDisplay}</span>
-              {nextEvent.location && <span className="truncate">{nextEvent.location}</span>}
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto scrollbar-hide pr-1">
+        {dayGroups.map((group) => (
+          <div key={group.key}>
+            <div className={`mb-1 px-1 text-[10px] font-medium ${textSecondary}`}>
+              {formatCalendarGroupLabel(group.date)}
+            </div>
+            <div className="space-y-1">
+              {group.events.map((event) => (
+                <CalendarEventItem
+                  key={event.id}
+                  event={event}
+                  textPrimary={textPrimary}
+                  textSecondary={textSecondary}
+                  hoverText={hoverText}
+                  hoverBg={hoverBg}
+                  onItemClick={() => onEventClick?.(event)}
+                  variant="compact"
+                />
+              ))}
             </div>
           </div>
-        </button>
-      </div>
-
-      <div className={`text-xs ${moreEventsColor}`}>
-        {Math.max(0, mockEvents.length - 1)} more events today
+        ))}
       </div>
     </div>
   );

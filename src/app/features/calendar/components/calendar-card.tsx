@@ -3,6 +3,7 @@ import { memo, useState } from 'react';
 import {
   type CardSize,
   CardSizeSelector,
+  getCompactCardSize,
   isCompactCardSize,
 } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
@@ -37,6 +38,7 @@ export const CalendarCard = memo(function CalendarCard({
   onSizeChange,
 }: CalendarCardProps) {
   const { theme, colors } = useTheme();
+  const effectiveSize = getCompactCardSize(size);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const {
@@ -48,22 +50,13 @@ export const CalendarCard = memo(function CalendarCard({
     setViewMode,
     viewMode,
   } = useCalendarCardSources(id, events ?? []);
-  const { monthName, dayNumber, dayName, sourceEvents, nextEvent, mediumEvents, largeEvents } =
-    useCalendarData(selectedEvents);
+  const { nextEvent, smallGroups, mediumGroups, largeGroups } = useCalendarData(selectedEvents);
 
-  const {
-    textPrimary,
-    textSecondary,
-    overlayBg,
-    dividerColor,
-    hoverBg,
-    hoverText,
-    dotColor,
-    moreEventsColor,
-  } = useCalendarTheme(theme);
+  const { textPrimary, textSecondary, overlayBg, dividerColor, hoverBg, hoverText } =
+    useCalendarTheme(theme);
 
-  const isSmall = isCompactCardSize(size);
-  const isMedium = size === 'medium';
+  const isSmall = isCompactCardSize(effectiveSize);
+  const isMedium = effectiveSize === 'medium';
   const canOpenSettings = !inEditMode;
 
   return (
@@ -79,48 +72,62 @@ export const CalendarCard = memo(function CalendarCard({
           ${inEditMode ? 'cursor-move' : 'cursor-pointer'}
         `}
       >
-        {/* Glass overlay */}
         <div className={`absolute inset-0 ${overlayBg}`} />
-
-        {/* Subtle glow */}
         <div
           className={`absolute inset-0 bg-gradient-to-br ${colors.calendar.glow} to-transparent`}
         />
 
-        {/* Content */}
-        <div className="relative flex h-full flex-col p-4">
+        <div className={`relative flex h-full flex-col ${isSmall ? 'p-3' : 'p-4'}`}>
           {canOpenSettings ? (
             <button
               type="button"
-              className="mb-3 block w-full text-left"
+              className={`${isSmall ? 'mb-2' : 'mb-3'} block w-full text-left`}
               onClick={(event) => {
                 event.stopPropagation();
                 setIsSettingsOpen(true);
               }}
             >
               <EntityCardHeader
-                title={`${dayName}, ${monthName} ${dayNumber}`}
-                subtitle={selectedCalendarLabel || name}
-                size={size}
+                title={selectedCalendarLabel || name}
+                subtitle="Upcoming agenda"
+                size={effectiveSize}
+                titleClassName={isSmall ? 'text-[11px]' : ''}
+                subtitleClassName={isSmall ? 'text-[9px]' : ''}
                 leading={
-                  <EntityCardHeaderIcon IconComponent={CalendarDays} isActive={true} size={size} />
+                  <EntityCardHeaderIcon
+                    IconComponent={CalendarDays}
+                    isActive={true}
+                    size={effectiveSize}
+                  />
                 }
               />
             </button>
           ) : (
             <EntityCardHeader
-              title={`${dayName}, ${monthName} ${dayNumber}`}
-              subtitle={selectedCalendarLabel || name}
-              size={size}
+              title={selectedCalendarLabel || name}
+              subtitle="Upcoming agenda"
+              size={effectiveSize}
+              titleClassName={isSmall ? 'text-[11px]' : ''}
+              subtitleClassName={isSmall ? 'text-[9px]' : ''}
               leading={
-                <EntityCardHeaderIcon IconComponent={CalendarDays} isActive={true} size={size} />
+                <EntityCardHeaderIcon
+                  IconComponent={CalendarDays}
+                  isActive={true}
+                  size={effectiveSize}
+                />
               }
             />
           )}
 
-          {inEditMode && onSizeChange && (
-            <CardSizeSelector currentSize={size} onSizeChange={onSizeChange} />
-          )}
+          {inEditMode && onSizeChange ? (
+            <div className={`${isSmall ? 'mb-2' : 'mb-3'}`}>
+              <CardSizeSelector
+                currentSize={effectiveSize}
+                onSizeChange={onSizeChange}
+                allowedSizes={['small', 'medium', 'large']}
+              />
+            </div>
+          ) : null}
 
           {!nextEvent ? (
             <div className={`flex flex-1 items-center justify-center text-sm ${textSecondary}`}>
@@ -128,33 +135,29 @@ export const CalendarCard = memo(function CalendarCard({
             </div>
           ) : isSmall ? (
             <CalendarSmallView
-              nextEvent={nextEvent}
-              mockEvents={sourceEvents}
+              dayGroups={smallGroups}
               textPrimary={textPrimary}
               textSecondary={textSecondary}
-              moreEventsColor={moreEventsColor}
+              hoverText={hoverText}
+              hoverBg={hoverBg}
               onEventClick={setSelectedEvent}
             />
           ) : isMedium ? (
             <CalendarMediumView
-              mediumEvents={mediumEvents}
-              theme={theme}
+              dayGroups={mediumGroups}
               textPrimary={textPrimary}
               textSecondary={textSecondary}
               hoverText={hoverText}
-              dotColor={dotColor}
               hoverBg={hoverBg}
               dividerColor={dividerColor}
               onEventClick={setSelectedEvent}
             />
           ) : (
             <CalendarLargeView
-              largeEvents={largeEvents}
-              theme={theme}
+              dayGroups={largeGroups}
               textPrimary={textPrimary}
               textSecondary={textSecondary}
               hoverText={hoverText}
-              dotColor={dotColor}
               hoverBg={hoverBg}
               dividerColor={dividerColor}
               onEventClick={setSelectedEvent}
@@ -164,6 +167,7 @@ export const CalendarCard = memo(function CalendarCard({
       </div>
 
       <CalendarSettingsDialog
+        entityId={id}
         isOpen={isSettingsOpen}
         onOpenChange={setIsSettingsOpen}
         theme={theme}
@@ -172,6 +176,7 @@ export const CalendarCard = memo(function CalendarCard({
           id: calendar.id,
           name: calendar.name,
           room: calendar.room,
+          color: calendar.color,
         }))}
         selectedCalendarIds={selectedCalendarIds}
         onSelectedCalendarIdsChange={setSelectedCalendarIds}

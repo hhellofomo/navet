@@ -7,27 +7,27 @@ A quick visual reference for all Navet brand assets.
 ## 🔷 Logo Variations
 
 ### 1. Square Logo (Primary)
-**File:** `public/logo.svg` | **Size:** 120×120px
+**File:** `/public/logo.svg` | **Size:** 120×120px
 
-<img src="public/logo.svg" width="120" alt="Navet Square Logo" />
+<img src="../../public/logo.svg" width="120" alt="Navet Square Logo" />
 
 **Best for:** App icons • Social media • Square placements
 
 ---
 
 ### 2. Horizontal Logo (Dark Text)
-**File:** `public/logo-horizontal.svg` | **Size:** 200×60px
+**File:** `/public/logo-horizontal.svg` | **Size:** 200×60px
 
-<img src="public/logo-horizontal.svg" width="200" alt="Navet Horizontal Logo" />
+<img src="../../public/logo-horizontal.svg" width="200" alt="Navet Horizontal Logo" />
 
 **Best for:** Light backgrounds • Website headers • Documentation
 
 ---
 
 ### 3. Horizontal Logo (Light Text)
-**File:** `public/logo-horizontal-light.svg` | **Size:** 200×60px
+**File:** `/public/logo-horizontal-light.svg` | **Size:** 200×60px
 
-<img src="public/logo-horizontal-light.svg" width="200" alt="Navet Horizontal Logo Light" style="background: #1a1a1a; padding: 10px;" />
+<img src="../../public/logo-horizontal-light.svg" width="200" alt="Navet Horizontal Logo Light" style="background: #1a1a1a; padding: 10px;" />
 
 **Best for:** Dark backgrounds • Dark mode • Night theme
 
@@ -36,18 +36,18 @@ A quick visual reference for all Navet brand assets.
 ## 🔸 Favicons & Icons
 
 ### 4. Browser Favicon
-**File:** `public/favicon.svg` | **Size:** 32×32px
+**File:** `/public/favicon.svg` | **Size:** 32×32px
 
-<img src="public/favicon.svg" width="32" alt="Navet Favicon" />
+<img src="../../public/favicon.svg" width="32" alt="Navet Favicon" />
 
 **Best for:** Browser tabs • Bookmarks • PWA icons
 
 ---
 
 ### 5. Apple Touch Icon
-**File:** `public/apple-touch-icon.svg` | **Size:** 180×180px
+**File:** `/public/apple-touch-icon.svg` | **Size:** 180×180px
 
-<img src="public/apple-touch-icon.svg" width="120" alt="Navet Apple Touch Icon" />
+<img src="../../public/apple-touch-icon.svg" width="120" alt="Navet Apple Touch Icon" />
 
 **Best for:** iOS home screen • Safari tabs • iOS shortcuts
 
@@ -98,13 +98,13 @@ End:   #ea580c (Tailwind orange-600)
 
 ### React/JSX
 ```jsx
-import logo from '/public/logo.svg';
+import logo from '/logo.svg';
 <img src={logo} alt="Navet" width="60" height="60" />
 ```
 
 ### Markdown
 ```markdown
-![Navet Logo](public/logo.svg)
+![Navet Logo](../../public/logo.svg)
 ```
 
 ---

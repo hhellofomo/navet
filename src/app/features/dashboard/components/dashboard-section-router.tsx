@@ -15,6 +15,7 @@ import { RenderProfiler } from '@/app/components/shared/render-profiler';
 import { AllViewGrid } from '../all-view-grid';
 import { DeviceGrid } from '../device-grid';
 import type { DashboardController } from '../hooks/use-dashboard-controller';
+import { useDashboardEditModeLongPress } from '../hooks/use-dashboard-edit-mode-long-press';
 import { DashboardLayout } from '../shell';
 
 const SettingsSection = lazy(async () => {
@@ -46,6 +47,7 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     isEditMode,
     lightDeviceMap,
     lightRooms,
+    onEnterEditMode,
     onMoveRoom,
     onSetAllViewGrouping,
     onOpenAddCardDialog,
@@ -56,6 +58,10 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
     sensors,
     updateCardSize,
   } = controller;
+  const editModeLongPressProps = useDashboardEditModeLongPress({
+    disabled: isEditMode,
+    onLongPress: onEnterEditMode,
+  });
 
   if (activeSection === 'security') {
     return (
@@ -84,32 +90,34 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
   if (activeSection === 'lights') {
     return (
       <DashboardLayout>
-        {lightDeviceMap.size > 0 ? (
-          <RenderProfiler id="LightsSection">
-            <AllViewGrid
-              deviceMap={lightDeviceMap}
-              rooms={lightRooms}
-              cardOrders={cardOrders}
-              isEditMode={isEditMode}
-              cardSizes={cardSizes}
-              grouping="custom"
-              updateCardSize={updateCardSize}
+        <div className="flex flex-col gap-6 md:gap-8" {...editModeLongPressProps}>
+          {lightDeviceMap.size > 0 ? (
+            <RenderProfiler id="LightsSection">
+              <AllViewGrid
+                deviceMap={lightDeviceMap}
+                rooms={lightRooms}
+                cardOrders={cardOrders}
+                isEditMode={isEditMode}
+                cardSizes={cardSizes}
+                grouping="custom"
+                updateCardSize={updateCardSize}
+              />
+            </RenderProfiler>
+          ) : (
+            <EmptyState
+              icon={Lightbulb}
+              title="No Lights"
+              description={
+                hiddenEntityIds.length > 0
+                  ? 'All light entities have been removed from the dashboard.'
+                  : 'No Home Assistant light entities are currently available.'
+              }
+              actionIcon={Lightbulb}
+              actionLabel={hiddenEntityIds.length > 0 ? 'Add Entity' : undefined}
+              onAction={hiddenEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
             />
-          </RenderProfiler>
-        ) : (
-          <EmptyState
-            icon={Lightbulb}
-            title="No Lights"
-            description={
-              hiddenEntityIds.length > 0
-                ? 'All light entities have been removed from the dashboard.'
-                : 'No Home Assistant light entities are currently available.'
-            }
-            actionIcon={Lightbulb}
-            actionLabel={hiddenEntityIds.length > 0 ? 'Add Entity' : undefined}
-            onAction={hiddenEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
-          />
-        )}
+          )}
+        </div>
       </DashboardLayout>
     );
   }
@@ -150,66 +158,68 @@ export function DashboardSectionRouter({ controller }: DashboardSectionRouterPro
       onDragEnd={handleDragEnd}
     >
       <DashboardLayout>
-        <RoomNav
-          rooms={roomOrder}
-          activeRoom={activeRoom}
-          onRoomChange={changeRoom}
-          allViewGrouping={allViewGrouping}
-          isEditMode={isEditMode}
-          onAllViewGroupingChange={onSetAllViewGrouping}
-          onToggleEditMode={onToggleEditMode}
-          onMoveRoom={onMoveRoom}
-          onAddCard={onOpenAddCardDialog}
-          onAddEntity={addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
-          addEntityLabel="Add Entity"
-        />
-
-        {activeRoom === 'All' ? (
-          <RenderProfiler id="AllViewGrid">
-            <AllViewGrid
-              deviceMap={deviceMap}
-              rooms={roomOrder}
-              cardOrders={cardOrders}
-              isEditMode={isEditMode}
-              cardSizes={cardSizes}
-              grouping={allViewGrouping}
-              updateCardSize={updateCardSize}
-              customCards={customCards}
-              onDeleteCard={handleDeleteCard}
-              onUpdateCard={handleUpdateCard}
-              onRemoveEntity={handleRemoveEntity}
-              allowEntityRemoval
-              usesHideAction
-            />
-          </RenderProfiler>
-        ) : (
-          <RenderProfiler id={`DeviceGrid:${activeRoom}`}>
-            <DeviceGrid
-              orderedCardIds={orderedCardIds}
-              deviceMap={deviceMap}
-              isEditMode={isEditMode}
-              cardSizes={cardSizes}
-              updateCardSize={updateCardSize}
-              customCards={customCards}
-              onDeleteCard={handleDeleteCard}
-              onUpdateCard={handleUpdateCard}
-              onRemoveEntity={handleRemoveEntity}
-              allowEntityRemoval
-              usesHideAction
-            />
-          </RenderProfiler>
-        )}
-
-        {deviceMap.size === 0 && customCards.length === 0 && activeRoom === 'All' && (
-          <EmptyState
-            icon={Lightbulb}
-            title="No Visible Entities"
-            description="Your dashboard is empty. Add entities from your hidden list or add custom cards to start building it."
-            actionIcon={Lightbulb}
-            actionLabel={addableEntityIds.length > 0 ? 'Add Entity' : undefined}
-            onAction={addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
+        <div className="flex flex-col gap-6 md:gap-8" {...editModeLongPressProps}>
+          <RoomNav
+            rooms={roomOrder}
+            activeRoom={activeRoom}
+            onRoomChange={changeRoom}
+            allViewGrouping={allViewGrouping}
+            isEditMode={isEditMode}
+            onAllViewGroupingChange={onSetAllViewGrouping}
+            onToggleEditMode={onToggleEditMode}
+            onMoveRoom={onMoveRoom}
+            onAddCard={onOpenAddCardDialog}
+            onAddEntity={addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
+            addEntityLabel="Add Entity"
           />
-        )}
+
+          {activeRoom === 'All' ? (
+            <RenderProfiler id="AllViewGrid">
+              <AllViewGrid
+                deviceMap={deviceMap}
+                rooms={roomOrder}
+                cardOrders={cardOrders}
+                isEditMode={isEditMode}
+                cardSizes={cardSizes}
+                grouping={allViewGrouping}
+                updateCardSize={updateCardSize}
+                customCards={customCards}
+                onDeleteCard={handleDeleteCard}
+                onUpdateCard={handleUpdateCard}
+                onRemoveEntity={handleRemoveEntity}
+                allowEntityRemoval
+                usesHideAction
+              />
+            </RenderProfiler>
+          ) : (
+            <RenderProfiler id={`DeviceGrid:${activeRoom}`}>
+              <DeviceGrid
+                orderedCardIds={orderedCardIds}
+                deviceMap={deviceMap}
+                isEditMode={isEditMode}
+                cardSizes={cardSizes}
+                updateCardSize={updateCardSize}
+                customCards={customCards}
+                onDeleteCard={handleDeleteCard}
+                onUpdateCard={handleUpdateCard}
+                onRemoveEntity={handleRemoveEntity}
+                allowEntityRemoval
+                usesHideAction
+              />
+            </RenderProfiler>
+          )}
+
+          {deviceMap.size === 0 && customCards.length === 0 && activeRoom === 'All' && (
+            <EmptyState
+              icon={Lightbulb}
+              title="No Visible Entities"
+              description="Your dashboard is empty. Add entities from your hidden list or add custom cards to start building it."
+              actionIcon={Lightbulb}
+              actionLabel={addableEntityIds.length > 0 ? 'Add Entity' : undefined}
+              onAction={addableEntityIds.length > 0 ? onOpenAddEntityDialog : undefined}
+            />
+          )}
+        </div>
       </DashboardLayout>
     </DndContext>
   );

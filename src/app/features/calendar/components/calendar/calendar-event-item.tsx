@@ -1,40 +1,28 @@
-import { Calendar as CalendarIcon, MapPin, Users, Video } from 'lucide-react';
-import type { ThemeType } from '@/app/hooks/use-theme';
+import { Clock3, MapPin } from 'lucide-react';
+import { formatCalendarEventTimeLabel } from './calendar-formatters';
 import type { CalendarEvent } from './types';
 
 interface CalendarEventItemProps {
   event: CalendarEvent;
-  theme: ThemeType;
   textPrimary: string;
   textSecondary: string;
   hoverText: string;
-  dotColor: string;
   hoverBg: string;
   onItemClick?: () => void;
-  showEndTime?: boolean;
+  variant?: 'default' | 'compact';
 }
 
 export function CalendarEventItem({
   event,
-  theme,
   textPrimary,
   textSecondary,
   hoverText,
-  dotColor,
   hoverBg,
   onItemClick,
-  showEndTime = false,
+  variant = 'default',
 }: CalendarEventItemProps) {
-  const getEventIcon = (type: CalendarEvent['type']) => {
-    switch (type) {
-      case 'call':
-        return <Video className="w-3 h-3" />;
-      case 'meeting':
-        return <Users className="w-3 h-3" />;
-      case 'event':
-        return <CalendarIcon className="w-3 h-3" />;
-    }
-  };
+  const isCompact = variant === 'compact';
+  const timeLabel = formatCalendarEventTimeLabel(event);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -46,59 +34,47 @@ export function CalendarEventItem({
   return (
     <button
       type="button"
-      className={`group/item w-full text-left ${hoverBg} rounded-lg p-2 -m-2 transition-colors`}
-      onClick={(event) => {
-        event.stopPropagation();
+      className={`group/item flex w-full items-start gap-2 text-left transition-colors ${hoverBg} ${
+        isCompact ? 'rounded-lg px-1 py-0.5' : 'rounded-xl px-1.5 py-1'
+      }`}
+      onClick={(uiEvent) => {
+        uiEvent.stopPropagation();
         onItemClick?.();
       }}
       onKeyDown={handleKeyDown}
     >
-      <div className="flex items-start gap-2.5">
-        {/* Time */}
-        <div className="w-14 flex-shrink-0 pt-0.5 text-left">
-          <div className={`text-xs font-medium ${textPrimary}`}>{event.timeDisplay}</div>
-          {showEndTime && (
-            <div className={`text-xs ${theme === 'light' ? 'text-gray-300' : 'text-white/50'}`}>
-              {event.endTime}
-            </div>
-          )}
+      <div
+        className={`${isCompact ? 'mt-0.5 h-8 w-0.5' : 'mt-0.5 w-px self-stretch'} rounded-full ${
+          event.color
+        }`}
+      />
+
+      <div className="min-w-0 flex-1">
+        <div
+          className={`min-w-0 font-semibold ${textPrimary} ${hoverText} transition-colors ${
+            isCompact ? 'line-clamp-2 text-[11px] leading-3.5' : 'text-sm leading-4.5'
+          }`}
+        >
+          {event.title}
         </div>
 
-        {/* Color bar */}
         <div
-          className={`w-1 ${showEndTime ? 'self-stretch min-h-[44px]' : 'h-10'} ${event.color} rounded-full flex-shrink-0`}
-        />
-
-        {/* Event details */}
-        <div className="flex-1 min-w-0 text-left">
-          <h3
-            className={`text-sm font-semibold ${textPrimary} leading-tight mb-1 ${hoverText} transition-colors text-left`}
-          >
-            {event.title}
-          </h3>
-          <div className={`flex flex-wrap items-center gap-1.5 text-xs ${textSecondary}`}>
-            <div className="flex items-center gap-1">
-              {getEventIcon(event.type)}
-              <span className="capitalize">{event.type}</span>
-            </div>
-            {event.location && (
-              <>
-                <span className={dotColor}>•</span>
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3" />
-                  <span className="truncate">{event.location}</span>
-                </div>
-              </>
-            )}
-            {event.attendees && (
-              <>
-                <span className={dotColor}>•</span>
-                <span>
-                  {event.attendees} {event.attendees === 1 ? 'person' : 'people'}
-                </span>
-              </>
-            )}
-          </div>
+          className={`mt-0.5 ${textSecondary} ${
+            isCompact
+              ? 'flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px]'
+              : 'flex items-center gap-1 text-[11px]'
+          }`}
+        >
+          <span className="inline-flex items-center gap-1">
+            <Clock3 className={`${isCompact ? 'h-2.5 w-2.5' : 'h-3 w-3'} flex-shrink-0`} />
+            <span>{timeLabel}</span>
+          </span>
+          {event.location ? (
+            <span className="inline-flex min-w-0 items-center gap-1">
+              <MapPin className={`${isCompact ? 'h-2.5 w-2.5' : 'mt-0.5 h-3 w-3'} flex-shrink-0`} />
+              <span className={isCompact ? 'break-words' : 'truncate'}>{event.location}</span>
+            </span>
+          ) : null}
         </div>
       </div>
     </button>

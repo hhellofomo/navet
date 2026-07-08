@@ -1,35 +1,30 @@
-import { Calendar as CalendarIcon } from 'lucide-react';
-
 interface CalendarDateDisplayProps {
   textPrimary: string;
-  iconBg: string;
-  iconColor: string;
-  dayName: string;
-  monthName: string;
+  textSecondary: string;
+  weekdayLabel: string;
+  monthLabel: string;
   dayNumber: number;
+  temperatureLabel: string;
 }
 
 export function CalendarDateDisplay({
   textPrimary,
-  iconBg,
-  iconColor,
-  dayName,
-  monthName,
+  textSecondary,
+  weekdayLabel,
+  monthLabel,
   dayNumber,
+  temperatureLabel,
 }: CalendarDateDisplayProps) {
   return (
-    <div className="flex items-start justify-between mb-3">
-      <div className="min-w-0 flex-1 text-left">
-        <span className={`font-semibold ${textPrimary} text-sm text-left`}>
-          {dayName}, {monthName} {dayNumber}
-        </span>
+    <div className="flex w-[72px] flex-shrink-0 flex-col items-center py-1 text-center">
+      <div className={`text-xs font-medium uppercase tracking-[0.22em] ${textSecondary}`}>
+        {weekdayLabel}
       </div>
-
-      <div
-        className={`flex-shrink-0 w-10 h-10 rounded-full ${iconBg} flex items-center justify-center ml-2`}
-      >
-        <CalendarIcon className={`w-5 h-5 ${iconColor}`} />
+      <div className={`mt-1 text-4xl font-semibold leading-none ${textPrimary}`}>{dayNumber}</div>
+      <div className={`mt-2 text-xs font-medium uppercase tracking-[0.28em] ${textSecondary}`}>
+        {monthLabel}
       </div>
+      <div className={`mt-3 text-[11px] font-medium ${textSecondary}`}>{temperatureLabel}</div>
     </div>
   );
 }

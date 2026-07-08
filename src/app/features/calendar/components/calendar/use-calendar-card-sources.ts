@@ -7,6 +7,14 @@ type PersistedCalendarSources = Record<string, string[]>;
 type CalendarViewMode = 'week' | 'month';
 type PersistedCalendarViewModes = Record<string, CalendarViewMode>;
 
+const SOURCE_COLOR_CLASSES = [
+  'bg-blue-500',
+  'bg-purple-500',
+  'bg-green-500',
+  'bg-orange-500',
+  'bg-indigo-500',
+] as const;
+
 export function useCalendarCardSources(cardId?: string, fallbackEvents: CalendarEvent[] = []) {
   const devices = useDevices();
   const [calendarSources, setCalendarSources] = usePersistedState<PersistedCalendarSources>(
@@ -18,7 +26,14 @@ export function useCalendarCardSources(cardId?: string, fallbackEvents: Calendar
     {}
   );
 
-  const availableCalendars = devices.calendars;
+  const availableCalendars = useMemo(
+    () =>
+      devices.calendars.map((calendar, index) => ({
+        ...calendar,
+        color: SOURCE_COLOR_CLASSES[index % SOURCE_COLOR_CLASSES.length],
+      })),
+    [devices.calendars]
+  );
 
   const selectedCalendarIds = useMemo(() => {
     if (!cardId) {
@@ -58,7 +73,12 @@ export function useCalendarCardSources(cardId?: string, fallbackEvents: Calendar
     endDate.setDate(now.getDate() + (viewMode === 'week' ? 7 : 31));
 
     return matchedCalendars
-      .flatMap((calendar) => calendar.events)
+      .flatMap((calendar) =>
+        calendar.events.map((event) => ({
+          ...event,
+          color: calendar.color,
+        }))
+      )
       .filter((event) => {
         if (!event.sortKey) {
           return true;
