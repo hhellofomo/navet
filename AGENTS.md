@@ -10,9 +10,9 @@ Connects to Home Assistant over WebSocket.
 - Use [Conventional Commits](https://www.conventionalcommits.org/) format: `type(scope): summary`
 - Valid types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `build`, `ci`, `perf`, `style`
 - Summary must be lowercase, imperative mood, no period at the end
-- Keep the summary line under 72 characters
 - Do not use generic or free-form commit messages
 - Include a concise bullet-point body for meaningful changes so the project can track what changed between releases
+- Keep bullet lists contiguous in the commit body. Do not create each bullet as a separate `git commit -m` paragraph, because that inserts blank lines between items.
 - Keep commit bodies focused on user-visible behavior, architecture, tests, docs, or operational impact
 - Trivial commits such as formatting-only or metadata-only changes may omit the body
 - Do not use `git commit --no-verify` unless the user explicitly approves skipping hooks for that commit
