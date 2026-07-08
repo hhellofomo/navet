@@ -120,6 +120,15 @@ class HAEntityService {
     await this.callService('climate', 'set_temperature', { temperature }, { entity_id: entityId });
   }
 
+  async setClimateHvacMode(entityId: string, hvacMode: string): Promise<void> {
+    await this.callService(
+      'climate',
+      'set_hvac_mode',
+      { hvac_mode: hvacMode },
+      { entity_id: entityId }
+    );
+  }
+
   async updateMediaPlayerPlayback(
     entityId: string,
     action: 'toggle' | 'play' | 'pause' | 'previous' | 'next'

@@ -628,6 +628,7 @@ export const esMessages = {
   'climate.coolingDownTo': 'Enfriando hasta {temp}°C',
   'climate.heatingTo': 'Calentar hasta {temp}°C',
   'climate.feedback.updateTemperatureFailed': 'No se pudo actualizar la temperatura',
+  'climate.feedback.updateModeFailed': 'No se pudo actualizar el modo',
   'climate.decreaseTemperature': 'Bajar temperatura',
   'climate.increaseTemperature': 'Subir temperatura',
   'climate.gaugeLabel': 'Indicador de temperatura {mode} que muestra {temp} grados',

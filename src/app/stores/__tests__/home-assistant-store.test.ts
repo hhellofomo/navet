@@ -10,6 +10,7 @@ type StubListenerMap = {
   config: Set<StubConfigListener>;
   registries: Set<StubRegistriesListener>;
   connection: Set<StubConnectionListener>;
+  error: Set<(payload: { message: string }) => void>;
 };
 type StubHomeAssistantService = {
   listeners: StubListenerMap;
@@ -38,6 +39,7 @@ const { homeAssistantServiceStub } = vi.hoisted(() => ({
       connection: new Set<
         (payload: { connected: boolean; connection: unknown; reconnecting: boolean }) => void
       >(),
+      error: new Set<(payload: { message: string }) => void>(),
     },
     connected: false,
     config: null as Record<string, unknown> | null,
@@ -133,7 +135,7 @@ describe('homeAssistantStore', () => {
       token: 'abc',
     });
 
-    expect(homeAssistantServiceStub.addListener).toHaveBeenCalledTimes(4);
+    expect(homeAssistantServiceStub.addListener).toHaveBeenCalledTimes(5);
     expect(homeAssistantStore.getState().connected).toBe(true);
     expect(homeAssistantStore.getState().areas).toHaveLength(1);
     expect(homeAssistantStore.getState().entities?.['light.kitchen']?.state).toBe('on');

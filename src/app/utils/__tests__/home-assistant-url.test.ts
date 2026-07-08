@@ -1,10 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import {
   resolveHomeAssistantAbsoluteUrl,
   resolveHomeAssistantProxyUrl,
 } from '../home-assistant-url';
 
 describe('home-assistant-url', () => {
+  beforeEach(() => {
+    document.querySelector('base')?.remove();
+  });
+
   it('keeps safe app asset paths for absolute artwork resolution', () => {
     expect(resolveHomeAssistantAbsoluteUrl('/navet/demo/assets/album.jpg')).toBe(
       '/navet/demo/assets/album.jpg'
@@ -21,6 +25,25 @@ describe('home-assistant-url', () => {
     expect(resolveHomeAssistantProxyUrl('/api/media_player_proxy/media_player.living_room')).toBe(
       '/__navet_ha_proxy__/api/media_player_proxy/media_player.living_room'
     );
+  });
+
+  it('proxies Home Assistant media paths under the ingress base path', () => {
+    const base = document.createElement('base');
+    base.href = `${window.location.origin}/api/hassio_ingress/addon-slug/`;
+    document.head.append(base);
+
+    expect(resolveHomeAssistantProxyUrl('/api/media_player_proxy/media_player.living_room')).toBe(
+      '/api/hassio_ingress/addon-slug/__navet_ha_proxy__/api/media_player_proxy/media_player.living_room'
+    );
+  });
+
+  it('proxies absolute Home Assistant media URLs when they match the configured Home Assistant URL', () => {
+    expect(
+      resolveHomeAssistantProxyUrl(
+        'https://ha.example.test/api/media_player_proxy/media_player.living_room',
+        'https://ha.example.test'
+      )
+    ).toBe('/__navet_ha_proxy__/api/media_player_proxy/media_player.living_room');
   });
 
   it('still expands Home Assistant media paths for production when a Home Assistant URL exists', () => {

@@ -617,6 +617,7 @@ export const enMessages = {
   'climate.coolingDownTo': 'Cooling down to {temp}°C',
   'climate.heatingTo': 'Heat to {temp}°C',
   'climate.feedback.updateTemperatureFailed': 'Failed to update temperature',
+  'climate.feedback.updateModeFailed': 'Failed to update mode',
   'climate.decreaseTemperature': 'Decrease temperature',
   'climate.increaseTemperature': 'Increase temperature',
   'climate.gaugeLabel': '{mode} temperature gauge showing {temp} degrees',

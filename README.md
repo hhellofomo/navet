@@ -99,7 +99,15 @@ For Home Assistant OS or supervised installations:
    dashboard_config_url: ""
    ```
 
-5. Start the add-on and open Navet from the Home Assistant sidebar.
+5. Start the add-on and open Navet from the Home Assistant sidebar, or use the add-on's `8099`
+   direct-access port for a dashboard view without the Home Assistant sidebar.
+
+### Home Assistant dev add-on
+
+For testing unreleased builds, run the **Publish Home Assistant Add-on** GitHub Actions workflow
+manually, then refresh the custom add-on repository in Home Assistant and install **Navet Dev**.
+The dev add-on uses the same options as the regular add-on, but pulls the `dev` add-on image tag
+from GitHub Container Registry.
 
 Set `dashboard_config_url` to a Navet dashboard YAML export if you want fresh browsers or Home
 Assistant companion-app WebViews to bootstrap the same dashboard instead of starting from onboarding.

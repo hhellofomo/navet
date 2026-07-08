@@ -7,12 +7,14 @@ describe('runtime-config', () => {
       hassUrl: 'https://ha.example.com/',
       hassToken: '  token  ',
       dashboardConfigUrl: '  /navet-dashboard.yaml  ',
+      proxyBaseUrl: ' /__navet_ha_proxy__/ ',
     };
 
     expect(getRuntimeConfig()).toEqual({
       hassUrl: 'https://ha.example.com',
       hassToken: 'token',
       dashboardConfigUrl: '/navet-dashboard.yaml',
+      proxyBaseUrl: '/__navet_ha_proxy__',
     });
   });
 });

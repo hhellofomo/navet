@@ -39,6 +39,7 @@ export interface ClimateDevice extends BaseDevice {
   currentTemperature: number;
   mode: string;
   action?: string;
+  supportedHvacModes?: string[];
 }
 
 // Weather device

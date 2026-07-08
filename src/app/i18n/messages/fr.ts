@@ -631,6 +631,7 @@ export const frMessages = {
   'climate.coolingDownTo': 'Refroidit jusqu’à {temp}°C',
   'climate.heatingTo': 'Chauffe jusqu’à {temp}°C',
   'climate.feedback.updateTemperatureFailed': 'Impossible de mettre à jour la temperature',
+  'climate.feedback.updateModeFailed': 'Impossible de mettre à jour le mode',
   'climate.decreaseTemperature': 'Baisser la temperature',
   'climate.increaseTemperature': 'Augmenter la temperature',
   'climate.gaugeLabel': 'Jauge de temperature {mode} affichant {temp} degres',

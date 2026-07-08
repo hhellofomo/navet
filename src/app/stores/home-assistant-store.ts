@@ -102,6 +102,15 @@ export const homeAssistantStore = createStore<HomeAssistantStore>()((set, _get) 
               set({ connected, connection, connecting: reconnecting, reconnecting });
             }
           ),
+          homeAssistantService.addListener('error', ({ message }) => {
+            set({
+              error: message,
+              connecting: false,
+              reconnecting: false,
+              connected: false,
+            });
+            useErrorStore.getState().setError(message);
+          }),
         ];
         const unsubscribe = () => {
           for (const fn of unsubscribers) fn();

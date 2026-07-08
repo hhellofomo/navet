@@ -102,6 +102,7 @@ export const HVACCardLargeLayout = memo(function HVACCardLargeLayout({
                   mode={controller.visualMode}
                   isOn={controller.isOn}
                   onModeChange={controller.setMode}
+                  supportedHvacModes={controller.supportedHvacModes}
                   size="medium"
                 />
               </CardActionRowGroup>
