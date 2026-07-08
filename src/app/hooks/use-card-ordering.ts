@@ -75,34 +75,41 @@ export const useCardOrdering = (
 
     setCardOrders((prev) => {
       const next = buildOrders();
-      let changed = false;
+      const mergedOrders: Record<string, string[]> = {};
+      const allRooms = new Set([...Object.keys(prev), ...Object.keys(next)]);
 
-      Object.entries(prev).forEach(([room, order]) => {
+      allRooms.forEach((room) => {
+        const order = prev[room];
         if (!Array.isArray(order)) {
+          mergedOrders[room] = next[room] ?? [];
           return;
         }
 
         const roomOrder = next[room] ?? [];
         const preserved = order.filter((id) => allDeviceIds.has(id));
         const additions = roomOrder.filter((id) => !preserved.includes(id));
-        const merged = [...preserved, ...additions];
-
-        if (
-          merged.length !== roomOrder.length ||
-          merged.some((id, index) => id !== roomOrder[index])
-        ) {
-          changed = true;
-        }
-
-        next[room] = merged;
+        mergedOrders[room] = [...preserved, ...additions];
       });
 
       const prevRooms = Object.keys(prev);
-      if (!changed && prevRooms.length === Object.keys(next).length) {
+      const nextRooms = Object.keys(mergedOrders);
+      const changed =
+        prevRooms.length !== nextRooms.length ||
+        nextRooms.some((room) => {
+          const previousOrder = prev[room] ?? [];
+          const nextOrder = mergedOrders[room] ?? [];
+
+          return (
+            previousOrder.length !== nextOrder.length ||
+            previousOrder.some((id, index) => id !== nextOrder[index])
+          );
+        });
+
+      if (!changed) {
         return prev;
       }
 
-      return next;
+      return mergedOrders;
     });
   }, [buildOrders, devices, safeCustomCards]);
 

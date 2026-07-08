@@ -1,5 +1,8 @@
+import { Bot } from 'lucide-react';
 import { memo } from 'react';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
+import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { useTheme } from '@/app/hooks';
 import { useVacuumControl } from './vacuum/use-vacuum-control';
 import { VacuumControlsLarge } from './vacuum/vacuum-controls-large';
@@ -7,7 +10,7 @@ import { VacuumControlsMedium } from './vacuum/vacuum-controls-medium';
 import { VacuumControlsSmall } from './vacuum/vacuum-controls-small';
 import { VacuumSettingsDialog } from './vacuum/vacuum-settings-dialog';
 import { VacuumStatusDisplay } from './vacuum/vacuum-status-display';
-import { getVacuumThemeStatus, type VacuumStatus } from './vacuum/vacuum-utils';
+import type { VacuumStatus } from './vacuum/vacuum-utils';
 
 interface VacuumCardProps {
   id: string;
@@ -42,18 +45,16 @@ export const VacuumCard = memo(function VacuumCard({
     handlePause,
     handleReturnHome,
   } = useVacuumControl({ initialStatus: status });
-  const { theme, colors } = useTheme();
+  const { theme } = useTheme();
 
   // Size-specific styling with intelligent layout adaptation
   const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
   const padding = isSmall ? 'p-4' : 'p-5';
-  const vacuumColors = colors.vacuum[getVacuumThemeStatus(currentStatus)];
 
   const cardGradient =
     theme === 'light' ? 'from-white to-gray-50/80' : 'from-gray-900/90 to-gray-950/95';
   const cardBorder = theme === 'light' ? 'border-gray-200/80' : 'border-gray-700/30';
-  const textPrimary = theme === 'light' ? 'text-gray-900' : 'text-white';
   const glowGradient = theme === 'light' ? 'from-gray-50/40' : 'from-gray-500/5';
 
   return (
@@ -74,24 +75,18 @@ export const VacuumCard = memo(function VacuumCard({
         {theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
 
         <div className="relative h-full flex flex-col">
-          {/* Header */}
-          <div className={`flex items-start justify-between ${isSmall ? 'mb-3' : 'mb-4'}`}>
-            <div className="min-w-0 flex-1">
-              <h3
-                className={`font-semibold ${textPrimary} truncate ${isSmall ? 'text-xs' : 'text-sm'}`}
-              >
-                {name}
-              </h3>
-              <p className="text-[10px] text-gray-300 truncate mt-0.5">Vacuum</p>
-            </div>
-            <div
-              className={`${isSmall ? 'w-8 h-8' : 'w-10 h-10'} rounded-full ${
-                vacuumColors.iconBg
-              } flex items-center justify-center flex-shrink-0`}
-            >
-              <div className={`w-4 h-4 rounded-full ${vacuumColors.accent}`}></div>
-            </div>
-          </div>
+          <EntityCardHeader
+            title={name}
+            subtitle="Vacuum"
+            size={size}
+            leading={
+              <EntityCardHeaderIcon
+                IconComponent={Bot}
+                isActive={currentStatus === 'cleaning' || currentStatus === 'returning'}
+                size={size}
+              />
+            }
+          />
 
           {/* Status and Controls */}
           <div className="flex-1 flex flex-col">

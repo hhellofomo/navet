@@ -1,5 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import * as Slider from '@radix-ui/react-slider';
+import type { LucideIcon } from 'lucide-react';
 import {
   Blinds,
   ChevronDown,
@@ -7,13 +8,15 @@ import {
   DoorOpen,
   Fence,
   Home,
-  Settings2,
   ShieldCheck,
   Square,
   SunDim,
 } from 'lucide-react';
 import { memo, useState } from 'react';
+import { CardActionRow } from '@/app/components/shared/card-action-row';
+import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
+import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
 import { useTheme } from '@/app/hooks';
@@ -39,10 +42,7 @@ interface CoverCardProps {
   isEditMode: boolean;
 }
 
-const deviceClassConfig: Record<
-  DeviceClass,
-  { label: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }
-> = {
+const deviceClassConfig: Record<DeviceClass, { label: string; icon: LucideIcon }> = {
   blind: { label: 'Window Blinds', icon: Blinds },
   shade: { label: 'Roller Shades', icon: Blinds },
   curtain: { label: 'Curtains', icon: Home },
@@ -68,13 +68,11 @@ export const CoverCard = memo(function CoverCard({
     initialPosition === 100 ? 'open' : initialPosition === 0 ? 'closed' : 'open'
   );
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const _cardId = `cover-${name.toLowerCase().replace(/ /g, '-')}`;
   const { colors, theme } = useTheme();
 
   // Size-specific styling with intelligent layout adaptation
   const isSmall = size === 'extra-small' || size === 'small';
   const isMedium = size === 'medium';
-  const _isLarge = size === 'large';
   const padding = isSmall ? 'p-4' : 'p-5';
 
   // Get colors based on cover state
@@ -89,8 +87,6 @@ export const CoverCard = memo(function CoverCard({
     theme === 'light'
       ? 'bg-gray-100 hover:bg-gray-200 text-gray-900'
       : 'bg-white/5 hover:bg-white/10 text-white';
-  const settingsBtnClass =
-    theme === 'light' ? 'bg-gray-100 hover:bg-gray-200' : 'bg-white/10 hover:bg-white/20';
 
   const DeviceIcon = deviceClassConfig[deviceClass].icon;
 
@@ -175,32 +171,27 @@ export const CoverCard = memo(function CoverCard({
       {theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
 
       <div className="relative h-full flex flex-col">
-        <div className={`flex items-start justify-between ${isSmall ? 'mb-1' : 'mb-2'}`}>
-          <div className="min-w-0 flex-1">
-            <h3
-              className={`font-semibold ${textColor} truncate ${isSmall ? 'text-xs' : 'text-sm'}`}
-            >
-              {name}
-            </h3>
-            <p className="text-[10px] text-gray-300 truncate mt-0.5">
-              {deviceClassConfig[deviceClass].label}
-            </p>
-            {!isSmall && (
-              <div className="space-y-0.5">
-                <p className={`text-xs ${secondaryTextColor} truncate`}>{room}</p>
-                <p className={`text-xs ${stateDisplay.color} truncate`}>{stateDisplay.text}</p>
-              </div>
-            )}
+        <EntityCardHeader
+          title={name}
+          subtitle={deviceClassConfig[deviceClass].label}
+          size={size}
+          leading={
+            <EntityCardHeaderIcon
+              IconComponent={DeviceIcon}
+              isActive={position > 50}
+              size={size}
+              ariaLabel={cardInteraction.iconButtonProps['aria-label']}
+              onClick={cardInteraction.iconButtonProps.onClick}
+            />
+          }
+        />
+
+        {!isSmall && (
+          <div className="mb-2 space-y-0.5">
+            <p className={`truncate text-xs ${secondaryTextColor}`}>{room}</p>
+            <p className={`truncate text-xs ${stateDisplay.color}`}>{stateDisplay.text}</p>
           </div>
-          <EntityCardHeaderIcon
-            IconComponent={DeviceIcon}
-            isActive={position > 50}
-            size={size}
-            ariaLabel={cardInteraction.iconButtonProps['aria-label']}
-            onClick={cardInteraction.iconButtonProps.onClick}
-            onPointerDown={cardInteraction.iconButtonProps.onPointerDown}
-          />
-        </div>
+        )}
 
         {isSmall ? (
           // Small: Just the percentage and state with quick actions
@@ -210,54 +201,55 @@ export const CoverCard = memo(function CoverCard({
               <div className={`text-xs ${stateDisplay.color}`}>{stateDisplay.text}</div>
             </div>
 
-            {/* Quick action buttons + Settings */}
-            <div className="flex gap-2 items-center">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleOpen();
-                }}
-                className={`w-7 h-7 rounded-full ${buttonBg} hover:scale-105 transition-all flex items-center justify-center`}
-                title="Open"
-              >
-                <ChevronUp className={`w-3 h-3 ${buttonText}`} />
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleStop();
-                }}
-                className={`w-7 h-7 rounded-full ${buttonBg} hover:scale-105 transition-all flex items-center justify-center`}
-                title="Stop"
-              >
-                <Square className={`w-3 h-3 ${buttonText}`} />
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleClose();
-                }}
-                className={`w-7 h-7 rounded-full ${buttonBg} hover:scale-105 transition-all flex items-center justify-center`}
-                title="Close"
-              >
-                <ChevronDown className={`w-3 h-3 ${buttonText}`} />
-              </button>
-
-              {/* Settings button */}
-              <button
-                {...cardInteraction.settingsButtonProps}
-                className={`w-7 h-7 rounded-full ${settingsBtnClass} transition-all flex items-center justify-center`}
-              >
-                <Settings2 className={`w-3 h-3 ${buttonText}`} />
-              </button>
-            </div>
+            <CardActionRow
+              theme={theme}
+              size="small"
+              leftContent={
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpen();
+                    }}
+                    className={`h-7 w-7 rounded-full ${buttonBg} hover:scale-105 transition-all flex items-center justify-center`}
+                    title="Open"
+                  >
+                    <ChevronUp className={`h-3 w-3 ${buttonText}`} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleStop();
+                    }}
+                    className={`h-7 w-7 rounded-full ${buttonBg} hover:scale-105 transition-all flex items-center justify-center`}
+                    title="Stop"
+                  >
+                    <Square className={`h-3 w-3 ${buttonText}`} />
+                  </button>
+                </>
+              }
+              overflowItems={[
+                {
+                  key: 'close',
+                  label: 'Close',
+                  icon: ChevronDown,
+                  onSelect: handleClose,
+                },
+              ]}
+              rightContent={
+                <CardSettingsActionButton
+                  {...cardInteraction.settingsButtonProps}
+                  theme={theme}
+                  size="small"
+                />
+              }
+            />
           </div>
         ) : isMedium ? (
           // Medium: Percentage with compact slider and controls
-          <>
+          <div className="flex-1 flex flex-col gap-2">
             <div className="flex-1 flex flex-col justify-center gap-2">
               <div className={`text-3xl font-bold ${textColor} leading-none mb-1`}>{position}%</div>
               <Slider.Root
@@ -273,53 +265,57 @@ export const CoverCard = memo(function CoverCard({
                 <Slider.Thumb className="block w-4 h-4 bg-white rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer" />
               </Slider.Root>
             </div>
-            <div className="flex gap-2 mt-2 items-center">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleOpen();
-                }}
-                className={`flex-1 py-1.5 ${actionBtnClass} rounded-lg text-[10px] font-medium transition-colors flex items-center justify-center gap-0.5`}
-              >
-                <ChevronUp className="w-3 h-3" /> Open
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleStop();
-                }}
-                className={`flex-1 py-1.5 ${actionBtnClass} rounded-lg text-[10px] font-medium transition-colors flex items-center justify-center gap-0.5`}
-              >
-                <Square className="w-3 h-3" /> Stop
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleClose();
-                }}
-                className={`flex-1 py-1.5 ${actionBtnClass} rounded-lg text-[10px] font-medium transition-colors flex items-center justify-center gap-0.5`}
-              >
-                <ChevronDown className="w-3 h-3" /> Close
-              </button>
-
-              {/* Spacer */}
-              <div className="flex-1" />
-
-              {/* Settings button */}
-              <button
-                {...cardInteraction.settingsButtonProps}
-                className={`w-7 h-7 rounded-full ${settingsBtnClass} transition-all flex items-center justify-center`}
-              >
-                <Settings2 className={`w-3 h-3 ${buttonText}`} />
-              </button>
+            <div className="mt-auto pt-2">
+              <CardActionRow
+                theme={theme}
+                size="medium"
+                leftContent={
+                  <>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpen();
+                      }}
+                      className={`flex-1 py-1.5 ${actionBtnClass} rounded-lg text-[10px] font-medium transition-colors flex items-center justify-center gap-0.5`}
+                    >
+                      <ChevronUp className="h-3 w-3" /> Open
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStop();
+                      }}
+                      className={`flex-1 py-1.5 ${actionBtnClass} rounded-lg text-[10px] font-medium transition-colors flex items-center justify-center gap-0.5`}
+                    >
+                      <Square className="h-3 w-3" /> Stop
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleClose();
+                      }}
+                      className={`flex-1 py-1.5 ${actionBtnClass} rounded-lg text-[10px] font-medium transition-colors flex items-center justify-center gap-0.5`}
+                    >
+                      <ChevronDown className="h-3 w-3" /> Close
+                    </button>
+                  </>
+                }
+                rightContent={
+                  <CardSettingsActionButton
+                    {...cardInteraction.settingsButtonProps}
+                    theme={theme}
+                    size="small"
+                  />
+                }
+              />
             </div>
-          </>
+          </div>
         ) : (
           // Large: Full layout with spacious controls
-          <>
+          <div className="flex-1 flex flex-col">
             <div className="flex-1 flex flex-col justify-center">
               <div className={`text-3xl font-bold ${textColor} mb-1`}>{position}%</div>
               <Slider.Root
@@ -335,50 +331,54 @@ export const CoverCard = memo(function CoverCard({
                 <Slider.Thumb className="block w-4 h-4 bg-white rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer" />
               </Slider.Root>
             </div>
-            <div className="flex gap-2 items-center">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleOpen();
-                }}
-                className={`flex-1 py-2 ${actionBtnClass} rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1`}
-              >
-                <ChevronUp className="w-3.5 h-3.5" /> Open
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleStop();
-                }}
-                className={`flex-1 py-2 ${actionBtnClass} rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1`}
-              >
-                <Square className="w-3.5 h-3.5" /> Stop
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleClose();
-                }}
-                className={`flex-1 py-2 ${actionBtnClass} rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1`}
-              >
-                <ChevronDown className="w-3.5 h-3.5" /> Close
-              </button>
-
-              {/* Spacer */}
-              <div className="flex-1" />
-
-              {/* Settings button */}
-              <button
-                {...cardInteraction.settingsButtonProps}
-                className={`w-8 h-8 rounded-full ${settingsBtnClass} transition-all flex items-center justify-center`}
-              >
-                <Settings2 className={`w-3.5 h-3.5 ${buttonText}`} />
-              </button>
+            <div className="mt-auto pt-4">
+              <CardActionRow
+                theme={theme}
+                size="large"
+                leftContent={
+                  <>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpen();
+                      }}
+                      className={`flex-1 py-2 ${actionBtnClass} rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1`}
+                    >
+                      <ChevronUp className="h-3.5 w-3.5" /> Open
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleStop();
+                      }}
+                      className={`flex-1 py-2 ${actionBtnClass} rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1`}
+                    >
+                      <Square className="h-3.5 w-3.5" /> Stop
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleClose();
+                      }}
+                      className={`flex-1 py-2 ${actionBtnClass} rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1`}
+                    >
+                      <ChevronDown className="h-3.5 w-3.5" /> Close
+                    </button>
+                  </>
+                }
+                rightContent={
+                  <CardSettingsActionButton
+                    {...cardInteraction.settingsButtonProps}
+                    theme={theme}
+                    size="medium"
+                  />
+                }
+              />
             </div>
-          </>
+          </div>
         )}
       </div>
 

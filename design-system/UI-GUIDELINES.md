@@ -83,17 +83,11 @@ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica N
 
 ### Type Scale
 
-#### Small Cards
+#### Extra-Small / Small / Medium Cards
 - **Title**: `text-xs font-semibold` (12px, 600 weight)
-- **Subtitle**: Hidden on small cards for space efficiency
+- **Subtitle**: `text-[11px]` to `text-xs` with muted treatment depending on density
 - **Body**: `text-[10px]` (10px)
 - **Labels**: `text-[9px]` (9px)
-
-#### Medium Cards
-- **Title**: `text-sm font-semibold` (14px, 600 weight)
-- **Subtitle**: `text-xs text-gray-400` (12px)
-- **Body**: `text-xs` (12px)
-- **Labels**: `text-[10px]` (10px)
 
 #### Large Cards
 - **Title**: `text-base font-semibold` (16px, 600 weight)
@@ -281,27 +275,35 @@ Subtle glow effects
 
 ## Card Size System
 
-### Three-Tier Sizing
+### Four-Tier Sizing
 
-#### Small (col-span-1)
+#### Extra-Small (col-span-1 row-span-1)
 - **Grid Columns**: 1
-- **Typical Height**: Auto-fit content
-- **Use Case**: Simple on/off controls, status indicators
-- **Content Strategy**: Minimal - Icon + Title only
+- **Grid Height**: 87px
+- **Use Case**: Dense status or single inline control row
+- **Content Strategy**: Header plus one essential control or metric
+- **Padding**: `px-3.5 pt-3 pb-4`
+
+#### Small (col-span-1 row-span-2)
+- **Grid Columns**: 1
+- **Grid Height**: 190px
+- **Use Case**: Standard compact controls
+- **Content Strategy**: Header, primary value/slider, compact action row
 - **Padding**: `p-4`
 
-#### Medium (col-span-2)
+#### Medium (col-span-2 row-span-2)
 - **Grid Columns**: 2
-- **Typical Height**: Auto-fit content
+- **Grid Height**: 190px
 - **Use Case**: Controls with 1-2 adjustable parameters
-- **Content Strategy**: Moderate - Icon + Title + Room + Primary Controls
+- **Content Strategy**: Same header density as small, more horizontal space
 - **Padding**: `p-5`
 
-#### Large (col-span-2 row-span-2)
+#### Large (col-span-2 row-span-4)
 - **Grid Columns**: 2
-- **Grid Rows**: 2
+- **Grid Rows**: 4
+- **Grid Height**: 396px
 - **Use Case**: Complex controls with multiple parameters
-- **Content Strategy**: Full - All information + Advanced controls
+- **Content Strategy**: Full information and secondary sections
 - **Padding**: `p-6`
 
 ### Adaptive Layout Rules
@@ -393,18 +395,19 @@ Desktop: > 1024px
 
 ### Mobile Optimizations
 - Sidebar hidden, accessible via menu
-- Single column grid becomes dominant
+- Fixed-width dashboard tracks wrap automatically
 - Touch-friendly 44px minimum hit targets
 - Reduced card padding for space efficiency
 - Simplified layouts in small cards
 
 ### Grid Adaptations
 ```css
-Mobile: grid-cols-2 (2 column layout)
-Tablet: grid-cols-3 (3 column layout)
-Desktop (1024-1439px): grid-cols-6 (6 column layout) [Recommended]
-Desktop (1024-1439px): grid-cols-4 (4 column layout) [Alternative for larger cards]
-Desktop Large (≥1440px): grid-cols-6 (6 column layout)
+Dashboard grid: repeat(auto-fit, 190px)
+Gap: 16px
+Auto rows: 87px
+Small cards: 190px × 190px
+Medium cards: 396px minimum width × 190px height
+Large cards: 396px × 396px
 ```
 
 ---
@@ -413,23 +416,31 @@ Desktop Large (≥1440px): grid-cols-6 (6 column layout)
 
 ### Card Header Structure
 ```tsx
-<div className="flex items-start justify-between mb-2">
+<div className="flex items-start gap-3">
+  <div className="w-8 h-8 rounded-full bg-{color}/20 flex items-center justify-center flex-shrink-0">
+    <Icon className="w-5 h-5 text-{color}" />
+  </div>
   <div className="min-w-0 flex-1">
     <h3 className="font-semibold truncate">{name}</h3>
-    <p className="text-xs text-gray-400">{room}</p>
-  </div>
-  <div className="w-10 h-10 rounded-full bg-{color}/20 flex items-center justify-center flex-shrink-0">
-    <Icon className="w-5 h-5 text-{color}" />
+    <p className="text-xs text-gray-400">{subtitle}</p>
   </div>
 </div>
 ```
 
-### Control Groups
+### Bottom Action Row
 ```tsx
-<div className="flex items-center gap-2">
-  {/* Buttons with consistent sizing */}
+<div className="mt-auto flex items-center justify-between gap-3">
+  <div className="flex items-center gap-2">
+    {/* left-side primary actions, truncate extras into overflow */}
+  </div>
+  <button>{/* controls/settings opener */}</button>
 </div>
 ```
+
+### Edit Controls
+- Remove-entity action lives in the top-left edit slot
+- Resize action lives in the top-right edit slot
+- Both use the same circular sizing tiers and offsets
 
 ### Sliders
 ```tsx

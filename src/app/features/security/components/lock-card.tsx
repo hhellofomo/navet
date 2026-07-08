@@ -1,5 +1,7 @@
 import { DoorClosed, DoorOpen, Lock, Unlock } from 'lucide-react';
 import { memo, useState } from 'react';
+import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
+import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { useTheme } from '@/app/hooks';
 
 interface LockCardProps {
@@ -16,7 +18,6 @@ export const LockCard = memo(function LockCard({
   const { theme, colors } = useTheme();
 
   const cardColors = isLocked ? colors.lock.locked : colors.lock.unlocked;
-  const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
 
   return (
     <div
@@ -30,23 +31,18 @@ export const LockCard = memo(function LockCard({
       {theme === 'light' && <div className="absolute inset-0 bg-white/60" />}
 
       <div className="relative h-full flex flex-col">
-        <div className="flex items-start justify-between mb-2">
-          <div className="min-w-0 flex-1">
-            <h3 className={`font-semibold truncate text-xs ${textColor}`}>{name}</h3>
-            <p className="text-[10px] text-gray-300 truncate mt-0.5">Lock</p>
-          </div>
-          <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-500 ${cardColors.iconBg}`}
-          >
-            {isLocked ? (
-              <DoorClosed
-                className={`w-4 h-4 transition-colors duration-500 ${cardColors.accent}`}
-              />
-            ) : (
-              <DoorOpen className={`w-4 h-4 transition-colors duration-500 ${cardColors.accent}`} />
-            )}
-          </div>
-        </div>
+        <EntityCardHeader
+          title={name}
+          subtitle="Lock"
+          size="small"
+          leading={
+            <EntityCardHeaderIcon
+              IconComponent={isLocked ? DoorClosed : DoorOpen}
+              isActive={isLocked}
+              size="small"
+            />
+          }
+        />
 
         <div className="flex-1 flex flex-col items-center justify-center">
           <button

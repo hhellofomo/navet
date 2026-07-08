@@ -3,6 +3,8 @@
  * Central export point for all custom hooks
  */
 
+export type { Section } from '../navigation/sections';
+export { isSection, NAVIGATION_SECTIONS } from '../navigation/sections';
 export { useCardOrdering } from './use-card-ordering';
 // Existing hooks
 export { useCardState } from './use-card-state';
@@ -16,7 +18,6 @@ export { useEditMode } from './use-edit-mode';
 export { useHomeAssistant } from './use-home-assistant';
 export { useInterval } from './use-interval';
 export { useBreakpoints, useMediaQuery } from './use-media-query';
-export type { Section } from './use-navigation';
 export { useNavigation } from './use-navigation';
 // New reusable hooks
 export { usePersistedState } from './use-persisted-state';

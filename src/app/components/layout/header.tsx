@@ -12,9 +12,20 @@ export const Header = memo(function Header() {
   const { entities, user } = useHomeAssistant();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [currentDateTime, setCurrentDateTime] = useState(() => new Date());
   const { searchQuery, setSearchQuery, setFilteredDeviceIds, clearSearch, isSearchActive } =
     useSearch();
   const devices = useDevices();
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000 * 30);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   // Update filtered devices whenever search query changes
   useEffect(() => {
@@ -125,6 +136,26 @@ export const Header = memo(function Header() {
     return authConfig ? `${authConfig.url}${entityPicture}` : entityPicture;
   }, [authConfig, entities, user?.name]);
 
+  const formattedDate = useMemo(
+    () =>
+      new Intl.DateTimeFormat(undefined, {
+        weekday: 'short',
+        month: 'long',
+        day: 'numeric',
+      }).format(currentDateTime),
+    [currentDateTime]
+  );
+
+  const formattedTime = useMemo(
+    () =>
+      new Intl.DateTimeFormat(undefined, {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }).format(currentDateTime),
+    [currentDateTime]
+  );
+
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-8 gap-4">
       <div className="flex items-center gap-4 md:gap-6 flex-1">
@@ -135,11 +166,11 @@ export const Header = memo(function Header() {
           <div className={`${textSecondary} flex flex-wrap items-center gap-3 text-xs md:text-sm`}>
             <div className="flex items-center gap-1.5">
               <Clock3 className="h-3.5 w-3.5" />
-              <span>March 7, 2026</span>
+              <span>{formattedDate}</span>
               <span aria-hidden="true" className="text-gray-300">
                 |
               </span>
-              <span>Saturday</span>
+              <span>{formattedTime}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <CalendarDays className="h-3.5 w-3.5" />

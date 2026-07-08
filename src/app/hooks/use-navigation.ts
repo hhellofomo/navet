@@ -1,6 +1,5 @@
+import type { Section } from '../navigation/sections';
 import { useNavigationStore } from '../stores/navigation-store';
-
-export type Section = 'home' | 'security' | 'tasks' | 'locks' | 'lights' | 'media' | 'settings';
 
 interface NavigationState {
   activeSection: Section;

@@ -1,14 +1,21 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Power, Settings2 } from 'lucide-react';
-import { memo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
+import type { CardSize } from '@/app/components/shared/card-size-selector';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
 import { useEntityCardInteractionController } from '@/app/components/shared/entity-card-interaction-controller';
+import { STORAGE_KEYS } from '@/app/constants/storage-keys';
 import { iconMap } from '@/app/features/sensors/components/sensors/sensor-types';
-import { useTheme } from '@/app/hooks';
+import { useHomeAssistant, useTheme } from '@/app/hooks';
+import { homeAssistantService } from '@/app/services/home-assistant.service';
 import type { DeviceMetric } from '@/app/types/device.types';
+import { storage } from '@/app/utils/storage';
 
 interface SwitchCardProps {
+  id: string;
   name: string;
+  size: CardSize;
   room: string;
   initialState?: boolean;
   entityType?: string;
@@ -19,8 +26,26 @@ interface SwitchCardProps {
   isEditMode?: boolean;
 }
 
+function normalizeStoredMetricLabels(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((label): label is string => typeof label === 'string');
+  }
+
+  if (typeof value === 'string' && value.length > 0) {
+    return [value];
+  }
+
+  return [];
+}
+
+function areMetricLabelListsEqual(left: string[], right: string[]) {
+  return left.length === right.length && left.every((label, index) => label === right[index]);
+}
+
 export const SwitchCard = memo(function SwitchCard({
+  id,
   name,
+  size,
   initialState = false,
   entityType = 'Switch',
   power,
@@ -31,7 +56,18 @@ export const SwitchCard = memo(function SwitchCard({
 }: Omit<SwitchCardProps, 'room'>) {
   const [isOn, setIsOn] = useState(initialState);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { entities } = useHomeAssistant();
   const { colors, theme } = useTheme();
+  const liveEntity = entities?.[id];
+
+  useEffect(() => {
+    if (liveEntity) {
+      setIsOn(liveEntity.state === 'on');
+      return;
+    }
+
+    setIsOn(initialState);
+  }, [initialState, liveEntity]);
 
   const formatPower = (watts?: number) => {
     if (!watts) return null;
@@ -39,44 +75,111 @@ export const SwitchCard = memo(function SwitchCard({
     return `${watts} W`;
   };
 
-  const fallbackMetrics: DeviceMetric[] = [
-    ...(power != null
-      ? [
-          {
-            label: 'Power',
-            value: power,
-            unit: 'W',
-            icon: 'zap' as const,
-            category: 'measurement' as const,
-          },
-        ]
-      : []),
-    ...(voltage != null
-      ? [
-          {
-            label: 'Voltage',
-            value: voltage,
-            unit: 'V',
-            icon: 'gauge' as const,
-            category: 'measurement' as const,
-          },
-        ]
-      : []),
-    ...(energy != null
-      ? [
-          {
-            label: 'Energy',
-            value: energy,
-            unit: 'kWh',
-            icon: 'activity' as const,
-            category: 'measurement' as const,
-          },
-        ]
-      : []),
-  ];
-  const allMetrics = metrics?.length ? metrics : fallbackMetrics;
-  const visibleMetrics = allMetrics.filter((metric) => isOn || metric.category === 'configuration');
-  const hasMetrics = visibleMetrics.length > 0;
+  const fallbackMetrics = useMemo<DeviceMetric[]>(
+    () => [
+      ...(power != null
+        ? [
+            {
+              label: 'Power',
+              value: power,
+              unit: 'W',
+              icon: 'zap' as const,
+              category: 'measurement' as const,
+            },
+          ]
+        : []),
+      ...(voltage != null
+        ? [
+            {
+              label: 'Voltage',
+              value: voltage,
+              unit: 'V',
+              icon: 'gauge' as const,
+              category: 'measurement' as const,
+            },
+          ]
+        : []),
+      ...(energy != null
+        ? [
+            {
+              label: 'Energy',
+              value: energy,
+              unit: 'kWh',
+              icon: 'activity' as const,
+              category: 'measurement' as const,
+            },
+          ]
+        : []),
+    ],
+    [energy, power, voltage]
+  );
+  const allMetrics = useMemo(
+    () => (metrics?.length ? metrics : fallbackMetrics),
+    [fallbackMetrics, metrics]
+  );
+  const availableMetrics = useMemo(
+    () => allMetrics.filter((metric) => isOn || metric.category === 'configuration'),
+    [allMetrics, isOn]
+  );
+  const metricPreferenceKey = `${STORAGE_KEYS.switchCardMetricPreferences}:${id}`;
+  const metricLimit = useMemo(() => {
+    switch (size) {
+      case 'extra-small':
+        return 1;
+      case 'small':
+        return 2;
+      case 'medium':
+        return 3;
+      case 'large':
+        return 4;
+      default:
+        return 2;
+    }
+  }, [size]);
+  const [selectedMetricLabels, setSelectedMetricLabels] = useState<string[]>(() =>
+    normalizeStoredMetricLabels(storage.get<unknown>(metricPreferenceKey, []))
+  );
+
+  useEffect(() => {
+    setSelectedMetricLabels(
+      normalizeStoredMetricLabels(storage.get<unknown>(metricPreferenceKey, []))
+    );
+  }, [metricPreferenceKey]);
+
+  useEffect(() => {
+    const availableMetricLabels = new Set(availableMetrics.map((metric) => metric.label));
+    const nextLabels = selectedMetricLabels.filter((label) => availableMetricLabels.has(label));
+
+    if (nextLabels.length === 0) {
+      const fallbackLabels = availableMetrics.slice(0, metricLimit).map((metric) => metric.label);
+      if (!areMetricLabelListsEqual(selectedMetricLabels, fallbackLabels)) {
+        setSelectedMetricLabels(fallbackLabels);
+      }
+      return;
+    }
+
+    if (nextLabels.length > metricLimit) {
+      const truncatedLabels = nextLabels.slice(0, metricLimit);
+      if (!areMetricLabelListsEqual(selectedMetricLabels, truncatedLabels)) {
+        setSelectedMetricLabels(truncatedLabels);
+      }
+      return;
+    }
+
+    if (!areMetricLabelListsEqual(selectedMetricLabels, nextLabels)) {
+      setSelectedMetricLabels(nextLabels);
+    }
+  }, [availableMetrics, metricLimit, selectedMetricLabels]);
+
+  useEffect(() => {
+    storage.set(metricPreferenceKey, selectedMetricLabels);
+  }, [metricPreferenceKey, selectedMetricLabels]);
+
+  const selectedMetrics = availableMetrics
+    .filter((metric) => selectedMetricLabels.includes(metric.label))
+    .slice(0, metricLimit);
+  const hasMetrics = availableMetrics.length > 0;
+  const hasControlsDialog = hasMetrics;
 
   const cardColors = isOn
     ? colors.switch.on
@@ -109,10 +212,52 @@ export const SwitchCard = memo(function SwitchCard({
     ariaLabel: `${name} switch`,
     ariaPressed: isOn,
     isEditMode,
-    onToggle: () => setIsOn((current) => !current),
-    onOpenControls: () => setIsDialogOpen(true),
-    onOpenSettings: () => setIsDialogOpen(true),
+    onToggle: () => {
+      const nextIsOn = !isOn;
+      setIsOn(nextIsOn);
+      void homeAssistantService.updateSwitch(id, nextIsOn ? 'on' : 'off').catch((error) => {
+        setIsOn(!nextIsOn);
+        toast.error(error instanceof Error ? error.message : 'Failed to update switch');
+      });
+    },
+    onOpenControls: () => {
+      if (hasControlsDialog) {
+        setIsDialogOpen(true);
+      }
+    },
+    onOpenSettings: () => {
+      if (hasControlsDialog) {
+        setIsDialogOpen(true);
+      }
+    },
   });
+  const showSettingsButton =
+    hasControlsDialog && cardInteraction.interactionMode !== 'control-first';
+
+  const formatMetricValue = (metric: DeviceMetric) =>
+    typeof metric.value === 'number'
+      ? metric.label === 'Power'
+        ? formatPower(metric.value)
+        : `${metric.value.toFixed(metric.unit === 'kWh' ? 2 : 0)}${metric.unit ? ` ${metric.unit}` : ''}`
+      : metric.value;
+  const renderMetricIcon = (metric: DeviceMetric, className: string) => {
+    const Icon = iconMap[metric.icon] ?? Power;
+    return <Icon className={className} />;
+  };
+  const handleMetricToggle = (metricLabel: string) => {
+    setSelectedMetricLabels((current) => {
+      if (current.includes(metricLabel)) {
+        const next = current.filter((label) => label !== metricLabel);
+        return next.length > 0 ? next : current;
+      }
+
+      if (current.length >= metricLimit) {
+        return [...current.slice(1), metricLabel];
+      }
+
+      return [...current, metricLabel];
+    });
+  };
 
   return (
     <>
@@ -139,7 +284,6 @@ export const SwitchCard = memo(function SwitchCard({
               size="small"
               ariaLabel={cardInteraction.iconButtonProps['aria-label']}
               onClick={cardInteraction.iconButtonProps.onClick}
-              onPointerDown={cardInteraction.iconButtonProps.onPointerDown}
             />
             <div className="min-w-0 flex-1">
               <h3
@@ -149,36 +293,33 @@ export const SwitchCard = memo(function SwitchCard({
               </h3>
               <p className="text-[10px] text-gray-300 truncate mt-0.5 text-left">{entityType}</p>
             </div>
-            <button
-              {...cardInteraction.settingsButtonProps}
-              className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full transition-colors ${settingsButtonClass}`}
-            >
-              <Settings2 className="h-3.5 w-3.5" />
-            </button>
+            {showSettingsButton && (
+              <button
+                {...cardInteraction.settingsButtonProps}
+                className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full transition-colors ${settingsButtonClass}`}
+              >
+                <Settings2 className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
 
           <div className="flex-1"></div>
 
           {/* Metrics display */}
-          {hasMetrics && (
+          {selectedMetrics.length > 0 && (
             <div className="space-y-0.5">
-              {visibleMetrics.map((metric) => {
-                const Icon = iconMap[metric.icon] ?? Power;
-                const formattedValue =
-                  typeof metric.value === 'number'
-                    ? metric.label === 'Power'
-                      ? formatPower(metric.value)
-                      : `${metric.value.toFixed(metric.unit === 'kWh' ? 2 : 0)}${metric.unit ? ` ${metric.unit}` : ''}`
-                    : metric.value;
-
+              {selectedMetrics.map((metric) => {
                 return (
-                  <div key={metric.label} className="flex items-center justify-between text-xs">
+                  <div
+                    key={metric.label}
+                    className="flex items-center justify-between gap-2 text-xs"
+                  >
                     <span className={`${labelColor} min-w-0 flex items-center gap-1 pr-2`}>
-                      <Icon className="h-3 w-3 flex-shrink-0" />
+                      {renderMetricIcon(metric, 'h-3 w-3 flex-shrink-0')}
                       <span className="truncate">{metric.label}</span>
                     </span>
                     <span className={`${valueColor} flex-shrink-0 whitespace-nowrap font-medium`}>
-                      {formattedValue}
+                      {formatMetricValue(metric)}
                     </span>
                   </div>
                 );
@@ -188,7 +329,7 @@ export const SwitchCard = memo(function SwitchCard({
         </div>
       </div>
 
-      <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog.Root open={hasControlsDialog ? isDialogOpen : false} onOpenChange={setIsDialogOpen}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" />
           <Dialog.Content
@@ -200,50 +341,54 @@ export const SwitchCard = memo(function SwitchCard({
             </Dialog.Description>
 
             <div className="mt-6 space-y-4">
-              <div
-                className={`rounded-2xl p-4 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'}`}
-              >
-                <p className={`text-xs uppercase tracking-[0.16em] ${labelColor}`}>State</p>
-                <div className="mt-2 flex items-center justify-between">
-                  <span className={`text-lg font-semibold ${textColor}`}>
-                    {isOn ? 'On' : 'Off'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setIsOn((current) => !current)}
-                    className="rounded-full px-4 py-2 text-sm font-medium text-white"
-                    style={{ backgroundColor: isOn ? '#2563eb' : '#6b7280' }}
-                  >
-                    {isOn ? 'Turn off' : 'Turn on'}
-                  </button>
-                </div>
-              </div>
-
               {hasMetrics && (
                 <div
                   className={`rounded-2xl p-4 ${theme === 'light' ? 'bg-gray-100' : 'bg-white/5'}`}
                 >
-                  <p className={`text-xs uppercase tracking-[0.16em] ${labelColor}`}>Metrics</p>
+                  <p className={`text-xs uppercase tracking-[0.16em] ${labelColor}`}>Card Metric</p>
+                  <p className={`mt-1 text-xs ${labelColor}`}>
+                    Select up to {metricLimit} {metricLimit === 1 ? 'metric' : 'metrics'} for this
+                    card.
+                  </p>
                   <div className="mt-3 space-y-2">
-                    {visibleMetrics.map((metric) => {
-                      const Icon = iconMap[metric.icon] ?? Power;
+                    {availableMetrics.map((metric) => {
+                      const isSelected = selectedMetricLabels.includes(metric.label);
                       return (
-                        <div
+                        <button
+                          type="button"
                           key={`dialog-${metric.label}`}
-                          className="flex items-center justify-between gap-3"
+                          onClick={() => handleMetricToggle(metric.label)}
+                          className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-3 py-2 text-left transition-colors ${
+                            isSelected
+                              ? theme === 'light'
+                                ? 'border-gray-900/20 bg-white'
+                                : 'border-white/20 bg-white/10'
+                              : theme === 'light'
+                                ? 'border-transparent bg-white/60 hover:bg-white'
+                                : 'border-transparent bg-white/5 hover:bg-white/10'
+                          }`}
                         >
                           <span className={`min-w-0 flex items-center gap-2 ${labelColor}`}>
-                            <Icon className="h-4 w-4 flex-shrink-0" />
+                            {renderMetricIcon(metric, 'h-4 w-4 flex-shrink-0')}
                             <span className="truncate">{metric.label}</span>
                           </span>
-                          <span className={`flex-shrink-0 font-medium ${textColor}`}>
-                            {typeof metric.value === 'number'
-                              ? metric.label === 'Power'
-                                ? formatPower(metric.value)
-                                : `${metric.value.toFixed(metric.unit === 'kWh' ? 2 : 0)}${metric.unit ? ` ${metric.unit}` : ''}`
-                              : metric.value}
-                          </span>
-                        </div>
+                          <div className="flex flex-shrink-0 items-center gap-3">
+                            <span className={`font-medium ${textColor}`}>
+                              {formatMetricValue(metric)}
+                            </span>
+                            <span
+                              className={`h-4 w-4 rounded border transition-colors ${
+                                isSelected
+                                  ? theme === 'light'
+                                    ? 'border-gray-900 bg-gray-900'
+                                    : 'border-white bg-white'
+                                  : theme === 'light'
+                                    ? 'border-gray-400 bg-transparent'
+                                    : 'border-white/40 bg-transparent'
+                              }`}
+                            />
+                          </div>
+                        </button>
                       );
                     })}
                   </div>

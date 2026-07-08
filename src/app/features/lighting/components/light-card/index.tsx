@@ -1,5 +1,4 @@
 import type { HassEntity } from 'home-assistant-js-websocket';
-import { Settings2 } from 'lucide-react';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { type CardSize, CardSizeSelector } from '@/app/components/shared/card-size-selector';
@@ -85,11 +84,6 @@ export const LightCard = memo(function LightCard({
   const isSmall = isExtraSmall || size === 'small';
   const isMedium = size === 'medium';
   const padding = isExtraSmall ? 'px-3.5 pt-3 pb-4' : isSmall ? 'p-4' : 'p-5';
-  const settingsButtonSize = isSmall ? 'w-7 h-7' : 'w-8 h-8';
-  const settingsIconSize = isSmall ? 'w-3 h-3' : 'w-3.5 h-3.5';
-  const settingsButtonBg =
-    theme === 'light' ? 'bg-gray-900/15 hover:bg-gray-900/25' : 'bg-white/10 hover:bg-white/20';
-  const settingsButtonText = theme === 'light' ? 'text-gray-900' : 'text-white';
 
   useEffect(() => {
     if (liveEntity) {
@@ -481,31 +475,7 @@ export const LightCard = memo(function LightCard({
 
   return (
     <>
-      <div
-        {...cardInteraction.cardProps}
-        className={`relative h-full w-full backdrop-blur-xl rounded-3xl ${padding} border overflow-hidden transition-all duration-500 ${!isEditMode ? 'cursor-pointer' : ''} ${
-          gradientColors.customGradient
-            ? ''
-            : `bg-gradient-to-br ${gradientColors.from} ${gradientColors.to} ${gradientColors.border}`
-        } ${!isOn ? 'grayscale opacity-40' : ''} ${theme === 'light' && isOn ? 'shadow-lg' : ''}`}
-        style={
-          gradientColors.customGradient
-            ? {
-                background: gradientColors.customGradient,
-                borderColor: effectiveSelectedColor ? `${effectiveSelectedColor}66` : undefined,
-              }
-            : {}
-        }
-      >
-        {!isEditMode && !isSmall && !isMedium && showSettingsButton && (
-          <button
-            {...cardInteraction.settingsButtonProps}
-            className={`absolute right-3 bottom-3 z-20 ${settingsButtonSize} rounded-full ${settingsButtonBg} transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center cursor-pointer`}
-          >
-            <Settings2 className={`${settingsIconSize} ${settingsButtonText}`} />
-          </button>
-        )}
-
+      <div className="relative h-full w-full">
         {isEditMode && (
           <CardSizeSelector
             currentSize={size}
@@ -513,89 +483,108 @@ export const LightCard = memo(function LightCard({
           />
         )}
 
-        {/* Glow effect when on */}
-        {isOn && (
-          <div
-            className={`absolute -inset-[100%] blur-3xl ${theme === 'light' ? 'opacity-40' : 'opacity-20'}`}
-            style={{
-              background: `radial-gradient(circle, ${gradientColors.glow || 'transparent'} 0%, transparent 70%)`,
-            }}
-          />
-        )}
-
-        {/* Light theme frosted overlay - warm tint when on, neutral when off */}
-        {theme === 'light' && (
-          <div
-            className="absolute inset-0"
-            style={
-              isOn
-                ? {
-                    background: effectiveSelectedColor
-                      ? `linear-gradient(135deg, ${effectiveSelectedColor}2e 0%, rgba(255, 255, 255, 0.38) 100%)`
-                      : 'rgba(255, 251, 235, 0.3)',
-                  }
-                : { background: 'rgba(255, 255, 255, 0.6)' }
-            }
-          />
-        )}
-
-        {theme !== 'light' && (
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
-        )}
-
-        <div className="relative h-full flex flex-col">
-          {isSmall ? (
-            <LightCardSmall
-              name={name}
-              room={room}
-              size={size}
-              brightness={brightness}
-              currentColor={effectiveSelectedColor ?? customColor}
-              brightnessPresets={brightnessPresets}
-              isOn={isOn}
-              IconComponent={IconComponent}
-              iconButtonProps={cardInteraction.iconButtonProps}
-              settingsButtonProps={cardInteraction.settingsButtonProps}
-              showSettingsButton={showSettingsButton}
-              showPresetOverflow={showPresetOverflow}
-              supportsColorControl={supportsColorControl}
-              onBrightnessChange={handleBrightnessChange}
-              onBrightnessCommit={handleBrightnessCommit}
-              onColorChange={handleColorChange}
-            />
-          ) : isMedium ? (
-            <LightCardMedium
-              name={name}
-              brightness={brightness}
-              currentColor={effectiveSelectedColor ?? customColor}
-              brightnessPresets={brightnessPresets}
-              isOn={isOn}
-              IconComponent={IconComponent}
-              iconButtonProps={cardInteraction.iconButtonProps}
-              settingsButtonProps={cardInteraction.settingsButtonProps}
-              showSettingsButton={showSettingsButton}
-              showPresetOverflow={showPresetOverflow}
-              supportsColorControl={supportsColorControl}
-              onBrightnessChange={handleBrightnessChange}
-              onBrightnessCommit={handleBrightnessCommit}
-              onColorChange={handleColorChange}
-            />
-          ) : (
-            <LightCardLarge
-              name={name}
-              brightness={brightness}
-              brightnessPresets={brightnessPresets}
-              selectedColor={effectiveSelectedColor}
-              currentColor={effectiveSelectedColor ?? customColor}
-              isOn={isOn}
-              IconComponent={IconComponent}
-              iconButtonProps={cardInteraction.iconButtonProps}
-              supportsColorControl={supportsColorControl}
-              onBrightnessChange={handleBrightnessChange}
-              onBrightnessCommit={handleBrightnessCommit}
-              onColorChange={handleColorChange}
+        <div
+          {...cardInteraction.cardProps}
+          className={`relative h-full w-full backdrop-blur-xl rounded-3xl ${padding} border overflow-hidden transition-all duration-500 ${!isEditMode ? 'cursor-pointer' : ''} ${
+            gradientColors.customGradient
+              ? ''
+              : `bg-gradient-to-br ${gradientColors.from} ${gradientColors.to} ${gradientColors.border}`
+          } ${!isOn ? 'grayscale opacity-40' : ''} ${theme === 'light' && isOn ? 'shadow-lg' : ''}`}
+          style={
+            gradientColors.customGradient
+              ? {
+                  background: gradientColors.customGradient,
+                  borderColor: effectiveSelectedColor ? `${effectiveSelectedColor}66` : undefined,
+                }
+              : {}
+          }
+        >
+          {/* Glow effect when on */}
+          {isOn && (
+            <div
+              className={`absolute -inset-[100%] blur-3xl ${theme === 'light' ? 'opacity-40' : 'opacity-20'}`}
+              style={{
+                background: `radial-gradient(circle, ${gradientColors.glow || 'transparent'} 0%, transparent 70%)`,
+              }}
             />
           )}
+
+          {/* Light theme frosted overlay - warm tint when on, neutral when off */}
+          {theme === 'light' && (
+            <div
+              className="absolute inset-0"
+              style={
+                isOn
+                  ? {
+                      background: effectiveSelectedColor
+                        ? `linear-gradient(135deg, ${effectiveSelectedColor}2e 0%, rgba(255, 255, 255, 0.38) 100%)`
+                        : 'rgba(255, 251, 235, 0.3)',
+                    }
+                  : { background: 'rgba(255, 255, 255, 0.6)' }
+              }
+            />
+          )}
+
+          {theme !== 'light' && (
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
+          )}
+
+          <div className="relative h-full flex flex-col">
+            {isSmall ? (
+              <LightCardSmall
+                name={name}
+                room={room}
+                size={size}
+                brightness={brightness}
+                currentColor={effectiveSelectedColor ?? customColor}
+                brightnessPresets={brightnessPresets}
+                isOn={isOn}
+                IconComponent={IconComponent}
+                iconButtonProps={cardInteraction.iconButtonProps}
+                settingsButtonProps={cardInteraction.settingsButtonProps}
+                showSettingsButton={showSettingsButton}
+                showPresetOverflow={showPresetOverflow}
+                supportsColorControl={supportsColorControl}
+                onBrightnessChange={handleBrightnessChange}
+                onBrightnessCommit={handleBrightnessCommit}
+                onColorChange={handleColorChange}
+              />
+            ) : isMedium ? (
+              <LightCardMedium
+                name={name}
+                brightness={brightness}
+                currentColor={effectiveSelectedColor ?? customColor}
+                brightnessPresets={brightnessPresets}
+                isOn={isOn}
+                IconComponent={IconComponent}
+                iconButtonProps={cardInteraction.iconButtonProps}
+                settingsButtonProps={cardInteraction.settingsButtonProps}
+                showSettingsButton={showSettingsButton}
+                showPresetOverflow={showPresetOverflow}
+                supportsColorControl={supportsColorControl}
+                onBrightnessChange={handleBrightnessChange}
+                onBrightnessCommit={handleBrightnessCommit}
+                onColorChange={handleColorChange}
+              />
+            ) : (
+              <LightCardLarge
+                name={name}
+                brightness={brightness}
+                brightnessPresets={brightnessPresets}
+                selectedColor={effectiveSelectedColor}
+                currentColor={effectiveSelectedColor ?? customColor}
+                isOn={isOn}
+                IconComponent={IconComponent}
+                iconButtonProps={cardInteraction.iconButtonProps}
+                settingsButtonProps={cardInteraction.settingsButtonProps}
+                showSettingsButton={showSettingsButton}
+                supportsColorControl={supportsColorControl}
+                onBrightnessChange={handleBrightnessChange}
+                onBrightnessCommit={handleBrightnessCommit}
+                onColorChange={handleColorChange}
+              />
+            )}
+          </div>
         </div>
       </div>
 

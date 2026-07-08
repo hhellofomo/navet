@@ -1,8 +1,9 @@
 import type { LucideIcon } from 'lucide-react';
-import { Settings2 } from 'lucide-react';
 import { type ButtonHTMLAttributes, memo } from 'react';
 import { BrightnessPresetsInline } from '@/app/components/shared/brightness-presets-inline';
 import { BrightnessSlider } from '@/app/components/shared/brightness-slider';
+import { CardActionRow } from '@/app/components/shared/card-action-row';
+import { CardSettingsActionButton } from '@/app/components/shared/card-settings-action-button';
 import { useTheme } from '@/app/hooks';
 import { CustomColorTrigger } from './custom-color-trigger';
 import { LightCardHeader } from './light-card-header';
@@ -47,9 +48,6 @@ export const LightCardMedium = memo(function LightCardMedium({
   showPresetOverflow,
 }: Omit<LightCardMediumProps, 'room'>) {
   const { theme } = useTheme();
-  const buttonBg =
-    theme === 'light' ? 'bg-gray-900/10 hover:bg-gray-900/20' : 'bg-white/10 hover:bg-white/20';
-  const buttonText = theme === 'light' ? 'text-gray-900' : 'text-white';
 
   return (
     <>
@@ -74,37 +72,39 @@ export const LightCardMedium = memo(function LightCardMedium({
         />
 
         {/* Color controls */}
-        <div className="flex items-center gap-2">
-          <div className="flex min-w-0 items-center gap-2">
-            <BrightnessPresetsInline
-              presets={brightnessPresets}
-              currentBrightness={brightness}
-              isOn={isOn}
-              onBrightnessChange={onBrightnessCommit}
-              size="medium"
-              maxVisible={showPresetOverflow ? 3 : undefined}
-              overflow={showPresetOverflow ? 'menu' : 'hide'}
-            />
-          </div>
+        <CardActionRow
+          theme={theme}
+          size="medium"
+          leftContent={
+            <>
+              <div className="flex min-w-0 items-center gap-2">
+                <BrightnessPresetsInline
+                  presets={brightnessPresets}
+                  currentBrightness={brightness}
+                  isOn={isOn}
+                  onBrightnessChange={onBrightnessCommit}
+                  size="medium"
+                  maxVisible={showPresetOverflow ? 3 : undefined}
+                  overflow={showPresetOverflow ? 'menu' : 'hide'}
+                />
+              </div>
 
-          {supportsColorControl && (
-            <CustomColorTrigger
-              isOn={isOn}
-              currentColor={currentColor}
-              onColorChange={onColorChange}
-              size="medium"
-            />
-          )}
-
-          {showSettingsButton && (
-            <button
-              {...settingsButtonProps}
-              className={`ml-auto w-8 h-8 shrink-0 self-center rounded-full ${buttonBg} transition-all flex items-center justify-center cursor-pointer`}
-            >
-              <Settings2 className={`w-3.5 h-3.5 ${buttonText}`} />
-            </button>
-          )}
-        </div>
+              {supportsColorControl && (
+                <CustomColorTrigger
+                  isOn={isOn}
+                  currentColor={currentColor}
+                  onColorChange={onColorChange}
+                  size="medium"
+                />
+              )}
+            </>
+          }
+          rightContent={
+            showSettingsButton ? (
+              <CardSettingsActionButton {...settingsButtonProps} theme={theme} size="medium" />
+            ) : undefined
+          }
+        />
       </div>
     </>
   );

@@ -1,8 +1,8 @@
 import type { LucideIcon } from 'lucide-react';
 import { type ButtonHTMLAttributes, memo } from 'react';
 import type { CardSize } from '@/app/components/shared/card-size-selector';
+import { EntityCardHeader } from '@/app/components/shared/entity-card-header';
 import { EntityCardHeaderIcon } from '@/app/components/shared/entity-card-header-icon';
-import { useTheme } from '@/app/hooks';
 
 interface LightCardHeaderProps {
   name: string;
@@ -23,29 +23,21 @@ export const LightCardHeader = memo(function LightCardHeader({
   onIconPointerDown,
   iconAriaLabel,
 }: LightCardHeaderProps) {
-  const { theme } = useTheme();
-  const textColor = theme === 'light' ? 'text-gray-900' : 'text-white';
-  const isExtraSmall = size === 'extra-small';
-  const isCompact = size === 'extra-small' || size === 'small';
-  const titleSize = isCompact ? 'text-xs' : 'text-sm';
-  const marginBottom = isExtraSmall ? 'mb-1' : 'mb-2';
-  const headerGap = isExtraSmall ? 'gap-2' : 'gap-3';
-  const subtitleMarginTop = isExtraSmall ? 'mt-0' : 'mt-0.5';
-
   return (
-    <div className={`flex items-start ${headerGap} ${marginBottom}`}>
-      <EntityCardHeaderIcon
-        IconComponent={IconComponent}
-        isActive={isOn}
-        size={size}
-        ariaLabel={iconAriaLabel}
-        onClick={onIconClick}
-        onPointerDown={onIconPointerDown}
-      />
-      <div className="min-w-0 flex-1">
-        <h3 className={`font-semibold ${titleSize} ${textColor} truncate`}>{name}</h3>
-        <p className={`text-[10px] text-gray-300 truncate ${subtitleMarginTop}`}>Light</p>
-      </div>
-    </div>
+    <EntityCardHeader
+      title={name}
+      subtitle="Light"
+      size={size}
+      leading={
+        <EntityCardHeaderIcon
+          IconComponent={IconComponent}
+          isActive={isOn}
+          size={size}
+          ariaLabel={iconAriaLabel}
+          onClick={onIconClick}
+          onPointerDown={onIconPointerDown}
+        />
+      }
+    />
   );
 });

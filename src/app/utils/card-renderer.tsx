@@ -154,7 +154,9 @@ export const renderCard = ({
     case 'switches':
       return (
         <SwitchCard
+          id={device.id as string}
           name={device.name as string}
+          size={size}
           initialState={device.state as boolean | undefined}
           entityType={device.entityType as string | undefined}
           power={device.power as number | undefined}

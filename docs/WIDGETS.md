@@ -126,7 +126,7 @@ Editable sticky note for quick reminders.
 
 ### Step 1: Enter Edit Mode
 
-Click the **Edit** button in the top navigation bar.
+Click **Customize** in the dashboard action row.
 
 ### Step 2: Open Add Card Dialog
 
@@ -157,7 +157,7 @@ Click **Add Widget** to add it to your current room.
 ### Resizing Widgets
 
 1. Enter **Edit Mode**
-2. Click on a widget card to cycle through sizes
+2. Use the top-right resize action on the widget card
 3. Exit edit mode to save
 
 ### Moving Widgets

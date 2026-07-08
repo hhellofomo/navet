@@ -1,38 +1,64 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-export type DashboardEntityMode = 'auto' | 'manual';
-
 interface DashboardEntitiesState {
-  mode: DashboardEntityMode;
-  manualEntityIds: string[];
-  setMode: (mode: DashboardEntityMode) => void;
-  addEntity: (entityId: string) => void;
-  removeEntity: (entityId: string) => void;
-  resetManualEntities: () => void;
+  hiddenEntityIds: string[];
+  onboardingCompleted: boolean;
+  completeOnboarding: (entityIds: string[], startBlank: boolean) => void;
+  hideEntity: (entityId: string) => void;
+  showEntity: (entityId: string) => void;
+  showAllEntities: () => void;
+  resetHiddenEntities: () => void;
+  reopenOnboarding: () => void;
 }
 
 export const useDashboardEntitiesStore = create<DashboardEntitiesState>()(
   persist(
     (set) => ({
-      mode: 'auto',
-      manualEntityIds: [],
-      setMode: (mode) => set({ mode }),
-      addEntity: (entityId) =>
+      hiddenEntityIds: [],
+      onboardingCompleted: false,
+      completeOnboarding: (entityIds, startBlank) =>
+        set({
+          hiddenEntityIds: startBlank ? entityIds : [],
+          onboardingCompleted: true,
+        }),
+      hideEntity: (entityId) =>
         set((state) => ({
-          manualEntityIds: state.manualEntityIds.includes(entityId)
-            ? state.manualEntityIds
-            : [...state.manualEntityIds, entityId],
+          hiddenEntityIds: state.hiddenEntityIds.includes(entityId)
+            ? state.hiddenEntityIds
+            : [...state.hiddenEntityIds, entityId],
         })),
-      removeEntity: (entityId) =>
+      showEntity: (entityId) =>
         set((state) => ({
-          manualEntityIds: state.manualEntityIds.filter((id) => id !== entityId),
+          hiddenEntityIds: state.hiddenEntityIds.filter((id) => id !== entityId),
         })),
-      resetManualEntities: () => set({ manualEntityIds: [] }),
+      showAllEntities: () => set({ hiddenEntityIds: [] }),
+      resetHiddenEntities: () => set({ hiddenEntityIds: [] }),
+      reopenOnboarding: () => set({ onboardingCompleted: false }),
     }),
     {
       name: 'navet-dashboard-entities',
       storage: createJSONStorage(() => localStorage),
+      merge: (persistedState, currentState) => {
+        const persisted = (persistedState as Record<string, unknown> | null) ?? {};
+        const hiddenEntityIds = Array.isArray(persisted.hiddenEntityIds)
+          ? persisted.hiddenEntityIds.filter((item): item is string => typeof item === 'string')
+          : [];
+
+        const onboardingCompleted =
+          typeof persisted.onboardingCompleted === 'boolean'
+            ? persisted.onboardingCompleted
+            : typeof persisted.mode === 'string' ||
+              Array.isArray(persisted.manualEntityIds) ||
+              hiddenEntityIds.length > 0;
+
+        return {
+          ...currentState,
+          ...persisted,
+          hiddenEntityIds,
+          onboardingCompleted,
+        };
+      },
     }
   )
 );
